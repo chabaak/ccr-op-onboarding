@@ -179,6 +179,6 @@ describe('[u0#c9] vite.config.ts carries the §3.7 pack-copy plugin, by name and
   })
 
   it('still pins the GitHub-Pages base', () => {
-    expect(read('vite.config.ts')).toMatch(/base:\s*'\/nhn-game-2026\/'/)
+    expect(read('vite.config.ts')).toMatch(/base:\s*'\/ccr-op-onboarding\/'/)
   })
 })

@@ -14,7 +14,7 @@ import { fileURLToPath, pathToFileURL } from 'node:url'
 const REPO = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '../..')
 const CONFIG_PATH = path.join(REPO, 'playwright.config.ts')
 
-const EXPECTED_BASE_URL = 'http://localhost:5174/nhn-game-2026/'
+const EXPECTED_BASE_URL = 'http://localhost:5174/ccr-op-onboarding/'
 
 function source(): string {
   return fs.readFileSync(CONFIG_PATH, 'utf8')
