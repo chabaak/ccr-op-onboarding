@@ -32,9 +32,9 @@ const UNIT_PORT = 5174
 const PREVIEW_PORT = 5175
 const DEV_PORT = 5176
 const OUT_DIR = 'dist-e2e'
-const unitURL = `http://localhost:${UNIT_PORT}/nhn-game-2026/`
-const previewURL = `http://localhost:${PREVIEW_PORT}/nhn-game-2026/`
-const devURL = `http://localhost:${DEV_PORT}/nhn-game-2026/`
+const unitURL = `http://localhost:${UNIT_PORT}/ccr-op-onboarding/`
+const previewURL = `http://localhost:${PREVIEW_PORT}/ccr-op-onboarding/`
+const devURL = `http://localhost:${DEV_PORT}/ccr-op-onboarding/`
 
 /** u11's own dev-hosted specs — the §7 run-through and the P0-B captures. */
 const DEV_HOSTED = /(acceptance|captures)\.spec\.ts/

@@ -2,7 +2,7 @@ import { copyFileSync, existsSync, mkdirSync, readFileSync, readdirSync, writeFi
 import { dirname, join } from 'node:path'
 import { defineConfig, type Plugin } from 'vite'
 
-// Project-site pathing for GitHub Pages: https://alstjgg.github.io/nhn-game-2026/
+// Project-site pathing for GitHub Pages: https://alstjgg.github.io/ccr-op-onboarding/
 // If the repo is renamed, update this to match the new name.
 
 /**
@@ -200,7 +200,7 @@ function copyPackData(): Plugin {
 }
 
 export default defineConfig(({ mode }) => ({
-  base: '/nhn-game-2026/',
+  base: '/ccr-op-onboarding/',
   plugins: [copyPackData()],
 
   // [u9d#c6] spec-client §3 invariant 11 — the debug pane is build-flag only.

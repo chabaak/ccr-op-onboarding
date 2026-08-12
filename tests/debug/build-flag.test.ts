@@ -1,6 +1,6 @@
 // [u9d#c6] HARD CONSTRAINT — this unit is the ONLY one permitted to edit
 // `vite.config.ts`, and only to add the debug-pane build flag. `base` must stay
-// '/nhn-game-2026/' and the §3.7 pack-copy plugin must NOT appear here.
+// '/ccr-op-onboarding/' and the §3.7 pack-copy plugin must NOT appear here.
 //
 // Also pins the shape of the flag itself ([u9d#c2] depends on it): a vite
 // `define` that constant-folds to `false` in the production build, so the
@@ -18,8 +18,8 @@ describe('[u9d#c6] vite.config.ts — what must not change', () => {
     expect(code()).toMatch(/defineConfig/)
   })
 
-  it('(b) base stays exactly /nhn-game-2026/', () => {
-    expect(code()).toMatch(/base\s*:\s*'\/nhn-game-2026\/'|base\s*:\s*"\/nhn-game-2026\/"/)
+  it('(b) base stays exactly /ccr-op-onboarding/', () => {
+    expect(code()).toMatch(/base\s*:\s*'\/ccr-op-onboarding\/'|base\s*:\s*"\/ccr-op-onboarding\/"/)
   })
 
   it('(c) no pack-copy PLUGIN PACKAGE is smuggled in with the flag', () => {
