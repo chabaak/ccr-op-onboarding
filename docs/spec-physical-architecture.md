@@ -370,13 +370,16 @@ user messages before and after, and the offline suite passes 44/44.
 
 ### 3.9 Left open
 
-- ✅ **Where headless run records are written — `artifacts/`, committed** (08-03).
-  `artifacts/runs/<pack>/<policy>/<run-id>.json` and `artifacts/reports/`. They
-  are committed because they are gameplay-measurement evidence and LLM output is
-  not reproducible, so a deleted record cannot be regenerated. They are **not**
-  under `data/`: that directory is inputs, it is copied into `dist/` (§3.7), and
-  putting outputs there would publish every measured run to the web. Probe
-  artifacts are unaffected and stay at `planning/dday-mechanism/runs/`.
+- ✅ **Where headless run records are written — `artifacts/runs/`, local only**
+  (revised 08-16). `tools/driver/drive-run.mjs` still defaults there, but the
+  directory is ignored: generated fixture records are not evidence about a live
+  model, and the deterministic fixture contract is held by two fresh temp-output
+  runs plus schema validation in `tools/tests/run-record.mjs`. Live-path proof is
+  the loopback relay smoke, which records response metadata in its issue rather
+  than committing non-deterministic model prose. They are **not** under `data/`:
+  that directory is inputs, it is copied into `dist/` (§3.7), and putting outputs
+  there would publish every measured run to the web. Probe artifacts are
+  unaffected and stay at `planning/dday-mechanism/runs/`.
 - **Where the run-loop manager's between-run state is written.** §1.1 binds the
   browser side to `sessionStorage`; whether `tools/` mirrors it to disk for
   headless multi-run measurement is the run-loop manager's own design decision.

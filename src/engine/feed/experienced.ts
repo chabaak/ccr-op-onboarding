@@ -34,7 +34,8 @@ import type { RoundInput, RoundSlots } from './types.ts'
  * fallback path `assembleObjectiveLog` keeps the utterance row, those lines are
  * minted on the `f` channel and shown verbatim. `[무전]` names the medium, which
  * is the honest contrast to `[속내]` — what was thought, then what went out on
- * the line. Regenerate `artifacts/runs/우는다리-fixture-r1.json` when this moves.
+ * the line. `tools/tests/run-record.mjs` regenerates and compares fixture output
+ * in temp directories whenever this moves.
  */
 export const EXPERIENCED_PREFIX = {
   SCRIPT: '',

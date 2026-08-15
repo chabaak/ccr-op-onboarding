@@ -1009,9 +1009,10 @@ and user messages before and after; probe selftest 44/44; proxy 36/36;
 `npm run build` green. **Not done: zero real Bedrock calls** — no deploy, no AWS
 smoke.
 
-**Run records** go to `artifacts/runs/` and `artifacts/reports/`, committed — not
-under `data/`, which is copied into `dist/` (§3.7) and would publish every
-measured run to the web.
+**Run records** go to `artifacts/runs/` and `artifacts/reports/` locally; run
+records are gitignored and determinism is checked by generating two independent
+temporary outputs. They do not belong under `data/`, which is copied into
+`dist/` (§3.7) and would publish every measured run to the web.
 
 ### TBD audit — what blocks running the tracks in parallel
 
