@@ -35,6 +35,7 @@ This file holds permanent rules. `docs/status.md` records mutable project state,
 ## Working through issues
 
 Every change starts from an issue, and the issue is a **coordination surface**, not a queue. The board is read to find out what the other person is touching.
+For the seat-level Coordinator / Implementer / Reviewer flow, see [`docs/orchestration.md`](./docs/orchestration.md).
 
 1. **Assign yourself before the first commit.** Always, without exception. This single act is what prevents two people building the same thing; the issue itself prevents nothing. If the work has no issue, open one (`file-issue`) and assign it before editing.
 2. **Post your reasoning into the issue thread before implementing.** For a bug: why it happens, where the cause is, how you propose to fix it, and how far the blast radius reaches. For a feature: what you considered and what you discarded. Name real files and line numbers. Dead ends included.
