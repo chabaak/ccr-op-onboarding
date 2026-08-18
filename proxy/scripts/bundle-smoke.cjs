@@ -23,7 +23,7 @@ Object.assign(process.env, {
   ALLOWED_MODEL_IDS: "global.anthropic.claude-haiku-4-5-20251001-v1:0",
   MAX_TOKENS: "2048",
   MODEL_TIMEOUT_MS: "7000",
-  ALLOWED_ORIGIN: "https://alstjgg.github.io",
+  ALLOWED_ORIGIN: "https://chabaak.github.io",
   MAX_BODY_BYTES: "131072",
 });
 

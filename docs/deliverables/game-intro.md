@@ -160,8 +160,8 @@
 
 | | |
 |---|---|
-| **플레이 링크 (웹)** | https://alstjgg.github.io/nhn-game-2026/ |
-| **소스코드** | https://github.com/alstjgg/nhn-game-2026 |
+| **플레이 링크 (웹)** | https://chabaak.github.io/ccr-op-onboarding/ |
+| **소스코드** | https://github.com/chabaak/ccr-op-onboarding |
 
 웹으로 배포하므로 APK나 테스트 배포 링크는 해당하지 않는다. 링크를 열면 바로 플레이된다.
 

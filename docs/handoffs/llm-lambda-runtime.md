@@ -38,7 +38,7 @@ validation boundary in [`llm-layer.md`](../../planning/handoffs/llm-layer.md).
 | API ID | `zcyeajmv11` |
 | Lambda | `nhn-game-llm-layer-turn` |
 | Active model | `global.amazon.nova-2-lite-v1:0` |
-| Allowed Origin | `https://alstjgg.github.io` |
+| Allowed Origin | `https://chabaak.github.io` |
 | GitHub deploy role | `nhn-game-llm-github-deploy` |
 | CloudFormation role | `nhn-game-llm-cloudformation-exec` |
 | Artifact bucket | `nhn-game-llm-artifacts-141840355276-ap-northeast-2` |

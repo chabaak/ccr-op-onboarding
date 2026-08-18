@@ -8,7 +8,7 @@ be verified end-to-end.
 **Status:** DDAY concept confirmed (2026-07-28) — see [docs/status.md](./docs/status.md)
 for current state.
 
-**Live (placeholder):** https://alstjgg.github.io/nhn-game-2026/
+**Live:** https://chabaak.github.io/ccr-op-onboarding/
 
 ## Stack
 
