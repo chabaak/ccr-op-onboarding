@@ -548,7 +548,7 @@ in its card above, in context. C-STRUCT items are closed and do not appear.
 ### Disposition (2026-07-31, per the 07-30 close-out meeting)
 
 The verification program is **closed** — "working game, not perfect game"
-([회의록](../meetings/2026-07-30-mechanism-close-spec-first.md)). The tables
+([회의록](../../../planning/meetings/2026-07-30-mechanism-close-spec-first.md)). The tables
 below stay as written for the record; their live status:
 
 | item | disposition |

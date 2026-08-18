@@ -471,7 +471,7 @@ PRDs** — 53 references, 21 of them to §5.7 alone, which is the stop rule ever
 PRD carries verbatim and every executor was instructed to obey by that name.
 Renumbering §5 to §4 would mean editing PRDs that are records of what an
 executor was actually told, making them say something that was never issued. It
-would also be unsafe to do mechanically: `planning/dday-mechanism/suites/*.json`
+would also be unsafe to do mechanically: `tools/probe/dday-mechanism/suites/*.json`
 carries its own `§5.1`, belonging to a different document entirely, so a
 repo-wide substitution corrupts the probe record. A numbering gap is the cheaper
 mistake, and §1.5 already set the precedent.

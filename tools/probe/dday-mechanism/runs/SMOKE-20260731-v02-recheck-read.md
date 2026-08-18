@@ -73,7 +73,7 @@ Call 1의 `utterance`다). 그런데 고정 사건이 통제관에게 **답을 �
 
 **→ 저작 규칙으로 이관.** 고정 사건은 통제관의 응답을 요구하지 않는 형태로 쓴다.
 답이 필요한 사건이라면 그것은 그 자체로 게이트이거나, 답이 다음 Call 1의 `utterance`가
-되도록 비트를 이어 붙인다. [엔진 요청서 §6.1](../../../docs/dday-engine-minimal-request.md)에
+되도록 비트를 이어 붙인다. [엔진 요청서 §6.1](../../../../planning/dday-engine-minimal-request.md)에
 실측과 함께 반영했다.
 
 ### 반응 생성 계약 자체는 성공했다
@@ -110,7 +110,7 @@ Call 1의 `utterance`다). 그런데 고정 사건이 통제관에게 **답을 �
 `validateSuite`에 계약 §3의 `TIMELINE_TAIL` 요건을 fatal로 넣었다. 이번에 실패한 두
 스위트로 검증했다 — v2는 suite 게이트에서 막히고, v3는 린트가 비트 경계를 잡는다.
 게이트 저작마다 재발할 종류였으므로, 민서의 6~8게이트 저작부터 값을 한다.
-전체 목록은 [EXTENDING.md § Paper gates](../../../infra/test-harness/EXTENDING.md).
+전체 목록은 [EXTENDING.md § Paper gates](../../../../tools/probe/EXTENDING.md).
 
 ## 남은 것
 

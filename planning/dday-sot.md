@@ -51,7 +51,7 @@
 | 세계 데이터 (슬라이스) | v1: [slice.json](./dday-poc/poc/slice.json) / v2: [slice-terror.json](./dday-poc/poc-terror/slice-terror.json) |
 | 실험 하네스 | `.claude/agents/sim-field-*.md` (기질별 서브에이전트 정의) + `/poc-paper-test`, `/poc-paper-test-terror` 커맨드 + 각 폴더의 PAPER-TEST.md |
 | 런 원자료 (재현 불가 실측) | `planning/dday-poc/poc/runs/` · `poc-terror/runs/` |
-| **메커니즘 실측 프로그램** | [planning/dday-mechanism/](./dday-mechanism/README.md) — 진입점 README부터. 실험 계획은 [docs/dday-mechanism-deep-test.md](../docs/dday-mechanism-deep-test.md), 하네스는 `tools/probe/` |
+| **메커니즘 실측 프로그램** | [tools/probe/dday-mechanism/](../tools/probe/dday-mechanism/README.md) — 진입점 README부터. 실험 계획은 [docs/dday-mechanism-deep-test.md](../docs/dday-mechanism-deep-test.md), 하네스는 `tools/probe/` |
 | 문장 풀 초안 (테러 슬라이스) | [SENTENCE-POOL-DRAFT.md](./dday-poc/poc-terror/SENTENCE-POOL-DRAFT.md) — 검토용, `slice-terror.json` 미편입 |
 
 ## 3. 페이퍼 테스트가 증명한 것
@@ -162,8 +162,8 @@
   유효 응답에서 목표 방향 효과가 없었다. priority UI는 서사용으로 남길 수
   있으나 순서 변경 효과를 약속하지 않는다.
 
-상세: [방향 결정문](./dday-mechanism/MECHANISM-DIRECTION-DECISION.md) ·
-[증거 부록](./dday-mechanism/MECHANISM-DIRECTION-EVIDENCE.md)
+상세: [방향 결정문](../tools/probe/dday-mechanism/MECHANISM-DIRECTION-DECISION.md) ·
+[증거 부록](../tools/probe/dday-mechanism/MECHANISM-DIRECTION-EVIDENCE.md)
 
 ## 6. 다음 마일스톤
 

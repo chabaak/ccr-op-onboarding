@@ -1691,7 +1691,7 @@ built demo's identity after 07-24 is still not evidenced (see T-59).
   "위반이 곧 데이터다" was a *v2* change, so v1 *was* laundering format failures. How many v1
   retries silently overwrote a violation is unknowable; v1 didn't count them.
 - gaps: whether the RUNLOG is genuinely append-only is checkable from the git history of
-  `planning/dday-mechanism/RUNLOG.md`; that check is not in the corpus and would be cheap.
+  `tools/probe/dday-mechanism/RUNLOG.md`; that check is not in the corpus and would be cheap.
 - oral-only: none. OH-4 supplies the general counter-argument from outside — a repo-mined history
   cannot see work whose artifact never landed (T-63).
 - fit: #4 (how the evidence base was kept honest) · #3

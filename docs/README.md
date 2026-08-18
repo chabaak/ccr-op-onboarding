@@ -129,7 +129,7 @@ these are the sources:
 | [`planning/dday-sot.md`](../planning/dday-sot.md) | The 07-28 concept-freeze record and document map at that moment |
 | `data/scenario/우는다리/draft.md` | **The shipped scenario itself** — characters, truths, gates, timeline, score. This is the authority on scenario content, not any prose summary |
 | [`planning/dday-poc/poc-terror/RESULTS.md`](../planning/dday-poc/poc-terror/RESULTS.md) | Paper-test raw measurements |
-| [`planning/dday-mechanism/`](../planning/dday-mechanism/) | The mechanism program: DECISION · EVIDENCE · RUNLOG · run artifacts |
+| [`tools/probe/dday-mechanism/`](../tools/probe/dday-mechanism/) | The mechanism program: DECISION · EVIDENCE · RUNLOG · run artifacts |
 
 ## 6. Renamed — redirect table
 

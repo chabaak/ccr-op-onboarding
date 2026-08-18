@@ -34,7 +34,7 @@ import type { CallType } from "../src/types.js";
  */
 
 const REPO = join(dirname(fileURLToPath(import.meta.url)), "..", "..");
-const SUITES = join(REPO, "planning", "dday-mechanism", "suites");
+const SUITES = join(REPO, "tools", "probe", "dday-mechanism", "suites");
 const TEMPERAMENT = join(REPO, "tools", "probe", "fixtures", "temperament");
 const PROMPT_ROOT = join(REPO, "proxy", "prompts");
 

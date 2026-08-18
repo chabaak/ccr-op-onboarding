@@ -1534,7 +1534,7 @@ The `#4-role:` ranks are the thing to argue with. Two calls worth a second look:
   - *[from B T-07]* Preservation is not absolute — the model-selection benchmark was *deliberately dropped* (S5-023/S4-072); leaked tool-call XML survived unreviewed ~10 days across two moves (S5-011); an entire merged PR's content silently dropped from main until cherry-picked back (S9b-130); a README stale self-contradiction sat unannotated at snapshot (S6-013). The rule is "delete only deliberately, with a reason" — S5-011 and S9b-130 violate it.
 - gaps:
   - *[from A T-60]* **no atom shows anyone reopening a preserved argument**, so the discipline's payoff is asserted and never observed. No atom shows a future session actually *using* a carry-forward list or a strikethrough correctly. The 117 post-snapshot commits are where that would show.
-  - *[from A T-39]* whether the RUNLOG is genuinely append-only is checkable from the git history of `planning/dday-mechanism/RUNLOG.md`; that check is not in the corpus and would be cheap.
+  - *[from A T-39]* whether the RUNLOG is genuinely append-only is checkable from the git history of `tools/probe/dday-mechanism/RUNLOG.md`; that check is not in the corpus and would be cheap.
   - *[from B T-07]* Cannot quantify genuinely-attempted work that left no trace (see T-12).
 - oral-only:
   - *[from A T-60]* none. OH-4's finding is the inverse case and belongs to T-63.

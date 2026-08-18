@@ -171,7 +171,10 @@ const md = [
   '',
 ].join('\n');
 
-const outDir = opt('out', join(HERE, '..', '..', 'planning', 'dday-mechanism', 'runs', 'BEAT-drive'));
+const outDir = opt(
+  'out',
+  join(HERE, '..', 'probe', 'dday-mechanism', 'runs', 'BEAT-drive'),
+);
 mkdirSync(outDir, { recursive: true });
 const mdPath = join(outDir, 'beat.md');
 writeFileSync(mdPath, md);

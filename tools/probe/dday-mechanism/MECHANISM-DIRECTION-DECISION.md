@@ -10,7 +10,7 @@
 > 남길 수 있다"와 §6의 재개 조건은 07-31 결정으로 대체 — **C-STRUCT는 UI
 > 포함 완전 제거, 재개하지 않는다.** 두 독립 프로그램의 통합 판정은
 > [REPORT](REPORT.md) C-STRUCT 카드,
-> 결정 맥락은 [회의록](../meetings/2026-07-30-mechanism-close-spec-first.md).
+> 결정 맥락은 [회의록](../../../planning/meetings/2026-07-30-mechanism-close-spec-first.md).
 
 ## 1. 결정
 

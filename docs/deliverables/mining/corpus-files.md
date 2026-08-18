@@ -120,30 +120,30 @@ Collapsed run data:
 
 S2: 54 files listed individually, 112 collapsed under 4 glob rows (166 total).
 
-## S3 — mechanism (`planning/dday-mechanism/`)
+## S3 — mechanism (`tools/probe/dday-mechanism/`)
 
 | path | approx size | one-line content descriptor |
 |---|---|---|
-| planning/dday-mechanism/README.md | 4 KB | Entry point for the mechanism measurement program ("메커니즘 실측 프로그램 — 진입점") |
-| planning/dday-mechanism/REPORT.md | 35 KB | Mechanism test report — verdict cards |
-| planning/dday-mechanism/RUNLOG.md | 91 KB | Run log and standing amendments of the mechanism program (largest planning doc) |
-| planning/dday-mechanism/RUNBOOK-overnight.md | 20 KB | Runbook for the unattended overnight mechanism run |
-| planning/dday-mechanism/MECHANISM-DIRECTION-DECISION.md | 5 KB | Direction decision: adopt C-BLOCK, stop C-STRUCT ("C-BLOCK 채택, C-STRUCT 중단") |
-| planning/dday-mechanism/MECHANISM-DIRECTION-EVIDENCE.md | 25 KB | Evidence appendix ("증거 부록") for the direction decision |
-| planning/dday-mechanism/runs/README.md | 1 KB | Rule: runs/ holds measured artifacts only |
-| planning/dday-mechanism/runs/OVERNIGHT-20260730-summary.md | 8 KB | Morning report of the 07-30→31 overnight run |
-| planning/dday-mechanism/runs/OVERNIGHT-20260731-summary.md | 7 KB | Second morning report of the overnight run |
-| planning/dday-mechanism/runs/SMOKE-20260731-callcontract-read.md | 9 KB | Smoke read of the call contract (SMOKE-C3 · C2 · C2b) |
-| planning/dday-mechanism/runs/SMOKE-20260731-v02-recheck-read.md | 7 KB | v0.2 re-smoke read ("기록 계약은 통과, 나레이션은 원인이 다른 데 있었다") |
-| planning/dday-mechanism/runs/BEAT-drive/beat.md | 6 KB | Beat transcript chaining three suites (S1→C2→C3v2) — wiring-only, no state model |
-| planning/dday-mechanism/runs/BEAT-drive/beat.json | 7 KB | Beat driver config listing the chained suites |
-| planning/dday-mechanism/suites/OVERNIGHT-phase0-stance-sets.md | — | Phase 0 stance sets per gate (paper, zero calls) |
+| tools/probe/dday-mechanism/README.md | 4 KB | Entry point for the mechanism measurement program ("메커니즘 실측 프로그램 — 진입점") |
+| tools/probe/dday-mechanism/REPORT.md | 35 KB | Mechanism test report — verdict cards |
+| tools/probe/dday-mechanism/RUNLOG.md | 91 KB | Run log and standing amendments of the mechanism program (largest planning doc) |
+| tools/probe/dday-mechanism/RUNBOOK-overnight.md | 20 KB | Runbook for the unattended overnight mechanism run |
+| tools/probe/dday-mechanism/MECHANISM-DIRECTION-DECISION.md | 5 KB | Direction decision: adopt C-BLOCK, stop C-STRUCT ("C-BLOCK 채택, C-STRUCT 중단") |
+| tools/probe/dday-mechanism/MECHANISM-DIRECTION-EVIDENCE.md | 25 KB | Evidence appendix ("증거 부록") for the direction decision |
+| tools/probe/dday-mechanism/runs/README.md | 1 KB | Rule: runs/ holds measured artifacts only |
+| tools/probe/dday-mechanism/runs/OVERNIGHT-20260730-summary.md | 8 KB | Morning report of the 07-30→31 overnight run |
+| tools/probe/dday-mechanism/runs/OVERNIGHT-20260731-summary.md | 7 KB | Second morning report of the overnight run |
+| tools/probe/dday-mechanism/runs/SMOKE-20260731-callcontract-read.md | 9 KB | Smoke read of the call contract (SMOKE-C3 · C2 · C2b) |
+| tools/probe/dday-mechanism/runs/SMOKE-20260731-v02-recheck-read.md | 7 KB | v0.2 re-smoke read ("기록 계약은 통과, 나레이션은 원인이 다른 데 있었다") |
+| tools/probe/dday-mechanism/runs/BEAT-drive/beat.md | 6 KB | Beat transcript chaining three suites (S1→C2→C3v2) — wiring-only, no state model |
+| tools/probe/dday-mechanism/runs/BEAT-drive/beat.json | 7 KB | Beat driver config listing the chained suites |
+| tools/probe/dday-mechanism/suites/OVERNIGHT-phase0-stance-sets.md | — | Phase 0 stance sets per gate (paper, zero calls) |
 
 | path (glob) | files | one-line content descriptor |
 |---|---|---|
-| planning/dday-mechanism/suites/*.json | 35 | Probe suite definitions (arms, blocks, provenance) — e.g. P4-species-J1.json carries `_what`/`_authoring_provenance` prose explaining the experiment design |
-| planning/dday-mechanism/suites/*.reachability.md | 12 | Zero-call reachability audits filed per suite/gate (paper audits against the terror slice, per plan §7.3) |
-| planning/dday-mechanism/runs/*-calls/** | 156 | Measured call records per arm: calls-{baseline,live,placebo}.md tables + matching metrics-*.json, across P0–P8, S1, RB1/RB2, E0, CSTRUCT-* and SMOKE-* runs |
+| tools/probe/dday-mechanism/suites/*.json | 35 | Probe suite definitions (arms, blocks, provenance) — e.g. P4-species-J1.json carries `_what`/`_authoring_provenance` prose explaining the experiment design |
+| tools/probe/dday-mechanism/suites/*.reachability.md | 12 | Zero-call reachability audits filed per suite/gate (paper audits against the terror slice, per plan §7.3) |
+| tools/probe/dday-mechanism/runs/*-calls/** | 156 | Measured call records per arm: calls-{baseline,live,placebo}.md tables + matching metrics-*.json, across P0–P8, S1, RB1/RB2, E0, CSTRUCT-* and SMOKE-* runs |
 
 S3: 14 files listed individually, 203 collapsed under 3 glob rows (217 total).
 
@@ -390,9 +390,9 @@ New gate family **DOME** (successor to the P0–P8 program) plus C2 count/one-se
 
 | path (glob) | files | one-line what-it-is |
 |---|---|---|
-| planning/dday-mechanism/runs/DOME-*/** | 72 | Measured call records for the DOME gate program (G1 baseline/stance-c, G2, G2-r2, G3 r1–r6): calls-{baseline,live,placebo}.md + metrics-*.json; G3 splits live into k3/k4 temperament arms. |
-| planning/dday-mechanism/runs/SMOKE-C2v{5,6,7}-*-calls/** | 6 | Smoke reads for Call-2 sentence-count / one-sentence variants (J1). |
-| planning/dday-mechanism/suites/*.json (new) | 6 | Probe suite defs: DOME-G1-baseline, DOME-G2, DOME-G3, SMOKE-C2v5/v6/v7 (arms + provenance prose). |
+| tools/probe/dday-mechanism/runs/DOME-*/** | 72 | Measured call records for the DOME gate program (G1 baseline/stance-c, G2, G2-r2, G3 r1–r6): calls-{baseline,live,placebo}.md + metrics-*.json; G3 splits live into k3/k4 temperament arms. |
+| tools/probe/dday-mechanism/runs/SMOKE-C2v{5,6,7}-*-calls/** | 6 | Smoke reads for Call-2 sentence-count / one-sentence variants (J1). |
+| tools/probe/dday-mechanism/suites/*.json (new) | 6 | Probe suite defs: DOME-G1-baseline, DOME-G2, DOME-G3, SMOKE-C2v5/v6/v7 (arms + provenance prose). |
 
 S3 additions: **84 files** across 3 globs.
 

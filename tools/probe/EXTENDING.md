@@ -24,10 +24,10 @@ the thing belongs in a call type instead.
 The common case. Copy a suite, change the data, run it. No code.
 
 ```bash
-cp planning/dday-mechanism/suites/E0-shape-revalidation.json \
-   planning/dday-mechanism/suites/E1-cblock-placebo.json
+cp tools/probe/dday-mechanism/suites/E0-shape-revalidation.json \
+   tools/probe/dday-mechanism/suites/E1-cblock-placebo.json
 # edit: experiment, pre_registration, arms (add placebo)
-node tools/probe/run.mjs planning/dday-mechanism/suites/E1-cblock-placebo.json --print-prompt=placebo
+node tools/probe/run.mjs tools/probe/dday-mechanism/suites/E1-cblock-placebo.json --print-prompt=placebo
 ```
 
 The one thing to get right is `channel`: it decides which slots the arms are

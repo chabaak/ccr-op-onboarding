@@ -1,6 +1,6 @@
 ---
 name: read-mechanism-run
-description: Read the results of a DDAY mechanism probe run and write them up in the project's fixed format — probe setup, every call in every arm with the stance it chose and how it read the situation, stance-vs-belief signal comparison, then next moves framed as the three levers (stance set / default prompt / injection sentence). Use whenever asked to read, summarize, review, or report a run under planning/dday-mechanism/runs, or after executing a probe with tools/probe.
+description: Read the results of a DDAY mechanism probe run and write them up in the project's fixed format — probe setup, every call in every arm with the stance it chose and how it read the situation, stance-vs-belief signal comparison, then next moves framed as the three levers (stance set / default prompt / injection sentence). Use whenever asked to read, summarize, review, or report a run under tools/probe/dday-mechanism/runs, or after executing a probe with tools/probe.
 ---
 
 # Reading a mechanism run
@@ -10,7 +10,7 @@ works at a gate** — not to pass or fail a mechanism. So a read is a diagnosis:
 what did the block actually change, what stayed the same, and which of the three
 levers should move next.
 
-Before writing anything, read `planning/dday-mechanism/RUNLOG.md`. Its `A#`
+Before writing anything, read `tools/probe/dday-mechanism/RUNLOG.md`. Its `A#`
 amendments override the deep-test plan and several of them change how a result
 must be read (A5 fabricated ids, A7 malformation, A8/A9/A10 saturation).
 

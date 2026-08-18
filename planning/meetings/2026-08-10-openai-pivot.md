@@ -185,13 +185,13 @@ Discord를 논의 채널로 유지하되, webhook으로 트래킹 내용을 공�
 | 3 | `discovery/` · `DISCOVERY.md` 삭제 | 256K + 루트 파일. super-pipeline 산출물이며 유지 대상이 아니다 |
 | 4 | `docs/` 취사선택 | 1.8M. **무엇을 남길지 추가 논의 필요** — 스펙은 남고 데모 시기 계획서는 나간다 |
 | 5 | `e2e/` 파일별 검증 | 3.9M 중 `e2e/reference-shots/`가 3.4M. 레퍼런스 샷은 폐기 가능 |
-| 6 | `planning/` 삭제 | 9.2M. `meetings/`는 당분간 남겼다가 마지막에 정리. **`planning/dday-mechanism`은 코드가 읽는다** — 아래 참조 |
+| 6 | `planning/` 삭제 | 9.2M. `meetings/`는 당분간 남겼다가 마지막에 정리. **`tools/probe/dday-mechanism`은 코드가 읽는다** — 아래 참조 |
 | 7 | `proxy/prompts/` 버전 단일화 | 현재 4계열 **20개 파일**(judgment v0.4–0.5, reporter·narration v0.1–0.4)이 전부 번들에 열거되어 있다 |
 | 8 | 루트 파일 정리 | `AGENTS.md`가 `CLAUDE.md`를 가리키는 포인터다. Codex 시대에는 뒤집어야 한다 |
 | 9 | `assets` 정리 | `assets-manifest.json` · `tests/assets/baseline/manifest-baseline.json` 재생성 |
 | 10 | 이슈 왕창 생성 | 위 전부 |
 
-**6번은 단순 삭제가 아니다.** `planning/dday-mechanism`을 참조하는 것이 문서가 아니라 실행 코드다:
+**6번은 단순 삭제가 아니다.** `tools/probe/dday-mechanism`을 참조하는 것이 문서가 아니라 실행 코드다:
 `tools/probe/run.mjs` · `tools/driver/drive-beat.mjs` · `proxy/src/default-prompt.ts` ·
 `proxy/tests/prompt-parity.test.ts` · `tests/shared/default-prompt-coverage.test.ts`.
 **옮긴 뒤에 삭제한다** — 5-2의 시나리오 팩과 같은 순서 문제다.
