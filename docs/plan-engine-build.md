@@ -120,7 +120,7 @@ because five units are compiling against it at that moment.
 | # | Decision | Where |
 |---|---|---|
 | 1 | The proxy renders **both** prompt layers; the client posts `{call_type, template_version, slots}` | physical §3.10 · contract-calls §11 |
-| 2 | `template_version` is **per call type** (judgment v0.4 · narration v0.3 · reporter v0.2) | contract-calls §11 |
+| 2 | `template_version` is **per call type** (judgment v0.5 · narration v0.4 · reporter v0.4) | contract-calls §11 |
 | 3 | The engine exposes **slot-oriented views**, not a `RunState` snapshot | contract-engine-composer §1 |
 | 4 | The **round event assembler is the engine's** | contract-engine-composer §5 |
 | 5 | The engine emits `FeedLine[]`; the driver wraps them into `ViewEvent`s | contract-engine-composer §2.0 |
