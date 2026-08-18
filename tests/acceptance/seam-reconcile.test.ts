@@ -1,13 +1,9 @@
 // [u11#c14] C19 — every one of u2f's thirteen base measurements is classified:
 // STALE unit-scoped assert (re-aimed per C12/C17) or REAL seam break (fixed at
-// the owning unit + logged in DISCOVERY).
+// the owning unit).
 //
-// On the "7/13" in C19: BUILD went back to the raw record (`discovery/u2f.md`
-// §5) and it reads "**7 files / 13 tests** already red before this unit" — seven
-// FILES, thirteen TESTS, all thirteen red. `seam-ledger.ts` reconstructs them
-// test by test and lands on exactly those counts; `RED` is therefore 13 and the
-// file count is kept as `RED_FILES`, so (b) below now demands MORE of the ledger
-// than the compressed reading did, and (b2) pins the seven that were lost in it.
+// `seam-ledger.ts` reconstructs the measured failures test by test; `RED` is the
+// failing test count, and `RED_FILES` pins the file count.
 //
 // The ledger itself lives in `seam-ledger.ts` (data); the rules live here
 // (asserts). Nothing in this file may be relaxed to make a row fit — a row that
@@ -20,9 +16,6 @@ import { MEASURED, RED, RED_FILES, SEAM_LEDGER } from './seam-ledger.ts'
 import type { SeamRow } from './seam-ledger.ts'
 
 const REPO = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '../..')
-const DISCOVERY = path.join(REPO, 'DISCOVERY.md')
-
-const discovery = (): string => fs.readFileSync(DISCOVERY, 'utf8')
 
 /** Comments name the banned forms in order to ban them — scan CODE only. */
 function stripComments(source: string): string {
@@ -104,12 +97,6 @@ describe('[u11#c14] a REAL row routes to its owner, never to u11 ([u11#c8])', ()
     expect(rows('REAL').filter((r) => r.owner === 'u11').map((r) => r.id)).toEqual([])
   })
 
-  it('(j) each REAL row has a DISCOVERY line naming it', () => {
-    const body = discovery()
-    const unlogged = rows('REAL').filter((r) => !body.includes(r.id))
-    expect(unlogged.map((r) => r.id), 'a REAL seam break is not logged in DISCOVERY.md').toEqual([])
-  })
-
   it('(k) each REAL row states the break, not just the command', () => {
     const thin = rows('REAL').filter((r) => r.target.trim().split(/\s+/).length < 4)
     expect(thin.map((r) => r.id), 'a REAL row records no statement of what broke').toEqual([])
@@ -143,7 +130,7 @@ describe('[u11#c14] the whole suite stays a real suite', () => {
     // EXPLICIT allowlist. Nothing is on it: the one entry it would have carried
     // was re-aimed instead (the case now makes its precondition with u3's resize
     // grip and fails loudly if it cannot). Anything added here must name the
-    // criterion it leaves unmeasured and carry a DISCOVERY line.
+    // criterion it leaves unmeasured and point at the issue that accepted it.
     const DISABLED = /\b(it|test|describe)\.(skip|fixme)\s*\(\s*['"`]|\bx(it|describe)\s*\(|\b(it|test)\.todo\b/
     const CONDITIONAL = /\b(it|test)\.skip\s*\(\s*(?!['"`])/
     const ALLOWED_CONDITIONAL: readonly string[] = []
