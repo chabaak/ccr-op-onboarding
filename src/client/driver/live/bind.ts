@@ -21,7 +21,7 @@ import { createComposer } from '../../../composer/index.ts'
 import { baselineState, createBlockStore, createLiveDriver, createScorer } from '../../../driver/index.ts'
 import type { MutableBlockStore } from '../../../driver/index.ts'
 import { createTransport } from '../../../transport/index.ts'
-import type { FetchLike } from '../../../transport/index.ts'
+import type { FetchLike, Transport } from '../../../transport/index.ts'
 import type { LivePack } from './pack.ts'
 import type { BoundRun } from './adapter.ts'
 
@@ -35,6 +35,11 @@ export type BindDeps = {
    */
   proxyBaseUrl: string | null
   fetch: FetchLike
+  /**
+   * One live sitting's transport. Reused across bound runs so its request cache
+   * spans the sitting.
+   */
+  transport?: Transport
 }
 
 export type OpenRunDeps = {
@@ -96,7 +101,7 @@ export function bindLiveRun(deps: BindDeps, open: OpenRunDeps): BoundRun {
 
   const engine = createEngine({ pack: deps.pack, run: open.run })
   const composer = createComposer({ blocks, reportGuidance: deps.guidance, pack: deps.pack.slug })
-  const transport = createTransport({ baseUrl: deps.proxyBaseUrl, fetch: deps.fetch })
+  const transport = deps.transport ?? createTransport({ baseUrl: deps.proxyBaseUrl, fetch: deps.fetch })
 
   // The scorer reads the state the day ENDED in, so it is handed the engine's
   // accessor rather than a snapshot: `createLiveDriver` calls `score()` once,
