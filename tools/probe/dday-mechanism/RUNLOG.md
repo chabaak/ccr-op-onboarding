@@ -1,6 +1,6 @@
 # Mechanism program — run log and standing amendments
 
-Append-only. The [deep-test plan](../../docs/dday-mechanism-deep-test.md) stays
+Append-only. The [deep-test plan](../../../docs/plan-mechanism-test.md) stays
 frozen as the reference document; measured results amend it here instead of
 being edited into it. Opened 2026-07-30, when the first measured run contradicted
 the plan and there was no time to re-paper it.
@@ -1364,7 +1364,7 @@ evidence-tier promotion: S1 has no placebo and program-wide negative control,
 B3a, B3b/Tier-B and returning-run work remain.
 
 Full rationale:
-`planning/dday-mechanism/MECHANISM-DIRECTION-DECISION.md`.
+`tools/probe/dday-mechanism/MECHANISM-DIRECTION-DECISION.md`.
 
 ### A19 · C-STRUCT is paused; concentrate validation on C-BLOCK
 

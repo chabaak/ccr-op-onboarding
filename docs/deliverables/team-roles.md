@@ -105,7 +105,7 @@ GitHub Pages로 나가기 때문이다. 커밋 이력 자체가 제출물이라 
 [^3]: `planning/scenario-model.md`, `planning/scenario-writer-brief.md`.
 [^4]: `authoring/` (컴파일러·lint), `data/scenario/_schema/`,
       `.claude/skills/write-scenario/`, `docs/contract-datapack.md`.
-[^5]: `planning/dday-mechanism/` — `suites/` (미리 등록한 실험 구성), `runs/` (원본 응답과
+[^5]: `tools/probe/dday-mechanism/` — `suites/` (미리 등록한 실험 구성), `runs/` (원본 응답과
       지표), `RUNLOG.md`. 측정 도구는 `tools/probe/`.
 [^6]: `src/client/`, `docs/spec-client.md`, `docs/plan-client-build.md`.
 [^7]: `docs/spec-physical-architecture.md` §3, `tsconfig.core.json`.
@@ -114,7 +114,7 @@ GitHub Pages로 나가기 때문이다. 커밋 이력 자체가 제출물이라 
 [^9]: `proxy/src/`, `.github/workflows/proxy-deploy.yml`,
        `proxy/tests/prompt-parity.test.ts` (프로브와 실제 서비스의 바이트 일치 검사).
 [^10]: `data/policy/audio-map.json`, `tools/audio/`, `docs/plan-audio.md`.
-[^11]: `planning/dday-mechanism/MECHANISM-DIRECTION-DECISION.md`,
+[^11]: `tools/probe/dday-mechanism/MECHANISM-DIRECTION-DECISION.md`,
        `MECHANISM-DIRECTION-EVIDENCE.md`.
 [^12]: `proxy/prompts/` (세 콜의 base·user 템플릿 — judgment v0.5 · narration v0.4 ·
        reporter v0.4), `proxy/src/default-prompt.ts`, `proxy/src/calls.ts`.

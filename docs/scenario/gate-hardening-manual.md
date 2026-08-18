@@ -8,7 +8,7 @@
 > 세션에 브리프와 함께 투입되는 작가용 규칙. 세션 투입용이라 그쪽에는
 > 저장소 링크와 문서 간 참조가 없다; 두 문서의 연결은 이 헤더가 담당한다.
 > 이 문서의 모든 규칙은 실측에서 왔다: 근거와 수치는
-> [`planning/dday-mechanism/REPORT.md`](../../planning/dday-mechanism/REPORT.md).
+> [`tools/probe/dday-mechanism/REPORT.md`](../../tools/probe/dday-mechanism/REPORT.md).
 > 가이드 참조 시 절 번호: 채널의 물리 = 가이드 §2 · 기질 저작 = 가이드 §4.
 
 ## 1. 게이트 표준형

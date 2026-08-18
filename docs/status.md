@@ -340,7 +340,7 @@ times** — three label rewrites, one addition to world physics, one cost-symmet
 rewrite, one temperament change — and the baseline never moved. The diagnosis is the
 position, not the wording: at 19:58 opening the emergency door is the correct act, and
 no key gates a correct act. It routes cleanly to `WIN_B`; what the player hands over
-just does not decide it. Records in `planning/dday-mechanism/runs/DOME-*`, failures
+just does not decide it. Records in `tools/probe/dday-mechanism/runs/DOME-*`, failures
 included, and the brief's §5 carries the rules the probes bought.
 
 **THE AGENT WE MEASURED WAS NOT THE AGENT WE DEPLOYED, in two places.** This is the
@@ -1069,7 +1069,7 @@ core loop다 — 블록 선택 → 상황 해석 변화 → stance/행동 변화
 없어 중단했다. **주의: C-BLOCK은 채택됐지만 검증 완료가 아니다** — placebo
 control, program-wide negative control, blind coding이 남아 있다. 대외 문구는
 "현재 가장 강한 실측 근거를 가진 기본 메커니즘"까지만 쓴다. 프로그램 진입점:
-[planning/dday-mechanism/README.md](../planning/dday-mechanism/README.md).
+[tools/probe/dday-mechanism/README.md](../tools/probe/dday-mechanism/README.md).
 
 **다음은 측정이 아니라 구현.** 만들 것이 무엇인지는 확정됐다. `demos/dday/`
 스캐폴딩과 첫 60초 플레이 루프가 우선이고, 남은 검증 중 게임에 직접 영향을 주는
@@ -1210,8 +1210,8 @@ minimal-first.
   효과 없음. priority UI는 서사용으로 남길 수 있으나 순서 변경 효과를 약속하지
   않는다. C-STRUCT의 보편적 실패 판정이 아니라 program pause이며, 재개 조건은
   결정문 §6에 고정했다. 근거·한계·실험 계보:
-  [MECHANISM-DIRECTION-DECISION.md](../planning/dday-mechanism/MECHANISM-DIRECTION-DECISION.md) ·
-  [EVIDENCE](../planning/dday-mechanism/MECHANISM-DIRECTION-EVIDENCE.md).
+  [MECHANISM-DIRECTION-DECISION.md](../tools/probe/dday-mechanism/MECHANISM-DIRECTION-DECISION.md) ·
+  [EVIDENCE](../tools/probe/dday-mechanism/MECHANISM-DIRECTION-EVIDENCE.md).
 - 2026-07-30 — 메커니즘 실측 문서 체계를 4단(DECISION / EVIDENCE / HANDOFF /
   RUNLOG)에서 3단(DECISION / EVIDENCE / RUNLOG) + 진입점 README로 통합.
   `CSTRUCT-J1-TEST-HANDOFF.md`는 중단된 계열의 handoff라 대상이 없어졌고,

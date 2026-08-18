@@ -359,8 +359,8 @@ halves turned out to be wrong. It bought the separation this section is *for*:
 the probe was holding the production system prompts, the call schemas, the
 composer prototype, and an embryonic full-run driver in one folder, so no
 boundary in §3.1 was observable in the tree. And it cost no provenance — the
-recorded artifacts live under `planning/dday-mechanism/runs/`, never moved, and
-the code went by `git mv`.
+recorded artifacts moved later as a unit to
+`tools/probe/dday-mechanism/runs/`; the code went by `git mv`.
 
 Verified at the move: the three call types compose byte-identical system and
 user messages before and after, and the offline suite passes 44/44.
@@ -376,7 +376,7 @@ user messages before and after, and the offline suite passes 44/44.
   not reproducible, so a deleted record cannot be regenerated. They are **not**
   under `data/`: that directory is inputs, it is copied into `dist/` (§3.7), and
   putting outputs there would publish every measured run to the web. Probe
-  artifacts are unaffected and stay at `planning/dday-mechanism/runs/`.
+  artifacts are unaffected and stay at `tools/probe/dday-mechanism/runs/`.
 - **Where the run-loop manager's between-run state is written.** §1.1 binds the
   browser side to `sessionStorage`; whether `tools/` mirrors it to disk for
   headless multi-run measurement is the run-loop manager's own design decision.

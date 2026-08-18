@@ -36,8 +36,8 @@ type Suite = { slots: { FLAW: string; INCIDENT: string; PRIORITY_LIST: string[] 
  * measured is exactly what this file exists to catch.
  */
 const MEASURED_BY: Readonly<Record<string, string>> = {
-  전구간정상: 'planning/dday-mechanism/suites/CSTRUCT-priority-reorder-J1-A.json',
-  멈춘회전문: 'planning/dday-mechanism/suites/DOME-G1-baseline.json',
+  전구간정상: 'tools/probe/dday-mechanism/suites/CSTRUCT-priority-reorder-J1-A.json',
+  멈춘회전문: 'tools/probe/dday-mechanism/suites/DOME-G1-baseline.json',
 }
 
 describe('the proxy default prompt covers the shipped pack', () => {
@@ -78,7 +78,7 @@ describe('the proxy default prompt covers the shipped pack', () => {
 
   it('(e) 멈춘회전문 三 suites agree — the entry stands for all three gates, not one', () => {
     const suites = ['DOME-G1-baseline', 'DOME-G2', 'DOME-G3'].map(
-      (name) => readJson(`planning/dday-mechanism/suites/${name}.json`) as Suite,
+      (name) => readJson(`tools/probe/dday-mechanism/suites/${name}.json`) as Suite,
     )
     for (const suite of suites) {
       expect(suite.slots.FLAW).toBe(suites[0]!.slots.FLAW)

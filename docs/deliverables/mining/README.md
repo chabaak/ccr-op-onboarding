@@ -75,7 +75,7 @@ may split, merge, or die as evidence accumulates:
 |---|---|
 | S1 | `planning/concepts/` — the 9 game concepts + briefs |
 | S2 | scenarios + PoC — `planning/dday-scenarios/`, `planning/dday-scenario/`, `planning/dday-poc/`, `planning/field-report-poc/`, `planning/paper-tests/` |
-| S3 | `planning/dday-mechanism/` — mechanism-direction evidence and decision |
+| S3 | `tools/probe/dday-mechanism/` — mechanism-direction evidence and decision |
 | S4 | `planning/meetings/`, `planning/handoffs/` |
 | S5 | `planning/research/`, `planning/legacy-services/` |
 | S6 | `docs/` (incl. `status.md` history) + planning root-level docs + repo-root prose |

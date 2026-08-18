@@ -11,7 +11,7 @@ Self-contained for execution: a session given this document can author probes,
 run them, and record results — provided it applies the run integrity protocol
 (§3), which is a precondition for every call, and follows the run sheet (§7).
 
-**Read [`planning/dday-mechanism/RUNLOG.md`](../planning/dday-mechanism/RUNLOG.md)
+**Read [`tools/probe/dday-mechanism/RUNLOG.md`](../tools/probe/dday-mechanism/RUNLOG.md)
 first.** Measured results amend this plan there rather than being edited in;
 where the run log carries an `A#` amendment for a section, the run log wins.
 
@@ -701,8 +701,8 @@ authoritative sequence rather than two.
 
 Written by the runner, one directory per experiment, mirroring the prior
 program's layout (`planning/dday-poc/*/runs/`). Suites (the probe definitions,
-as data) live in `planning/dday-mechanism/suites/`; artifacts land in
-`planning/dday-mechanism/runs/`.
+as data) live in `tools/probe/dday-mechanism/suites/`; artifacts land in
+`tools/probe/dday-mechanism/runs/`.
 
 ```
 runs/<EXP>-calls/
@@ -795,7 +795,7 @@ kept in place flagged (§3 rules 2, 5); a hallucinated block id is recorded but
 
 | Scope | Artifact | Where |
 |---|---|---|
-| per arm | `calls-<arm>.md` (primary, verbatim) + `metrics-<arm>.json` (derived) | `planning/dday-mechanism/runs/<EXP>-calls/` (§7.4) |
+| per arm | `calls-<arm>.md` (primary, verbatim) + `metrics-<arm>.json` (derived) | `tools/probe/dday-mechanism/runs/<EXP>-calls/` (§7.4) |
 | per probe | pre-registration sheet | the suite JSON (§9.1) |
 | per probe | reachability audit note | filed with the suite (§5.2 B1) |
 | per mechanism | blind-coding recovery x/y | §5.2 B3 |

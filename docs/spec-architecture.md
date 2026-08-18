@@ -3,7 +3,7 @@
 > Status: **v1** — compiled after the mechanism verification program closed.
 > This spec states what the system **is**; it does not re-argue why. Evidence
 > and decision history live in
-> [`planning/dday-mechanism/REPORT.md`](../planning/dday-mechanism/REPORT.md)
+> [`tools/probe/dday-mechanism/REPORT.md`](../tools/probe/dday-mechanism/REPORT.md)
 > and the
 > [07-30 회의록](../planning/meetings/2026-07-30-mechanism-close-spec-first.md).
 

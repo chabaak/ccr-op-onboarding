@@ -2,7 +2,7 @@
 
 > DDAY의 AI 메커니즘 후보를 실제 모델 호출로 측정한 기록이다.
 > 이 폴더는 계획 문서가 아니라 **측정 기록**이다. 실험 계획은
-> [`docs/plan-mechanism-test.md`](../../docs/plan-mechanism-test.md)에 있다.
+> [`docs/plan-mechanism-test.md`](../../../docs/plan-mechanism-test.md)에 있다.
 
 ## 지금 상태 (2026-07-31 · 검증 프로그램 종료)
 
@@ -15,7 +15,7 @@ overnight 프로그램의 placebo-controlled 4개 probe — 모두에서 목표 
 
 placebo control(P1a)과 program-wide negative control(P2)은 완료됐다. blind
 coding과 player-visible 확인은 07-30 회의에서 생략을 결정했다
-([회의록](../meetings/2026-07-30-mechanism-close-spec-first.md)). 대외 문구는
+([회의록](../../../planning/meetings/2026-07-30-mechanism-close-spec-first.md)). 대외 문구는
 "현재 가장 강한 실측 근거를 가진 기본 메커니즘"까지만 쓴다.
 
 ## 무엇부터 읽나

@@ -1,8 +1,8 @@
 {
   "suites": [
-    "../../planning/dday-mechanism/suites/S1-stanceset-J1.json",
-    "../../planning/dday-mechanism/suites/SMOKE-C2-roleboundary-J1.json",
-    "../../planning/dday-mechanism/suites/SMOKE-C3v2-reporter-J1.json"
+    "tools/probe/dday-mechanism/suites/S1-stanceset-J1.json",
+    "tools/probe/dday-mechanism/suites/SMOKE-C2-roleboundary-J1.json",
+    "tools/probe/dday-mechanism/suites/SMOKE-C3v2-reporter-J1.json"
   ],
   "calls": [
     {

@@ -83,7 +83,7 @@ never be bought with a call.
 | `--print-prompt=ARM` | compose one arm, print system + user, exit |
 | `--arm=NAME` | run one arm instead of all |
 | `--n=N` | override `pre_registration.n_per_arm` |
-| `--out=DIR` | artifact directory (default `planning/dday-mechanism/runs/<EXP>-calls`) |
+| `--out=DIR` | artifact directory (default `tools/probe/dday-mechanism/runs/<EXP>-calls`) |
 | `--max-retries=N` | schema retries per call slot (default 2) |
 | `--force` | replace existing artifacts — only for a run that aborted |
 
@@ -127,7 +127,7 @@ both are paper instruments with zero calls.
 
 ## Suite anatomy
 
-Suites are data, under `planning/dday-mechanism/suites/`. See
+Suites are data, under `tools/probe/dday-mechanism/suites/`. See
 `E0-shape-revalidation.json` for a worked one.
 
 ```jsonc
@@ -180,7 +180,7 @@ const myCall = {
 `prompts/narration/` and `prompts/reporter/`, both v0.1) — their contracts,
 and the decisions behind their field lists, live in
 [docs/contract-calls.md](../../docs/contract-calls.md). First smoke
-suites: `planning/dday-mechanism/suites/SMOKE-C2*-narration-J1.json` and
+suites: `tools/probe/dday-mechanism/suites/SMOKE-C2*-narration-J1.json` and
 `SMOKE-C3-reporter-J1.json`.
 
 Two things to keep in mind when adding one:

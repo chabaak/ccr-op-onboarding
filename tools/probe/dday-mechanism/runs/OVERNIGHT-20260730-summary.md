@@ -1,6 +1,6 @@
 # Overnight run — 2026-07-30 → 07-31 · morning report
 
-Runbook: `planning/dday-mechanism/RUNBOOK-overnight.md`. Durable record:
+Runbook: `tools/probe/dday-mechanism/RUNBOOK-overnight.md`. Durable record:
 `RUNLOG.md` (this is the summary; the run log is the evidence).
 
 ## 1. Headline — the program halted at Phase 0
