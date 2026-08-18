@@ -1,10 +1,10 @@
 AWSTemplateFormatVersion: "2010-09-09"
-Description: Deployment roles for the nhn-game-proxy stack (create + update), trusted by GitHub Actions OIDC.
+Description: Deployment roles for the ccr-op-onboarding proxy stack (create + update), trusted by GitHub Actions OIDC.
 
-# Why this exists, given that apothecary already has a bootstrap.
+# Why this exists, given that the AWS account already has shared bootstrap resources.
 #
-# proxy/README says the bootstrap stack is REUSED rather than copied, and that
-# is still right for the two things it created that are genuinely account-wide
+# proxy/README says the bootstrap resources are REUSED rather than copied, and
+# that is still right for the two things that are genuinely account-wide
 # singletons: the GitHub OIDC provider and the artifact bucket. This template
 # creates NEITHER — it takes both as parameters and points at the existing ones.
 #
@@ -31,19 +31,19 @@ Description: Deployment roles for the nhn-game-proxy stack (create + update), tr
 Parameters:
   GitHubOwner:
     Type: String
-    Default: alstjgg
+    Default: chabaak
     AllowedPattern: ^[A-Za-z0-9_.-]+$
   GitHubOwnerId:
     Type: String
-    Default: "26458319"
+    Default: "315916785"
     AllowedPattern: ^[0-9]+$
   GitHubRepository:
     Type: String
-    Default: nhn-game-2026
+    Default: ccr-op-onboarding
     AllowedPattern: ^[A-Za-z0-9_.-]+$
   GitHubRepositoryId:
     Type: String
-    Default: "1306590172"
+    Default: "1331268521"
     AllowedPattern: ^[0-9]+$
   GitHubBranch:
     Type: String
@@ -268,7 +268,7 @@ Resources:
                 Resource: "*"
       Tags:
         - Key: Project
-          Value: nhn-game-2026
+          Value: ccr-op-onboarding
         - Key: Component
           Value: proxy-cloudformation
 
@@ -407,7 +407,7 @@ Resources:
                   - Fn::Sub: arn:${AWS::Partition}:logs:${AWS::Region}:${AWS::AccountId}:log-group:/aws/lambda/${ApplicationStackName}-call:*
       Tags:
         - Key: Project
-          Value: nhn-game-2026
+          Value: ccr-op-onboarding
         - Key: Component
           Value: proxy-deploy
 
