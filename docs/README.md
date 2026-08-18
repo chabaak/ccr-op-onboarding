@@ -1,7 +1,7 @@
 # docs/ — how to read this directory
 
 **Start here, then go to [`status.md`](./status.md)** for current phase, active
-work, and next steps. Permanent repo rules live in [`/CLAUDE.md`](../CLAUDE.md)
+work, and next steps. Permanent repo rules live in [`/AGENTS.md`](../AGENTS.md)
 and are not repeated anywhere in this directory.
 
 This directory is written in **English**. Its primary readers are agents, and a
@@ -59,7 +59,7 @@ artifact that can enforce itself.*
 | [`plan-audio.md`](./plan-audio.md) | plan | Sound: the design position (foley, not score), the 34 shipped cues keyed to the §5.2 seam, per-source licensing, the AAC/lazy-load budget, and how each done-criterion is held. The mapping itself is law in `data/policy/audio-map.json` | 윤석 |
 | [`status.md`](./status.md) | — | **Mutable project state.** Updated freely by any session. Newest first | shared |
 | [`orchestration.md`](./orchestration.md) | — | The current Coordinator / Implementer / Reviewer seat model, issue-to-PR cycle, review checklist, scope discipline, and attribution rule | shared |
-| [`competition.md`](./competition.md) | — | The 5 required deliverables and the rules governing them | shared |
+| [`OpenAI pivot note`](../planning/meetings/2026-08-10-openai-pivot.md) | — | Current submission authority: event, deadline, deliverables, and scoring frame | shared |
 | [`architecture-map.md`](./architecture-map.md) | — | **Derived map, not law** — one view of all layers: structure diagram, box catalog with per-claim sources, three flow diagrams. When it disagrees with a spec, the spec wins | 민서 |
 | [`design/phase2-ui/`](./design/phase2-ui/README.md) | — | The client **design target** (self-contained mockup; spec-client §8 binds its standing and porting rule) | 민서 |
 | [`scenario/scenario-generation-guide.md`](./scenario/scenario-generation-guide.md) | guide | Rules injected into a writing session — the physics a scenario must obey | 민서 |
