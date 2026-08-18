@@ -151,6 +151,14 @@ describe('A3–A5 — the envelope is exactly what §11 describes', () => {
       expect(PROMPT_BUNDLE[`${t}/user-${v}`], `${t}/user-${v}`).toBeTypeOf('string')
     }
   })
+
+  it('A5b proxy runtime-version map agrees with the client', () => {
+    const runtimeVersions = JSON.parse(
+      fs.readFileSync(path.join(REPO, 'proxy/prompts/runtime-versions.json'), 'utf8'),
+    ) as Record<CallType, string>
+
+    expect(runtimeVersions).toEqual(TEMPLATE_VERSION)
+  })
 })
 
 // ─── A6 / A7 / A8 — §8-7 through the proxy's own validators, offline ─────────

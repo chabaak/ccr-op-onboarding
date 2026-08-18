@@ -9,6 +9,7 @@ import {
   ALLOWED_ORIGIN,
   context,
   event,
+  judgmentSlots,
   validCallBody,
   validConfig,
 } from "./fixtures.js";
@@ -150,7 +151,7 @@ describe("DDAY proxy HTTP skeleton", () => {
         event(
           JSON.stringify({
             call_type: "narration",
-            template_version: "v0.3",
+            template_version: "v0.4",
             slots: {
               TIMELINE_TAIL: ["09:40 판독 보고 전송."],
               AGENT_UTTERANCE: "",
@@ -180,6 +181,23 @@ describe("DDAY proxy HTTP skeleton", () => {
     expect(res.statusCode).toBe(200);
     expect(body(res).stance).toBe("a");
     expect(res.headers?.["x-llm-fallback"]).toBe("false");
+  });
+
+  it("rejects an archived prompt version that is still on disk for probe evidence", async () => {
+    const res = result(
+      await build()(
+        event(
+          JSON.stringify({
+            call_type: "judgment",
+            template_version: "v0.4",
+            slots: judgmentSlots,
+          }),
+        ),
+        context,
+      ),
+    );
+    expect(res.statusCode).toBe(400);
+    expect(body(res).error.code).toBe("unknown_template_version");
   });
 
   // Engine spec §5: the engine owns every fallback (two of the three need
@@ -214,7 +232,7 @@ describe("DDAY proxy HTTP skeleton", () => {
         event(
           JSON.stringify({
             call_type: "judgment",
-            template_version: "v0.4",
+            template_version: "v0.5",
             slots: { STANCE_SET: [{ id: "only", label: "하나" }] },
           }),
         ),

@@ -37,7 +37,7 @@ export const judgmentSlots = {
 
 export const validCallBody = JSON.stringify({
   call_type: "judgment",
-  template_version: "v0.4",
+  template_version: "v0.5",
   slots: judgmentSlots,
 });
 
