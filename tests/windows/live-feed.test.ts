@@ -37,6 +37,7 @@ import {
 import type { FeedNode, FeedPart } from '../../src/client/components/run-feed.ts'
 import { typeDuration } from '../../src/client/components/typewriter.ts'
 import { FALLBACK_CLASS, FALLBACK_LABEL } from '../../src/client/components/fallback-notice.ts'
+import { LIVE_FEED_PACING } from '../../data/policy/live-feed-pacing.ts'
 
 const REPO = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '../..')
 
@@ -476,6 +477,21 @@ describe('x11 the reveal pump charges time for lines, never for events', () => {
     const longest = feedGapMs('08:50', '10:19')
     expect(longest / shortest, 'the pause spread grew past what a player will sit through').toBeLessThan(4)
     expect(longest, 'the cap stopped binding on the packs we ship').toBe(feedGapMs('08:50', '09:33'))
+  })
+
+  it('(d2) the live feed pacing knobs live in data, not inline renderer literals', () => {
+    const source = code(RUN_FEED)
+    expect(source, 'the feed pace stopped importing its data policy').toContain(
+      'data/policy/live-feed-pacing.ts',
+    )
+    expect(FEED_PACE).toEqual({
+      msPerChar: LIVE_FEED_PACING.msPerChar,
+      msBetween: LIVE_FEED_PACING.rowPauseMs,
+    })
+    expect(feedGapMs('08:00', '08:01')).toBe(
+      LIVE_FEED_PACING.gapOpenMs + LIVE_FEED_PACING.gapMsPerMinute,
+    )
+    expect(feedGapMs('08:00', '10:00')).toBe(LIVE_FEED_PACING.gapMaxMs)
   })
 
   it('(e) the whole demo day of paper still fits inside the day of sim it prints', () => {
