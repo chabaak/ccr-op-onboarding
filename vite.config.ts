@@ -2,7 +2,7 @@ import { copyFileSync, existsSync, mkdirSync, readFileSync, readdirSync, writeFi
 import { dirname, join } from 'node:path'
 import { defineConfig, type Plugin } from 'vite'
 
-// Project-site pathing for GitHub Pages: https://alstjgg.github.io/ccr-op-onboarding/
+// Project-site pathing for GitHub Pages: https://chabaak.github.io/ccr-op-onboarding/
 // If the repo is renamed, update this to match the new name.
 
 /**

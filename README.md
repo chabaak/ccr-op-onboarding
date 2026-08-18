@@ -1,19 +1,17 @@
-# nhn-game-2026
+# ccr-op-onboarding
 
-Competition entry for the **NHN AI Game Competition (2026)** — built by a 2-person team.
-The game is still unnamed and the engine/genre is not yet chosen; this repo currently holds an
-engine-agnostic Vite + TypeScript skeleton that renders a placeholder so the deploy pipeline can
-be verified end-to-end.
+Competition entry for **OpenAI Game Builders Seoul**, Track 1: `긴급상황대응실 운영자 임용을 축하합니다` (English working title: *Central Control Room Operator Onboarding*). The game is a browser-based emergency control room simulation built by a 2-person team.
 
-**Status:** DDAY concept confirmed (2026-07-28) — see [docs/status.md](./docs/status.md)
-for current state.
+**Status:** OpenAI competition phase — see [AGENTS.md](./AGENTS.md) for permanent repo rules and [docs/status.md](./docs/status.md) for mutable project state.
 
-**Live (placeholder):** https://alstjgg.github.io/nhn-game-2026/
+**Live:** https://chabaak.github.io/ccr-op-onboarding/
 
 ## Stack
 
-- Vite + TypeScript (vanilla, strict mode) — no game engine installed yet.
-- Deployed to GitHub Pages via GitHub Actions on every push to `main`.
+- Vite + TypeScript (vanilla, strict mode) for the browser client.
+- Node-based authoring, probe, and driver tools.
+- AWS Lambda proxy for runtime LLM calls.
+- GitHub Pages deploy on every push to `main`.
 
 ## Develop
 
@@ -27,16 +25,16 @@ npm run preview  # preview the production build locally
 ## Layout
 
 ```
-src/            the browser bundle + isomorphic core (engine · composer · client)
-authoring/      authoring-time preprocessing: datapack compile · lint · type generation
-tools/          Node-only executables — probe runner, beat driver, shared call libs
-proxy/          the LLM tier — Lambda + Bedrock, deployed separately from Pages
-demos/          playable demos, own stacks — each deployed at /<slug>/ by the Pages workflow
-planning/       planning-phase archive — concepts, scenarios, paper tests, meetings, legacy-services
+src/            browser bundle + isomorphic core (engine, composer, client)
+authoring/      authoring-time preprocessing: datapack compile, lint, type generation
+tools/          Node-only executables: probe runner, beat driver, shared call libs
+proxy/          LLM tier: Lambda + Bedrock, deployed separately from Pages
+demos/          historical playable demos; do not extend during this phase
+planning/       planning archive, including meeting notes and legacy research
 public/assets/  static assets served as-is
-data/           balance-as-data — datapacks, policy, the user prompt layer
-docs/           living docs — project status, competition requirements, deliverable drafts
-.github/        CI/CD (GitHub Pages deploy)
+data/           balance-as-data: datapacks, policy, prompt inputs
+docs/           project specs, contracts, plans, status, and deliverable drafts
+.github/        CI/CD workflows
 ```
 
 ## Contributing

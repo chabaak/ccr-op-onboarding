@@ -6,7 +6,7 @@ name: CI
 # holding up "the mechanism measurements describe the deployed system", ran only
 # when a human remembered to run them locally.
 #
-# Nothing here deploys. deploy.yml stays the only path to Pages (CLAUDE.md rule 3),
+# Nothing here deploys. deploy.yml stays the only path to Pages (AGENTS.md rule 3),
 # and is left untouched; the overlap on push-to-main is one cheap duplicate build.
 
 on:

@@ -1,7 +1,7 @@
 name: Proxy deploy
 
 # The LLM tier's deploy path. Separate workflow from deploy.yml on purpose:
-# deploy.yml is the only route to GitHub Pages (CLAUDE.md rule 3) and stays
+# deploy.yml is the only route to GitHub Pages (AGENTS.md rule 3) and stays
 # untouched, and this one never publishes a page. They share nothing but the repo.
 #
 # No stored AWS secret. The deploy job presents a GitHub OIDC token and assumes
