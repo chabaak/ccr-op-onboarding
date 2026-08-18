@@ -780,13 +780,13 @@ describe('[u7#c9] run-wide hard constraints hold in this unit', () => {
     }
   })
 
-  // C17 / [u11#c12] — RE-AIMED (08-04), never deleted. The C5 SPLIT added a third host: the
-  // §7 fixture round and the P0-B captures are DEV-only by inv 11, so C5(a)
-  // ruled they may run on `npm run dev`. A blanket `not.toMatch(/npm run dev/)`
-  // now contradicts a ruling. The u7 intent — "the runner this unit's specs run
-  // on serves a real build" — is asserted directly instead: the host u7's specs
-  // use (the `chromium` project, port 5174) is a build+preview, and the dev host
-  // is fenced to the two spec files that cannot exist anywhere else.
+  // C17 / [u11#c12] — RE-AIMED (08-04), never deleted. The C5 SPLIT added a third host:
+  // the §7 fixture round is DEV-only by inv 11, so C5(a) ruled it may run on
+  // `npm run dev`. A blanket `not.toMatch(/npm run dev/)` now contradicts a
+  // ruling. The u7 intent — "the runner this unit's specs run on serves a real
+  // build" — is asserted directly instead: the host u7's specs use (the
+  // `chromium` project, port 5174) is a build+preview, and the dev host is
+  // fenced to the one surviving spec file that cannot exist anywhere else.
   it('(g) C5 — the e2e runner serves a real build', () => {
     const config = stripComments(read(path.join(REPO, 'playwright.config.ts')))
     expect(config).toMatch(/npm run preview/)
@@ -801,9 +801,8 @@ describe('[u7#c9] run-wide hard constraints hold in this unit', () => {
     const devHosts = [...config.matchAll(/command:\s*`([^`]*npm run dev[^`]*)`/g)]
     expect(devHosts.length, 'at most the one dev host C5(a) ruled for the fixture round').toBeLessThanOrEqual(1)
     if (devHosts.length === 1) {
-      expect(config, 'the dev host is fenced to the acceptance/captures specs').toMatch(
-        /DEV_HOSTED\s*=\s*\/\(acceptance\|captures\)/,
-      )
+      expect(config, 'the dev host is fenced to acceptance alone').toMatch(/DEV_HOSTED\s*=\s*\/acceptance\\\.spec\\\.ts\//)
+      expect(config, 'the stale capture lane is still fenced into the dev host').not.toMatch(/captures/)
     }
   })
 
