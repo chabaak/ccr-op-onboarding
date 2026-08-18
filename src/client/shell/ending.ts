@@ -125,17 +125,19 @@ const PREVIEW_SCORE: { total: number; rows: readonly ScoredRow[] } = {
 /** The one control's two labels: the plates that advance, and the one that ends. */
 export const ENDING_NEXT = '다음'
 export const ENDING_CLOSE = '시뮬레이션 종료'
+export const ENDING_WINDOW_CLOSE = '창 닫기'
 
 /** The pause between the ledger's last number and the veil. See the header. */
 export const HELD_BEAT_MS = 2000
 
 /**
- * How long the exit waits on `window.close()` before taking the other road.
+ * How long the bad ending waits on `window.close()` before taking the other road.
  *
  * A browser refuses `close()` on a tab the script did not open, and it refuses
- * it silently — there is no error to catch and no promise to await, only a
- * window that is still there a moment later. So the reload is scheduled behind
- * a short grace period and cancels itself if the tab did in fact go.
+ * it silently -- there is no error to catch and no promise to await, only a
+ * window that is still there a moment later. Bad still resets to the door, so
+ * the reload is scheduled behind a short grace period and cancels itself if the
+ * tab did in fact go.
  */
 const CLOSE_GRACE_MS = 400
 
@@ -386,19 +388,21 @@ function holdChrome(on: boolean): void {
 /**
  * Walks the three plates and resolves the moment the last one is answered.
  *
- * It resolves as the exit state goes on, not after it: the caller leaves the
- * page on that resolution, so the veil is already going out while the browser
- * is doing whatever it does about the tab.
+ * It resolves as the final action goes on, not after it: on Bad the caller
+ * leaves the page on that resolution, so the veil is already going out while
+ * the browser is doing whatever it does about the tab. On Good there is no
+ * blackout: the point of the last press is only to ask the browser to close,
+ * leaving the final feed and result visible if the browser refuses.
  *
  * NOT DISMISSIBLE, and there is no Escape here — which is the one place this
  * departs from `shell/manual.ts`. Escape skips the BRIEFING because a keyboard
  * user must never be trapped in front of three paragraphs and because there is
- * a desk behind that plate to be let onto. There is nothing behind this one:
- * the sitting is over, the desk is inert, and every road out of this layer runs
- * through the button. So the walk stays fully keyboard-operable the only way it
- * can be — the control takes focus once and keeps it across all three steps,
- * so Enter three times is the whole ending — and no key is bound to a shortcut
- * that would have to invent an exit of its own.
+ * a desk behind that plate to be let onto. Behind this one is only a scored
+ * sitting: readable on Good, withheld on Bad, inert in both cases. So the walk
+ * stays fully keyboard-operable the only way it can be -- the control takes
+ * focus once and keeps it across all three steps, so Enter three times is the
+ * whole ending -- and no key is bound to a shortcut that would have to invent an
+ * exit of its own.
  *
  * The plate is built ONCE and repainted in place, for the reasons `manual.ts`
  * gives: remounting would replay the entrance three times and would drop focus
@@ -461,13 +465,14 @@ export function openEnding(app: HTMLElement, kind: EndingKind, numbers: EndingNu
       ...step.body.map((line) => el('p', 'cf-note', line)),
     )
 
-    go.textContent = last ? ENDING_CLOSE : ENDING_NEXT
-    go.title = last ? ENDING_CLOSE : ENDING_NEXT
+    const finalLabel = kind === 'good' ? ENDING_WINDOW_CLOSE : ENDING_CLOSE
+    go.textContent = last ? finalLabel : ENDING_NEXT
+    go.title = last ? finalLabel : ENDING_NEXT
     // The op the press performs, so the walk is legible to a test and to the
     // reader of a DOM dump: three presses, and only the last one ends the
     // session.
     go.dataset.step = String(at + 1)
-    go.dataset.op = last ? 'close' : 'next'
+    go.dataset.op = last ? (kind === 'good' ? 'close_window' : 'close') : 'next'
 
     // Re-trigger the step animation. Removing the class and reading a layout
     // property is what makes the SAME animation run again on an element that
@@ -491,12 +496,11 @@ export function openEnding(app: HTMLElement, kind: EndingKind, numbers: EndingNu
         return
       }
       answered = true
-      // The veil goes out and the root STAYS in the document. `manual.ts`
-      // removes its own after the exit animation because a desk is waiting
-      // underneath; here there is nothing underneath that anyone is meant to
-      // reach, and if the exit below is refused outright the honest screen to
-      // be left on is the one that says the simulation is over.
-      root.classList.add('end-out')
+      // Bad still leaves through the old blackout/reset path. Good does not:
+      // if the browser refuses `window.close()`, the honest screen to leave on
+      // is the finished desk itself, with the final feed and result still under
+      // the ending plate.
+      if (kind === 'bad') root.classList.add('end-out')
       resolve()
     }
     go.addEventListener('click', advance)
@@ -599,26 +603,33 @@ function ledgerLanded(): Promise<void> {
 /* ── the exit ────────────────────────────────────────────────────────────── */
 
 /**
- * Leaves the terminal: close the tab, and failing that, go back to the door.
+ * Ask the browser to close the tab, swallowing the common refusal paths.
+ */
+function closeWindow(host: Window): void {
+  try {
+    host.close()
+  } catch {
+    // A refused close is the expected case, not an error worth reporting.
+  }
+}
+
+/**
+ * Leaves a failed terminal: close the tab, and failing that, go back to the door.
  *
  * `close()` is attempted first because it is the only exit that matches what
  * the plate just said — the session is over, the terminal is done. Browsers
- * refuse it on a tab the script did not open, which on GitHub Pages is every
- * tab, so the reload is the road actually taken: `sessionStorage` is cleared so
- * the sign-in door opens cold (the run slot `run-state.ts` owns lives there),
- * and the page comes back as a fresh sitting.
+ * refuse it on a tab the script did not open. On a bad ending, the fallback is
+ * still a reset: `sessionStorage` is cleared so the sign-in door opens cold (the
+ * run slot `run-state.ts` owns lives there), and the page comes back as a fresh
+ * sitting.
  *
  * Nothing in here may throw out of the press handler. A sandboxed frame throws
  * on `close()`, a private-mode `Storage` throws on `clear()`, and a navigation
  * the host refuses throws on `reload()` — none of which is a reason to leave an
  * operator staring at a button that did nothing visible.
  */
-function leaveDesk(host: Window): void {
-  try {
-    host.close()
-  } catch {
-    // A refused close is the expected case, not an error worth reporting.
-  }
+function resetDesk(host: Window): void {
+  closeWindow(host)
   host.setTimeout(() => {
     if (host.closed) return
     try {
@@ -676,7 +687,8 @@ async function raise(host: Window, driver: FixtureDriver, kind: EndingKind, numb
   // whatever is left, exactly as it does for any other pause).
   driver.clock.setRate(0)
   await openEnding(must('#app'), kind, numbers)
-  leaveDesk(host)
+  if (kind === 'good') closeWindow(host)
+  else resetDesk(host)
 }
 
 /**

@@ -31,6 +31,7 @@ import { CLIENT, SHELL_DIR, exists, read, rel, walk } from './shell-utils.ts'
 import {
   ENDING_CLOSE,
   ENDING_NEXT,
+  ENDING_WINDOW_CLOSE,
   SITE_OCCUPANTS,
   endingKindOf,
   endingPlates,
@@ -340,6 +341,7 @@ describe('[x6] the plates', () => {
   it('(g) the walk`s two button labels', () => {
     expect(ENDING_NEXT).toBe('다음')
     expect(ENDING_CLOSE).toBe('시뮬레이션 종료')
+    expect(ENDING_WINDOW_CLOSE).toBe('창 닫기')
   })
 })
 
@@ -387,5 +389,28 @@ describe('[x6] the ending is an observer', () => {
     const src = code(ENDING_TS)
     expect(src).not.toMatch(/dataset\.tallyState\s*=/)
     expect(src).not.toMatch(/createScoreTally/)
+  })
+
+  it('(g) Good exits by asking the browser to close, never by resetting the desk', () => {
+    const src = code(ENDING_TS)
+    const raise = /async function raise[\s\S]*?^}/m.exec(src)?.[0] ?? ''
+    expect(raise, 'raise() no longer branches on the ending kind').toMatch(
+      /if\s*\(\s*kind\s*===\s*['"]good['"]\s*\)\s*closeWindow\s*\(\s*host\s*\)\s*else\s*resetDesk\s*\(\s*host\s*\)/,
+    )
+
+    const close = /function closeWindow[\s\S]*?function resetDesk/.exec(src)?.[0] ?? ''
+    expect(close, 'Good no longer attempts to close the tab').toMatch(/host\.close\s*\(\s*\)/)
+    expect(close, 'Good reset still clears the final feed/result').not.toMatch(/sessionStorage|reload|setTimeout/)
+  })
+
+  it('(h) only Bad puts the ending into the blackout/reset state', () => {
+    const src = code(ENDING_TS)
+    const advance = /const advance = \(\): void => \{[\s\S]*?go\.addEventListener/.exec(src)?.[0] ?? ''
+    expect(advance, 'Bad no longer keeps the old blackout state').toMatch(
+      /if\s*\(\s*kind\s*===\s*['"]bad['"]\s*\)\s*root\.classList\.add\s*\(\s*['"]end-out['"]\s*\)/,
+    )
+    expect(advance, 'Good still blacks out the finished desk').not.toMatch(
+      /kind\s*===\s*['"]good['"][\s\S]*root\.classList\.add\s*\(\s*['"]end-out['"]\s*\)/,
+    )
   })
 })
