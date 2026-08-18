@@ -19,8 +19,8 @@ if (!arg) {
   process.exit(1);
 }
 
-const RUNS = join(REPO, 'planning/dday-mechanism/runs');
-const SUITES = join(REPO, 'planning/dday-mechanism/suites');
+const RUNS = join(REPO, 'tools/probe/dday-mechanism/runs');
+const SUITES = join(REPO, 'tools/probe/dday-mechanism/suites');
 
 const runDir = existsSync(arg) ? resolve(arg) : join(RUNS, `${arg}-calls`);
 if (!existsSync(runDir)) {
