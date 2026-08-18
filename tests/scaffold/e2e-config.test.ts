@@ -127,14 +127,16 @@ describe('[u0#c5] playwright.config.ts resolved value', () => {
     expect(preview!.command).toContain('--strictPort')
 
     // The dev host exists BY RULING, is the only one, and is fenced to the
-    // DEV-only fixture round — it never serves the unit or artefact specs.
+    // DEV-only fixture round — it never serves the unit or artefact specs. The
+    // old capture baseline lane is gone; keeping it named here would preserve
+    // the stale reference-shot debt #6 is retiring.
     const devHosts = all.filter((s) => /npm run dev/.test(s.command ?? ''))
     expect(devHosts, 'exactly one dev host, for the fixture round alone').toHaveLength(1)
     expect(devHosts[0]!.command).toContain('--strictPort')
     const config = source()
-    expect(config, 'the dev-hosted specs are named and fenced').toMatch(/testMatch/)
+    expect(config, 'the dev-hosted spec is named and fenced').toMatch(/testMatch/)
     expect(config).toMatch(/acceptance/)
-    expect(config).toMatch(/captures/)
+    expect(config).not.toMatch(/captures/)
   })
 
   // C17 / [u11#c12] — RE-AIMED (08-04), never deleted. baseURL moved onto the projects when

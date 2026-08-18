@@ -78,12 +78,11 @@ type Handles = { __agentFile?: AgentFileHandle; __shell?: { frame(): { store: Se
  * 인수인계 사항 turns the page itself.
  *
  * x7 — …and it LANDS the cover, which is not optional here. The cover types
- * itself out on first arrival, and THIS LANE DOES NOT FREEZE ANIMATIONS —
- * `playwright.config.ts` calls no freeze, `fixtures/harness.ts` freezes only
- * inside `freezeAt` (a capture-side stylesheet, not the driver gate), and this
- * helper asks for no reduced motion. Verified rather than assumed, because the
- * assumption was the other way round: without this press every assert against
- * cover copy below would be racing a reveal.
+ * itself out on first arrival, and THIS LANE DOES NOT FREEZE ANIMATIONS. This
+ * helper asks for no reduced motion, and no shared harness step suppresses the
+ * reveal. Verified rather than assumed, because the assumption was the other way
+ * round: without this press every assert against cover copy below would be
+ * racing a reveal.
  *
  * The press is the operator's own way past it rather than a wait, so the
  * control is exercised by every test in the file. `landCover` is a no-op once

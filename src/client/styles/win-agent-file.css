@@ -300,17 +300,11 @@
    screen together, and the cue's whole window is the stretch of the walk that is
    deliberately silent.
 
-   THE CAPTURE BASELINES DO NOT MOVE, which is the one place a number here is
-   load-bearing outside the desk — and it was RE-CHECKED against the harness when
-   the duration changed rather than carried over as an assurance.
-   `e2e/fixtures/harness.ts` freezes animations seek-and-pause at
-   `animation-delay:-2000ms` (`DEFAULT_SEEK_MS = 2000`, `freezeAt`), and 2000 is an
-   exact multiple of 1000 — 2000 = 2 × 1000, so the seek lands on the start of the
-   third iteration, progress 0%, the deactivated half, which is the background the
-   button already had. It divided by the old number too (2000 = 4 × 500), which is
-   the only reason this change was free. What would break it is a duration 2000
-   does not divide by — 700, 750, 1500 — and then the two `threaded` shots (the
-   only ones that turn to the agent's page) start recording a red DEPLOY.
+   THE STANDARD E2E LANES DO NOT SPEND IT BY ACCIDENT. Tests that reach this page
+   do so by the operator's own turn (`e2e/fixtures/harness.ts`'s `turnToAgent()`),
+   and the first deploy press spends the cue before any later walk or run-loop
+   check can observe it. The cue's timing is therefore product timing, not a
+   harness timing contract.
    ═══════════════════════════════════════════════════════════════════════════ */
 .btn-deploy.is-cued{animation:dzCue 1s linear infinite both}
 @keyframes dzCue{
@@ -443,12 +437,9 @@
    independent reasons `dzCue` records; a second infinite animation on a descendant
    changes neither.
 
-   THE CAPTURE BASELINES DO NOT MOVE EITHER, by the same arithmetic as `dzCue`:
-   `freezeAt` seeks to `-2000ms`, 2000 = 2 × 1000, so a framed shot lands on 0% —
-   `opacity:0`, nothing drawn, the arrow exactly as the reference held it. And the
-   e2e lane never reaches the cue in the first place: `harness.ts`'s `boot()` calls
-   `turnToAgent()`, which clicks `›` immediately, and that press spends the latch a
-   whole second before the arm would have fired. ══════════════════════════════ */
+   THE STANDARD E2E LANES NEVER REACH THE CUE BY ACCIDENT. `harness.ts`'s `boot()`
+   calls `turnToAgent()`, which clicks `›` immediately, and that press spends the
+   latch a whole second before the arm would have fired. ══════════════════════ */
 .pg-next{position:relative}
 .pg-next.is-cued::after{content:'';position:absolute;inset:-2px;
   border:1px solid var(--seal-2);border-radius:3px;pointer-events:none;
