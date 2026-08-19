@@ -8,8 +8,7 @@
    screen would read as a different program congratulating them. So this sheet
    is `win-manual.css` again (the veil, the entrance, the in-place step, the
    prose treatment of `.cf-note`, the one-button foot, the toast suppression),
-   with three things it does not share: it comes in heavier, Bad goes out into
-   black instead of back to the desk, and it has TWO faces.
+   with two things it does not share: it comes in heavier, and it has TWO faces.
 
    The two faces are where the design work is. A sitting that closed on one
    death and a sitting that spent its last run are not the same event, and the
@@ -58,43 +57,6 @@ body:has(#ending) #toast{display:none}
      error dialog. It has to close the way a room goes quiet. */
   animation:endVeil .9s ease-out both}
 @keyframes endVeil{from{opacity:0}to{opacity:1}}
-
-/* ─── the exit ───────────────────────────────────────────────────────────────
-   The briefing dismisses itself: `man-out` runs the veil BACKWARDS over 420 ms
-   and `manual.ts` drops the node at 460, because behind it is a desk the
-   operator is about to be handed. Reversing this veil would be wrong twice —
-   it would hand back a desk that is finished, and it would end the game on a
-   shot of an empty terminal.
-
-   So the bad ending does not fade out. It goes dark. A full-bleed `--ink-0`
-   plane comes down over the veil AND over the plate, and the last frame before
-   the reset is a black screen — which is also exactly what the sign-in door
-   opens from, so the reload lands without a flash.
-
-   400 ms, and that number is not a taste call: the contract's exit calls
-   `window.close()` and, if the tab is still there ~400 ms later (it always is
-   on Pages — browsers refuse `close()` on a tab the script did not open), Bad
-   clears `sessionStorage` and reloads. Good never enters this class: its final
-   press only asks the browser to close, so a refused close leaves the final feed
-   and result visible under the green veil. 400 ms is therefore Bad's entire
-   budget between the last press and the document being torn down. Landing the
-   blackout on the last usable frame is what "weight" means here; anything
-   longer is an animation nobody ever sees the end of.
-
-   `::after` rather than animating `#ending`'s own background: the plane has to
-   cover the plate too, and an absolutely-positioned pseudo-element on a flex
-   container is not a flex item, so it stacks over the section without touching
-   the layout. */
-#ending::after{content:'';position:absolute;inset:0;pointer-events:none;
-  background:var(--ink-0);opacity:0}
-#ending.end-out{pointer-events:none}
-#ending.end-out::after{animation:endBlack .4s ease-in both}
-@keyframes endBlack{from{opacity:0}to{opacity:1}}
-/* Under the black, the plate settles rather than holding rigid — the last
-   thing it does is stop being lit. Half the blackout's length so it is
-   finished, not interrupted, by the time the plane is opaque. */
-#ending.end-out .end-plate{animation:endSettle .4s ease-in both}
-@keyframes endSettle{to{opacity:.55;transform:translateY(7px)}}
 
 /* ─── the plate ─────────────────────────────────────────────────────────────
    Heavier than the briefing's `manRise` (.62s) and with a beat of delay, so the
@@ -277,8 +239,8 @@ body:has(#ending) #toast{display:none}
 /* ═══ REDUCED MOTION ══════════════════════════════════════════════════════
    `base.css` collapses every animation on the page to a single 1 ms pass with
    `both` fill, which lands each of the rules above on its END state — the veil
-   opaque, the plate settled, the Bad blackout black. All correct: the ending
-   degrades to cuts between finished frames, which is what it should do.
+   opaque, the plate settled. All correct: the ending degrades to cuts between
+   finished frames, which is what it should do.
 
    One exception, and it is the one base.css already documents: a signal whose
    LOOP carries the state has to degrade to a static distinguishing style, or it
