@@ -14,7 +14,7 @@ Description: Stateless DDAY LLM proxy backed by Amazon Bedrock Converse (haiku).
 Parameters:
   AllowedOrigin:
     Type: String
-    Default: https://alstjgg.github.io
+    Default: https://chabaak.github.io
     AllowedPattern: ^https://[A-Za-z0-9.-]+(?::[0-9]+)?$
     Description: Exact GitHub Pages origin, without a trailing slash.
   MaxTokens:

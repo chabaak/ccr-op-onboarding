@@ -2,7 +2,7 @@ import type { APIGatewayProxyEventV2 } from "aws-lambda";
 
 import type { RuntimeConfig } from "../src/config.js";
 
-export const ALLOWED_ORIGIN = "https://alstjgg.github.io";
+export const ALLOWED_ORIGIN = "https://chabaak.github.io";
 
 export const validEnv = {
   BEDROCK_REGION: "ap-northeast-2",

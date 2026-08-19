@@ -39,7 +39,7 @@ env:
   # Must equal samconfig.toml's AllowedOrigin override. src/handler.ts's origin
   # guard runs ahead of route dispatch, so every post-deploy probe below has to
   # carry this or it is answered 403 origin_forbidden before reaching a route.
-  ALLOWED_ORIGIN: https://alstjgg.github.io
+  ALLOWED_ORIGIN: https://chabaak.github.io
   SAM_CLI_TELEMETRY: "0"
 
 jobs:
