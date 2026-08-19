@@ -115,7 +115,7 @@ Resources:
           version: "1.0"
         paths: {}
       Tags:
-        Project: nhn-game-2026
+        Project: ccr-op-onboarding
         Component: dday-proxy
 
   ProxyExecutionRole:
@@ -182,7 +182,7 @@ Resources:
                       Fn::Sub: arn:${AWS::Partition}:bedrock:${AWS::Region}:${AWS::AccountId}:inference-profile/global.anthropic.claude-haiku-4-5-20251001-v1:0
       Tags:
         - Key: Project
-          Value: nhn-game-2026
+          Value: ccr-op-onboarding
         - Key: Component
           Value: dday-proxy
 
@@ -250,7 +250,7 @@ Resources:
             PayloadFormatVersion: "2.0"
             TimeoutInMillis: 18000
       Tags:
-        Project: nhn-game-2026
+        Project: ccr-op-onboarding
         Component: dday-proxy
     Metadata:
       BuildMethod: esbuild
