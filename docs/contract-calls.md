@@ -549,11 +549,14 @@ origin: <the deployed Pages origin>          ← checked; a mismatch is 403
 ```jsonc
 {
   "call_type": "judgment" | "narration" | "reporter",
-  "template_version": "v0.4",                // /^v[0-9]+\.[0-9]+$/
+  "template_version": "v0.5",                // current judgment; narration/reporter use v0.4
   "pack": "멈춘회전문",                        // datapack slug — picks the default prompt
   "slots": { /* values, not prose — see below */ }
 }
 ```
+
+Current runtime versions are `judgment v0.5`, `narration v0.4`, and
+`reporter v0.4`; the proxy's checked-in runtime map is the source of truth.
 
 **One route for all three calls.** They differ only in an output schema and
 share auth, validation, timeout, and fallback; three routes would be three copies

@@ -16,8 +16,15 @@ import type { CallRequest, CallType } from "./types.js";
  * wording change is a proxy deploy rather than a Pages rebuild.
  */
 
-const template = (call: CallType, layer: "base" | "user", version: string): string => {
-  const text = PROMPT_BUNDLE[`${call}/${layer}-${version}`];
+export type PromptBundle = Readonly<Record<string, string>>;
+
+const template = (
+  bundle: PromptBundle,
+  call: CallType,
+  layer: "base" | "user",
+  version: string,
+): string => {
+  const text = bundle[`${call}/${layer}-${version}`];
   if (text === undefined) {
     throw new PublicError(
       400,
@@ -170,9 +177,10 @@ export type RenderedCall = { system: string; user: string };
  */
 export const PROXY_OWNED_SLOTS = new Set(["FLAW", "INCIDENT", "PRIORITY_LIST"]);
 
-export function renderCall(
+export function renderCallFromBundle(
   request: CallRequest,
   proxySlots: Record<string, unknown>,
+  bundle: PromptBundle,
 ): RenderedCall {
   const spec = CALL_SPECS[request.call_type];
   const values: Record<string, string> = {};
@@ -187,7 +195,14 @@ export function renderCall(
 
   const version = request.template_version;
   return {
-    system: fillSlots(template(request.call_type, "base", version), values),
-    user: fillSlots(template(request.call_type, "user", version), values),
+    system: fillSlots(template(bundle, request.call_type, "base", version), values),
+    user: fillSlots(template(bundle, request.call_type, "user", version), values),
   };
+}
+
+export function renderCall(
+  request: CallRequest,
+  proxySlots: Record<string, unknown>,
+): RenderedCall {
+  return renderCallFromBundle(request, proxySlots, PROMPT_BUNDLE);
 }

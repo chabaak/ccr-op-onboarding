@@ -15,7 +15,7 @@ import type { FetchLike, FetchResponseLike } from '../../src/transport/index.ts'
 
 export const JUDGMENT_REQUEST: CallRequest<'judgment'> = {
   call_type: 'judgment',
-  template_version: 'v0.4',
+  template_version: 'v0.5',
   pack: 'testpack',
   slots: {
     TEMPERAMENT: 'Procedural. Will not improvise without a named authority.',
