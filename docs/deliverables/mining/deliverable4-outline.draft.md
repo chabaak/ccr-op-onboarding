@@ -245,7 +245,7 @@ built bottom-up by this very AI mining/induction pipeline — 905→1,271 atoms,
 inductions, 96 themes; marked THIN/self-excluded because the pipeline excluded its own
 artifacts from mining, which is itself the §9a point (impl-2026-08-10).**
 
-**9b. 외부 에셋 · 오픈소스 출처 — REQUIRED (competition.md §4, second mandatory element).**
+**9b. 외부 에셋 · 오픈소스 출처 — REQUIRED (AGENTS.md rule 7 plus current pivot note).**
 `assets-manifest.json` carries 35 complete entries (`file`, `tool`, `prompt`, `license`) —
 the one required half that is finished. Add runtime + build models/services. Appendix is
 fine; absence is an unforced error. Status: **solid, element-only.**

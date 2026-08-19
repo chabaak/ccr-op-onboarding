@@ -1,7 +1,8 @@
 # Deliverable mining — method and corpus
 
-This directory is the working record of how deliverable #4 (the AI utilization
-technical document, `docs/competition.md` §4) is being **built**: the project's
+This directory is the working record of how the Codex-utilization writeup
+(`planning/meetings/2026-08-10-openai-pivot.md` plus `AGENTS.md` deliverables)
+is being **built**: the project's
 own history — documents, commit log, PR review threads — is mined by AI agents
 for decisions, reversals, failures, and boundaries, from the "AI director" POV
 the competition judges on. Themes are induced bottom-up from that evidence, and

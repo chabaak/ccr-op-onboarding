@@ -8,9 +8,9 @@
 > because it was interrupted and later resumed: its own section is rewritten in place at final
 > completion, and says so at the top. Part A is such a section.
 >
-> Requirement source: `docs/competition.md` §"Required deliverables (5)" → #4 must contain
-> (a) a technical explanation of AI usage — architecture, key prompts and instructions — and
-> (b) external asset / open-source attributions.
+> Requirement source: `planning/meetings/2026-08-10-openai-pivot.md` names the current
+> submission deliverables; `AGENTS.md` treats the Codex-utilization writeup as required
+> and rule 7 keeps external asset / open-source attributions mandatory.
 
 ### Run index
 
@@ -692,9 +692,9 @@ Also: the darkest-context 18 have no prompt table anywhere in this document. -->
 > Korean; the PRD and most run artifacts are Korean) and whether this becomes a standalone PDF or a
 > section of one. -->
 >
-> Requirement source: `docs/competition.md` §"Required deliverables (5)" → #4 must contain
-> (a) a technical explanation of AI usage — architecture, key prompts and instructions — and
-> (b) external asset / open-source attributions.
+> Requirement source: `planning/meetings/2026-08-10-openai-pivot.md` names the current
+> submission deliverables; `AGENTS.md` treats the Codex-utilization writeup as required
+> and rule 7 keeps external asset / open-source attributions mandatory.
 
 ### Open items for the human (the `<!-- TODO -->` markers, listed visibly)
 
