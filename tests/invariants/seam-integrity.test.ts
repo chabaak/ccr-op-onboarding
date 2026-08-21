@@ -169,12 +169,9 @@ describe('[u9#c4] the driver seam is the only path to the view', () => {
   // RE-AIMED (C17). This asserted that NO core module may appear in the player
   // build graph at all, with the message "C8: fixture-only". C8 was a scope
   // exclusion of the client run, not a structural rule —
-  // `docs/plan-client-build.md` §1: "**Does NOT do (run-level):** the live
-  // driver's engine/composer binding (*engine does not exist yet*; build to the
-  // seam, fixture-only)". The premise expired when the engine landed, and
-  // `docs/spec-client.md` has always planned the opposite (§2.1 module table;
-  // §5.1 "connect driver: fixture (default until proxy lands) | live"; §5.2 "the
-  // same seam, live … windows cannot tell the difference").
+  // the live driver's engine/composer binding was out of scope before the engine
+  // existed. The premise expired when the engine landed, and the live driver now
+  // intentionally shares the same seam as the fixture driver.
   //
   // What was ever structural survives, and is now measured on the BUILD GRAPH
   // instead of the source tree: a core module may ship, but only a driver module

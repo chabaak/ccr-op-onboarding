@@ -104,11 +104,11 @@ describe('[u2f#c10] frozen inputs are read, never written', () => {
   //
   // RE-AIMED (C17) at the post-merge reconcile (08-05). The freeze was pipeline
   // discipline — a run must not rewrite its own inputs — and for two of the
-  // paths that premise expired when the run merged (#110): `docs/spec-client.md`
-  // revises by its owner's hand post-run (spec-client §9, "bind by revision of
-  // this document"), and `src/shared/species.ts` carried its own deletion order
-  // for the duplicate `Species` union ("delete this the moment view-driver.ts
-  // lands" — view-driver.ts landed with this run). The original claim stays
+  // paths that premise expired when the run merged (#110): the client seam
+  // fixture revised by its owner's hand post-run, and `src/shared/species.ts`
+  // carried its own deletion order for the duplicate `Species` union ("delete
+  // this the moment view-driver.ts lands" — view-driver.ts landed with this
+  // run). The original claim stays
   // asserted where it stayed true: over the run's own merge range, in (e). The
   // live checks keep the paths that remain frozen.
   // `data/scenario/우는다리/` joins the released set with the score-predicate
@@ -129,7 +129,6 @@ describe('[u2f#c10] frozen inputs are read, never written', () => {
   // clauses, both of which the schemas demanded. The edits only widen the legal
   // set, so every pack that validated before still validates.
   const RELEASED = [
-    'docs/spec-client.md',
     'src/shared/species.ts',
     'data/scenario/우는다리/',
     'data/scenario/_schema/',

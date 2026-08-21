@@ -1,10 +1,10 @@
 {
-  "$note": "Balance-as-data for sound. Every cue mapping, level and cooldown lives here; src/client/audio/ holds no literal for any of them. Asset ids under `cues[].files` are built by tools/audio/build-audio-pack.mjs and resolve to `<base><file><ext>`. Levels are linear gain, not dB. Authority for the cue list: docs/plan-audio.md §4.",
+  "$note": "Balance-as-data for sound. Every cue mapping, level and cooldown lives here; src/client/audio/ holds no literal for any of them. Asset ids under `cues[].files` are built by tools/audio/build-audio-pack.mjs and resolve to `<base><file><ext>`. Levels are linear gain, not dB. Generated binding table: data/policy/audio-bindings.md.",
   "version": 1,
   "base": "assets/audio/",
   "ext": ".m4a",
 
-  "$buses": "Two, independently mutable. `ambience` sits far under `sfx` on purpose — plan-audio §2 rule 3: the bed must never be the reason a line is missed. The pack is foley under a reading surface, so both sit well below the level that feels right while auditing one cue at a time. x10 (08-10, 민서: '소리를 좀 조용하게') — ambience 0.15 → 0.1 → 0.05, in two passes: 0.1 was still not quiet enough on the running desk, and 0.05 is where 민서 set it. That is -26.0 dB on the bus, -9.5 dB below the level the complaint was about, and it puts the bed at -39.5 LUFS. ONE KNOB ON PURPOSE: bed (gain 1) and office (gain 0.8) both ride this bus, so the ~10 dB gap between them — the thing §4.4 calls the whole effect — is bus-invariant and the room recedes as a whole instead of deforming. NO CUE GAIN MOVED, and that was asked for explicitly: at 0.1 the office one-shots landed 21.9 dB under their raw cuts, past the 20.9 dB §4.4's tuning history rejected as reading like an EMPTY office, and the standing advice here was to answer that with `office.gain` 0.8 → 1.0 rather than with the bus. 민서 ruled otherwise — 'the office.gain is fine' — and took the bus down again instead, so the one-shots now sit 28.0 dB under their cuts and are expected to be at or past the edge of audible. THAT IS THE INSTRUCTION, not an oversight: the room is a bed with events in it that may or may not be caught, rather than a room asserting itself. Do not 'fix' the one-shots by raising `office.gain` without asking.",
+    "$buses": "Two, independently mutable. `ambience` sits far under `sfx` on purpose: the bed must never be the reason a line is missed. The pack is foley under a reading surface, so both sit well below the level that feels right while auditing one cue at a time. x10 (08-10, 민서: '소리를 좀 조용하게') — ambience 0.15 → 0.1 → 0.05, in two passes: 0.1 was still not quiet enough on the running desk, and 0.05 is where 민서 set it. That is -26.0 dB on the bus, -9.5 dB below the level the complaint was about, and it puts the bed at -39.5 LUFS. ONE KNOB ON PURPOSE: bed (gain 1) and office (gain 0.8) both ride this bus, so the ~10 dB gap between them is bus-invariant and the room recedes as a whole instead of deforming. NO CUE GAIN MOVED, and that was asked for explicitly: at 0.1 the office one-shots landed 21.9 dB under their raw cuts, past the 20.9 dB tuning point rejected as reading like an EMPTY office, and the standing advice here was to answer that with `office.gain` 0.8 → 1.0 rather than with the bus. 민서 ruled otherwise — 'the office.gain is fine' — and took the bus down again instead, so the one-shots now sit 28.0 dB under their cuts and are expected to be at or past the edge of audible. THAT IS THE INSTRUCTION, not an oversight: the room is a bed with events in it that may or may not be caught, rather than a room asserting itself. Do not 'fix' the one-shots by raising `office.gain` without asking.",
   "buses": {
     "sfx": 0.5,
     "ambience": 0.05
@@ -30,7 +30,7 @@
     "radio-open": { "files": ["radio-squelch-open"], "bus": "sfx", "gain": 0.6, "cooldownMs": 80 },
     "radio-close": { "files": ["radio-squelch-close"], "bus": "sfx", "gain": 0.45, "cooldownMs": 80 },
     "npc": { "files": ["npc-handset"], "bus": "sfx", "gain": 0.5, "cooldownMs": 120 },
-    "$symptom": "Deliberately the quietest one-shot in the pack. A player who notices every one of these is being told which lines carry temperament, and that is the deduction the game is made of — see plan-audio §4.2 #16.",
+    "$symptom": "Deliberately the quietest one-shot in the pack. A player who notices every one of these is being told which lines carry temperament, and that is the deduction the game is made of.",
     "symptom": { "files": ["symptom-chime"], "bus": "sfx", "gain": 0.18, "cooldownMs": 2200 },
     "mark": { "files": ["pen-mark"], "bus": "sfx", "gain": 0.5, "cooldownMs": 120 },
 
@@ -80,7 +80,7 @@
     "feed:npc": "npc",
     "feed:symptom": "symptom",
     "feed:mark": "mark",
-    "$feed-fallback": "Silent: the fallback ViewEvent already sounds the degrade at the moment it happens (event:fallback:*), which is where shell/announcer.ts announces it too, and spec-client §7 #7 makes the notice LINE ride a later feed line.",
+    "$feed-fallback": "Silent: the fallback ViewEvent already sounds the degrade at the moment it happens (event:fallback:*), which is where shell/announcer.ts announces it too, and the notice LINE rides a later feed line.",
     "feed:fallback": null,
     "$feed-wait": "UNREACHABLE since x6 (08-09), which is not the same as silent. Feed cues fire when a line is REVEALED, and no wait line is revealed any more: components/run-feed.ts drops kind:'wait' before it reaches the DOM. FeedKind keeps 'wait' only because the seam is frozen (shared/view-driver.ts), so the trigger keeps its entry here - but a cue id bound at this key would sound nothing at all. The wait's audio is wait:judgment, below.",
     "feed:wait": null,

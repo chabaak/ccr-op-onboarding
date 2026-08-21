@@ -2,10 +2,6 @@
  * State core — run state, the delta journal, and the symptom renderer.
  * Deterministic, isomorphic, DOM-free (compiled by `tsconfig.core.json`).
  *
- * Spec: [spec-engine](../../../docs/spec-engine.md) §1.1 · §1.1a · §1.2 · §1.3
- * (state model and the two actuators), §2.1 (journal entry), §2.3 (the
- * renderer contract, items 1–7).
- *
  * The shapes below are what `tests/engine/state/**` pins and what e3 takes by
  * injection (decision 15). `src/engine/index.ts` re-exports nothing from here
  * yet.

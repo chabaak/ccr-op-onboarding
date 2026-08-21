@@ -41,7 +41,10 @@ const FROZEN_SUITES: Readonly<Record<string, string>> = {
   // move, which is the tail wagging the contract.
   'replay-order.test.ts': '3f75d95ca65b515bff0b7611a78aac177549f779cf192de67ea9458bdb8f62ba',
   'seam-leak-guard.test.ts': 'a9d72c720ceadf16ee01c87609628dcde808247265b1e1097093c0b47c0f4bf0',
-  'seam-shapes.test.ts': '72f3f3866c8c552b16fa47fd1d843d2031eeabb3596f8e71c74de96f4c18e993',
+  // RE-PINNED (2026-08-21, issue #43): the seam fixture moved from deleted
+  // prose docs into `data/contracts/view-driver-seam.ts`; the assertions still
+  // compare the same six declarations against `src/shared/view-driver.ts`.
+  'seam-shapes.test.ts': '30082520d4d0557aa34823a5be41491d4abb95ae08fe1ac6a8c5731161d86634',
 }
 
 function sha256(file: string): string {

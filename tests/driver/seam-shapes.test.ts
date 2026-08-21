@@ -1,8 +1,8 @@
-// [u2#c1] + [u2#c2] + [u2#c8] — src/shared/view-driver.ts carries the §5.2 block VERBATIM
+// [u2#c1] + [u2#c2] + [u2#c8] — src/shared/view-driver.ts carries the ratified seam block
 // and compiles under tsconfig.core.json as a types-only module.
 //
-// "Verbatim" is checked structurally: the ratified ```ts fence is lifted out of
-// docs/spec-client.md §5.2, comments are stripped, whitespace/quote/semicolon
+// "Verbatim" is checked structurally: the ratified seam fixture is lifted out of
+// data/contracts/view-driver-seam.ts, comments are stripped, whitespace/quote/semicolon
 // noise is normalised away, and every one of the six declarations must appear
 // in the implementation source under that same normalisation. Adding `export`
 // is the only edit the unit is allowed to make.
@@ -14,7 +14,7 @@ import { fileURLToPath } from 'node:url'
 
 const REPO = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '../..')
 const SEAM = path.join(REPO, 'src/shared/view-driver.ts')
-const SPEC = path.join(REPO, 'docs/spec-client.md')
+const SEAM_CONTRACT = path.join(REPO, 'data/contracts/view-driver-seam.ts')
 
 const DECLS = ['Species', 'Sentence', 'FeedKind', 'FeedLine', 'ViewEvent', 'MembraneOp'] as const
 
@@ -36,17 +36,9 @@ function read(p: string): string {
   return fs.readFileSync(p, 'utf8')
 }
 
-/** The ratified ```ts fence that opens spec-client §5.2. */
-function ratifiedFence(): string {
-  const spec = read(SPEC)
-  const head = spec.indexOf('### 5.2')
-  expect(head, 'spec-client.md has no §5.2 heading').toBeGreaterThan(-1)
-  const open = spec.indexOf('```ts', head)
-  expect(open, '§5.2 has no ```ts fence').toBeGreaterThan(-1)
-  const bodyStart = spec.indexOf('\n', open) + 1
-  const close = spec.indexOf('```', bodyStart)
-  expect(close, '§5.2 fence is unterminated').toBeGreaterThan(-1)
-  return spec.slice(bodyStart, close)
+/** The ratified seam fixture copied out of the deleted spec-client §5.2 prose. */
+function ratifiedSeam(): string {
+  return read(SEAM_CONTRACT)
 }
 
 /**
@@ -101,7 +93,7 @@ describe('[u2#c1] the seam module exists where §5.2 puts it', () => {
 })
 
 describe('[u2#c1]+[u2#c8] each declaration matches the ratified fence VERBATIM', () => {
-  const spec = declarations(normalise(ratifiedFence()))
+  const spec = declarations(normalise(ratifiedSeam()))
 
   it('(d) the spec fence yields all six declarations (guards the extractor itself)', () => {
     expect([...spec.keys()].sort()).toEqual([...DECLS].sort())
@@ -111,7 +103,7 @@ describe('[u2#c1]+[u2#c8] each declaration matches the ratified fence VERBATIM',
     it(`(d:${name}) src/shared/view-driver.ts reproduces \`${name}\` unchanged`, () => {
       const chunk = spec.get(name)
       expect(chunk, `spec fence lost ${name}`).toBeTruthy()
-      expect(normalise(read(SEAM)), `${name} deviates from the ratified §5.2 text`).toContain(chunk!)
+      expect(normalise(read(SEAM)), `${name} deviates from the ratified seam text`).toContain(chunk!)
     })
   }
 })

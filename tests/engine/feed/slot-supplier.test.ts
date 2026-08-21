@@ -1,15 +1,10 @@
-// [e4#A8] — contract-engine-composer §8-1 transcribed at e4's seam: every slot
-// in call contracts §6's supplier table resolves to exactly one of
+// [e4#A8] — every call slot in the data contract resolves to exactly one of
 // `GateView ∪ BeatView ∪ RoundView ∪ ComposerDeps ∪ PROXY_OWNED_SLOTS`.
 //
-// "Criterion 1 is the one that keeps this document honest: it fails the moment
-// §6 gains a slot nobody assigned." So the slot list is READ FROM THE DOC on
-// disk rather than restated here — a restated list would only test itself. The
+// The slot list is read from `data/contracts/call-slots.json` rather than
+// restated here, so the supplier assertions still have an external denominator. The
 // view keys are likewise read from `src/engine/index.ts` on disk, because
 // `createEngine` is still a throwing stub.
-//
-// e10 owns the integrated §8 ten-criteria suite; this duplication is
-// intentional (spec decision 9).
 import { describe, it, expect } from 'vitest'
 import fs from 'node:fs'
 import path from 'node:path'
@@ -21,28 +16,21 @@ import {
 } from '../../../src/engine/feed/index.ts'
 
 const REPO = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '../../..')
-const CALLS_DOC = path.join(REPO, 'docs/contract-calls.md')
+const CALL_SLOTS = path.join(REPO, 'data/contracts/call-slots.json')
 const ENGINE_INDEX = path.join(REPO, 'src/engine/index.ts')
 
-/** Every backticked SLOT_NAME in the "Supplier per slot" table's slot column. */
-function slotsFromDoc(): string[] {
-  const text = fs.readFileSync(CALLS_DOC, 'utf8')
-  const start = text.indexOf('### Supplier per slot')
-  expect(start, 'contract-calls.md no longer has a "Supplier per slot" section').toBeGreaterThan(-1)
-  const rest = text.slice(start)
-  const end = rest.indexOf('\n### ', 1)
-  const table = end === -1 ? rest : rest.slice(0, end)
-
-  const out: string[] = []
-  for (const line of table.split('\n')) {
-    if (!line.trimStart().startsWith('|')) continue
-    const cells = line.split('|').map((c) => c.trim())
-    // | (empty) | Call | Slot | Supplier | (empty)
-    const slotCell = cells[2] ?? ''
-    if (/^-+$/.test(slotCell) || slotCell.toLowerCase() === 'slot') continue
-    for (const m of slotCell.matchAll(/`([A-Z][A-Z0-9_]*)`/g)) out.push(m[1]!)
+/** Every live call slot named by the data contract. */
+function slotsFromContract(): string[] {
+  const contract = JSON.parse(fs.readFileSync(CALL_SLOTS, 'utf8')) as {
+    supplierSlots?: unknown
   }
-  return out
+  expect(Array.isArray(contract.supplierSlots), 'call-slots.json has no supplierSlots array').toBe(
+    true,
+  )
+  return (contract.supplierSlots as unknown[]).map((slot) => {
+    expect(typeof slot, 'supplierSlots entries must be strings').toBe('string')
+    return slot as string
+  })
 }
 
 /** Keys declared by an `export type <Name> = { ... }` block in engine/index.ts. */
@@ -54,7 +42,7 @@ function viewKeys(typeName: string): string[] {
   return [...body.matchAll(/^\s{2}([A-Z][A-Z0-9_]*)\??:/gm)].map((m) => m[1]!)
 }
 
-const DOC_SLOTS = slotsFromDoc()
+const CONTRACT_SLOTS = slotsFromContract()
 
 const SUPPLIERS: Record<string, readonly string[]> = {
   GateView: viewKeys('GateView'),
@@ -64,24 +52,24 @@ const SUPPLIERS: Record<string, readonly string[]> = {
   PROXY_OWNED_SLOTS,
 }
 
-describe('[e4#A8] §6 slot ⟷ supplier closure', () => {
-  it('(a) the doc table parsed into a non-trivial slot list', () => {
-    expect(DOC_SLOTS.length).toBeGreaterThanOrEqual(12)
-    expect(DOC_SLOTS).toContain('TEMPERAMENT')
-    expect(DOC_SLOTS).toContain('EXPERIENCED')
-    expect(DOC_SLOTS).toContain('AGENT_UTTERANCE')
+describe('[e4#A8] call-slot ⟷ supplier closure', () => {
+  it('(a) the data contract parsed into a non-trivial slot list', () => {
+    expect(CONTRACT_SLOTS.length).toBeGreaterThanOrEqual(12)
+    expect(CONTRACT_SLOTS).toContain('TEMPERAMENT')
+    expect(CONTRACT_SLOTS).toContain('EXPERIENCED')
+    expect(CONTRACT_SLOTS).toContain('AGENT_UTTERANCE')
   })
 
-  it('(b) every §6 slot has AT LEAST one supplier', () => {
-    const unassigned = [...new Set(DOC_SLOTS)].filter(
+  it('(b) every call slot has AT LEAST one supplier', () => {
+    const unassigned = [...new Set(CONTRACT_SLOTS)].filter(
       (slot) => !Object.values(SUPPLIERS).some((set) => set.includes(slot)),
     )
-    expect(unassigned, '§6 gained a slot nobody assigned').toEqual([])
+    expect(unassigned, 'the call-slot contract gained a slot nobody assigned').toEqual([])
   })
 
-  it('(c) no §6 slot has two suppliers — except TEMPERAMENT, which §6 binds to both calls', () => {
+  it('(c) no call slot has two suppliers — except TEMPERAMENT, which binds to both calls', () => {
     const doubled: string[] = []
-    for (const slot of new Set(DOC_SLOTS)) {
+    for (const slot of new Set(CONTRACT_SLOTS)) {
       const owners = Object.entries(SUPPLIERS)
         .filter(([, set]) => set.includes(slot))
         .map(([name]) => name)
@@ -90,7 +78,7 @@ describe('[e4#A8] §6 slot ⟷ supplier closure', () => {
     expect(doubled).toEqual([])
   })
 
-  it('(d) TEMPERAMENT is supplied by exactly GateView and RoundView (§8-6 structural half)', () => {
+  it('(d) TEMPERAMENT is supplied by exactly GateView and RoundView', () => {
     const owners = Object.entries(SUPPLIERS)
       .filter(([, set]) => set.includes('TEMPERAMENT'))
       .map(([name]) => name)
@@ -98,21 +86,23 @@ describe('[e4#A8] §6 slot ⟷ supplier closure', () => {
     expect(owners).toEqual(['GateView', 'RoundView'])
   })
 
-  it('(e) PROXY_OWNED_SLOTS is exactly the default prompt\'s three (contract-calls §6 row 1)', () => {
+  it('(e) PROXY_OWNED_SLOTS is exactly the default prompt\'s three', () => {
     expect([...PROXY_OWNED_SLOTS].sort()).toEqual(['FLAW', 'INCIDENT', 'PRIORITY_LIST'])
   })
 
-  it('(f) neither non-view set names anything §6 does not', () => {
+  it('(f) neither non-view set names anything the call-slot contract does not', () => {
     const stray = [...PROXY_OWNED_SLOTS, ...COMPOSER_DEP_SLOTS].filter(
-      (s) => !DOC_SLOTS.includes(s),
+      (s) => !CONTRACT_SLOTS.includes(s),
     )
-    expect(stray, 'a slot was assigned that §6 does not declare').toEqual([])
+    expect(stray, 'a slot was assigned that the call-slot contract does not declare').toEqual([])
   })
 
-  it('(g) no view declares a slot §6 does not (the views do not invent inputs)', () => {
+  it('(g) no view declares a slot the call-slot contract does not (the views do not invent inputs)', () => {
     const stray: string[] = []
     for (const name of ['GateView', 'BeatView', 'RoundView'] as const) {
-      for (const key of SUPPLIERS[name]!) if (!DOC_SLOTS.includes(key)) stray.push(`${name}.${key}`)
+      for (const key of SUPPLIERS[name]!) {
+        if (!CONTRACT_SLOTS.includes(key)) stray.push(`${name}.${key}`)
+      }
     }
     expect(stray).toEqual([])
   })

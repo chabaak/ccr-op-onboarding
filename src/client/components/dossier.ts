@@ -23,7 +23,7 @@
 // any client source that names the pack's own vocabulary, comments included.)
 //
 // NOTE FOR A DOC PASS — not done here, no doc is edited by this change:
-// `docs/spec-client.md` 105..106 and 149 and `docs/design/phase2-ui/README.md`
+// `data/contracts/view-driver-seam.ts` and `docs/design/phase2-ui/README.md`
 // 65..66 all still describe §3 기질 as a rendered sealed block.
 //
 // Split model → builder (u4 D1): everything above `buildDossier` is pure.

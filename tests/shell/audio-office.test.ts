@@ -1,6 +1,6 @@
 // [08-09] the office beyond the desk — `ambience.deskHolds` and `ambience.sparse`.
 //
-// This suite exists because of the 08-08 lesson recorded in `docs/status.md`:
+// This suite exists because of the 08-08 lesson recorded in the issue and PR trail:
 // two regressions shipped green through a 215-test browser suite, and the reason
 // was structural — `e2e/` drives the DEV fixture loop, so anything whose whole
 // behaviour lives on the live path is untested there by construction. The
@@ -12,10 +12,10 @@
 //
 //  1. **The shipped map parses.** `validateAudioMap` failing is not a loud
 //     failure — `index.ts` catches it, warns, and leaves the desk SILENT
-//     (plan-audio §2 rule 3 makes that a legal outcome). A typo in
+//     (audio-map's documented fallback makes that a legal outcome). A typo in
 //     `audio-map.json` therefore deletes the entire audio layer without
 //     breaking a single test or a single pixel. This is the guard for that.
-//  2. **The new fields survive the round trip** with the values §4.4 documents,
+//  2. **The new fields survive the round trip** with the values audio-map documents,
 //     because they are the whole feature and they are pure data.
 //  3. **The validator still refuses what it should.** A sparse block naming a
 //     cue that does not exist is the exact edit a future reader makes when they
@@ -42,7 +42,7 @@ const MAP_PATH = path.join(REPO, 'data/policy/audio-map.json')
 const AUDIO_DIR = path.join(REPO, 'public/assets/audio')
 const AUDIO_INDEX = path.join(REPO, 'src/client/audio/index.ts')
 const BOOT = path.join(REPO, 'src/client/shell/boot.ts')
-const PLAN = path.join(REPO, 'docs/plan-audio.md')
+const AUDIO_BINDINGS = path.join(REPO, 'data/policy/audio-bindings.md')
 
 /**
  * A source with its comments removed.
@@ -250,7 +250,7 @@ describe('x10 — the room opens at the door', () => {
  *
  * The cut is made in the data and nowhere else (balance-as-data). It is made on
  * the BUS and not on a cue because bed and office both ride it: the ~10 dB gap
- * between them is what plan-audio §4.4 calls the whole effect, and a bus move
+ * between them is the whole effect, and a bus move
  * leaves that gap exactly where it was. These pin the number and the invariant
  * that the number is safe to move — if a later reader compensates on a cue gain,
  * (b) is the assertion that should be argued with, not quietly re-fitted.
@@ -278,8 +278,8 @@ describe('x10 — the ambience bus', () => {
     //
     // `office` at 0.8 is the load-bearing one now, and it is held here against a
     // reader with a good reason to change it: at bus 0.05 the one-shots sit 28 dB
-    // under their raw cuts, 7 dB past the quieter of the two settings plan-audio
-    // §4.4 records as having "read as an empty office". 민서 was asked directly at
+    // under their raw cuts, 7 dB past the quieter setting that read as an empty
+    // office. 민서 was asked directly at
     // the 0.1 pass and ruled "the office.gain is fine", then took the bus down
     // again — so the room is deliberately a bed with events that may or may not be
     // caught. Raising this to 1.0 is the obvious-looking fix and it is the thing
@@ -289,13 +289,13 @@ describe('x10 — the ambience bus', () => {
     expect(cues['watch']?.gain).toBe(0.75)
   })
 
-  it('(c) is the number docs/plan-audio.md publishes', () => {
-    // §4's generated block is the doc's authority on levels and it cannot be
+  it('(c) is the number data/policy/audio-bindings.md publishes', () => {
+    // The generated binding table is the data-side authority on levels and cannot be
     // regenerated without ffprobe, so the one line that carries the buses is
     // pinned here instead: a bus edit that leaves the published figure behind
     // fails now rather than misinforming a reader of a competition deliverable.
     const { buses } = parsed()
-    const doc = fs.readFileSync(PLAN, 'utf8')
+    const doc = fs.readFileSync(AUDIO_BINDINGS, 'utf8')
     expect(doc).toContain(`Buses: \`sfx\` ${buses.sfx} · \`ambience\` ${buses.ambience}.`)
   })
 })

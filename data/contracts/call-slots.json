@@ -1,0 +1,24 @@
+{
+  "supplierSlots": [
+    "FLAW",
+    "INCIDENT",
+    "PRIORITY_LIST",
+    "TEMPERAMENT",
+    "TIMELINE_EXCERPT",
+    "BLOCKS",
+    "GATE_QUESTION",
+    "STANCE_SET",
+    "TIMELINE_TAIL",
+    "AGENT_UTTERANCE",
+    "FIXED_NPC_ACTION",
+    "PRESENT_NPCS",
+    "SCENE_SYMPTOMS",
+    "EXPERIENCED",
+    "REPORT_GUIDANCE"
+  ],
+  "temperament": {
+    "calls": [1, 3],
+    "slot": "TEMPERAMENT",
+    "source": "scenario"
+  }
+}

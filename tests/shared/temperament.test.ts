@@ -1,6 +1,6 @@
 // [e1] — src/shared/temperament.ts + src/shared/report-guidance.ts.
 //
-// The prose SHAPE is known-open (contract-engine-composer §4.1: "S + D own it,
+// The prose SHAPE is known-open: "scenario and default prompt own it,
 // a work unit must not resolve it"). So nothing here asserts a template. What
 // it asserts is the four §4 invariants, plus the two things that keep an
 // invariant-only suite honest: the renderer must be a *function of its input*
@@ -8,8 +8,7 @@
 // authored content.
 //
 // The report-guidance renderer ships in the same unit and rides in this file on
-// purpose — `plan-engine-build.md` §4a gates e1 on
-// `npm test -- tests/shared/temperament.test.ts` alone, so a sibling
+// purpose, so a sibling
 // report-guidance.test.ts would sit outside the unit's own gate. See
 // discovery/e1.md.
 import { describe, it, expect } from 'vitest'
@@ -63,6 +62,9 @@ const HEADER_LINE = /^\*\*.+\*\*$/
 
 const PACK = readJson<Temperament>('data/scenario/우는다리/temperament.json')
 const GUIDANCE = readJson<ReportGuidance>('data/policy/report-guidance.json')
+const CALL_SLOTS = readJson<{
+  temperament: { calls: number[]; slot: string; source: string }
+}>('data/contracts/call-slots.json')
 
 const TEMPERAMENT_SRC = 'src/shared/temperament.ts'
 const REPORT_GUIDANCE_SRC = 'src/shared/report-guidance.ts'
@@ -85,8 +87,7 @@ const twoClauses: Temperament = {
 
 // ═══ invariant 1 — Call 1 and Call 3 get byte-identical output ═══════════════
 //
-// contract-engine-composer §4 invariant 1; contract-calls §6 row `1 · 3 |
-// TEMPERAMENT`. There is one temperament per scenario and two copies drift
+// There is one temperament per scenario and two copies drift
 // silently, so the two calls must be served by one renderer over one pack.
 
 describe('[e1] invariant 1 — Calls 1 and 3 receive byte-identical temperament', () => {
@@ -111,9 +112,12 @@ describe('[e1] invariant 1 — Calls 1 and 3 receive byte-identical temperament'
     expect(exported.filter((n) => /judgment|reporter|call\s*[13]|gate|round/i.test(n))).toEqual([])
   })
 
-  it('(d) premise: call contracts §6 still assigns TEMPERAMENT to calls 1 · 3 from one file', () => {
-    const calls = read('docs/contract-calls.md')
-    expect(calls).toMatch(/\|\s*1\s*·\s*3\s*\|\s*`TEMPERAMENT`\s*\|/)
+  it('(d) premise: the call-slot contract still assigns TEMPERAMENT to calls 1 · 3 from one file', () => {
+    expect(CALL_SLOTS.temperament).toEqual({
+      calls: [1, 3],
+      slot: 'TEMPERAMENT',
+      source: 'scenario',
+    })
   })
 })
 

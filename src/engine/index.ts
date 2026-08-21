@@ -5,11 +5,10 @@
  * the e0 skeleton and was never updated when e2/e3/e4 filled it in. The public
  * surface below is live and `createEngine` is bound by the composition root.
  *
- * Its **public surface** — what the composer may call — is fixed by
- * [contract-engine-composer.md](../../docs/contract-engine-composer.md) §2:
+ * Its **public surface** — what the composer may call — is fixed as
  * `gateView()` · `beatView()` · `roundView()`, each returning a snapshot of
- * plain data, never a live handle into state. That contract also assigns this
- * module the round event assembler (§5). Its internals are this spec's:
+ * plain data, never a live handle into state. This module also owns the round
+ * event assembler. Its internals are:
  *
  * What lands here, per that spec: the run state, the per-beat delta journal
  * (`{variable, before, after, cause}`), the symptom renderer, and the beat

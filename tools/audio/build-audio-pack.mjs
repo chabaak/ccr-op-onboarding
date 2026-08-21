@@ -560,7 +560,7 @@ const TRIGGER_WHEN = {
 }
 
 /**
- * Rewrites the "which sound plays when" table inside `docs/plan-audio.md`.
+ * Rewrites the "which sound plays when" table inside `data/policy/audio-bindings.md`.
  *
  * Three files have to agree for a cue to sound — `map.ts` declares the trigger,
  * `audio-map.json` binds it to a cue, and the cue names an asset this builder
@@ -571,7 +571,7 @@ const TRIGGER_WHEN = {
  * silent rather than going missing, which is the case worth seeing.
  */
 function writeBindingTable() {
-  const DOC = path.join(REPO, 'docs/plan-audio.md')
+  const DOC = path.join(REPO, 'data/policy/audio-bindings.md')
   const BEGIN = '<!-- audio:bindings:begin -->'
   const END = '<!-- audio:bindings:end -->'
 
@@ -648,10 +648,10 @@ function writeBindingTable() {
   const from = doc.indexOf(BEGIN)
   const to = doc.indexOf(END)
   if (from === -1 || to === -1) {
-    throw new Error(`docs/plan-audio.md is missing the ${BEGIN} / ${END} markers`)
+    throw new Error(`data/policy/audio-bindings.md is missing the ${BEGIN} / ${END} markers`)
   }
   fs.writeFileSync(DOC, doc.slice(0, from) + lines + doc.slice(to + END.length))
-  console.log(`docs/plan-audio.md — binding table written (${triggers.length} triggers)`)
+  console.log(`data/policy/audio-bindings.md — binding table written (${triggers.length} triggers)`)
 }
 
 /* ── entry ───────────────────────────────────────────────────────────────── */
