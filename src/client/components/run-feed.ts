@@ -57,6 +57,7 @@ import type { FallbackClass } from './fallback-notice.ts'
 import { tallyLineText } from './tally-line.ts'
 import { TYPE_START, typeCursor } from './typewriter.ts'
 import type { TypePace } from './typewriter.ts'
+import { LIVE_FEED_PACING } from '../../../data/policy/live-feed-pacing.ts'
 
 /* ── the model ───────────────────────────────────────────────────────────── */
 
@@ -249,9 +250,8 @@ export function feedLineModel(line: FeedLine): FeedNode {
    `windows/live-feed.ts` gates the whole `__feed` handle behind
    `import.meta.env.DEV` and the bundler folds it out of the player build. What
    is left is a queue that drains slower than it fills for a while and then
-   catches up in the quiet — measured at ~51 s of paper against the demo day's
-   77 s of sim at ×1, and `live-feed.test.ts` pins that ratio to the constants
-   below so a re-tune cannot quietly put the paper behind the day.            */
+   catches up in the quiet. `live-feed.test.ts` pins that ratio to the data
+   policy so a re-tune cannot quietly put the paper behind the day.           */
 
 /**
  * The pause after a ROW.
@@ -260,10 +260,10 @@ export function feedLineModel(line: FeedLine): FeedNode {
  * document; here a "sentence" is a whole feed line, so this is the beat between
  * two utterances and is priced higher than the report body's 130 ms. Same
  * reasoning `slot-board.ts` records for its own pair: the pause only reads as a
- * pause while it is worth a dozen-odd characters of the rate beside it, and at
- * 16 ms/char this is worth 16 of them — a row boundary, not a stop.
+ * pause while it is worth a dozen-odd characters of the rate beside it. Its
+ * value now comes from the data policy so a pacing tune is not a logic edit.
  */
-const FEED_ROW_MS = 260
+const FEED_ROW_MS = LIVE_FEED_PACING.rowPauseMs
 
 /**
  * Real milliseconds one character costs on the fanfold.
@@ -278,15 +278,14 @@ const FEED_ROW_MS = 260
  * The ceiling is arithmetic and it is close. The demo day prints ~1560
  * characters into 77 s of sim at ×1, and the paper may not end the run behind
  * the desk — the ending waits on it. A teletype's own 100 ms/char would be 156 s
- * of typing and is impossible; 16 lands the day's paper at ~57 s, and
- * `live-feed.test.ts` recomputes that sum from these constants against the real
- * fixture and holds the ratio under 0.8 so the next re-tune cannot cross it
- * quietly.
+ * of typing and is impossible, so `live-feed.test.ts` recomputes the day's cost
+ * from the data policy against the real fixture and holds the ratio under 0.8
+ * so the next re-tune cannot cross it quietly.
  *
  * The reading still happens in the PAUSES. This rate only has to make the
  * characters look like they are arriving rather than appearing.
  */
-const FEED_MS_PER_CHAR = 16
+const FEED_MS_PER_CHAR = LIVE_FEED_PACING.msPerChar
 
 /**
  * The feed's pace: this window's own rate and its own row beat.
@@ -309,17 +308,17 @@ export const FEED_PACE: TypePace = { msPerChar: FEED_MS_PER_CHAR, msBetween: FEE
  * The cap is NOT optional, and the shipped pack is the argument. `멈춘회전문`'s
  * gaps run 0 to 33 sim-minutes, so raw proportionality would make the last pause
  * thirty times the first; the demo fixture (`driver/fixtures/woodari-run03.ts`,
- * which is what e2e drives) has gaps of 89. Opening at 240 ms and adding 24 ms a
- * minute, the cap binds from 28 minutes up and the whole spread is 264 → 900 ms
- * — a factor of 3.4 between the shortest hop and the longest silence of the day.
+ * which is what e2e drives) has gaps of 89. Opening above zero and adding a
+ * little per minute, the cap binds inside that range and keeps the longest
+ * silence of the day within a small multiple of the shortest hop.
  *
  * The OPENING term is why a one-minute hop is not 24 ms: what the operator reads
  * is that the clock moved at all, and a pause too short to notice would make the
  * proportional part the only signal, which the small gaps do not carry.
  */
-const GAP_OPEN_MS = 240
-const GAP_MS_PER_MIN = 24
-const GAP_MAX_MS = 900
+const GAP_OPEN_MS = LIVE_FEED_PACING.gapOpenMs
+const GAP_MS_PER_MIN = LIVE_FEED_PACING.gapMsPerMinute
+const GAP_MAX_MS = LIVE_FEED_PACING.gapMaxMs
 
 /**
  * The pause the paper owes a line stamped `to` when the last one printed said
