@@ -20,6 +20,8 @@ const FONTS_CSS = path.join(REPO, 'src/client/styles/fonts.css')
 const NAV_BUDGET_MS = 1000
 /** Navigations timed for that budget — the best one is the build's own cost. */
 const NAV_SAMPLES = 5
+/** First-render font responses must be substantial, not an empty measurement. */
+const FIRST_RENDER_FONT_RESPONSE_FLOOR = 8
 const SHORT_KOREAN_SLICE_BUDGET = 6
 // C17 / [u11#c12] — the two absolute font budgets that stood here (24 files /
 // 300_000 B) were u10's calibration against an EMPTY desk and are re-aimed, not
@@ -171,6 +173,16 @@ function tailOf(url: string): string {
   return m ? m[0] : ''
 }
 
+function duplicatedValues(values: readonly string[]): string[] {
+  const seen = new Set<string>()
+  const duplicated = new Set<string>()
+  for (const value of values) {
+    if (seen.has(value)) duplicated.add(value)
+    else seen.add(value)
+  }
+  return [...duplicated].sort()
+}
+
 /**
  * Waits until the document has stopped pulling slices.
  *
@@ -244,7 +256,7 @@ test('the running page makes zero third-party requests', async ({ page, baseURL 
   }
 })
 
-test('the self-hosted fonts stay inside the ~1 s load budget', async ({ page, baseURL }) => {
+test('the self-hosted fonts stay inside the ~1 s load budget', async ({ page, context, baseURL }) => {
   const faces = readFaces()
   expect(faces.length).toBeGreaterThan(0)
 
@@ -279,26 +291,32 @@ test('the self-hosted fonts stay inside the ~1 s load budget', async ({ page, ba
       `(all: ${samples.map((s) => Math.round(s)).join(', ')} ms)`,
   ).toBeLessThan(NAV_BUDGET_MS)
 
+  // The budget samples above are finished once `load` fires, while
+  // `font-display: swap` deliberately lets font slices finish behind it. Measure
+  // slices on a fresh page so late responses from a previous sample cannot look
+  // like same-navigation refetches.
+  await page.close()
+  const fontPage = await context.newPage()
   const fontResponses: { url: string; bytes: number }[] = []
-  page.on('response', (r) => {
+  fontPage.on('response', (r) => {
     if (isFontUrl(r.url())) {
       fontResponses.push({ url: r.url(), bytes: 0 })
     }
   })
 
-  await page.goto('./')
+  await fontPage.goto('./')
 
   // Nothing font-shaped may block that document: `font-display: swap` is what
   // puts the whole payload behind first paint ([u10#c4]).
   const blocking = faces.filter((f) => f.display !== 'swap').map((f) => `${f.family} ${f.tail}`)
   expect(blocking, 'a face is not `font-display: swap` — its slices block first paint').toEqual([])
 
-  await quiesceFonts(page, fontResponses)
+  await quiesceFonts(fontPage, fontResponses)
   const firstRender = [...fontResponses]
 
   // Subset loading, measured: every slice the first render pulled answers text
   // the document actually renders.
-  const rendered = await page.evaluate(() => {
+  const rendered = await fontPage.evaluate(() => {
     const points = new Set<number>()
     // `textContent`, not `innerText`: a slice may legitimately answer text a
     // phase currently keeps off the desk (the TALLY sheet's ledger), and the
@@ -318,15 +336,19 @@ test('the self-hosted fonts stay inside the ~1 s load budget', async ({ page, ba
   expect(unjustified, 'these slices were pulled for text the page never renders').toEqual([])
 
   const tails = firstRender.map((f) => tailOf(f.url))
-  expect(new Set(tails).size, 'a slice was fetched more than once').toBe(tails.length)
+  expect(
+    tails.length,
+    'first-render font measurement observed too few slice responses to prove the split',
+  ).toBeGreaterThanOrEqual(FIRST_RENDER_FONT_RESPONSE_FLOOR)
+  expect(duplicatedValues(tails), 'a slice was fetched more than once').toEqual([])
   expect(tails.length, 'the page pulled the whole sheet — the unicode-range split does nothing').toBeLessThan(
     faces.length,
   )
 
   // …and the sample the probe forces still costs real bytes, so the payload
   // measurement itself cannot go vacuous.
-  await page.addStyleTag({ content: probeCss(baseURL!, faces) })
-  await page.evaluate(
+  await fontPage.addStyleTag({ content: probeCss(baseURL!, faces) })
+  await fontPage.evaluate(
     async ([latin, korean]) => {
       await document.fonts.load(`400 16px "IBM Plex Mono"`, latin)
       await document.fonts.load(`400 16px "Nanum Gothic Coding"`, korean)
