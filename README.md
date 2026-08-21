@@ -20,6 +20,7 @@ npm install
 npm run dev      # local dev server
 npm run build    # type-check + production build to dist/
 npm run preview  # preview the production build locally
+npm run audio:table # refresh audio binding table; requires ffprobe on PATH
 ```
 
 ## Layout

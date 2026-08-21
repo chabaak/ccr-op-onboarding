@@ -1,11 +1,11 @@
 /**
- * Channel → `Species`. The map spec-client §5.2 ratified as existing but never
- * wrote down.
+ * Channel → `Species`. The map the view-driver seam ratified as existing but
+ * never wrote down.
  *
- * Owner: 윤석 (architecture track). Pure data — physical §3.2 permits that here.
+ * Pure data: shared may define the channel vocabulary without touching host APIs.
  *
  * "**Species derives from the channel, never from classification**" is the
- * ratified rule (spec-client §5.2). Nothing infers a species from the text: a
+ * ratified rule. Nothing infers a species from the text: a
  * sentence is what its source made it.
  *
  * The four names are the authoring vocabulary, not new terms —
@@ -13,13 +13,13 @@
  * **certified** and two are not, and that split is load-bearing rather than
  * descriptive:
  *
- * - [contract-datapack](../../docs/contract-datapack.md) **E2** — a key
- *   condition's species is `사실` or `자기서술` **only** (schema enum);
- *   emotion and quotation cannot enter the solution path.
- * - [gate-hardening-manual](../../docs/scenario/gate-hardening-manual.md)
- *   anti-pattern **5** — an uncertified species on the correct path "moves even
- *   when it points at a bystander, so aiming becomes impossible". Emotion and
- *   quotation belong in the periphery, as texture.
+ * - `data/scenario/_schema/truths.schema.json` allows key conditions to cite
+ *   only fact and self-narration species; emotion and quotation cannot enter
+ *   the solution path.
+ * - The lint rule enforced by `authoring/lint-datapack.mjs` keeps uncertified
+ *   species off key conditions, because such text can move bystander details
+ *   into the route logic. Emotion and quotation belong in the periphery, as
+ *   texture.
  *
  * So this map decides which generated text can ever be part of a solution.
  */
@@ -35,8 +35,7 @@ export type { Species }
 
 /**
  * The five minted channels. `t*` ids are inherited from `timeline.json` and
- * never minted (contract-engine-composer §2.0), so they are not in this union —
- * see `AUTHORED_SPECIES` below.
+ * never minted, so they are not in this union; see `AUTHORED_SPECIES` below.
  */
 export type Channel = 'f' | 'b' | 'n' | 'q' | 'u'
 
@@ -54,8 +53,8 @@ export const SPECIES_OF: Readonly<Record<Channel, Species>> = {
    */
   b: 'selfnarr',
   /**
-   * Call 2 `timeline_entries` — "reactions and scene texture" (call contracts
-   * §2). Uncertified, deliberately.
+   * Call 2 `timeline_entries` — reactions and scene texture. Uncertified,
+   * deliberately.
    *
    * This is the one the ratification left unstated, and it is not a matter of
    * taste. Certifying it would put **model-generated, unauthored prose on the
@@ -75,7 +74,7 @@ export const SPECIES_OF: Readonly<Record<Channel, Species>> = {
  */
 export const AUTHORED_SPECIES: Species = 'fact'
 
-/** The two species a key condition may be (contract-datapack E2). */
+/** The two species a key condition may cite. */
 export const CERTIFIED: ReadonlySet<Species> = new Set<Species>(['fact', 'selfnarr'])
 
 export const isCertified = (s: Species): boolean => CERTIFIED.has(s)

@@ -17,8 +17,9 @@
 //   • generated — `synth.mjs`, for the cues no library does well (room tone,
 //     drone, squelch, the dissonant symptom chime, the collapse)
 //
-// Requires ffmpeg on PATH. Downloads are cached in `tools/audio/.cache/`
-// (gitignored); only the encoded OGGs under `public/` are committed.
+// Requires ffmpeg on PATH; `--table` also requires ffprobe. Downloads are
+// cached in `tools/audio/.cache/` (gitignored); only the encoded OGGs under
+// `public/` are committed.
 import fs from 'node:fs'
 import path from 'node:path'
 import os from 'node:os'
@@ -644,7 +645,10 @@ function writeBindingTable() {
     END,
   ].join('\n')
 
-  const doc = fs.readFileSync(DOC, 'utf8')
+  fs.mkdirSync(path.dirname(DOC), { recursive: true })
+  const doc = fs.existsSync(DOC)
+    ? fs.readFileSync(DOC, 'utf8')
+    : `${BEGIN}\n${END}\n`
   const from = doc.indexOf(BEGIN)
   const to = doc.indexOf(END)
   if (from === -1 || to === -1) {

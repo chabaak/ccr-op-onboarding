@@ -1,11 +1,12 @@
-// Call-type registry — the three calls of [call contracts v1](../../docs/contract-calls.md),
-// as executable definitions. Shared by the probe runner and the full-run driver.
+// Call-type registry — the three calls as executable definitions. Shared by the
+// probe runner and the full-run driver. Slot ownership is pinned by
+// data/contracts/call-slots.json.
 //
 // `buildTool` IS the contract's output schema. It is the only executable copy in
 // the repo today: `src/shared/contracts.ts` transcribes the same document for the
 // bundle, and the proxy will need a third copy outside the root install. Three
 // copies of one contract need a drift gate, the way the datapack schemas already
-// have one (physical architecture §3.1) — that gate does not exist yet.
+// have one — that gate does not exist yet.
 //
 // The probe layers a test program on top: a test type is a (call type × suite)
 // pair, the suite is data, and adding one means one entry below plus the two
@@ -198,7 +199,7 @@ const judgment = {
 };
 
 // ── Call 2 — Narration / NPC dialogue ───────────────────────────────────────
-// Contract: docs/contract-calls.md §2. One bundled call per beat (spec §4).
+// Contract: one bundled narration call per beat.
 // Load-bearing properties — mineable yield and constraint compliance — are
 // test-program material; the schema structures the output, the human checks the
 // constraint. Output units match mining units: timeline_entries is an array of
@@ -301,7 +302,7 @@ const narration = {
         // An invented speaker is an observation about the model, not a
         // malformed response — record it, never retry (retrying erases the
         // observation). Production drops the offending line instead; see the
-        // contracts doc §3. Same grading as judgment's hallucinated block ids.
+        // production path. Same grading as judgment's hallucinated block ids.
         else if (!legal.has(m[1])) problems.push(`__soft__ npc_lines unknown speaker: ${m[1]}`);
         // The controller is not in PRESENT_NPCS, so re-emitting its utterance
         // as someone's dialogue passes the speaker check with a legal id. Soft:
@@ -344,7 +345,7 @@ const narration = {
 };
 
 // ── Call 3 — Reporter ───────────────────────────────────────────────────────
-// Contract: docs/contract-calls.md §3. 사실/판단 분리는 2안(스키마 확장,
+// Contract: 사실/판단 분리는 2안(스키마 확장,
 // 07-31 윤석): facts = 객관로그 행, report_body = 자필 보고서. 실용성이 없으면
 // 폐기하고 3안(엔진 로그)으로 격하 — 스모크의 drop_condition이 그 게이트다.
 // (그 줄은 분리를 정한 시점의 기록이다. report_body는 prompts reporter v0.3에서
@@ -352,7 +353,7 @@ const narration = {
 //
 // Field order is load-bearing twice over: facts-first is the extraction anchor
 // (본문 오염 감소 가설), and report_body-LAST is what keeps the SSE option open
-// (input_json_delta의 꼬리 = 본문 — contracts doc §SSE). Do not reorder.
+// (input_json_delta의 꼬리 = 본문). Do not reorder.
 //
 // Whether each facts row is actually factual (no judgment/interpretation mixed
 // in) is not machine-checkable — that is the smoke's human check, per the
