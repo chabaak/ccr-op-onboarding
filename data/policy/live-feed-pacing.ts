@@ -5,8 +5,8 @@
  * recompute the shipped day from them so a pacing change stays visible.
  */
 export const LIVE_FEED_PACING = {
-  rowPauseMs: 280,
-  msPerChar: 17,
+  rowPauseMs: 700,
+  msPerChar: 48,
   gapOpenMs: 260,
   gapMsPerMinute: 24,
   gapMaxMs: 900,

@@ -494,13 +494,13 @@ describe('x11 the reveal pump charges time for lines, never for events', () => {
     expect(feedGapMs('08:00', '10:00')).toBe(LIVE_FEED_PACING.gapMaxMs)
   })
 
-  it('(e) the whole demo day of paper still fits inside the day of sim it prints', () => {
+  it('(e) the whole demo day of paper stays inside the human-readable presentation band', () => {
     // The one number the pacing block claims out loud, pinned to the constants
     // it is a function of — `slot-board.ts`'s note is the precedent, and the
     // reason is the same: a comment that states a total goes stale with the
-    // numbers beside it, and this one is the argument that removing the crowd
-    // divisor was affordable. What must hold is that a run drains inside its own
-    // day at ×1 and that the pacing has not been quietly tuned down to a dump.
+    // numbers beside it. What must hold now is the human-tested trade: the
+    // paper no longer races the simulated day at ×1, but it also has not been
+    // quietly tuned into an endless crawl.
     //
     // x12 — "with room for the report holds" is struck from that sentence: the
     // holds are gone (`run-feed.ts`, where `REPORT_HOLD_MS` was) and the sum
@@ -508,7 +508,8 @@ describe('x11 the reveal pump charges time for lines, never for events', () => {
     // margin and nothing else. It is also the margin the report GATE spends —
     // REPORTS waits for the paper to reach a round before it draws it
     // (`shell/feed-reach.ts`), so the day's documents land a lag behind the
-    // seam, and the lag is exactly what this bound keeps small.
+    // seam. Candidate D accepts that lag because unreadable paper is worse than
+    // a longer first run; the bound keeps that choice inside a presentation band.
     let at = ''
     let paper = 0
     for (const event of EVENTS) {
@@ -538,9 +539,10 @@ describe('x11 the reveal pump charges time for lines, never for events', () => {
       at = node.stamp ?? at
     }
     const day = (mm(woodariRun03.end) - mm(woodariRun03.start)) * MS_PER_SIM_MIN
-    expect(paper, 'the paper cannot keep up with the day it prints').toBeLessThan(day)
-    expect(paper / day).toBeLessThan(0.8)
-    expect(paper / day, 'the pacing collapsed — the day would print as a dump').toBeGreaterThan(0.4)
+    const ratio = paper / day
+    expect(paper, 'the paper is racing the day again instead of staying readable').toBeGreaterThan(day)
+    expect(ratio, 'the paper outgrew the readable candidate-D trade').toBeLessThan(2)
+    expect(ratio, 'the pacing collapsed — the day would print as a dump').toBeGreaterThan(1.5)
   })
 })
 
