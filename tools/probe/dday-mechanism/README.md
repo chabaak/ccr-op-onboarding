@@ -1,8 +1,8 @@
 # 메커니즘 실측 프로그램 — 진입점
 
 > DDAY의 AI 메커니즘 후보를 실제 모델 호출로 측정한 기록이다.
-> 이 폴더는 계획 문서가 아니라 **측정 기록**이다. 실험 계획은
-> [`docs/plan-mechanism-test.md`](../../../docs/plan-mechanism-test.md)에 있다.
+> 이 폴더는 계획 문서가 아니라 **측정 기록**이다. 원래 실험 계획은
+> docs cleanup에서 제거됐고, 현행 판독 기록은 이 폴더 안의 REPORT/RUNLOG가 맡는다.
 
 ## 지금 상태 (2026-07-31 · 검증 프로그램 종료)
 
@@ -36,7 +36,7 @@ coding과 player-visible 확인은 07-30 회의에서 생략을 결정했다
 
 문서끼리 어긋나면 위가 이긴다.
 
-1. [RUNLOG.md](RUNLOG.md) — `A#` amendment가 deep-test plan보다 우선한다
+1. [RUNLOG.md](RUNLOG.md) — `A#` amendment가 현행 운영 기록보다 우선한다
 2. 각 suite의 사전등록 (`suites/*.json`)
 3. 각 run의 raw `calls-*.md`
 4. 각 run의 `metrics-*.json`

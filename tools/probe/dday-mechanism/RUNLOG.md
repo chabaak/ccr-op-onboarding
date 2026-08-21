@@ -1,14 +1,13 @@
 # Mechanism program — run log and standing amendments
 
-Append-only. The [deep-test plan](../../../docs/plan-mechanism-test.md) stays
-frozen as the reference document; measured results amend it here instead of
-being edited into it. Opened 2026-07-30, when the first measured run contradicted
-the plan and there was no time to re-paper it.
+Append-only. The retired deep-test plan no longer lives under `docs/`; measured
+results and standing amendments are retained here instead. Opened 2026-07-30,
+when the first measured run contradicted the plan and there was no time to
+re-paper it.
 
 **Precedence.** For anything carrying an `A#` amendment below, **this file wins**
-over the plan until someone reconciles them. For everything else the plan wins,
-unchanged. The architecture spec is untouched by this file — a spec change is
-never an amendment, it is a spec change.
+over the older plan language. The current repository rules in `AGENTS.md` still
+win for work in this repo; a rule change is never a run-log amendment.
 
 **Rules.** Append, never rewrite. Every entry is dated and names the run that
 caused it. An amendment states the **operating rule to follow now**, not an essay

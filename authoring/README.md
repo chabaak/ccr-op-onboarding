@@ -8,12 +8,12 @@ before a TypeScript build, before a browser. That is the whole reason it is not
 under `tools/`: `tools/` imports `src/` and executes the game's own code paths,
 while nothing here may assume any of that exists.
 
-Pipeline stages 1–2 of [plan-pipeline.md](../docs/plan-pipeline.md) §2.
+Pipeline stages 1–2: compile the draft, then lint the produced datapack.
 
 | Script | Stage | Transformation |
 |---|---|---|
 | `compile-datapack.mjs` | 1 · Compile | draft (write-scenario §4 format) → `data/scenario/<slug>/` |
-| `lint-datapack.mjs` | 2 · Lint | datapack → violation list ([contract](../docs/contract-datapack.md) §3) |
+| `lint-datapack.mjs` | 2 · Lint | datapack → violation list (`data/scenario/_schema` + lint rules) |
 | `generate-datapack-types.mjs` | — | `data/scenario/_schema/*.schema.json` → `src/shared/datapack.ts` |
 
 ```bash
@@ -26,7 +26,7 @@ npm run datapack:check          # type drift; also runs inside `npm run check`
 erased at runtime and cannot check JSON, and packs must be validated where no
 engine and no TS build exist yet — which is exactly here. `datapack.ts` is
 generated so the transcription cannot disagree with its source; `--check` exits
-non-zero on drift and is wired into `npm run check` (physical architecture §3.1).
+non-zero on drift and is wired into `npm run check`.
 
 Zero dependencies, zero LLM calls. No model touches stage 1: pack sentences are
 the player's mining vein, and a silent paraphrase would break key conditions

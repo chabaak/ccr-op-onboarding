@@ -365,7 +365,7 @@ check('no nested objects in the narration schema', () => {
 // no test read the schema's constraints and the deploy smoke only ever calls
 // judgment. `npc_lines` is capped by schema on purpose — the prompt asks for one
 // line, and the cap is what makes the model refuse a second rather than us
-// truncating after the fact. See docs/handoffs/feed-register-llm.md §3.3.
+// truncating after the fact.
 check('npc_lines is capped at one line — the schema refuses overproduction', () => {
   const props = nspec.buildTool(narrSuite()).input_schema.properties;
   assert.equal(props.npc_lines.maxItems, 1, 'npc_lines lost its cap');

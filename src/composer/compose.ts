@@ -2,11 +2,10 @@
  * The three builders — engine view (+ the player's injected block ids) → the
  * `CallRequest` the bundle POSTs to the proxy.
  *
- * Contract: [engine ⟷ composer](../../docs/contract-engine-composer.md) §3 (the
- * three builders, `BLOCKS` as a *set* of ids), §4 (`{TEMPERAMENT}` is the one
- * pre-rendered slot), §7 (no scenario read — every value arrives through a
- * view), and [call contracts](../../docs/contract-calls.md) §6/§11 (supplier per
- * slot; the wire shape).
+ * Contract: three builders, `BLOCKS` as a *set* of ids, `{TEMPERAMENT}` as the
+ * one pre-rendered slot, no scenario read, and every value arriving through a
+ * view. Slot ownership is pinned by `data/contracts/call-slots.json`; the wire
+ * shape is pinned by `src/shared/contracts.ts`.
  *
  * Three properties this file exists to hold:
  *
@@ -57,7 +56,7 @@ export type BlockStore = { get(id: string): Block | undefined }
  * `narration v0.4` / `reporter v0.4` carry the recast, the register split
  * (Call 3 존댓말, Calls 1–2 clipped 해라체), the one-NPC-one-line rule and the
  * branch for a beat where the agent said nothing — which is most of them
- * (`driver.ts:133`, and `docs/handoffs/feed-register-llm-amendment.md` for why).
+ * (`driver.ts:133`).
  *
  * IT LANDS SECOND, AND THIS IS THE SECOND. `proxy-deploy.yml` and the Pages
  * `deploy.yml` both fire on push-to-main and run concurrently, so a client that

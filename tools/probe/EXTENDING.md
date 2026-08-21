@@ -37,8 +37,7 @@ allowed to differ in. Anything else varying across arms aborts the run.
 
 Worked examples now live in the codebase: **`narration`** and **`reporter`**
 (`tools/lib/calls.mjs`, the narration and reporter prompt pairs, both v0.1)
-were added this way — schemas and the decisions behind them are recorded in
-[docs/contract-calls.md](../../docs/contract-calls.md). The steps:
+were added this way. The steps:
 
 1. Add `prompts/<call>/base-vX.Y.md` (proxy) and `data/prompts/<call>/user-vX.Y.md` with `{SLOT}` markers.
 2. Add the entry to `tools/lib/calls.mjs`: `promptDir`, `slots`, `buildTool`

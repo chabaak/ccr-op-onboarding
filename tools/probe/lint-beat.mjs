@@ -25,8 +25,7 @@
 // reported Q&A back into live dialogue, that re-staging needs the agent's half,
 // and only NPCs can carry it — same failure, quieter road. Detecting it needs a
 // reported-speech pattern this check does not have; until then the guard is the
-// narration prompt's dialogue contract (base-v0.4) plus `maxItems: 1` on
-// npc_lines. See docs/handoffs/feed-register-llm.md §3.1.
+// narration prompt's dialogue contract plus `maxItems: 1` on npc_lines.
 //
 // "controller" throughout this file is the agent under its pre-DDAY name.
 //

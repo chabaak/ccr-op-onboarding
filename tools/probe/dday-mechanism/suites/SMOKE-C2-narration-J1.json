@@ -1,5 +1,5 @@
 {
-  "_what": "Call 2 (Narration/NPC) 첫 스모크 — docs/dday-call-contracts.md §5의 스모크 배치 절반. 측정 대상은 회의록 할 것 4의 두 속성: constraint compliance(고정 사건을 어기지 않는가)와 mineable yield(문장이 채굴 재료가 되는가). 판정은 사람이 calls-*.md를 읽고 §5.3 mineability log에 쓴다 — 하네스는 카운트만 낸다. constraint_echo=on 암(SMOKE-C2b가 off 암).",
+  "_what": "Call 2 (Narration/NPC) 첫 스모크 — retired call-contract smoke batch의 절반. 측정 대상은 회의록 할 것 4의 두 속성: constraint compliance(고정 사건을 어기지 않는가)와 mineable yield(문장이 채굴 재료가 되는가). 판정은 사람이 calls-*.md를 읽고 mineability log에 쓴다 — 하네스는 카운트만 낸다. constraint_echo=on 암(SMOKE-C2b가 off 암).",
   "_authoring_provenance": {
     "scene": "S1-stanceset-J1의 J1 문맥을 이어받은 직후 비트: live 암의 전형 결과(공감 스탠스, f_script 주입 후)를 전제로 통제관 발화를 저작. 고정 사건은 시나리오 초안의 '대본 이탈' 비트를 가정한 저작 — 최종 시나리오 선정 시 교체 대상.",
     "npc_ids": "caller_a(회선 A 발신자) · jhg(정해권) · hbr(황보람) — S1 TIMELINE_EXCERPT의 등장 인물과 일치."

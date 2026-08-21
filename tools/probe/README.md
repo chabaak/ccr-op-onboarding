@@ -2,10 +2,10 @@
 
 Probe runner for DDAY test programs. Zero dependencies, plain Node ≥24.
 
-First consumer is the [mechanism deep-test plan](../../docs/plan-mechanism-test.md)
-— see its §8 for the operating procedure. The runner is built to outlive that
-program: [**EXTENDING.md**](./EXTENDING.md) covers pointing it at other tests,
-with worked recipes and what each planned test still needs.
+First consumer is the mechanism deep-test material under
+`tools/probe/dday-mechanism/`. The runner is built to outlive that program:
+[**EXTENDING.md**](./EXTENDING.md) covers pointing it at other tests, with
+worked recipes and what each planned test still needs.
 
 ## What is and is not in here
 
@@ -177,10 +177,10 @@ const myCall = {
 
 `run.mjs`, the arm-diff check, the recorder, and the CLI are untouched. The
 `narration` and `reporter` call types are wired this way (templates at
-`prompts/narration/` and `prompts/reporter/`, both v0.1) — their contracts,
-and the decisions behind their field lists, live in
-[docs/contract-calls.md](../../docs/contract-calls.md). First smoke
-suites: `tools/probe/dday-mechanism/suites/SMOKE-C2*-narration-J1.json` and
+`prompts/narration/` and `prompts/reporter/`, both v0.1) — their contracts
+and the decisions behind their field lists are encoded in `tools/lib/calls.mjs`
+and the prompt bundles. First smoke suites:
+`tools/probe/dday-mechanism/suites/SMOKE-C2*-narration-J1.json` and
 `SMOKE-C3-reporter-J1.json`.
 
 Two things to keep in mind when adding one:

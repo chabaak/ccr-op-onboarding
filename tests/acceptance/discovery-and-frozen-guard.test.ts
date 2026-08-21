@@ -16,7 +16,7 @@ function git(args: string[]): string {
 describe('[u11#c6] frozen inputs stayed frozen (C1 / C13 / C20)', () => {
   // RE-AIMED (C17) at the post-merge reconcile (08-05). The freeze was pipeline
   // discipline — the run must not rewrite its own inputs — and for two paths
-  // that premise expired at the run's merge (#110): `docs/spec-client.md`
+  // that premise expired at the run's merge (#110): the client seam
   // revises by its owner's hand post-run (spec-client §9), and
   // `src/shared/species.ts` carried its own deletion order for the duplicate
   // `Species` union. The claim stays asserted where it stayed true — over the
@@ -39,7 +39,7 @@ describe('[u11#c6] frozen inputs stayed frozen (C1 / C13 / C20)', () => {
   //
   // The same release carries a second repair (08-06), on the same expiry: the
   // timeline printed `(갈림길 Gn의 자리)` on six lines of a player surface,
-  // against the 08-03 decision log and `docs/spec-client.md` §3 invariant 6.
+  // against the 08-03 decision log and the client invariant.
   // That leak cannot be repaired anywhere but the authored file — fixing only
   // the compiled `timeline.json` would let the next `datapack:compile` restore
   // it. `_schema/` stays frozen for this one too: the schemas are not what
@@ -62,7 +62,6 @@ describe('[u11#c6] frozen inputs stayed frozen (C1 / C13 / C20)', () => {
   // shape, and both shipped packs still lint at ERROR 0. A pack that validated
   // before this still validates after it.
   const RELEASED = [
-    'docs/spec-client.md',
     'src/shared/species.ts',
     'data/scenario/우는다리/',
     'data/scenario/_schema/',

@@ -1,5 +1,5 @@
-// [e8#A3] — exposure depth is the max clock ever reached, and "unmeasurable ≠ zero"
-// (docs/contract-run-artifacts §2 / RUNLOG A20): null never becomes 0 or '00:00'.
+// [e8#A3] — exposure depth is the max clock ever reached, and "unmeasurable ≠ zero":
+// null never becomes 0 or '00:00'.
 import { describe, it, expect } from 'vitest'
 import { CLOCK_RE, createMemoryMetaStore, createRunLoop, deeperClock } from '../../src/runloop/index.ts'
 import { loadSchema } from './schema.ts'

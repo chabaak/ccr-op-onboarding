@@ -8,7 +8,7 @@ name: Apothecary LLM layer
 #
 # `workflow_dispatch` stays so the stack (nhn-game-llm-layer) can still be
 # updated if it ever needs to be. Locally, samconfig.toml supports the same
-# deploy — see docs/handoffs/llm-lambda-runtime.md.
+# deploy.
 on:
   workflow_dispatch:
 
@@ -148,8 +148,7 @@ jobs:
           --model-id "$LLM_MODEL_ID"
           --audit-logs
       # Enable only after the bootstrap stack grants the deploy role
-      # `cloudformation:GetStackPolicy` — see "Verifying the application stack
-      # policy" in docs/handoffs/llm-lambda-runtime.md. Until then this step
+      # `cloudformation:GetStackPolicy`. Until then this step
       # would fail with AccessDenied on every deploy, so it stays commented out.
       # `SetStackPolicy` is deliberately NOT requested: it can also remove the
       # protection, so CI verifies and never applies.

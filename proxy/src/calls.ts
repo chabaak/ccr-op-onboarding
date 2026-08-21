@@ -2,11 +2,11 @@ import { PublicError } from "./errors.js";
 import type { CallType } from "./types.js";
 
 /**
- * The three calls of [call contracts v1](../../docs/contract-calls.md):
- * which slots each fills, and the output schema it forces.
+ * The three runtime calls: which slots each fills, and the output schema each
+ * call forces. Slot ownership is pinned by data/contracts/call-slots.json.
  *
  * This is the production home of what `tools/lib/calls.mjs` holds for the probe.
- * The schemas moved here with the templates (physical architecture §3.10): the
+ * The schemas moved here with the templates: the
  * tool schema is built *from slot values* — `stance` enumerates `STANCE_SET` —
  * so it belongs wherever slots are consumed, which is now this tier.
  *

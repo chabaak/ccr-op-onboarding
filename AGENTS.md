@@ -10,7 +10,7 @@ Competition entry for **OpenAI Game Builders Seoul**, Track 1: `긴급상황대�
 
 ## Where are we now?
 
-This file holds permanent rules. `docs/status.md` records mutable project state, but it currently still reflects the NHN phase; read it before work, then verify current facts from the repository and issues.
+This file holds permanent rules. Mutable project state lives in GitHub issues and PRs; verify current facts from the repository and issue threads before work.
 
 ## Hard rules
 
@@ -26,7 +26,8 @@ This file holds permanent rules. `docs/status.md` records mutable project state,
 ## Design constraints that affect code
 
 - **Four roots, four jobs.** `src/` is what the bundle ships; `proxy/` is a separately-deployed tier that may not import `src/`; `tools/` is Node-only and never reachable from `index.html`; `authoring/` runs before any of them exist. Experiment vocabulary (arm, channel, placebo, harness) belongs to `tools/probe/` and nowhere else.
-- **Production phase structure:** the selected game is built at the repo root. The demos under `demos/<slug>/` are competition history and are not extended. The root's physical layout (module boundaries under `src/`, where Node-side tools and the proxy live) is bound by `docs/spec-physical-architecture.md`; do not restructure the root ahead of that document.
+- **Production phase structure:** the selected game is built at the repo root. Keep the four-root split intact: `src/` ships to the browser, `proxy/` deploys separately, `tools/` stays Node-only, and `authoring/` runs before any shipped artifact exists. Do not restructure the root without an issue and PR that update this file in the same change.
+- **Plain module resolution:** use relative imports across the repo. Do not add TypeScript `paths` aliases or equivalent hidden module-resolution shortcuts.
 - **The membrane rule:** the player never types free text to an LLM. All LLM input is composed from structured game elements (blocks/cards/items/telemetry). Do not build text-input UI for AI features. Prompt-injection "combat" is not an exception: those attacks are performed by the **agent the player built**, not by the player typing. The player shapes the agent from structured items, and the agent acts. The membrane holds.
 - **Runtime LLM calls** go through the proxy backend, never directly from the client with an embedded key. Latency must hide in natural game pauses (between rounds/waves); never block mid-action gameplay on an LLM response.
 - **Balance-as-data:** all tunables (stats, timings, costs, spawn tables) live in `data/` as JSON/TS data, never inline in logic. `data/` holds inputs; `artifacts/` holds measurement outputs.

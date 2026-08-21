@@ -1,12 +1,9 @@
 /**
  * Wire types for the DDAY proxy.
  *
- * Transcribes [call contracts v1](../../docs/contract-calls.md). This is the
- * proxy's copy — it cannot import `src/shared/contracts.ts`, because this
- * package lives outside the root install by design (physical architecture §3.3).
- * That makes three transcriptions of one document (here, `src/shared/`,
- * `tools/lib/calls.mjs`) with no drift gate between them; the gap is recorded in
- * physical architecture §3.9.
+ * This is the proxy's copy of the wire types. It cannot import
+ * `src/shared/contracts.ts` because `proxy/` is a separate deployed tier by
+ * AGENTS.md, so drift is guarded by tests instead of cross-root imports.
  */
 
 export type TokenUsage = {

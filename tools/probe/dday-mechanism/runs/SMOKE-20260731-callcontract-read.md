@@ -1,7 +1,7 @@
 # 콜 계약 스모크 판독 — SMOKE-C3 · C2 · C2b (2026-07-31)
 
-> 메커니즘 프로브가 아니다 — [dday-call-contracts.md](../../../../docs/contract-calls.md)
-> §5의 콜 계약 스모크 배치. 읽는 질문 세 개: ① 사실/판단 분리 2안의 실용성(존폐
+> 메커니즘 프로브가 아니다 — retired call-contract smoke batch. 읽는 질문
+> 세 개: ① 사실/판단 분리 2안의 실용성(존폐
 > 게이트), ② SSE용 보고서 콜 지연 실측, ③ narration의 constraint compliance ·
 > echo A/B · mineable yield. 판정 없음 — 드롭 조건 발동 여부와 근거만 제시한다.
 >

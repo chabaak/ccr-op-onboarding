@@ -1,7 +1,6 @@
-// [e2] — `renderSymptoms` (docs/spec-engine.md §2.3, items 1–7).
+// [e2] — `renderSymptoms`.
 //
-// Every assertion here traces to a numbered item of §2.3 or to the worked
-// render in §2.2. The suite is deliberately fixture-heavy: the renderer is a
+// The suite is deliberately fixture-heavy: the renderer is a
 // lookup function over authored data (§2.2), so the only way to pin its
 // *ordering* and its *error* behaviour is to hand it packs that a real
 // scenario would never contain.

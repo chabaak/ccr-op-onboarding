@@ -1,5 +1,5 @@
 {
-  "_what": "Call 3 (Reporter) 첫 스모크 — docs/dday-call-contracts.md §5의 스모크 배치 나머지 절반이자 두 결정의 입력. (1) 사실/판단 분리 2안의 존폐(07-31 윤석: '2안으로 구축, 실용성 없으면 폐기'): facts 추출 품질을 사람이 판정한다. (2) SSE 여부: 이 런의 latency_s가 '보고서 콜의 실제 지연' — judgment의 19–75s는 예측치로 쓸 수 없다(출력 길이 비례성이 다름). drop_condition이 곧 2안의 폐기 게이트다.",
+  "_what": "Call 3 (Reporter) 첫 스모크 — retired call-contract smoke batch의 나머지 절반이자 두 결정의 입력. (1) 사실/판단 분리 2안의 존폐(07-31 윤석: '2안으로 구축, 실용성 없으면 폐기'): facts 추출 품질을 사람이 판정한다. (2) SSE 여부: 이 런의 latency_s가 '보고서 콜의 실제 지연' — judgment의 19–75s는 예측치로 쓸 수 없다(출력 길이 비례성이 다름). drop_condition이 곧 2안의 폐기 게이트다.",
   "_authoring_provenance": {
     "scene": "S1-stanceset-J1 live 암의 전형 결과를 한 라운드로 렌더한 EXPERIENCED — 스크립트 이벤트 + 통제관 발화·속마음(W1) + 생성 NPC 대사 자리(W2, 여기서는 SMOKE-C2의 고정 사건 라인으로 대신). 기질 k1 공유(judgment와 같은 파일 — temperamentDir).",
     "report_guidance": "잠정 분량 정책(계약 문서 §분량: 20~30문장)을 그대로 지침으로."
