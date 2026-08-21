@@ -26,7 +26,9 @@ Description: Deployment roles for the ccr-op-onboarding proxy stack (create + up
 #     --template-file deploy/bootstrap.yaml \
 #     --stack-name nhn-game-proxy-bootstrap \
 #     --capabilities CAPABILITY_NAMED_IAM \
-#     --region ap-northeast-2 --profile nhn-game
+#     --region ap-northeast-2 --profile ccr-op-onboarding
+#   The profile name is a local AWS CLI alias; rename the matching local profile
+#   before running this command.
 
 Parameters:
   GitHubOwner:

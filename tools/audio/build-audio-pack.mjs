@@ -365,7 +365,7 @@ async function ensureSource(key) {
   const grab = async (url, dest) => {
     // Commons rate-limits anonymous hotlinking and answers 429 without a UA
     // that identifies the caller; every other host here is indifferent to it.
-    const res = await fetch(url, { headers: { 'user-agent': 'nhn-game-2026 audio-pack builder (https://github.com/alstjgg/nhn-game-2026)' } })
+    const res = await fetch(url, { headers: { 'user-agent': 'ccr-op-onboarding audio-pack builder (https://github.com/chabaak/ccr-op-onboarding)' } })
     if (!res.ok) throw new Error(`${res.status} ${res.statusText} — ${url}`)
     fs.writeFileSync(dest, Buffer.from(await res.arrayBuffer()))
   }
