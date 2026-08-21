@@ -2,6 +2,21 @@
   "$schema-note": "Tracks third-party assets and their licenses, separate from our MIT-licensed code. One entry per external asset. Required before shipping any asset we did not create.",
   "assets": [
     {
+      "file": "public/favicon.svg",
+      "source": "Vite create-vite scaffold default favicon, matching the Vite 2026 logo asset shipped with the initial Vite + TypeScript scaffold",
+      "license": "MIT",
+      "license_source": "https://vite.dev/ — the Vite site states 'Vite is MIT Licensed...' and credits '© 2019-present VoidZero Inc. and Vite contributors' in its footer (checked 2026-08-22)",
+      "note": "Referenced from index.html and copied by Vite from public/ into the Pages build."
+    },
+    {
+      "file": "public/assets/fonts/fonts.css",
+      "tool": "tools/fonts/vendor-google-webfonts.mjs — generated static font-pack stylesheet from the vendored Google Fonts CSS2 response",
+      "prompt": null,
+      "license": "generated for this project; referenced font families remain under SIL Open Font License 1.1",
+      "license_source": "tools/fonts/vendor-google-webfonts.mjs in this repository renders public/assets/fonts/fonts.css from fetched Google Fonts CSS2 metadata; the referenced font files are covered by the adjacent family rows and their OFL license_source citations.",
+      "note": "Copied by Vite from public/ into the Pages build beside the WOFF2 slices; the bundled client uses src/client/styles/fonts.css instead."
+    },
+    {
       "file": "public/assets/fonts/ibm-plex-mono/",
       "source": "Google Fonts webfont API (css2) — WOFF2 per-unicode-range slices, vendored into the repo by tools/fonts/vendor-google-webfonts.mjs",
       "license": "SIL Open Font License 1.1",

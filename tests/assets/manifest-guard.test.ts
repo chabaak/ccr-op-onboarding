@@ -36,11 +36,23 @@ const baseline = () => readJson<Baseline>(path.join(REPO, 'tests/assets/baseline
 const entryHash = (entry: Entry): string => sha(JSON.stringify(entry))
 const entryTarget = (file: string): string => path.join(REPO, file.replace(/\/$/, ''))
 const fileOf = (entry: Entry): string => String(entry.file ?? '')
+const SHIPPED_PUBLIC_ASSET = /\.(css|eot|gif|jpe?g|m4a|mp3|ogg|otf|png|svg|ttf|wav|webp|woff2?)$/i
 
 function audioFilesOnDisk(): string[] {
   return walk(path.join(REPO, 'public/assets/audio'))
     .filter((p) => p.endsWith('.m4a'))
     .map(rel)
+}
+
+function publicAssetsOnDisk(): string[] {
+  return walk(path.join(REPO, 'public'))
+    .map(rel)
+    .filter((file) => SHIPPED_PUBLIC_ASSET.test(file))
+}
+
+function coversFile(target: string, file: string): boolean {
+  const clean = target.replace(/\/$/, '')
+  return file === clean || file.startsWith(`${clean}/`)
 }
 
 describe('[issue #10] the manifest parses and keeps its submitted-game shape', () => {
@@ -61,7 +73,12 @@ describe('[issue #10] the manifest parses and keeps its submitted-game shape', (
   it('(d) every entry is one of the submitted game asset rows', () => {
     const offScope = manifest()
       .assets.map(fileOf)
-      .filter((file) => !file.startsWith('public/assets/fonts/') && !file.startsWith('public/assets/audio/'))
+      .filter(
+        (file) =>
+          file !== 'public/favicon.svg' &&
+          !file.startsWith('public/assets/fonts/') &&
+          !file.startsWith('public/assets/audio/'),
+      )
     expect(offScope).toEqual([])
   })
 })
@@ -131,12 +148,20 @@ describe('[issue #10] every shipped font binary is covered', () => {
   it('(b) each submitted font family directory is manifested once', () => {
     const targets = manifest()
       .assets.map(fileOf)
-      .filter((file) => file.startsWith('public/assets/fonts/'))
+      .filter((file) => file.startsWith('public/assets/fonts/') && file.endsWith('/'))
     expect(targets).toEqual([
       'public/assets/fonts/ibm-plex-mono/',
       'public/assets/fonts/nanum-myeongjo/',
       'public/assets/fonts/nanum-gothic-coding/',
     ])
+  })
+})
+
+describe('[issue #10] every shipped public asset is manifested', () => {
+  it('(a) each shippable file under public/ is covered by a manifest row', () => {
+    const targets = manifest().assets.map(fileOf)
+    const uncovered = publicAssetsOnDisk().filter((file) => !targets.some((target) => coversFile(target, file)))
+    expect(uncovered).toEqual([])
   })
 })
 
