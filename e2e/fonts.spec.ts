@@ -20,6 +20,8 @@ const FONTS_CSS = path.join(REPO, 'src/client/styles/fonts.css')
 const NAV_BUDGET_MS = 1000
 /** Navigations timed for that budget — the best one is the build's own cost. */
 const NAV_SAMPLES = 5
+/** First-render font responses must be substantial, not an empty measurement. */
+const FIRST_RENDER_FONT_RESPONSE_FLOOR = 8
 const SHORT_KOREAN_SLICE_BUDGET = 6
 // C17 / [u11#c12] — the two absolute font budgets that stood here (24 files /
 // 300_000 B) were u10's calibration against an EMPTY desk and are re-aimed, not
@@ -334,6 +336,10 @@ test('the self-hosted fonts stay inside the ~1 s load budget', async ({ page, co
   expect(unjustified, 'these slices were pulled for text the page never renders').toEqual([])
 
   const tails = firstRender.map((f) => tailOf(f.url))
+  expect(
+    tails.length,
+    'first-render font measurement observed too few slice responses to prove the split',
+  ).toBeGreaterThanOrEqual(FIRST_RENDER_FONT_RESPONSE_FLOOR)
   expect(duplicatedValues(tails), 'a slice was fetched more than once').toEqual([])
   expect(tails.length, 'the page pulled the whole sheet — the unicode-range split does nothing').toBeLessThan(
     faces.length,
