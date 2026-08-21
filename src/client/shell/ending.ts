@@ -122,22 +122,13 @@ const PREVIEW_SCORE: { total: number; rows: readonly ScoredRow[] } = {
   ],
 }
 
-/** The one control's two labels: the plates that advance, and the one that ends. */
+/** The one control's two labels: the plates that advance, and the one that asks the browser to leave. */
 export const ENDING_NEXT = '다음'
-export const ENDING_CLOSE = '시뮬레이션 종료'
+export const ENDING_CLOSE = '창 닫기 시도'
+export const ENDING_WINDOW_CLOSE = ENDING_CLOSE
 
 /** The pause between the ledger's last number and the veil. See the header. */
 export const HELD_BEAT_MS = 2000
-
-/**
- * How long the exit waits on `window.close()` before taking the other road.
- *
- * A browser refuses `close()` on a tab the script did not open, and it refuses
- * it silently — there is no error to catch and no promise to await, only a
- * window that is still there a moment later. So the reload is scheduled behind
- * a short grace period and cancels itself if the tab did in fact go.
- */
-const CLOSE_GRACE_MS = 400
 
 /* ── what a day earns ────────────────────────────────────────────────────── */
 
@@ -386,19 +377,19 @@ function holdChrome(on: boolean): void {
 /**
  * Walks the three plates and resolves the moment the last one is answered.
  *
- * It resolves as the exit state goes on, not after it: the caller leaves the
- * page on that resolution, so the veil is already going out while the browser
- * is doing whatever it does about the tab.
+ * It resolves as the final action goes on, not after it: both endings make the
+ * same request of the browser, and a refused close leaves this finished plate
+ * mounted over the final feed and result.
  *
  * NOT DISMISSIBLE, and there is no Escape here — which is the one place this
  * departs from `shell/manual.ts`. Escape skips the BRIEFING because a keyboard
  * user must never be trapped in front of three paragraphs and because there is
- * a desk behind that plate to be let onto. There is nothing behind this one:
- * the sitting is over, the desk is inert, and every road out of this layer runs
- * through the button. So the walk stays fully keyboard-operable the only way it
- * can be — the control takes focus once and keeps it across all three steps,
- * so Enter three times is the whole ending — and no key is bound to a shortcut
- * that would have to invent an exit of its own.
+ * a desk behind that plate to be let onto. Behind this one is only a scored
+ * sitting: readable and inert in both cases. So the walk
+ * stays fully keyboard-operable the only way it can be -- the control takes
+ * focus once and keeps it across all three steps, so Enter three times is the
+ * whole ending -- and no key is bound to a shortcut that would have to invent an
+ * exit of its own.
  *
  * The plate is built ONCE and repainted in place, for the reasons `manual.ts`
  * gives: remounting would replay the entrance three times and would drop focus
@@ -408,9 +399,9 @@ export function openEnding(app: HTMLElement, kind: EndingKind, numbers: EndingNu
   const plates = endingPlates(kind, numbers)
 
   // The desk goes inert and STAYS inert. Nothing here puts it back: the only
-  // continuations of this screen are a closed tab and a reload, and a desk that
-  // became operable again behind the last plate would be offering a sitting
-  // that has already been scored.
+  // continuations of this screen are a closed tab or this mounted ending, and a
+  // desk that became operable again behind the last plate would be offering a
+  // sitting that has already been scored.
   holdChrome(true)
 
   const root = el('div', kind === 'good' ? 'end-good' : 'end-bad')
@@ -467,7 +458,7 @@ export function openEnding(app: HTMLElement, kind: EndingKind, numbers: EndingNu
     // reader of a DOM dump: three presses, and only the last one ends the
     // session.
     go.dataset.step = String(at + 1)
-    go.dataset.op = last ? 'close' : 'next'
+    go.dataset.op = last ? 'close_window' : 'next'
 
     // Re-trigger the step animation. Removing the class and reading a layout
     // property is what makes the SAME animation run again on an element that
@@ -491,12 +482,6 @@ export function openEnding(app: HTMLElement, kind: EndingKind, numbers: EndingNu
         return
       }
       answered = true
-      // The veil goes out and the root STAYS in the document. `manual.ts`
-      // removes its own after the exit animation because a desk is waiting
-      // underneath; here there is nothing underneath that anyone is meant to
-      // reach, and if the exit below is refused outright the honest screen to
-      // be left on is the one that says the simulation is over.
-      root.classList.add('end-out')
       resolve()
     }
     go.addEventListener('click', advance)
@@ -599,39 +584,14 @@ function ledgerLanded(): Promise<void> {
 /* ── the exit ────────────────────────────────────────────────────────────── */
 
 /**
- * Leaves the terminal: close the tab, and failing that, go back to the door.
- *
- * `close()` is attempted first because it is the only exit that matches what
- * the plate just said — the session is over, the terminal is done. Browsers
- * refuse it on a tab the script did not open, which on GitHub Pages is every
- * tab, so the reload is the road actually taken: `sessionStorage` is cleared so
- * the sign-in door opens cold (the run slot `run-state.ts` owns lives there),
- * and the page comes back as a fresh sitting.
- *
- * Nothing in here may throw out of the press handler. A sandboxed frame throws
- * on `close()`, a private-mode `Storage` throws on `clear()`, and a navigation
- * the host refuses throws on `reload()` — none of which is a reason to leave an
- * operator staring at a button that did nothing visible.
+ * Ask the browser to close the tab, swallowing the common refusal paths.
  */
-function leaveDesk(host: Window): void {
+function closeWindow(host: Window): void {
   try {
     host.close()
   } catch {
     // A refused close is the expected case, not an error worth reporting.
   }
-  host.setTimeout(() => {
-    if (host.closed) return
-    try {
-      host.sessionStorage.clear()
-    } catch {
-      // Private mode refuses the write; the reload below is still worth doing.
-    }
-    try {
-      host.location.reload()
-    } catch {
-      // Nothing left to try. The `end-out` plate is what stays on screen.
-    }
-  }, CLOSE_GRACE_MS)
 }
 
 /* ── the walk ────────────────────────────────────────────────────────────── */
@@ -676,7 +636,7 @@ async function raise(host: Window, driver: FixtureDriver, kind: EndingKind, numb
   // whatever is left, exactly as it does for any other pause).
   driver.clock.setRate(0)
   await openEnding(must('#app'), kind, numbers)
-  leaveDesk(host)
+  closeWindow(host)
 }
 
 /**
