@@ -66,3 +66,25 @@ Everything runs straight from the repo root:
 ```bash
 npm run probe:selftest
 ```
+
+## Local live API smoke
+
+The root game normally degrades to fixture transport when `VITE_PROXY_BASE_URL`
+is absent. To prove the browser's live path reaches the deployed Bedrock proxy
+without changing its production CORS policy, run the loopback-only relay:
+
+```bash
+cp .env.example .env.local
+npm run dev:api
+```
+
+In another terminal, run `npm run dev -- --host 127.0.0.1`, then open
+`http://127.0.0.1:5173/ccr-op-onboarding/`. The relay accepts only
+`/dday/health` and `/dday/call`, always forwards to the configured public
+upstream, and sends the configured production origin upstream. It never holds a
+credential and must remain bound to `127.0.0.1`.
+
+After the relay is running, execute `npm run smoke:local-api`. It makes one
+paid judgment request and succeeds only when the response is HTTP 200 with
+`x-llm-fallback: false`, a request id, and a shaped response. Record its
+metadata in the issue; do not commit model prose.

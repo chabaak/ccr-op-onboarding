@@ -222,6 +222,6 @@ export default defineConfig(({ mode }) => ({
     // The client posts to a same-origin path, so the browser sends the dev
     // origin the proxy is configured to accept. In production
     // `VITE_PROXY_BASE_URL` points at API Gateway instead (call contracts §11).
-    proxy: { '/dday': { target: 'http://localhost:8787', changeOrigin: false } },
+    proxy: { '/dday': { target: 'http://127.0.0.1:8787', changeOrigin: false } },
   },
 }))

@@ -99,15 +99,14 @@ describe('the baseline day — §5.2 amendment h', () => {
     // nothing could check it against a run — and it went wrong exactly that
     // way: u6 read 3권 전량 파쇄 while the baseline day scored 사본만. Deriving
     // the baseline from the same rules makes the two structurally incapable of
-    // disagreeing. The recorded run is the fixture provider's, which answers
-    // every gate with its first stance and so sets no flag any unit reads.
-    const recorded = JSON.parse(
-      fs.readFileSync(path.join(REPO, 'artifacts/runs/우는다리-fixture-r1.json'), 'utf8'),
-    ) as { score: { units: { id: string; value: string | number }[]; total: number } }
+    // disagreeing. The run-record projection is generated here rather than
+    // loaded from a committed fixture artifact.
+    const recorded = scoreRecord(PACK, UNTOUCHED, UNTOUCHED)
+    expect(recorded).not.toBeNull()
 
     const computed = scoreUnits(PACK, UNTOUCHED, UNTOUCHED)
-    expect(computed.map((u) => ({ id: u.id, value: u.value }))).toEqual(recorded.score.units)
-    expect(totalOf(computed)).toBe(recorded.score.total)
+    expect(computed.map((u) => ({ id: u.id, value: u.value }))).toEqual(recorded!.units)
+    expect(totalOf(computed)).toBe(recorded!.total)
   })
 
   it('(k) `baselineState` carries the fixed timeline and NO gate outcome', () => {

@@ -36,6 +36,10 @@ blob-report/
 # Vite reads this file itself on a production build, so nothing else has to.
 !.env.production
 
+# `drive-run` output is a local measurement artifact. CI proves its schema and
+# determinism from temp directories; no generated run record belongs in git.
+artifacts/runs/
+
 # Super-pipeline runtime state must stay out of git
 .claude/super/
 
