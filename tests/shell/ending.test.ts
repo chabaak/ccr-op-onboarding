@@ -31,6 +31,7 @@ import { CLIENT, SHELL_DIR, exists, read, rel, walk } from './shell-utils.ts'
 import {
   ENDING_CLOSE,
   ENDING_NEXT,
+  ENDING_WINDOW_CLOSE,
   SITE_OCCUPANTS,
   endingKindOf,
   endingPlates,
@@ -339,7 +340,8 @@ describe('[x6] the plates', () => {
 
   it('(g) the walk`s two button labels', () => {
     expect(ENDING_NEXT).toBe('다음')
-    expect(ENDING_CLOSE).toBe('시뮬레이션 종료')
+    expect(ENDING_CLOSE).toBe('창 닫기 시도')
+    expect(ENDING_WINDOW_CLOSE).toBe(ENDING_CLOSE)
   })
 })
 
@@ -387,5 +389,42 @@ describe('[x6] the ending is an observer', () => {
     const src = code(ENDING_TS)
     expect(src).not.toMatch(/dataset\.tallyState\s*=/)
     expect(src).not.toMatch(/createScoreTally/)
+  })
+
+  it('(g) both endings exit by asking the browser to close, never by resetting the desk', () => {
+    const src = code(ENDING_TS)
+    const raise = /async function raise[\s\S]*?^}/m.exec(src)?.[0] ?? ''
+    expect(raise, 'raise() no longer asks the browser to close the tab').toMatch(
+      /await\s+openEnding\s*\([\s\S]*?\)\s*closeWindow\s*\(\s*host\s*\)/,
+    )
+    expect(raise, 'Bad still branches to a reset path').not.toMatch(/kind\s*===|resetDesk/)
+
+    expect(src, 'the final action no longer attempts to close the tab').toMatch(/host\.close\s*\(\s*\)/)
+    expect(src, 'a refused close still clears the final feed/result').not.toMatch(
+      /sessionStorage\s*\.\s*clear/,
+    )
+    expect(src, 'a refused close still reloads the page').not.toMatch(/location\s*\.\s*reload/)
+  })
+
+  it('(h) the final plate stays mounted when the browser refuses to close', () => {
+    const src = code(ENDING_TS)
+    expect(src, 'the reset fallback returned').not.toMatch(/function\s+resetDesk/)
+    expect(src, 'the ending still clears persisted run state').not.toMatch(/sessionStorage\s*\.\s*clear/)
+    expect(src, 'the ending still reloads after a refused close').not.toMatch(/location\s*\.\s*reload/)
+
+    const advance = /const advance = \(\): void => \{[\s\S]*?go\.addEventListener/.exec(src)?.[0] ?? ''
+    expect(advance, 'the final press still hides the ending screen').not.toMatch(/end-out|remove\(|replaceChildren\(\)/)
+  })
+
+  it('(i) Good and Bad expose the same window-close final action', () => {
+    const src = code(ENDING_TS)
+    const paint = /function paint\(\): void \{[\s\S]*?body\.classList\.add/.exec(src)?.[0] ?? ''
+    expect(paint, 'the final label still varies by ending').not.toMatch(/kind\s*===/)
+    expect(paint, 'the final button does not name the window-close attempt').toMatch(
+      /go\.(?:textContent|title)\s*=\s*last\s*\?\s*ENDING_CLOSE\s*:\s*ENDING_NEXT/,
+    )
+    expect(paint, 'Bad still exposes a non-window-close final op').toMatch(
+      /go\.dataset\.op\s*=\s*last\s*\?\s*['"]close_window['"]\s*:\s*['"]next['"]/,
+    )
   })
 })

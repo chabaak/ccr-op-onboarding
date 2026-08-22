@@ -15,6 +15,8 @@ import { clearWebStorageMetaStore, createWebStorageMetaStore } from '../../../ru
 import type { StorageLike } from '../../../runloop/index.ts'
 import type { ReportGuidance } from '../../../shared/report-guidance.ts'
 import type { FixtureDriver } from '../fixture-driver.ts'
+import { createTransport } from '../../../transport/index.ts'
+import type { FetchLike } from '../../../transport/index.ts'
 import { createLiveAdapter } from './adapter.ts'
 import type { BoundRun, RunClose } from './adapter.ts'
 import { bindLiveRun, type BindDeps } from './bind.ts'
@@ -64,6 +66,9 @@ export async function createLiveRunDriver(deps: LiveRunDeps): Promise<FixtureDri
     fetchGuidance(source) as Promise<ReportGuidance>,
   ])
 
+  const fetch: FetchLike = (url, init) => deps.fetch(url, init as RequestInit)
+  const transport = createTransport({ baseUrl: deps.proxyBaseUrl, fetch })
+
   const bindDeps: BindDeps = {
     pack,
     guidance,
@@ -74,7 +79,8 @@ export async function createLiveRunDriver(deps: LiveRunDeps): Promise<FixtureDri
     // That is wider than `RequestInit` accepts, and this is the one place that
     // knows both halves — putting the cast here keeps the transport isomorphic
     // instead of loosening the guard to make an assignment compile.
-    fetch: (url, init) => deps.fetch(url, init as RequestInit),
+    fetch,
+    transport,
   }
 
   // H2 — a page load is a new sitting. Cleared here rather than inside the

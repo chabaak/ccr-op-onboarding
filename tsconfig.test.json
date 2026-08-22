@@ -3,7 +3,7 @@
    * Type-checks the test harness only. `tsconfig.json` (include: ["src"]) is the
    * product build and stays untouched; this config adds Node globals for the
    * structural suites and the two runner configs. No `paths` — the repo resolves
-   * by relative specifier everywhere (physical §3.2).
+   * by relative specifier everywhere (AGENTS.md design constraints).
    */
   "extends": "./tsconfig.json",
   "compilerOptions": {

@@ -12,8 +12,9 @@
 // the only call site sits behind `import.meta.env.DEV` — is asserted here, so a
 // regression fails without waiting for a build.
 //
-// This unlocks the two TALLY captures (seed → 21:04 → `#w-tally` loses
-// `.hidden`). `#w-tally` being `display:none` before its phase is CORRECT.
+// This unlocks deterministic browser drives to the terminal minute. A result
+// surface being absent before its phase is CORRECT; the hook is how tests reach
+// that phase without racing the visible clock.
 import { describe, it, expect, beforeEach } from 'vitest'
 import fs from 'node:fs'
 import path from 'node:path'

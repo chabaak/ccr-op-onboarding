@@ -39,7 +39,7 @@ const freeze = (slots: {
 /**
  * One agent per scenario, keyed by datapack slug.
  *
- * 전구간정상 — from `planning/dday-mechanism/suites/CSTRUCT-priority-reorder-J1-A.json`,
+ * 전구간정상 — from `tools/probe/dday-mechanism/suites/CSTRUCT-priority-reorder-J1-A.json`,
  * the suite the mechanism program measured C-BLOCK on.
  *
  * 멈춘회전문 — from the three DOME suites (`DOME-G1-baseline`, `DOME-G2`,

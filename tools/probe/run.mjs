@@ -9,7 +9,7 @@
 //   --n=N               override pre_registration.n_per_arm (dry-run only —
 //                       measured runs take N from the suite; edit the sheet
 //                       to change it, so the change is recorded)
-//   --out=DIR           artifact directory (default: planning/dday-mechanism/runs/<EXP>-calls)
+//   --out=DIR           artifact directory (default: tools/probe/dday-mechanism/runs/<EXP>-calls)
 //   --max-retries=N     schema retries per call slot (default 2)
 //   --force             replace existing artifacts for the arms being run
 //
@@ -95,7 +95,10 @@ if (nRaw !== undefined) {
 }
 const n = nRaw !== undefined ? Number(nRaw) : suite.pre_registration.n_per_arm;
 const armNames = opt('arm') ? [opt('arm')] : Object.keys(suite.arms);
-const outDir = opt('out', join(REPO, 'planning/dday-mechanism/runs', `${suite.experiment}-calls`));
+const outDir = opt(
+  'out',
+  join(REPO, 'tools', 'probe', 'dday-mechanism', 'runs', `${suite.experiment}-calls`),
+);
 const tool = spec.buildTool(suite);
 
 // ── 3a. Artifact preflight — before any call is spent ──────────────────────

@@ -141,6 +141,14 @@ type Attempt =
   | { ok: true; requestId: string | null; body: unknown }
   | { ok: false; requestId: string | null; grade: Grade; error: CallErrorBody['error'] | null }
 
+function cloneJson<T>(value: T): T {
+  return JSON.parse(JSON.stringify(value)) as T
+}
+
+function requestCacheKey(request: CallRequest): string {
+  return JSON.stringify(request)
+}
+
 /** One wire round-trip, graded. Never throws — a rejected request is the network row. */
 async function performAttempt(requestFn: TransportRequestFn, request: CallRequest): Promise<Attempt> {
   let response: TransportHttpResponse
@@ -221,9 +229,37 @@ async function performSend<T extends CallType>(
 }
 
 function createLiveTransport(requestFn: TransportRequestFn): Transport {
+  // One transport instance backs one live sitting. Successful identical requests
+  // share the proxy result; failed outcomes are allowed to recover on the next ask.
+  const cache = new Map<string, TransportResult>()
+  const pending = new Map<string, Promise<TransportResult>>()
+
   return {
     mode: 'live',
-    send: (request) => performSend(requestFn, request),
+    async send<T extends CallType>(request: CallRequest<T>): Promise<TransportResult<T>> {
+      const key = requestCacheKey(request)
+      const cached = cache.get(key)
+      if (cached !== undefined) return cloneJson(cached) as TransportResult<T>
+
+      const waiting = pending.get(key)
+      if (waiting !== undefined) return cloneJson(await waiting) as TransportResult<T>
+
+      const sent = performSend(requestFn, request).then((result): TransportResult => {
+        if (result.ok) {
+          const stored = cloneJson(result) as TransportResult
+          cache.set(key, stored)
+          return stored
+        }
+        return result as TransportResult
+      })
+      pending.set(
+        key,
+        sent.finally(() => {
+          pending.delete(key)
+        }),
+      )
+      return cloneJson(await sent) as TransportResult<T>
+    },
   }
 }
 

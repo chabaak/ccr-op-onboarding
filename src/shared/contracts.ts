@@ -1,21 +1,18 @@
 /**
  * LLM call contracts — the wire shape between the bundle and the proxy.
  *
- * Owner: 윤석 (architecture track), per physical architecture §3.1.
- * Source of truth: `docs/contract-calls.md` v1 — §11 for the transport, §2–§4
- * for the response schemas. This file is a transcription of that document, not
- * a place to make new decisions; a change here without a change there is a bug
- * in one of the two.
+ * This is the browser-side wire contract. The proxy owns the executable output
+ * schemas in `proxy/src/calls.ts`, and slot ownership is pinned by
+ * `data/contracts/call-slots.json`.
  *
- * ⚠️ **Scope narrowed 2026-08-03** (physical §3.10). The proxy renders both
+ * ⚠️ **Scope narrowed 2026-08-03**. The proxy renders both
  * message layers, so this file no longer describes prompt payloads — it
  * describes what the client *posts* and what it gets back. The executable form
  * of the output schemas lives in `proxy/src/calls.ts`; a second copy here would
  * have no drift guard.
  *
  * There is no scenario content in this file. Slot *names* live here; what fills
- * them arrives through an engine view
- * ([engine ⟷ composer](../../docs/contract-engine-composer.md) §2).
+ * them arrives through an engine view.
  */
 
 // ─── slot value shapes ───────────────────────────────────────────────────────

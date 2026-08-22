@@ -24,10 +24,10 @@ the thing belongs in a call type instead.
 The common case. Copy a suite, change the data, run it. No code.
 
 ```bash
-cp planning/dday-mechanism/suites/E0-shape-revalidation.json \
-   planning/dday-mechanism/suites/E1-cblock-placebo.json
+cp tools/probe/dday-mechanism/suites/E0-shape-revalidation.json \
+   tools/probe/dday-mechanism/suites/E1-cblock-placebo.json
 # edit: experiment, pre_registration, arms (add placebo)
-node tools/probe/run.mjs planning/dday-mechanism/suites/E1-cblock-placebo.json --print-prompt=placebo
+node tools/probe/run.mjs tools/probe/dday-mechanism/suites/E1-cblock-placebo.json --print-prompt=placebo
 ```
 
 The one thing to get right is `channel`: it decides which slots the arms are
@@ -37,8 +37,7 @@ allowed to differ in. Anything else varying across arms aborts the run.
 
 Worked examples now live in the codebase: **`narration`** and **`reporter`**
 (`tools/lib/calls.mjs`, the narration and reporter prompt pairs, both v0.1)
-were added this way — schemas and the decisions behind them are recorded in
-[docs/contract-calls.md](../../docs/contract-calls.md). The steps:
+were added this way. The steps:
 
 1. Add `prompts/<call>/base-vX.Y.md` (proxy) and `data/prompts/<call>/user-vX.Y.md` with `{SLOT}` markers.
 2. Add the entry to `tools/lib/calls.mjs`: `promptDir`, `slots`, `buildTool`

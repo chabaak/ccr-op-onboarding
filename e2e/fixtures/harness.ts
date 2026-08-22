@@ -1,4 +1,4 @@
-// u11 — the acceptance harness: boot, drive, settle/freeze, and watch the wire.
+// u11 — the acceptance harness: boot, drive, settle the game surfaces, and watch the wire.
 //
 // Everything §7 needs to WALK the day lives here, so `acceptance.spec.ts` reads
 // as the twelve sentences of the spec and nothing else (design D6/SRP). No unit
@@ -95,13 +95,6 @@ export async function turnToAgent(page: Page): Promise<void> {
  */
 export async function settled(page: Page): Promise<void> {
   await page.waitForFunction(() => !document.body.classList.contains('booting'), undefined, { timeout: 20_000 })
-}
-
-/** The two rAFs the capture protocol calls "first paint" (C14). */
-export async function firstPaint(page: Page): Promise<void> {
-  await page.evaluate(
-    () => new Promise<void>((r) => requestAnimationFrame(() => requestAnimationFrame(() => r()))),
-  )
 }
 
 /* ── driver handles ──────────────────────────────────────────────────────── */
@@ -399,59 +392,6 @@ export function watchWire(page: Page, baseURL: string): WireLog {
   return { thirdParty: () => [...foreign], all: () => [...all] }
 }
 
-/* ── capture protocol (C14/C15) ──────────────────────────────────────────── */
-
-export const DEFAULT_SEEK_MS = 2000
-
-/**
- * FREEZE = seek-and-pause, never `animation:none` (C14): a paused animation
- * with a negative delay holds the frame the reference held, while
- * `animation:none` would leave every `animation … both` reveal invisible and
- * match a blank build shot falsely.
- */
-export async function freezeAt(page: Page, seekMs: number = DEFAULT_SEEK_MS): Promise<void> {
-  await page.addStyleTag({
-    content:
-      `*,*::before,*::after{animation-play-state:paused!important;` +
-      `animation-delay:-${seekMs}ms!important;` +
-      `transition-duration:0s!important;transition-delay:0s!important}` +
-      // capture-side only — the build itself carries no such rule (C14 PANE)
-      `#debug-pane,.debug-pane{display:none!important}`,
-  })
-}
-
-/**
- * SETTLE = install-after-first-paint (C14). Installing before `goto` stalls
- * boot and yields a black frame. Returns the settle mode actually achieved so a
- * capture can record it.
- */
-export async function settle(page: Page, seekMs: number = DEFAULT_SEEK_MS): Promise<'virtual-clock' | 'wallclock'> {
-  await firstPaint(page)
-  await freezeAt(page, seekMs)
-  try {
-    await page.clock.install()
-    return 'virtual-clock'
-  } catch {
-    return 'wallclock'
-  }
-}
-
-/** Advances real time under whichever settle mode is in force. */
-export async function advance(page: Page, mode: 'virtual-clock' | 'wallclock', ms: number): Promise<void> {
-  if (mode === 'virtual-clock') await page.clock.runFor(ms)
-  else await page.waitForTimeout(ms)
-}
-
-/**
- * C15 — installing the clock is NOT enough: a boot-paused app can hold windows
- * in a pre-mount state that element screenshots refuse. Run far enough forward
- * that mount has COMPLETED before any element shot is taken.
- */
-export async function runToMount(page: Page, mode: 'virtual-clock' | 'wallclock'): Promise<number> {
-  await advance(page, mode, 3000)
-  return page.evaluate(() => document.querySelectorAll('.win').length)
-}
-
 /**
  * Raises `#w-<key>` from the TASKBAR and waits until it is focused.
  *
@@ -483,4 +423,3 @@ export async function raiseWindow(page: Page, key: string): Promise<void> {
   }
   await expect(win).toHaveClass(/\bfocused\b/)
 }
-

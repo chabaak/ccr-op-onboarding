@@ -8,8 +8,8 @@ import { defineConfig, devices } from 'playwright/test'
 //
 // (a) **the fixture round → `npm run dev`.** spec-client §5.4 ships the fixtures
 //     in DEV builds only (`driver/demo-run.ts` returns null when
-//     `!import.meta.env.DEV`, inv 11), so the §7 run-through and the P0-B
-//     captures can only exist on a dev host. That is the `dev` project.
+//     `!import.meta.env.DEV`, inv 11), so the §7 run-through can only exist on a
+//     dev host. That is the `dev` project.
 // (b) **the artefact truths → `npm run preview`.** A real production build,
 //     served as deployed: the pack loads from `dist/data/` (the §3.7 plugin),
 //     nothing reaches a third-party origin (inv 10), no debug or fixture code
@@ -36,8 +36,8 @@ const unitURL = `http://localhost:${UNIT_PORT}/ccr-op-onboarding/`
 const previewURL = `http://localhost:${PREVIEW_PORT}/ccr-op-onboarding/`
 const devURL = `http://localhost:${DEV_PORT}/ccr-op-onboarding/`
 
-/** u11's own dev-hosted specs — the §7 run-through and the P0-B captures. */
-const DEV_HOSTED = /(acceptance|captures)\.spec\.ts/
+/** u11's own dev-hosted spec — the §7 run-through. */
+const DEV_HOSTED = /acceptance\.spec\.ts/
 const PREVIEW_HOSTED = /preview-smoke\.spec\.ts/
 
 const desktop = { ...devices['Desktop Chrome'], viewport: { width: 1280, height: 800 } }
@@ -69,17 +69,14 @@ export default defineConfig({
       use: { ...desktop, baseURL: unitURL },
     },
     {
-      // Runs AFTER `chromium`, never beside it. `captures.spec.ts` boots the desk
-      // ten times, freezes each one and holds the tally count-up for eleven real
-      // seconds; `acceptance.spec.ts` drives whole runs. Sharing a worker pool
-      // with the unit-hosted suite starved the wall-clock-driven assertions on
-      // BOTH sides — `#w-tally [data-tally-state]` sat at `pending` past its 20 s
-      // budget, and feed lines were reported outside the viewport mid-scroll.
+      // Runs AFTER `chromium`, never beside it. `acceptance.spec.ts` drives whole
+      // runs on the dev-only fixture surface. Sharing a worker pool with the
+      // unit-hosted suite starved the wall-clock-driven assertions on BOTH sides
+      // — `#w-tally [data-tally-state]` sat at `pending` past its 20 s budget,
+      // and feed lines were reported outside the viewport mid-scroll.
       //
-      // This was invisible until the captures suite began doing real work: it had
-      // been failing instantly on a missing reference directory, so it consumed
-      // nothing. Serialising the heavy lane is the fix; widening the timeouts
-      // would only move the threshold.
+      // Serialising the heavy lane is the fix; widening the timeouts would only
+      // move the threshold.
       name: 'dev',
       testMatch: DEV_HOSTED,
       dependencies: ['chromium'],

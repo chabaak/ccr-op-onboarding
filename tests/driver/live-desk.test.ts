@@ -24,17 +24,26 @@ import { createLiveAdapter } from '../../src/client/driver/live/adapter.ts'
 import type { BoundRun } from '../../src/client/driver/live/adapter.ts'
 import { bindLiveRun } from '../../src/client/driver/live/bind.ts'
 import type { BindDeps } from '../../src/client/driver/live/bind.ts'
+import { createTransport } from '../../src/transport/index.ts'
 import type { LivePack, PackFetch } from '../../src/client/driver/live/pack.ts'
 import type { ReportGuidance } from '../../src/shared/report-guidance.ts'
 import { createLiveRunDriver } from '../../src/client/driver/live/index.ts'
 import { registerAnimation, thawAnimations } from '../../src/client/driver/test-hooks.ts'
 import { mm } from '../../src/client/driver/clock.ts'
 import { problems } from '../../src/shared/predicates.ts'
+import type { Block } from '../../src/shared/contracts.ts'
 import type { StorageLike } from '../../src/runloop/index.ts'
 import type { FeedLine, ViewEvent } from '../../src/shared/view-driver.ts'
 import { displayStamp } from '../../src/client/driver/clock.ts'
 import { feedLineModel } from '../../src/client/components/run-feed.ts'
 import type { FixtureDriver } from '../../src/client/driver/fixture-driver.ts'
+import {
+  BASE_URL,
+  JUDGMENT_200,
+  NARRATION_200,
+  REPORTER_200,
+  stubFetch,
+} from '../transport/_helpers.ts'
 
 const REPO = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '../..')
 const SLUG = '우는다리'
@@ -80,6 +89,44 @@ function realRun(run: number): BoundRun {
   return bindLiveRun(bindDeps, { run, carried: [], shown: [], start: '08:50', end: '21:04', meta })
 }
 
+const CACHE_BLOCK: Block = {
+  id: 'b-r0-b01',
+  text: '첫 통화 음성 판독: 위협 패턴 아님 — 겁에 질린 사람의 호흡.',
+}
+
+function equivalentLiveRun(transport: BindDeps['transport']): BoundRun {
+  const bindDeps: BindDeps = {
+    pack: PACK,
+    guidance: GUIDANCE,
+    proxyBaseUrl: null,
+    fetch: () => {
+      throw new Error('the shared transport should own live fetches in this test')
+    },
+    transport,
+  }
+  const meta: Extract<ViewEvent, { type: 'meta' }> = {
+    type: 'meta',
+    run: 1,
+    runs_left: 3,
+    carried: [CACHE_BLOCK.id],
+    archive: [],
+  }
+  return bindLiveRun(bindDeps, {
+    run: 1,
+    carried: [CACHE_BLOCK],
+    shown: [],
+    start: '08:50',
+    end: '21:04',
+    meta,
+  })
+}
+
+async function stepWithCommittedFile(run: BoundRun): Promise<void> {
+  expect(run.driver.submit({ op: 'slot', block_id: CACHE_BLOCK.id, slot: 0 })).toEqual({ ok: true })
+  expect(run.driver.submit({ op: 'deploy', blocks: [CACHE_BLOCK.id] })).toEqual({ ok: true })
+  await run.driver.step()
+}
+
 /** Pumps the adapter like `shell/boot.ts`'s frame callback, until `done`. */
 async function pump(driver: FixtureDriver, done: () => boolean, frames = 40_000): Promise<void> {
   for (let i = 0; i < frames && !done(); i += 1) {
@@ -106,6 +153,31 @@ function openDay(adapter: FixtureDriver): void {
 }
 
 describe('(A) the live desk plays its day to the end', () => {
+  it('reuses one live transport cache across equivalent bound runs in a sitting', async () => {
+    const stub = stubFetch([
+      {
+        status: 200,
+        body: JSON.stringify({
+          ...JUDGMENT_200,
+          stance: 'c',
+          because_block_ids: [CACHE_BLOCK.id],
+          rejected_stance: 'b',
+          utterance: '계속 말씀해 주세요.',
+        }),
+      },
+      { status: 200, body: JSON.stringify(NARRATION_200) },
+      { status: 200, body: JSON.stringify(REPORTER_200) },
+    ])
+    const transport = createTransport({ baseUrl: BASE_URL, fetch: stub.fetch })
+
+    await stepWithCommittedFile(equivalentLiveRun(transport))
+    const spent = stub.calls.length
+    expect(spent).toBeGreaterThan(0)
+
+    await stepWithCommittedFile(equivalentLiveRun(transport))
+    expect(stub.calls).toHaveLength(spent)
+  })
+
   // The pack's terminal beat is authored `21:04+` — engine/beat/clock.ts's
   // "immediately after this minute". `buildSchedule` keeps the string verbatim
   // on `Beat.clock`, so it reaches the adapter on a `beat_start`.

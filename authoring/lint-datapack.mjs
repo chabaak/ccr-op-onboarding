@@ -13,14 +13,14 @@
 //           initials, free-text exposure conditions). Expected for a
 //           draft-stage pack; the list is the hardening worklist.
 //
-// Rule set: docs/contract-datapack.md §3. Schemas are the law
-// (data/scenario/_schema); this script implements the subset of JSON Schema
+// Rule set: the schemas in data/scenario/_schema are the law; this script
+// implements the subset of JSON Schema
 // they actually use, so the schema files stay the single source of truth.
 
 import { readFileSync } from 'node:fs';
 import { join, resolve, basename } from 'node:path';
 // The predicate grammar has ONE implementation, and this is how lint reaches it
-// rather than carrying a second (contract-datapack §3.6). `datapack:lint` runs
+// rather than carrying a second. `datapack:lint` runs
 // with `--experimental-strip-types` for this import; the floor that needs
 // (Node 22.6) sits under `engines.node`'s `>=22.12`.
 import { identifiers, problems } from '../src/shared/predicates.ts';

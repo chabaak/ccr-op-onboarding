@@ -207,7 +207,7 @@ Call 2는 `PRESENT_NPCS`의 인물만 말하게 할 수 있고 **통제관은 �
 참조. **엔진이 `PRESENT_NPCS`를 조립할 때 `side`를 반드시 채워야 하는 이유가 이것**
 — 장식이 아니라 이 실패를 막는 유일하게 작동한 수단이다.
 
-*원자료*: `planning/dday-mechanism/runs/SMOKE-C2v{2,3,4}-narration-J1-calls/`(원인 판별)
+*원자료*: `tools/probe/dday-mechanism/runs/SMOKE-C2v{2,3,4}-narration-J1-calls/`(원인 판별)
 · `SMOKE-C2-roleboundary-J1-calls/`(수렴 확인).
 
 ---

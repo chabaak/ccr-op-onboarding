@@ -2,7 +2,7 @@ import type { APIGatewayProxyEventV2 } from "aws-lambda";
 
 import type { RuntimeConfig } from "../src/config.js";
 
-export const ALLOWED_ORIGIN = "https://alstjgg.github.io";
+export const ALLOWED_ORIGIN = "https://chabaak.github.io";
 
 export const validEnv = {
   BEDROCK_REGION: "ap-northeast-2",
@@ -37,7 +37,7 @@ export const judgmentSlots = {
 
 export const validCallBody = JSON.stringify({
   call_type: "judgment",
-  template_version: "v0.4",
+  template_version: "v0.5",
   slots: judgmentSlots,
 });
 

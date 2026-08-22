@@ -1,16 +1,15 @@
 # planning/
 
 기획 단계(2026-07-21 ~ 07-28)에서 생산된 자료의 보관소. **DDAY 컨셉 확정**
-(07-28 미팅)까지의 과정 기록이며, 이후에는 참조 전용이다 — 현재 상태와 살아있는
-문서는 [docs/](../docs/) (시작점: [status.md](../docs/status.md)).
+(07-28 미팅)까지의 과정 기록이며, 이후에는 참조 전용이다.
+**Archive boundary:** `planning/` is previous-phase history; links here may point
+at documents since removed and are not live guidance.
 
 DDAY 트랙의 확정 시점 기록·문서 지도는 [dday-sot.md](./dday-sot.md).
 
-> ⚠️ **`docs/` was renamed on 2026-08-02** onto a `spec-` / `contract-` / `plan-`
-> scheme. Files in this archive still link to the old names **on purpose** — these
-> are records, and their append-only character is protected by a decision in
-> `docs/status.md`. If a `../docs/dday-*.md` link here does not resolve, look it
-> up in the redirect table: [docs/README.md](../docs/README.md) §6.
+> ⚠️ Files in this archive still link to older document names **on purpose**.
+> These are records, and their append-only character is protected by issue
+> discussion rather than by rewriting old links.
 
 | 폴더 | 내용 |
 |---|---|
