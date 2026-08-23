@@ -45,12 +45,45 @@ import { validate as validateAgainst, loadSchema } from '../driver/run/schema.ts
 const HERE = path.dirname(fileURLToPath(import.meta.url))
 const REPO = path.resolve(HERE, '../..')
 const SCRIPT = path.join(REPO, 'tools/driver/drive-run.mjs')
-const PACK = '우는다리'
+const SCENARIO_DIR = path.join(REPO, 'data/scenario')
+const PROVIDER = 'fixture'
+const RUN = 1
 const RUN_SCHEMA_PATH = path.join(REPO, 'data/runs/_schema/run-record.schema.json')
 const META_SCHEMA_PATH = path.join(REPO, 'data/runs/_schema/meta-state.schema.json')
 
 const RUN_SCHEMA = JSON.parse(fs.readFileSync(RUN_SCHEMA_PATH, 'utf8'))
-const GATES = JSON.parse(fs.readFileSync(path.join(REPO, 'data/scenario', PACK, 'gates.json'), 'utf8')).gates
+
+function readJson(file) {
+  return JSON.parse(fs.readFileSync(file, 'utf8'))
+}
+
+function scenarioPacks() {
+  return fs
+    .readdirSync(SCENARIO_DIR, { withFileTypes: true })
+    .filter((entry) => entry.isDirectory() && !entry.name.startsWith('_'))
+    .map((entry) => {
+      const meta = readJson(path.join(SCENARIO_DIR, entry.name, 'meta.json'))
+      return { slug: meta.slug, meta }
+    })
+    .sort((a, b) => a.slug.localeCompare(b.slug, 'ko'))
+}
+
+function fixturePack() {
+  const candidates = scenarioPacks()
+  if (candidates.length === 0) {
+    throw new Error('no scenario pack found under data/scenario/')
+  }
+  return candidates[0]
+}
+
+const FIXTURE_PACK = fixturePack()
+const PACK = FIXTURE_PACK.slug
+const PACK_END_CLOCK = FIXTURE_PACK.meta.clock?.end
+if (typeof PACK_END_CLOCK !== 'string') throw new Error(`pack ${PACK} has no meta.clock.end`)
+
+const runId = (run = RUN) => `${PACK}-${PROVIDER}-r${run}`
+const RUN_ID = runId()
+const GATES = loadPack(PACK).gates.gates
 
 /** gate id → the stance ids the pack authorises for it (A10's "stance set"). */
 const STANCE_SET = new Map(GATES.map((g) => [g.gate, new Set(g.stances.map((s) => s.id))]))
@@ -59,7 +92,7 @@ const STANCE_SET = new Map(GATES.map((g) => [g.gate, new Set(g.stances.map((s) =
 const serialize = (record) => `${JSON.stringify(record, null, 2)}\n`
 
 /** One headless pass with the fixture provider and a fresh in-memory store. */
-async function pass(overrides, runId = `${PACK}-fixture-r1`) {
+async function pass(overrides, runId = RUN_ID) {
   return runHeadless({
     pack: loadPack(PACK),
     guidance: loadGuidance(),
@@ -105,13 +138,13 @@ describe('A1 — the --validate command', () => {
   test('exits 0 and writes byte-identical validated records to independent temp directories', () => {
     const firstOut = tmpOut('a1-first')
     const secondOut = tmpOut('a1-second')
-    const args = ['--pack', PACK, '--provider', 'fixture', '--validate']
+    const args = ['--pack', PACK, '--provider', PROVIDER, '--validate']
     const first = cli([...args, `--out=${firstOut}`])
     const second = cli([...args, `--out=${secondOut}`])
     assert.equal(first.status, 0, `first stderr:\n${first.stderr}`)
     assert.equal(second.status, 0, `second stderr:\n${second.stderr}`)
 
-    const read = (out) => fs.readFileSync(path.join(out, `${PACK}-fixture-r1.json`), 'utf8')
+    const read = (out) => fs.readFileSync(path.join(out, `${RUN_ID}.json`), 'utf8')
     const one = read(firstOut)
     const two = read(secondOut)
     const diff = firstDiff(JSON.parse(one), JSON.parse(two))
@@ -125,7 +158,7 @@ describe('A1 — the --validate command', () => {
 
   test('every writing CLI invocation names an explicit temporary output directory', () => {
     const out = tmpOut('untouched')
-    assert.equal(cli(['--pack', PACK, '--provider', 'fixture', `--out=${out}`]).status, 0)
+    assert.equal(cli(['--pack', PACK, '--provider', PROVIDER, `--out=${out}`]).status, 0)
     const sources = fs.readFileSync(fileURLToPath(import.meta.url), 'utf8')
     // Only real invocations: the literal must open with a quoted argument.
     for (const [, args] of sources.matchAll(/cli\(\['([^\]]*)\]/g)) {
@@ -141,7 +174,7 @@ describe('A1 — the --validate command', () => {
 
   test('the written file is exactly JSON.stringify(record, null, 2) + newline', () => {
     const out = tmpOut('ser')
-    const res = cli(['--pack', PACK, '--provider', 'fixture', '--validate', `--out=${out}`])
+    const res = cli(['--pack', PACK, '--provider', PROVIDER, '--validate', `--out=${out}`])
     assert.equal(res.status, 0, res.stderr)
     const [file] = fs.readdirSync(out)
     const text = fs.readFileSync(path.join(out, file), 'utf8')
@@ -151,8 +184,8 @@ describe('A1 — the --validate command', () => {
   test('--pack=<slug> and --pack <slug> are the same invocation', () => {
     const a = tmpOut('eq-a')
     const b = tmpOut('eq-b')
-    assert.equal(cli(['--pack', PACK, '--provider', 'fixture', `--out=${a}`]).status, 0)
-    assert.equal(cli([`--pack=${PACK}`, '--provider=fixture', `--out=${b}`]).status, 0)
+    assert.equal(cli(['--pack', PACK, '--provider', PROVIDER, `--out=${a}`]).status, 0)
+    assert.equal(cli([`--pack=${PACK}`, `--provider=${PROVIDER}`, `--out=${b}`]).status, 0)
     const read = (d) => fs.readFileSync(path.join(d, fs.readdirSync(d)[0]), 'utf8')
     assert.equal(read(a), read(b))
   })
@@ -160,7 +193,7 @@ describe('A1 — the --validate command', () => {
 
 describe('A3 — the --determinism-check command', () => {
   test('exits 0 on two in-process passes over the fixture provider', () => {
-    const res = cli(['--pack', PACK, '--provider', 'fixture', '--determinism-check'])
+    const res = cli(['--pack', PACK, '--provider', PROVIDER, '--determinism-check'])
     assert.equal(res.status, 0, `stderr:\n${res.stderr}`)
   })
 
@@ -388,7 +421,7 @@ describe('A12 — reports are verbatim, never re-derived', () => {
       guidance: loadGuidance(),
       provider: wrapped.transport,
       store: createMemoryMetaStore(),
-      runId: `${PACK}-fixture-r1`,
+      runId: RUN_ID,
     })
     assert.equal(record.reports.report_body, wrapped.calls.reportBody)
   })
@@ -400,7 +433,7 @@ describe('A12 — reports are verbatim, never re-derived', () => {
       guidance: loadGuidance(),
       provider: wrapped.transport,
       store: createMemoryMetaStore(),
-      runId: `${PACK}-fixture-r1`,
+      runId: RUN_ID,
     })
     assert.deepEqual(record.reports.facts, wrapped.calls.facts)
   })
@@ -430,7 +463,7 @@ describe('A12 — reports are verbatim, never re-derived', () => {
       guidance: loadGuidance(),
       provider: wrapped.transport,
       store: createMemoryMetaStore(),
-      runId: `${PACK}-fixture-r1`,
+      runId: RUN_ID,
       // SHAPED — x14. An empty handover makes no Call 1 at all, so there would
       // be no stance for the recorder to capture and this would be asserting
       // over a run that never asked anything.
@@ -454,20 +487,20 @@ describe('A13 — meta-state', () => {
 
   test('--emit-meta writes a second file beside the record', () => {
     const out = tmpOut('meta-on')
-    const res = cli(['--pack', PACK, '--provider', 'fixture', '--emit-meta', `--out=${out}`])
+    const res = cli(['--pack', PACK, '--provider', PROVIDER, '--emit-meta', `--out=${out}`])
     assert.equal(res.status, 0, res.stderr)
     const files = fs.readdirSync(out).sort()
     assert.equal(files.length, 2, `expected record + meta, got ${files.join(', ')}`)
-    const metaFile = files.find((f) => f !== `${PACK}-fixture-r1.json`)
+    const metaFile = files.find((f) => f !== `${RUN_ID}.json`)
     const meta = JSON.parse(fs.readFileSync(path.join(out, metaFile), 'utf8'))
     assert.deepEqual(validateAgainst(loadSchema(META_SCHEMA_PATH), meta).errors, [])
   })
 
   test('absent the flag, no meta file is written', () => {
     const out = tmpOut('meta-off')
-    const res = cli(['--pack', PACK, '--provider', 'fixture', `--out=${out}`])
+    const res = cli(['--pack', PACK, '--provider', PROVIDER, `--out=${out}`])
     assert.equal(res.status, 0, res.stderr)
-    assert.deepEqual(fs.readdirSync(out), [`${PACK}-fixture-r1.json`])
+    assert.deepEqual(fs.readdirSync(out), [`${RUN_ID}.json`])
   })
 })
 
@@ -483,13 +516,13 @@ describe('A14 — CLI', () => {
   })
 
   test('an unknown flag exits non-zero', () => {
-    const res = cli(['--pack', PACK, '--provider', 'fixture', '--nope'])
+    const res = cli(['--pack', PACK, '--provider', PROVIDER, '--nope'])
     assert.notEqual(res.status, 0)
   })
 
   test('an unknown pack exits non-zero rather than emitting a record', () => {
     const out = tmpOut('badpack')
-    const res = cli(['--pack', '__no_such_pack__', '--provider', 'fixture', `--out=${out}`])
+    const res = cli(['--pack', '__no_such_pack__', '--provider', PROVIDER, `--out=${out}`])
     assert.notEqual(res.status, 0)
     assert.deepEqual(fs.readdirSync(out), [])
   })
@@ -511,13 +544,13 @@ describe('record assembly', () => {
 
   test('run_id is derived from (pack, provider, run index) — no timestamp, no uuid', async () => {
     const { record } = await pass()
-    assert.equal(record.run_id, `${PACK}-fixture-r1`)
+    assert.equal(record.run_id, RUN_ID)
     assert.equal(record.pack_slug, PACK)
   })
 
   test('--run-id= overrides the derived id and names the output file', () => {
     const out = tmpOut('runid')
-    const res = cli(['--pack', PACK, '--provider', 'fixture', '--run-id=custom-1', `--out=${out}`])
+    const res = cli(['--pack', PACK, '--provider', PROVIDER, '--run-id=custom-1', `--out=${out}`])
     assert.equal(res.status, 0, res.stderr)
     assert.deepEqual(fs.readdirSync(out), ['custom-1.json'])
     assert.equal(JSON.parse(fs.readFileSync(path.join(out, 'custom-1.json'), 'utf8')).run_id, 'custom-1')
@@ -530,7 +563,7 @@ describe('record assembly', () => {
 
   test('--policy=<name> only stamps the field', () => {
     const out = tmpOut('policy')
-    const res = cli(['--pack', PACK, '--provider', 'fixture', '--policy=greedy', `--out=${out}`])
+    const res = cli(['--pack', PACK, '--provider', PROVIDER, '--policy=greedy', `--out=${out}`])
     assert.equal(res.status, 0, res.stderr)
     const record = JSON.parse(fs.readFileSync(path.join(out, fs.readdirSync(out)[0]), 'utf8'))
     assert.equal(record.policy, 'greedy')
@@ -639,7 +672,7 @@ describe('review finding C — a failed Call 3 never becomes an empty report', (
       guidance: loadGuidance(),
       provider: reporterFails(),
       store: createMemoryMetaStore(),
-      runId: `${PACK}-fixture-r1`,
+      runId: RUN_ID,
     })
 
     assert.equal(record.reports, null, 'a report that never landed must not be invented')
@@ -695,8 +728,8 @@ describe('review finding C — a failed Call 3 never becomes an empty report', (
     const paths = persistRun({ record, meta, outDir: out })
     assert.equal(paths.metaPath !== null, true)
     assert.deepEqual(fs.readdirSync(out).sort(), [
-      `${PACK}-fixture-r1.json`,
-      `${PACK}-fixture-r1.meta.json`,
+      `${RUN_ID}.json`,
+      `${RUN_ID}.meta.json`,
     ])
   })
 })
@@ -716,9 +749,9 @@ function carriedStore() {
   return createMemoryMetaStore({
     pack_slug: PACK,
     run_count: 1,
-    exposure_clock_reached: '21:04+',
+    exposure_clock_reached: PACK_END_CLOCK,
     carried_blocks: [{ ...CARRIED }],
-    report_archive: [`${PACK}-fixture-r1`],
+    report_archive: [RUN_ID],
   })
 }
 
@@ -767,7 +800,7 @@ describe('carry-over — the record names only blocks the run actually holds', (
       guidance: loadGuidance(),
       provider: createFixtureProvider(),
       store: carriedStore(),
-      providerName: 'fixture',
+      providerName: PROVIDER,
     })
     assert.deepEqual(record.injected_blocks.map((b) => b.id), [CARRIED.id])
     assert.deepEqual(
@@ -790,17 +823,17 @@ describe('carry-over — the record names only blocks the run actually holds', (
       guidance: loadGuidance(),
       provider: createFixtureProvider(),
       store: carriedStore(),
-      providerName: 'fixture',
+      providerName: PROVIDER,
     })
     assert.deepEqual(record.injected_blocks, [
-      { id: CARRIED.id, text: CARRIED.text, mined_from_run: `${PACK}-fixture-r1` },
+      { id: CARRIED.id, text: CARRIED.text, mined_from_run: RUN_ID },
     ])
   })
 
   test('provenanceOf resolves the archived run id the block id names', () => {
-    const archive = [`${PACK}-fixture-r1`, `${PACK}-fixture-r2`]
-    assert.equal(provenanceOf({ id: 'b-r2-q07', text: 't' }, archive), `${PACK}-fixture-r2`)
-    assert.equal(provenanceOf({ id: 'b-r1-f01', text: 't' }, archive), `${PACK}-fixture-r1`)
+    const archive = [RUN_ID, runId(2)]
+    assert.equal(provenanceOf({ id: 'b-r2-q07', text: 't' }, archive), runId(2))
+    assert.equal(provenanceOf({ id: 'b-r1-f01', text: 't' }, archive), RUN_ID)
   })
 
   test('null is reserved for the script timeline — an authored t-id, and only that', () => {
@@ -809,7 +842,7 @@ describe('carry-over — the record names only blocks the run actually holds', (
 
   test('an unattributable block throws rather than claiming script provenance', () => {
     assert.throws(
-      () => provenanceOf({ id: 'b-r9-f01', text: 't' }, [`${PACK}-fixture-r1`]),
+      () => provenanceOf({ id: 'b-r9-f01', text: 't' }, [RUN_ID]),
       /not in the report archive/,
     )
     assert.throws(() => provenanceOf({ id: 'not-an-id', text: 't' }, []), /neither the minted/)
@@ -835,11 +868,11 @@ describe('carry-over — the record names only blocks the run actually holds', (
   test('a carried run is still deterministic — two passes are byte-identical', async () => {
     const one = await runHeadless({
       pack: loadPack(PACK), guidance: loadGuidance(), provider: createFixtureProvider(),
-      store: carriedStore(), providerName: 'fixture',
+      store: carriedStore(), providerName: PROVIDER,
     })
     const two = await runHeadless({
       pack: loadPack(PACK), guidance: loadGuidance(), provider: createFixtureProvider(),
-      store: carriedStore(), providerName: 'fixture',
+      store: carriedStore(), providerName: PROVIDER,
     })
     assert.equal(serialize(one.record), serialize(two.record))
   })
@@ -955,12 +988,12 @@ describe('layering — a shipped CLI never imports from tests/', () => {
       fs.cpSync(path.join(REPO, dir), path.join(ship, dir), { recursive: true })
     }
     const out = tmpOut('ship-out')
-    const res = cli(['--pack', PACK, '--provider', 'fixture', '--validate', `--out=${out}`], {
+    const res = cli(['--pack', PACK, '--provider', PROVIDER, '--validate', `--out=${out}`], {
       cwd: ship,
       script: path.join(ship, 'tools/driver/drive-run.mjs'),
     })
     assert.equal(res.status, 0, `the shipped tree could not run the driver:\n${res.stderr}`)
-    assert.deepEqual(fs.readdirSync(out), [`${PACK}-fixture-r1.json`])
+    assert.deepEqual(fs.readdirSync(out), [`${RUN_ID}.json`])
   })
 })
 
@@ -1008,7 +1041,7 @@ describe('[r1#D] an ok-but-unusable Call 1 is recorded as the default stance', (
   function unusableJudgment() {
     const inner = createFixtureProvider()
     return {
-      mode: 'fixture',
+      mode: PROVIDER,
       async send(request) {
         const result = await inner.send(request)
         if (request.call_type !== 'judgment') return result
