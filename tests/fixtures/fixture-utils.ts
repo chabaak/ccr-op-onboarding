@@ -9,89 +9,13 @@ import fs from 'node:fs'
 import path from 'node:path'
 import { fileURLToPath } from 'node:url'
 import type { FeedLine, Sentence, ViewEvent } from '../../src/shared/view-driver.ts'
-import { REFERENCE_TARGET } from './fixture-reference.ts'
 
 export const REPO = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '../..')
 export const FIXTURE_DIR = path.join(REPO, 'src/client/driver/fixtures')
 
-/** macOS hands back NFD directory names; resolve the pack by normalised match. */
-export function packDir(): string {
-  const root = path.join(REPO, 'data', 'scenario')
-  const hit = fs.readdirSync(root).find((e) => e.normalize('NFC') === '우는다리')
-  if (!hit) throw new Error('frozen scenario pack `data/scenario/우는다리` not found')
-  return path.join(root, hit)
-}
-
 export const nfc = (s: string): string => s.normalize('NFC')
 
 export const HANGUL = /[가-힣ᄀ-ᇿ㄰-㆏]/
-
-/* --- the local fixture reference ------------------------------------------ */
-
-/* --- the frozen scenario pack --------------------------------------------- */
-
-export const PACK_FILES = [
-  'timeline.json',
-  'symptoms.json',
-  'score.json',
-  'characters.json',
-  'places.json',
-] as const
-
-export interface TimelineEvent {
-  id: string
-  time: string
-  text: string
-  [k: string]: unknown
-}
-
-export function timelineEvents(): TimelineEvent[] {
-  const raw = fs.readFileSync(path.join(packDir(), 'timeline.json'), 'utf8')
-  return (JSON.parse(raw) as { events: TimelineEvent[] }).events
-}
-
-export function packJson(file: (typeof PACK_FILES)[number]): unknown {
-  return JSON.parse(fs.readFileSync(path.join(packDir(), file), 'utf8'))
-}
-
-/** Every string value reachable in a JSON-ish value, NFC-normalised. */
-export function deepStrings(value: unknown, out: string[] = []): string[] {
-  if (typeof value === 'string') out.push(nfc(value))
-  else if (Array.isArray(value)) for (const v of value) deepStrings(v, out)
-  else if (value && typeof value === 'object')
-    for (const v of Object.values(value)) deepStrings(v, out)
-  return out
-}
-
-let haystackCache: string[] | null = null
-
-/**
- * The provenance haystack: every authored string the fixture is allowed to
- * carry — the frozen pack plus the local fixture reference rows (spec §5.4:
- * "regenerated against 우는다리 — never lorem").
- */
-export function authoredTexts(): string[] {
-  if (haystackCache) return haystackCache
-  const out: string[] = []
-  for (const f of PACK_FILES) deepStrings(packJson(f), out)
-  deepStrings(REFERENCE_TARGET, out)
-  haystackCache = out.filter((s) => s.trim().length > 0)
-  return haystackCache
-}
-
-/**
- * A ported string traces iff every non-empty line of it is contained in some
- * single authored string (`RAW_BODY` joins authored sentences with `\n`, so the
- * per-line split is what makes a joined body checkable).
- */
-export function tracesToAuthored(text: string, haystack = authoredTexts()): boolean {
-  const parts = nfc(text)
-    .split(/\r?\n/)
-    .map((p) => p.trim())
-    .filter(Boolean)
-  if (parts.length === 0) return true
-  return parts.every((p) => haystack.some((h) => h.includes(p)))
-}
 
 /* --- unit sources ---------------------------------------------------------- */
 

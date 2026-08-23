@@ -1,5 +1,5 @@
 // [e3] A6 · A7 — the beat schedule (timeline.json × gate clocks) and the round
-// boundaries, against the FROZEN 우는다리 pack plus D1/D2/D3/D5/D6/D7 fixtures.
+// boundaries, against the tutorial pack plus D1/D2/D3/D5/D6/D7 fixtures.
 import { describe, it, expect } from 'vitest'
 import { buildSchedule } from '../../../src/engine/beat/schedule.ts'
 import { parseClock } from '../../../src/engine/beat/clock.ts'
@@ -13,41 +13,54 @@ const schedule = buildSchedule(real.timeline, real.gates)
 
 /** A7's pinned boundaries — [first clock … last clock] of each round. */
 const ROUNDS: Array<{ clocks: string[] }> = [
-  { clocks: ['09:25', '09:40', '10:40', '11:07'] },
-  { clocks: ['11:30', '12:00', '13:05'] },
-  { clocks: ['14:20', '15:10'] },
-  { clocks: ['16:40'] },
-  { clocks: ['17:30', '18:20'] },
-  { clocks: ['19:10', '19:40'] },
-  { clocks: ['20:10', '20:30', '21:04', '21:04+'] },
+  { clocks: ['18:41', '18:55', '18:55+', '19:26', '19:26+', '19:33', '19:33+'] },
+  { clocks: ['19:34', '19:47', '19:48', '19:52', '19:52+', '19:53', '19:55'] },
+  {
+    clocks: [
+      '19:58',
+      '20:04',
+      '20:05',
+      '20:14',
+      '20:15',
+      '20:16',
+      '20:16+',
+      '20:19',
+      '20:41',
+      '20:41+',
+      '21:02',
+      '21:35',
+      '21:35+',
+    ],
+  },
 ]
 
 describe('[e3#D1/D2/D3] one clock tick = one beat; a gate absorbs its co-timed event', () => {
-  it('turns 우는다리 19 events + 7 gates into 19 beats (18 event beats + 1 gate-only)', () => {
-    expect(real.timeline.events).toHaveLength(19)
-    expect(real.gates.gates).toHaveLength(7)
-    expect(schedule).toHaveLength(19)
-    expect(schedule.filter((b) => b.kind === 'gate')).toHaveLength(7)
+  it('turns the tutorial events and gates into one beat per authored stamp', () => {
+    expect(real.timeline.events).toHaveLength(34)
+    expect(real.gates.gates).toHaveLength(3)
+    expect(schedule).toHaveLength(31)
+    expect(schedule.filter((b) => b.kind === 'gate')).toHaveLength(3)
   })
 
-  it('groups the two 10:40 events into one beat, in events[] order (D1)', () => {
-    const b = beatAt(schedule, '10:40')
-    expect(b.events.map((e) => e.id)).toEqual(['t4', 't5'])
-    expect(schedule.filter((x) => x.clock === '10:40')).toHaveLength(1)
+  it('groups the three 19:26 events into one beat, in events[] order (D1)', () => {
+    const b = beatAt(schedule, '19:26')
+    expect(b.events.map((e) => e.id)).toEqual(['t7', 't8', 't9'])
+    expect(schedule.filter((x) => x.clock === '19:26')).toHaveLength(1)
   })
 
-  it('absorbs G1 and t2 at 09:25 into a single gate beat (D2)', () => {
-    const b = beatAt(schedule, '09:25')
+  it('gives G1 at 18:41 a gate-only beat with no events (D3)', () => {
+    const b = beatAt(schedule, '18:41')
     expect(b.kind).toBe('gate')
     expect(b.gate?.id).toBe('G1')
-    expect(b.events.map((e) => e.id)).toEqual(['t2'])
+    expect(b.events).toEqual([])
   })
 
-  it('gives G7 at 20:10 a gate-only beat with no events (D3)', () => {
-    const b = beatAt(schedule, '20:10')
-    expect(b.kind).toBe('gate')
-    expect(b.gate?.id).toBe('G7')
-    expect(b.events).toEqual([])
+  it('all tutorial gates are gate-only beats (D3)', () => {
+    for (const clock of ['18:41', '19:34', '19:58']) {
+      const b = beatAt(schedule, clock)
+      expect(b.kind).toBe('gate')
+      expect(b.events).toEqual([])
+    }
   })
 
   it('indexes beats 0..n-1 in clock order', () => {
@@ -80,29 +93,38 @@ describe('[e3#D7] clock parsing and the 21:04+ tie-break', () => {
     }
   })
 
-  it('sorts 21:04+ after 21:04 in the real schedule', () => {
-    const i04 = schedule.findIndex((b) => b.clock === '21:04')
+  it('sorts 21:35+ after 21:35 in the real schedule', () => {
+    const i04 = schedule.findIndex((b) => b.clock === '21:35')
     const iPlus = schedule.findIndex((b) => b.clock === '21:04+')
+    const iEndPlus = schedule.findIndex((b) => b.clock === '21:35+')
     expect(i04).toBeGreaterThanOrEqual(0)
-    expect(iPlus).toBe(i04 + 1)
-    expect(iPlus).toBe(schedule.length - 1)
+    expect(iEndPlus).toBe(i04 + 1)
+    expect(iEndPlus).toBe(schedule.length - 1)
+    expect(iPlus).toBe(-1)
   })
 })
 
 describe('[e3#A6] a beat before the first gate belongs to no round', () => {
-  it('gives 08:50 roundIndex null', () => {
-    expect(beatAt(schedule, '08:50').roundIndex).toBeNull()
-    expect(beatAt(schedule, '08:50').isRoundLast).toBe(false)
-    expect(beatAt(schedule, '08:50').index).toBe(0)
+  it('gives the opening beats before G1 roundIndex null', () => {
+    for (const clock of ['18:38', '18:38+', '18:40', '18:40+']) {
+      expect(beatAt(schedule, clock).roundIndex).toBeNull()
+      expect(beatAt(schedule, clock).isRoundLast).toBe(false)
+    }
+    expect(beatAt(schedule, '18:38').index).toBe(0)
   })
 
-  it('is the ONLY beat with a null roundIndex', () => {
-    expect(schedule.filter((b) => b.roundIndex === null).map((b) => b.clock)).toEqual(['08:50'])
+  it('only beats before G1 have a null roundIndex', () => {
+    expect(schedule.filter((b) => b.roundIndex === null).map((b) => b.clock)).toEqual([
+      '18:38',
+      '18:38+',
+      '18:40',
+      '18:40+',
+    ])
   })
 
   it('makes roundView() throw on it', () => {
     const r = rig(real)
-    expect(r.driver.current().clock).toBe('08:50')
+    expect(r.driver.current().clock).toBe('18:38')
     expect(() => r.driver.roundView()).toThrow(BeatPhaseError)
     r.driver.applyBeatEffects()
     expect(() => r.driver.roundView()).toThrow(BeatPhaseError)
@@ -113,20 +135,23 @@ describe('[e3#A6] a beat before the first gate belongs to no round', () => {
     r.driver.applyBeatEffects()
     expect(r.driver.steps().filter((s) => s.kind === 'report')).toHaveLength(0)
     r.driver.advance()
-    expect(r.driver.current().clock).toBe('09:25')
+    r.driver.advance()
+    r.driver.advance()
+    r.driver.advance()
+    expect(r.driver.current().clock).toBe('18:41')
     expect(r.driver.steps().filter((s) => s.kind === 'report')).toHaveLength(0)
   })
 })
 
 describe('[e3#A7] round boundary = just before the next gate', () => {
-  it('assigns the pinned 우는다리 round membership', () => {
+  it('assigns the pinned tutorial round membership', () => {
     ROUNDS.forEach((round, i) => {
       expect(
         schedule.filter((b) => b.roundIndex === i).map((b) => b.clock),
         `round ${i}`,
       ).toEqual(round.clocks)
     })
-    expect(Math.max(...schedule.map((b) => b.roundIndex ?? -1))).toBe(6)
+    expect(Math.max(...schedule.map((b) => b.roundIndex ?? -1))).toBe(2)
   })
 
   it('marks exactly one isRoundLast beat per round, at the round s last clock', () => {
@@ -135,21 +160,21 @@ describe('[e3#A7] round boundary = just before the next gate', () => {
     )
   })
 
-  it('emits exactly 7 report steps, one per round, immediately after that round s last beat', () => {
+  it('emits one report step per round, immediately after that round s last beat', () => {
     const r = rig(real)
     driveAll(r)
     const reports = r.driver.steps().filter((s) => s.kind === 'report')
-    expect(reports).toHaveLength(7)
-    expect(reports.map((s) => (s as { round: number }).round)).toEqual([0, 1, 2, 3, 4, 5, 6])
+    expect(reports).toHaveLength(3)
+    expect(reports.map((s) => (s as { round: number }).round)).toEqual([0, 1, 2])
     expect(reports.map((s) => s.beat)).toEqual(
       ROUNDS.map((round) => beatAt(schedule, round.clocks[round.clocks.length - 1]!).index),
     )
   })
 
-  it('emits no report step before 09:25', () => {
+  it('emits no report step before the first gate', () => {
     const r = rig(real)
     driveAll(r)
-    const firstGateIndex = beatAt(schedule, '09:25').index
+    const firstGateIndex = beatAt(schedule, '18:41').index
     const early = r.driver.steps().filter((s) => s.kind === 'report' && s.beat < firstGateIndex)
     expect(early).toHaveLength(0)
   })
@@ -185,14 +210,14 @@ describe('[e3#A7] round boundary = just before the next gate', () => {
     }
   })
 
-  it('every scheduled gate of the shipped pack is asked — none of them opts into availability yet', () => {
+  it('keeps every scheduled gate but asks only available gates on the no-intervention path', () => {
     const r = rig(real)
     driveAll(r)
-    expect(schedule.filter((b) => b.kind === 'gate')).toHaveLength(7)
-    expect(r.driver.steps().filter((s) => s.kind === 'judgment')).toHaveLength(7)
+    expect(schedule.filter((b) => b.kind === 'gate')).toHaveLength(3)
+    expect(r.driver.steps().filter((s) => s.kind === 'judgment')).toHaveLength(1)
   })
 
-  it('emits one narration step per beat, 19 in all (§3.1: script beats run Call 2 without exception)', () => {
+  it('emits one narration step per beat (§3.1: script beats run Call 2 without exception)', () => {
     const r = rig(real)
     driveAll(r)
     const narration = r.driver.steps().filter((s) => s.kind === 'narration')
@@ -228,8 +253,8 @@ describe('[e3#D5/D6] edge predicates compile at schedule-build time', () => {
     expect(r.driver.submitStance({ stance: 'a', utterance: 'u' }).nextNode).toBeNull()
   })
 
-  it('all seven 우는다리 gates ship empty edge_predicates', () => {
-    expect(schedule.filter((b) => b.kind === 'gate').map((b) => b.gate!.edges)).toEqual([[], [], [], [], [], [], []])
+  it('all tutorial gates ship empty edge_predicates', () => {
+    expect(schedule.filter((b) => b.kind === 'gate').map((b) => b.gate!.edges)).toEqual([[], [], []])
   })
 
   it('parses the five comparison operators plus <flag> == true', () => {
@@ -337,7 +362,7 @@ describe('[e3#F4] a gate is asked only where its availability holds', () => {
   })
 
   it('un-hardened PROSE leaves the gate open — F4 is opt-in, and packs still carry it', () => {
-    // 우는다리's G7 says 특정 가지에서만. Reading that through `holds()` alone
+    // A prose availability note says 특정 가지에서만. Reading that through `holds()` alone
     // would answer false and delete the gate from every run; `datapack:lint`
     // FLAGs it as hardening work instead, and the engine asks the gate.
     const r = rig(availabilityPack(true))

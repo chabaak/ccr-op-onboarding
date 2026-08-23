@@ -1,7 +1,4 @@
 import { afterEach, describe, expect, it, vi } from 'vitest'
-import fs from 'node:fs'
-import path from 'node:path'
-import { fileURLToPath } from 'node:url'
 
 import { META_KEY } from '../../src/client/shell/run-state.ts'
 import {
@@ -10,24 +7,18 @@ import {
   scenarioPackInPlay,
   switchScenarioPack,
 } from '../../src/client/shell/pack-session.ts'
-import type { ScenarioIndex } from '../../src/client/shell/pack.ts'
+import type { ScenarioIndex, ScenarioPackEntry } from '../../src/client/shell/pack.ts'
 import { metaKey, stampKey } from '../../src/runloop/index.ts'
 
-const REPO = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '../..')
-const MANIFEST = JSON.parse(
-  fs.readFileSync(path.join(REPO, 'data/scenario/index.json'), 'utf8'),
-) as ScenarioIndex
-const PLAYABLE_MANIFEST: ScenarioIndex = {
+const MANIFEST: ScenarioIndex = {
   packs: [
-    ...MANIFEST.packs,
-    {
-      slug: 'practice-live',
-      displayName: 'Practice Live',
-      role: 'practice',
-      order: 99,
-      difficulty: 'test',
-    },
+    { slug: 'tutorial-pack', displayName: 'Tutorial Pack', role: 'tutorial', order: 0, difficulty: 'tutorial' },
+    { slug: 'practice-pack', displayName: 'Practice Pack', role: 'practice', order: 10, difficulty: 'standard' },
+    { slug: 'fixture-pack', displayName: 'Fixture Pack', role: 'fixture', order: 20, difficulty: 'fixture' },
   ],
+}
+const PLAYABLE_MANIFEST: ScenarioIndex = {
+  packs: MANIFEST.packs.filter((pack): pack is ScenarioPackEntry => pack.role !== 'fixture'),
 }
 
 class FakeStorage {

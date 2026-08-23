@@ -1,17 +1,11 @@
 // The pack the deploy actually ships, played end to end — and NOT a second
 // copy of `live-desk.test.ts`.
 //
-// That file plays 우는다리 and states its numbers outright (19 beats, 7 reports,
-// a headline of 26, the `21:04+` stamp table). Those literals are the point
-// there: they are what caught the terminal-stamp death, and a run whose
+// Its sibling states tutorial-pack numbers outright. Those literals are the
+// point there: they are what caught the terminal-stamp death, and a run whose
 // expectations are derived from the same data it reads cannot catch a defect
-// that lives in the data. So they stay, aimed at that pack.
-//
-// What they cannot do is follow source. When the desk moved to 전구간정상
-// (08-08), every real-run harness in the suite — this file's sibling,
-// `acceptance/fixtures/rig.ts`, `scorer.test.ts` — stayed pointed at 우는다리,
-// and the shipped pack went out having never been played. A green suite meant
-// a pack that is not deployed is green.
+// that lives in the data. This file is the complementary manifest-following
+// guard.
 //
 // This closes that with the opposite discipline: the runtime tutorial pack is
 // read from `data/scenario/index.json`, and every expectation is computed from
@@ -80,8 +74,8 @@ const GUIDANCE = readJson('data/policy/report-guidance.json') as ReportGuidance
  * How many beats the day has, derived WITHOUT `buildSchedule`.
  *
  * `buildSchedule` is the thing under test, so counting with it would prove
- * nothing. A beat is one authored stamp — co-timed rows share one (우는다리's
- * t4/t5 both sit at 10:40) and a gate's clock joins the same slot — which is
+ * nothing. A beat is one authored stamp — co-timed rows share one and a gate's
+ * clock joins the same slot — which is
  * the schedule's contract stated from the data side.
  */
 const authoredStamps = new Set<string>([
@@ -233,9 +227,8 @@ describe('the shipped pack plays its day to the end', () => {
   })
 
   // The defect `exposure.extra_condition` was written to prevent, stated from
-  // the run's side. A pack authors its branches as co-timed pairs — 전구간정상's
-  // 21:22 announcement is either "차량 안에서 대기하십시오" or "차에서
-  // 내리십시오", never both — and while the slot was unread BOTH halves reached
+  // the run's side. A pack may author branches as co-timed pairs where only one
+  // half should reach a run, and while the slot was unread BOTH halves reached
   // the feed in the same minute. Derived from the pack, so it holds for any
   // scenario that authors pairs and asserts nothing about a scenario that does
   // not.

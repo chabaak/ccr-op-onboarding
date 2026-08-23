@@ -91,7 +91,7 @@ describe('[u0#c4] script wiring', () => {
     // say so. `datapack:check` is the type-drift check and is a different
     // question; the two are not substitutes.
     // WIDENED (08-08): the clause named ONE slug, so the gate covered one pack
-    // and the second pack (전구간정상) landed with no gate at all — the exact
+    // and another early pack landed with no gate at all — the exact
     // hole the paragraph above describes, reopened by a hardcoded argument.
     // `datapack:lint:all` enumerates `data/scenario/` instead, which is why
     // this array does not grow a row per pack; (g4) below is what holds the

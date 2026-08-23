@@ -26,6 +26,7 @@ import { describe, expect, it } from 'vitest'
 import { readFileSync } from 'node:fs'
 import path from 'node:path'
 import { publishedContentOf, publishedDataFiles } from '../../vite.config.ts'
+import { TUTORIAL_SLUG } from '../helpers/scenario.ts'
 
 const REPO = path.resolve(import.meta.dirname, '../..')
 const DATA = path.join(REPO, 'data')
@@ -123,7 +124,7 @@ describe('published packs carry no gate vocabulary (inv 6)', () => {
 
   it('(d) the scan reads what ships, not what is authored', () => {
     // The authored gates.json still says everything; the published one must not.
-    const authored = readFileSync(path.join(DATA, 'scenario/우는다리/gates.json'), 'utf8')
+    const authored = readFileSync(path.join(DATA, 'scenario', TUTORIAL_SLUG, 'gates.json'), 'utf8')
     expect(authored, 'the authored pack should still carry its design notes').toMatch(
       /"standard_form"/,
     )

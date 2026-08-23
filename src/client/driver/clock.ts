@@ -16,8 +16,8 @@ export type ClockRate = 0 | 1 | 4
 /**
  * Minutes since midnight for an `"HH:MM"` seam stamp.
  *
- * THE TRAILING `+` IS PART OF THE VOCABULARY, not a typo. `우는다리`'s timeline
- * closes on `21:04+` — "immediately after that minute" — and `engine/beat/
+ * THE TRAILING `+` IS PART OF THE VOCABULARY, not a typo. Scenario timelines
+ * can close on a `+` stamp — "immediately after that minute" — and `engine/beat/
  * clock.ts` gives it a sub-minute sort weight rather than a minute of its own.
  * `buildSchedule` keeps the authored string verbatim on `Beat.clock`, so the
  * live driver emits it on that beat's `beat_start`/`beat_end`, and this parser

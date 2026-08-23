@@ -1,6 +1,4 @@
 import { describe, expect, it, vi } from 'vitest'
-import fs from 'node:fs'
-import path from 'node:path'
 
 import { META_KEY } from '../../src/client/shell/run-state.ts'
 import {
@@ -24,10 +22,13 @@ import type {
 import { sortedScenarioPacks } from '../../src/client/shell/pack.ts'
 import { metaKey, stampKey } from '../../src/runloop/index.ts'
 
-const REPO = path.resolve(import.meta.dirname, '../..')
-const MANIFEST = JSON.parse(
-  fs.readFileSync(path.join(REPO, 'data/scenario/index.json'), 'utf8'),
-) as ScenarioIndex
+const MANIFEST: ScenarioIndex = {
+  packs: [
+    { slug: 'tutorial-pack', displayName: 'Tutorial Pack', role: 'tutorial', order: 0, difficulty: 'tutorial' },
+    { slug: 'practice-a', displayName: 'Practice A', role: 'practice', order: 10, difficulty: 'standard' },
+    { slug: 'fixture-pack', displayName: 'Fixture Pack', role: 'fixture', order: 20, difficulty: 'fixture' },
+  ],
+}
 const ENDINGS: ScenarioEndings = {
   siteOccupants: 1,
   scoredOutsideSite: [],

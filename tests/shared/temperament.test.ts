@@ -18,6 +18,7 @@ import { fileURLToPath } from 'node:url'
 import type { Temperament } from '../../src/shared/datapack.ts'
 import { renderTemperament } from '../../src/shared/temperament.ts'
 import { renderReportGuidance, type ReportGuidance } from '../../src/shared/report-guidance.ts'
+import { tutorialPart } from '../helpers/scenario.ts'
 
 const REPO = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '../..')
 
@@ -60,7 +61,7 @@ const HEADER_LINE = /^\*\*.+\*\*$/
 
 // ─── frozen inputs (read-only: data/scenario/**, data/policy/**) ─────────────
 
-const PACK = readJson<Temperament>('data/scenario/우는다리/temperament.json')
+const PACK = tutorialPart<Temperament>('temperament')
 const GUIDANCE = readJson<ReportGuidance>('data/policy/report-guidance.json')
 const CALL_SLOTS = readJson<{
   temperament: { calls: number[]; slot: string; source: string }
@@ -73,16 +74,30 @@ const REPORT_GUIDANCE_SRC = 'src/shared/report-guidance.ts'
 
 const DISPOSITION_A = '기록된 것을 믿는다. 서류에 남은 판단을 사람의 말보다 앞세운다.'
 const DISPOSITION_B = '사람의 말을 믿는다. 눈앞의 목소리를 서류보다 앞세운다.'
+const CLAUSE_A: Temperament['clauses'][number] = {
+  id: 'cl1',
+  axis: '방어',
+  axis_vocabulary: ['규정', '절차'],
+  condition: '규정만 반복하면',
+  defeat_condition: '단, 자기 행동을 직접 말하면 그렇지 않다',
+}
+const CLAUSE_B: Temperament['clauses'][number] = {
+  id: 'cl2',
+  axis: '신뢰',
+  axis_vocabulary: ['확인', '이동'],
+  condition: '보고를 확인하면',
+  defeat_condition: '단, 현장을 보지 못하면 그렇지 않다',
+}
 
 const zeroClauses: Temperament = { default_disposition: DISPOSITION_A, clauses: [] }
 const zeroClausesOtherDisposition: Temperament = {
   default_disposition: DISPOSITION_B,
   clauses: [],
 }
-const oneClause: Temperament = { default_disposition: DISPOSITION_A, clauses: [PACK.clauses[0]] }
+const oneClause: Temperament = { default_disposition: DISPOSITION_A, clauses: [CLAUSE_A] }
 const twoClauses: Temperament = {
   default_disposition: DISPOSITION_A,
-  clauses: [PACK.clauses[0], PACK.clauses[1]],
+  clauses: [CLAUSE_A, CLAUSE_B],
 }
 
 // ═══ invariant 1 — Call 1 and Call 3 get byte-identical output ═══════════════
@@ -124,7 +139,7 @@ describe('[e1] invariant 1 — Calls 1 and 3 receive byte-identical temperament'
 // ═══ invariant 2 — never empty ═══════════════════════════════════════════════
 
 describe('[e1] invariant 2 — output is non-empty for any schema-valid pack', () => {
-  it('(a) the authored 우는다리 pack renders non-empty', () => {
+  it('(a) the authored tutorial pack renders non-empty', () => {
     expect(renderTemperament(PACK).trim()).not.toBe('')
   })
 
@@ -260,18 +275,18 @@ describe('[e1] the output is a function of the pack, not a constant', () => {
   })
 
   it('(d) no authored clause is dropped — condition and defeat_condition both survive', () => {
-    const out = renderTemperament(PACK)
-    expect(PACK.clauses.length).toBe(2)
-    for (const clause of PACK.clauses) {
+    const out = renderTemperament(twoClauses)
+    expect(twoClauses.clauses.length).toBe(2)
+    for (const clause of twoClauses.clauses) {
       expect(out, `clause ${clause.id}: condition dropped`).toContain(clause.condition)
       expect(out, `clause ${clause.id}: defeat_condition dropped`).toContain(clause.defeat_condition)
     }
   })
 
   it('(e) clause order is preserved — cl1 before cl2', () => {
-    const out = renderTemperament(PACK)
-    expect(out.indexOf(PACK.clauses[0].condition)).toBeLessThan(
-      out.indexOf(PACK.clauses[1].condition),
+    const out = renderTemperament(twoClauses)
+    expect(out.indexOf(twoClauses.clauses[0]!.condition)).toBeLessThan(
+      out.indexOf(twoClauses.clauses[1]!.condition),
     )
   })
 

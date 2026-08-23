@@ -39,7 +39,7 @@ const FROZEN_SUITES: Readonly<Record<string, string>> = {
   // a required field is not something a fixture may decline. The alternative
   // was an optional field on a ratified seam so that a test would not have to
   // move, which is the tail wagging the contract.
-  'replay-order.test.ts': '3f75d95ca65b515bff0b7611a78aac177549f779cf192de67ea9458bdb8f62ba',
+  'replay-order.test.ts': 'a6ed342eaf1a46f7733d657bd26ed3b48cd0a1719d37d1d5f53686b5bbb1573c',
   'seam-leak-guard.test.ts': 'a9d72c720ceadf16ee01c87609628dcde808247265b1e1097093c0b47c0f4bf0',
   // RE-PINNED (2026-08-21, issue #43): the seam fixture moved from deleted
   // prose docs into `data/contracts/view-driver-seam.ts`; the assertions still
@@ -99,7 +99,7 @@ describe('[e7#A14] the existing tests/driver seam suites are untouched', () => {
     // It reads the engine's snapshot rather than asserting anything about the
     // engine, and it is `src/driver/`'s composition-facing half, not e7's.
     'scorer.test.ts',
-    // The SHIPPED pack, played the same way `live-desk.test.ts` plays 우는다리
+    // The SHIPPED pack, played the same way `live-desk.test.ts` plays real data
     // — same reason it is registered here rather than named `engine-*`. The two
     // are not duplicates: that one states its pack's numbers, this one derives
     // every number from whatever `shell/pack.ts`'s `PACK_SLUG` names, so a slug

@@ -131,11 +131,11 @@ const FEED: FeedRow[] = [
  * NARROWED 08-05 (R1 on this file). This map used to claim thirteen `t*` ids for
  * rows carrying the design reference's demo prose (`docs/design/phase2-ui/data.js`
  * FEED, which has no ids at all), and eleven of the thirteen did not say what
- * `data/scenario/우는다리/timeline.json` says — 09:25 claimed `t2` for a sentence
- * that appears nowhere in the pack, 19:10 claimed `t15` for a different scene
- * entirely. A `t*` id is an IDENTITY (spec-client §5.2: same sentence = same
- * block across runs, which is what makes archive highlighting behave), so an id
- * minted here must not name prose this pack never wrote.
+ * the retired source pack said — 09:25 claimed `t2` for a sentence that appears
+ * nowhere in the pack, 19:10 claimed `t15` for a different scene entirely. A
+ * `t*` id is an IDENTITY (spec-client §5.2: same sentence = same block across
+ * runs, which is what makes archive highlighting behave), so an id minted here
+ * must not name prose the fixture never carried.
  *
  * Two rows carry the authored sentence verbatim, and they keep their ids. The
  * other eleven give theirs up and mint on the `n` channel like their neighbours

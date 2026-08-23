@@ -2,7 +2,7 @@
 //          (mirroring Google's slicing) and the union of the slices covers every
 //          glyph the shipped scenario pack actually renders.
 //
-// The corpus is the frozen `data/scenario/우는다리/**` pack (read-only here).
+// The corpus is the shipped tutorial scenario pack (read-only here).
 // No fixture *content* is asserted — only which codepoints must be coverable.
 import { describe, it, expect } from 'vitest'
 import {

@@ -70,8 +70,8 @@ describe('[u3#c9] index.html carries the shell containers and nothing more', () 
    * `경간 A · 정착부 N-3`, `경간 B · 정착부 S-3`,
    * `윤슬교 종단면 · 축척 1:400 · 세명건설`, and a red `정착부 — 소선 파단`.
    * That is the vocabulary of the FIRST scenario concept — the bridge — which
-   * the project dropped for the pack it actually ships (`PACK_SLUG` in
-   * `shell/pack.ts` is `전구간정상`, a tunnel). Nothing in the suite said a
+   * the project dropped for the pack it actually ships from the scenario
+   * manifest. Nothing in the suite said a
    * word about the wallpaper's text, so a concept change swept the driver, the
    * data packs and the copy and left the markup captioning a case that no
    * longer exists.
@@ -83,10 +83,9 @@ describe('[u3#c9] index.html carries the shell containers and nothing more', () 
    * Hence (f) here rather than a suite of its own — the shell markup may not
    * hard-code scenario vocabulary, whichever scenario it belongs to.
    *
-   * Scoped to `index.html` DELIBERATELY. These needles are live, correct
-   * content elsewhere: `data/scenario/우는다리/` is a real pack we keep, and
-   * `driver/fixtures/woodari-*.ts` are its fixtures. The offence is a shell
-   * container speaking a pack's language, not the words existing in the repo.
+   * Scoped to `index.html` DELIBERATELY. These needles may be live, correct
+   * content elsewhere; the offence is a shell container speaking a pack's
+   * language, not the words existing in the repo.
    * Comments are scanned too — a label moved into a comment is still the
    * dropped concept's name sitting in the shipped markup, which is why the
    * `.bp` group's note above spells its history in prose and quotes the

@@ -17,11 +17,9 @@
 //     `frame()` delegating straight to the driver so "driver-fed" is testable.
 //
 // C3 (placeholder fixtures): nothing here asserts synthetic fixture CONTENT.
-// The one literal that does appear — `전 구간 정상` — is repo data
-// (`data/scenario/전구간정상/meta.json`), not fixture text. It tracks the SHIPPED
-// pack (`src/client/shell/pack.ts`): the case name asserts against
-// `PACK_DISPLAY_NAME`, which is `PACK_SLUG` spelled for a reader — the chrome
-// prints the display name, and the slug stays on the paths and doc numbers.
+// The case-name literal is repo data, not fixture text. It tracks the shipped
+// pack's display name — the chrome prints the display name, and the slug stays
+// on the paths and doc numbers.
 //
 // x6 — `23:12` used to be the second such literal, read off the clock's `→`
 // gutter. The gutter is gone with the progress bar it ended (see the topbar

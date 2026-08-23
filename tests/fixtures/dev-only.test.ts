@@ -112,12 +112,9 @@ describe('[u2f#c10] frozen inputs are read, never written', () => {
   // run). The original claim stays
   // asserted where it stayed true: over the run's own merge range, in (e). The
   // live checks keep the paths that remain frozen.
-  // `data/scenario/우는다리/` joins the released set with the score-predicate
-  // hardening (08-05) — same argument as the two above, recorded in full at
-  // `tests/acceptance/discovery-and-frozen-guard.test.ts`: the pack is content,
-  // the freeze was "the run must not rewrite its own inputs", and that claim
-  // expired at the run's merge. `data/scenario/_schema/` stays frozen; the
-  // schemas are the law the content is checked against.
+  // Scenario pack content is not part of the live frozen set; packs are content
+  // and revise with scenario work. `data/scenario/_schema/` follows the same
+  // release recorded below when the legal pack shape widened.
   //
   // The gate-vocabulary repair (08-06) lands under that same release — the leak
   // is in the authored timeline itself, so there is nowhere else to fix it.
@@ -131,7 +128,6 @@ describe('[u2f#c10] frozen inputs are read, never written', () => {
   // set, so every pack that validated before still validates.
   const RELEASED = [
     'src/shared/species.ts',
-    'data/scenario/우는다리/',
     'data/scenario/_schema/',
   ]
   const FROZEN = [

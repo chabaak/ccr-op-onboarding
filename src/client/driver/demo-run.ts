@@ -3,8 +3,8 @@
 // The shell opens the desk on a PLACEHOLDER stream (`shell/boot-run.ts`): one
 // `meta` event and nothing else, written while the authored run was still
 // blocked. It no longer is, and a desk whose stream is empty cannot show a
-// window's contents at all — so the driver offers the authored 우는다리 RUN 03
-// here, and the boot takes it when it is there.
+// window's contents at all — so the driver offers a canned RUN 03 stream here,
+// and the boot takes it when it is there.
 //
 // The offer is guarded rather than direct because spec-client §5.4 keeps the
 // fixtures in DEV builds only: the demo is reached through a dynamic import
