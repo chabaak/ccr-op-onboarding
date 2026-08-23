@@ -68,6 +68,19 @@ const PACK: LivePack = {
 
 const GUIDANCE = readJson('data/policy/report-guidance.json') as ReportGuidance
 
+function memoryStorage(): StorageLike {
+  const held = new Map<string, string>()
+  return {
+    getItem: (key) => held.get(key) ?? null,
+    setItem: (key, value) => {
+      held.set(key, value)
+    },
+    removeItem: (key) => {
+      held.delete(key)
+    },
+  }
+}
+
 /** One run of the real chain, offline — the binder's own wiring, unmodified. */
 function realRun(run: number): BoundRun {
   const bindDeps: BindDeps = {
@@ -186,6 +199,24 @@ describe('(A) the live desk plays its day to the end', () => {
     const times = timeline.timeline.events.map((e) => e.time)
     expect(times, 'the pack no longer authors a `+` stamp — this guard is measuring nothing').toContain('21:04+')
     expect(mm('21:04+')).toBe(mm('21:04'))
+  })
+
+  it('the live feed schedule comes from the active pack', async () => {
+    const fetch = (async (url: string | URL) => {
+      const rel = decodeURIComponent(new URL(String(url)).pathname).replace(/^\//, '')
+      return { ok: true, status: 200, json: async () => readJson(rel) }
+    }) satisfies PackFetch as unknown as typeof globalThis.fetch
+    const driver = await createLiveRunDriver({
+      baseUrl: BASE_URL,
+      fetch,
+      storage: memoryStorage(),
+      slug: SLUG,
+      start: '08:50',
+      end: '21:04',
+      proxyBaseUrl: null,
+    })
+    const timeline = PACK as unknown as { timeline: { events: { time: string }[] } }
+    expect(driver.feedGapClocks?.()).toEqual(timeline.timeline.events.map((e) => e.time))
   })
 
   it('the run reaches run_end with every beat and every round behind it', async () => {
@@ -333,18 +364,7 @@ describe('(B) the driver pumps the animations the desk registers', () => {
 
 describe('(C) a reload resumes the day rather than spending one', () => {
   /** `sessionStorage`, in memory — one tab, across several page loads. */
-  function tabStorage(): StorageLike {
-    const held = new Map<string, string>()
-    return {
-      getItem: (key) => held.get(key) ?? null,
-      setItem: (key, value) => {
-        held.set(key, value)
-      },
-      removeItem: (key) => {
-        held.delete(key)
-      },
-    }
-  }
+  const tabStorage = (): StorageLike => memoryStorage()
 
   /**
    * Serves the pack off disk, the way `dist/data/**` serves it in a build.

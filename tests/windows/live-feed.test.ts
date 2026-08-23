@@ -37,7 +37,12 @@ import {
 import type { FeedNode, FeedPart } from '../../src/client/components/run-feed.ts'
 import { typeDuration } from '../../src/client/components/typewriter.ts'
 import { FALLBACK_CLASS, FALLBACK_LABEL } from '../../src/client/components/fallback-notice.ts'
-import { LIVE_FEED_PACING } from '../../data/policy/live-feed-pacing.ts'
+import {
+  LIVE_FEED_DEFAULT_GAP_POLICY,
+  LIVE_FEED_PACING,
+  liveFeedGapPolicyFromClocks,
+} from '../../data/policy/live-feed-pacing.ts'
+import type { LiveFeedGapPolicy } from '../../data/policy/live-feed-pacing.ts'
 
 const REPO = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '../..')
 
@@ -58,6 +63,8 @@ const read = (relative: string): string => {
   const full = path.join(REPO, relative)
   return fs.existsSync(full) ? fs.readFileSync(full, 'utf8') : ''
 }
+
+const readJson = <T>(relative: string): T => JSON.parse(read(relative)) as T
 
 /** Replace comment bodies with spaces — kills the prose, keeps the newlines. */
 const blank = (text: string): string => {
@@ -145,6 +152,28 @@ const model = (line: FeedLine, band?: boolean): FeedNode =>
 /** Everything a node renders as text, in order — the stamp is NOT text. */
 const nodeText = (node: FeedNode): string =>
   node.parts.map((p: FeedPart) => ('text' in p ? p.text : '')).join('')
+
+function paperCost(events: readonly ViewEvent[], policy: LiveFeedGapPolicy): number {
+  let at = ''
+  let paper = 0
+  for (const event of events) {
+    if (event.type === 'feed' && UNDRAWN_KINDS.includes(event.line.kind)) {
+      at = event.line.clock
+      continue
+    }
+    if (!printsFeedLine(event)) continue
+    if (event.type !== 'feed') {
+      paper += FEED_PACE.msBetween
+      continue
+    }
+    const node = model(event.line)
+    paper += feedGapMs(at, event.line.clock, policy)
+    const chars = nodeText(node).length
+    paper += typesOut(event.line.kind) ? typeDuration([chars], FEED_PACE) : FEED_PACE.msBetween
+    at = node.stamp ?? at
+  }
+  return paper
+}
 
 /* ══ [u5#c1] the seven kinds map 1:1 ═════════════════════════════════════ */
 
@@ -464,15 +493,18 @@ describe('x11 the reveal pump charges time for lines, never for events', () => {
       previous = ms
     }
 
-    // The cap is not decoration: it binds INSIDE the shipped pack's own range.
-    // `멈춘회전문` runs gaps of 0..33 sim-minutes and the demo fixture reaches
-    // 89, so raw proportionality would put a thirty-fold spread on the pauses
-    // of one day. Capped, the longest silence of the run is worth under four of
-    // the shortest hops.
+    // The cap is not decoration: raw proportionality would let a wide authored
+    // schedule put a large spread on one day's pauses. Capped, the longest
+    // silence of a wide day stays within a small multiple of the shortest hop.
     const shortest = feedGapMs('08:50', '08:51')
     const longest = feedGapMs('08:50', '10:19')
     expect(longest / shortest, 'the pause spread grew past what a player will sit through').toBeLessThan(4)
     expect(longest, 'the cap stopped binding on the packs we ship').toBe(feedGapMs('08:50', '09:33'))
+
+    const densePolicy = liveFeedGapPolicyFromClocks(['08:00', '08:05'])
+    expect(densePolicy.gapMaxMs).toBe(LIVE_FEED_PACING.gapOpenMs + 5 * LIVE_FEED_PACING.gapMsPerMinute)
+    expect(feedGapMs('08:00', '09:00', densePolicy)).toBe(densePolicy.gapMaxMs)
+    expect(feedGapMs('08:00', '09:00', densePolicy)).toBeLessThan(feedGapMs('08:00', '09:00'))
   })
 
   it('(d2) the live feed pacing knobs live in data, not inline renderer literals', () => {
@@ -487,7 +519,27 @@ describe('x11 the reveal pump charges time for lines, never for events', () => {
     expect(feedGapMs('08:00', '08:01')).toBe(
       LIVE_FEED_PACING.gapOpenMs + LIVE_FEED_PACING.gapMsPerMinute,
     )
-    expect(feedGapMs('08:00', '10:00')).toBe(LIVE_FEED_PACING.gapMaxMs)
+    expect(feedGapMs('08:00', '10:00')).toBe(LIVE_FEED_DEFAULT_GAP_POLICY.gapMaxMs)
+    expect(LIVE_FEED_DEFAULT_GAP_POLICY).toEqual({ gapMaxMs: LIVE_FEED_PACING.gapMaxMs })
+    expect(source, 'a pack-specific gap justification leaked back into the renderer').not.toMatch(
+      /멈춘회전문|우는다리|Woodari|woodari/,
+    )
+  })
+
+  it('(d3) the shipped tutorial pack derives the same gap policy the hand tune shipped with', () => {
+    const scenario = readJson<{ packs: { slug: string; role?: string }[] }>('data/scenario/index.json')
+    const tutorial = scenario.packs.find((pack) => pack.role === 'tutorial')
+    expect(tutorial, 'the scenario manifest no longer identifies the shipped tutorial pack').toBeDefined()
+    const timeline = readJson<{ events: { time: string }[] }>(`data/scenario/${tutorial!.slug}/timeline.json`)
+    const policy = liveFeedGapPolicyFromClocks(timeline.events.map((event) => event.time))
+
+    expect(policy).toEqual(LIVE_FEED_DEFAULT_GAP_POLICY)
+    const open = mm('08:00')
+    for (let gap = 0; gap <= 120; gap += 1) {
+      const to = hhmm(open + gap)
+      expect(feedGapMs('08:00', to, policy)).toBe(feedGapMs('08:00', to, LIVE_FEED_DEFAULT_GAP_POLICY))
+    }
+    expect(paperCost(EVENTS, policy)).toBe(paperCost(EVENTS, LIVE_FEED_DEFAULT_GAP_POLICY))
   })
 
   it('(e) the whole demo day of paper stays inside the human-readable presentation band', () => {
@@ -506,34 +558,7 @@ describe('x11 the reveal pump charges time for lines, never for events', () => {
     // (`shell/feed-reach.ts`), so the day's documents land a lag behind the
     // seam. Candidate D accepts that lag because unreadable paper is worse than
     // a longer first run; the bound keeps that choice inside a presentation band.
-    let at = ''
-    let paper = 0
-    for (const event of EVENTS) {
-      // A dropped line still moves the desk clock, so it still moves the gap the
-      // next printed line is priced against — and costs nothing itself.
-      if (event.type === 'feed' && UNDRAWN_KINDS.includes(event.line.kind)) {
-        at = event.line.clock
-        continue
-      }
-      if (!printsFeedLine(event)) continue
-      if (event.type !== 'feed') {
-        // A `score` line reuses the last stamp (it carries none of its own), so
-        // it owes no pause. It types like any other line; its length is
-        // `tally-line.ts`'s business and not a fixture literal to assert here
-        // (C3), so it is priced as a bare row.
-        paper += FEED_PACE.msBetween
-        continue
-      }
-      const node = model(event.line)
-      paper += feedGapMs(at, event.line.clock)
-      const chars = nodeText(node).length
-      paper += typesOut(event.line.kind) ? typeDuration([chars], FEED_PACE) : FEED_PACE.msBetween
-      // …and the desk clock moves only for a line that HAS a stamp: a `mark` is
-      // one column wide and carries none, so the round divider does not reset
-      // what the next line's pause is measured from. Read off the model rather
-      // than off a rule restated here.
-      at = node.stamp ?? at
-    }
+    const paper = paperCost(EVENTS, LIVE_FEED_DEFAULT_GAP_POLICY)
     const day = (mm(woodariRun03.end) - mm(woodariRun03.start)) * MS_PER_SIM_MIN
     const ratio = paper / day
     expect(paper, 'the paper is racing the day again instead of staying readable').toBeGreaterThan(day)

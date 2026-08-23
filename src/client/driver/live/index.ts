@@ -82,6 +82,7 @@ export async function createLiveRunDriver(deps: LiveRunDeps): Promise<FixtureDri
     fetch,
     transport,
   }
+  const feedGapClocks = pack.timeline.events.map((event) => event.time)
 
   // H2 — a page load is a new sitting. Cleared here rather than inside the
   // store, because the store is also the headless path's and that one resumes.
@@ -178,6 +179,7 @@ export async function createLiveRunDriver(deps: LiveRunDeps): Promise<FixtureDri
 
   return createLiveAdapter({
     first,
+    feedGapClocks,
     canOpenNext,
     closeRun,
     async next(close: RunClose): Promise<BoundRun | null> {

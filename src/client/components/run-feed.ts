@@ -57,7 +57,12 @@ import type { FallbackClass } from './fallback-notice.ts'
 import { tallyLineText } from './tally-line.ts'
 import { TYPE_START, typeCursor } from './typewriter.ts'
 import type { TypePace } from './typewriter.ts'
-import { LIVE_FEED_PACING } from '../../../data/policy/live-feed-pacing.ts'
+import {
+  LIVE_FEED_DEFAULT_GAP_POLICY,
+  LIVE_FEED_PACING,
+  liveFeedGapPolicyFromClocks,
+} from '../../../data/policy/live-feed-pacing.ts'
+import type { LiveFeedGapPolicy } from '../../../data/policy/live-feed-pacing.ts'
 
 /* ── the model ───────────────────────────────────────────────────────────── */
 
@@ -300,17 +305,16 @@ export const FEED_PACE: TypePace = { msPerChar: FEED_MS_PER_CHAR, msBetween: FEE
  * The pause when the DESK CLOCK MOVES — the in-world time between two lines,
  * priced as real time and capped hard.
  *
- * Proportional, because a line stamped 33 minutes after the one above it should
- * not arrive as if it were the next breath; capped, because the player must not
- * be made to wait for a run that is happening whether they watch or not. The
- * pause has one job: to make the next line feel like it took time to happen.
+ * Proportional, because a line stamped many minutes after the one above it
+ * should not arrive as if it were the next breath; capped, because the player
+ * must not be made to wait for a run that is happening whether they watch or
+ * not. The pause has one job: to make the next line feel like it took time to
+ * happen.
  *
- * The cap is NOT optional, and the shipped pack is the argument. Its authored
- * gaps run 0 to 33 sim-minutes, so raw proportionality would make the last pause
- * thirty times the first; the demo fixture (`driver/fixtures/woodari-run03.ts`,
- * which is what e2e drives) has gaps of 89. Opening above zero and adding a
- * little per minute, the cap binds inside that range and keeps the longest
- * silence of the day within a small multiple of the shortest hop.
+ * The cap is derived from the active schedule and bounded by the tuned data
+ * policy. A pack with dense beats should not inherit a wider silence just
+ * because another pack authored a wider day, while a wide day still gets the
+ * human-tested global ceiling.
  *
  * The OPENING term is why a one-minute hop is not 24 ms: what the operator reads
  * is that the clock moved at all, and a pause too short to notice would make the
@@ -318,7 +322,6 @@ export const FEED_PACE: TypePace = { msPerChar: FEED_MS_PER_CHAR, msBetween: FEE
  */
 const GAP_OPEN_MS = LIVE_FEED_PACING.gapOpenMs
 const GAP_MS_PER_MIN = LIVE_FEED_PACING.gapMsPerMinute
-const GAP_MAX_MS = LIVE_FEED_PACING.gapMaxMs
 
 /**
  * The pause the paper owes a line stamped `to` when the last one printed said
@@ -329,11 +332,15 @@ const GAP_MAX_MS = LIVE_FEED_PACING.gapMaxMs
  * is ordered by clock, but a `score` line reuses the last stamp and a run that
  * ever emitted out of order would owe a negative pause, which is not a thing.
  */
-export function feedGapMs(from: string, to: string): number {
+export function feedGapMs(
+  from: string,
+  to: string,
+  policy: LiveFeedGapPolicy = LIVE_FEED_DEFAULT_GAP_POLICY,
+): number {
   if (from === '' || to === '' || from === to) return 0
   const delta = mm(to) - mm(from)
   if (delta <= 0) return 0
-  return Math.min(GAP_MAX_MS, GAP_OPEN_MS + delta * GAP_MS_PER_MIN)
+  return Math.min(policy.gapMaxMs, GAP_OPEN_MS + delta * GAP_MS_PER_MIN)
 }
 
 /**
@@ -585,6 +592,10 @@ function lineElement(
 }
 
 export function createRunFeed(host: HTMLElement, driver: FixtureDriver): RunFeed {
+  const gapPolicy =
+    driver.feedGapClocks === undefined
+      ? LIVE_FEED_DEFAULT_GAP_POLICY
+      : liveFeedGapPolicyFromClocks(driver.feedGapClocks())
   const left = el('div', 'sprocket left')
   const right = el('div', 'sprocket right')
   left.setAttribute('aria-hidden', 'true')
@@ -1048,7 +1059,7 @@ export function createRunFeed(host: HTMLElement, driver: FixtureDriver): RunFeed
     const at = head.type === 'feed' ? displayStamp(head.line.clock) : stamp
     if (!gapPaid) {
       gapPaid = true
-      const owed = feedGapMs(stamp, at)
+      const owed = feedGapMs(stamp, at, gapPolicy)
       if (owed > 0) {
         pauseMs = owed
         return
