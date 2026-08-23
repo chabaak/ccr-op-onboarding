@@ -1,0 +1,475 @@
+{
+  "experiment": "DOME-G2-cumulative-r1",
+  "arm": "baseline",
+  "call_type": "judgment",
+  "channel": "C-BLOCK",
+  "template": "v0.4",
+  "model": "claude-haiku-4-5-20251001",
+  "transport": "anthropic",
+  "dry_run": false,
+  "pre_registration": {
+    "hypothesis": "현재 G2가 증거 게이트라면 no-key와 K1은 a(남측 회전문 유지)에 머물고, K1+K2에서만 b 또는 c로 옮긴다. K1+K2+K3은 K1+K2보다 성공 선택을 더 키우지 않아야 하며, weak/placebo와 K1+K3 negative는 K1 단독보다 성공 선택을 물질적으로 키우지 않아야 한다.",
+    "n_per_arm": 10,
+    "drop_condition": "K1 단독이 b 또는 c에 30% 이상 닿거나, placebo 또는 negative_control이 b 또는 c를 K1 단독보다 30포인트 이상 키우면 현 G2 stance/evidence가 누설 상태다. K1+K2가 b 또는 c에 80% 미만이면 K2 문장 또는 stance set이 충분히 작동하지 않는다.",
+    "contingencies": [
+      "baseline(no-key)이 b 또는 c에 30% 이상 닿으면 stance label 또는 gate question 자체가 성공 행동을 노출한다.",
+      "K1+K2+K3이 K1+K2와 다른 분포를 보이면 G3 열쇠가 G2 판단에 새고 있다.",
+      "because_block_ids가 없는 arm에서 성공 stance의 필요 전제를 꾸며내면 traceability defect로 별도 기록한다."
+    ],
+    "not_claimed": "이 suite는 G2의 현재 판단 누설만 잰다. G3, full play reachability, casualty ladder는 이 suite alone으로 판정하지 않는다."
+  },
+  "n_effective": 10,
+  "n_overridden": false,
+  "calls": [
+    {
+      "arm": "baseline",
+      "slot": 1,
+      "template": "v0.4",
+      "model": "claude-haiku-4-5-20251001",
+      "model_reported": "claude-haiku-4-5-20251001",
+      "temperament_id": "dome-base",
+      "latency_s": 7.934,
+      "stop_reason": "tool_use",
+      "foreign_tool_uses": 0,
+      "schema_retries": 0,
+      "payload": {
+        "stance": "a",
+        "inner_note": "막구조 건물이 공기압 손실 상태에 있고, 시설 정보와 현장 상황 사이의 불일치가 커지고 있다. 하지만 확인된 것은 남측 회전문이 유일한 공식 출입구라는 사실뿐이다. 개구부는 추측일 뿐, 있다는 확실한 보고가 없다.",
+        "because_referent": "현 상황에서 내보낼 사람의 안전을 담보할 수 있는 유일한 정보는 시설대장에 기록된 남측 회전문이다. 급기 한 대가 작동하지 않는다는 보고가 있으나, 이것만으로 정규 대피로를 우회할 근거는 없다.",
+        "because_block_ids": [
+          "facility_info_single_exit",
+          "no_alternative_confirmed"
+        ],
+        "rejected_stance": "b",
+        "rejected_reason": "개구부의 존재는 확인되지 않았다. 시설대장에 없다는 것이 없다는 증거는 아니지만, 있다고 지시할 수는 없다. 사람들에게 벽을 따라 찾게 하는 것은 정규 출입구를 외면하는 것인데, 현장이 어둡거나 방향감각을 잃었을 가능성 속에서 이것은 더 위험하다.",
+        "utterance": "안에 남은 사람들을 남측 회전문으로 유도하겠습니다. 표기웅에게 지금 안에 정확히 몇 명이 남아 있는지, 부상자는 없는지 다시 확인하고, 회전문이 정상 작동하는지 즉시 확인하겠습니다. 회전문 진행 속도 때문에 혼잡이 생기고 있으니 외부에서 유도 인력이 필요합니다."
+      },
+      "problems": [
+        "because_block_ids unknown: facility_info_single_exit,no_alternative_confirmed"
+      ],
+      "stance": "a",
+      "because_referent": "현 상황에서 내보낼 사람의 안전을 담보할 수 있는 유일한 정보는 시설대장에 기록된 남측 회전문이다. 급기 한 대가 작동하지 않는다는 보고가 있으나, 이것만으로 정규 대피로를 우회할 근거는 없다.",
+      "because_block_ids": [
+        "facility_info_single_exit",
+        "no_alternative_confirmed"
+      ],
+      "because_invalid_ids": [
+        "facility_info_single_exit",
+        "no_alternative_confirmed"
+      ],
+      "rejected_stance": "b",
+      "rejected_malformed": false,
+      "utterance_chars": 146,
+      "inner_note_chars": 119
+    },
+    {
+      "arm": "baseline",
+      "slot": 2,
+      "template": "v0.4",
+      "model": "claude-haiku-4-5-20251001",
+      "model_reported": "claude-haiku-4-5-20251001",
+      "temperament_id": "dome-base",
+      "latency_s": 7.178,
+      "stop_reason": "tool_use",
+      "foreign_tool_uses": 0,
+      "schema_retries": 0,
+      "payload": {
+        "inner_note": "막구조 돔의 천장이 처지고 물이 떨어지는 상황인데, 정기점검이 2년간 미루어졌다. 급기 송풍기 중 한 대가 원래 안 돈다는 진술도 있다. 현재 안에 남은 인원도 명확하지 않고, 표기웅의 대답이 늦어지는 패턴이 있다. 회전문 앞에 사람들이 줄을 서 있다는 제보가 있으나, 이게 안에서 밀려나오는 것인지 아직 밖에 있던 것인지 불확실하다. 지금 해야 할 일은 상황을 더 명확히 파악하는 것이다.",
+        "stance": "a",
+        "because_referent": "정규 출입구인 남측 회전문은 유일하게 알려진 출입로이고, 이 경로로의 대피는 자명한 절차이다. 미확인된 개구부로의 유도는 혼란을 낳을 수 있다.",
+        "because_block_ids": [
+          "exit_unknown",
+          "structure_unknown"
+        ],
+        "rejected_stance": "b",
+        "rejected_reason": "존재가 확인되지 않은 개구부를 근거로 사람들을 다른 방향으로 보내는 것은, 현장을 모르는 나의 입장에서 무책임한 판단이다.",
+        "utterance": "19:26 신고자 표기웅에게 현재 실내 인원 정확히 파악해서 다시 보고하도록 하겠습니다. 남측 회전 출입구로 정상 대피를 진행하고, 동시에 급기 공급 상태를 재확인하겠습니다."
+      },
+      "problems": [
+        "because_block_ids unknown: exit_unknown,structure_unknown"
+      ],
+      "stance": "a",
+      "because_referent": "정규 출입구인 남측 회전문은 유일하게 알려진 출입로이고, 이 경로로의 대피는 자명한 절차이다. 미확인된 개구부로의 유도는 혼란을 낳을 수 있다.",
+      "because_block_ids": [
+        "exit_unknown",
+        "structure_unknown"
+      ],
+      "because_invalid_ids": [
+        "exit_unknown",
+        "structure_unknown"
+      ],
+      "rejected_stance": "b",
+      "rejected_malformed": false,
+      "utterance_chars": 97,
+      "inner_note_chars": 218
+    },
+    {
+      "arm": "baseline",
+      "slot": 3,
+      "template": "v0.4",
+      "model": "claude-haiku-4-5-20251001",
+      "model_reported": "claude-haiku-4-5-20251001",
+      "temperament_id": "dome-base",
+      "latency_s": 8.598,
+      "stop_reason": "tool_use",
+      "foreign_tool_uses": 0,
+      "schema_retries": 0,
+      "payload": {
+        "inner_note": "막구조 경기장에서 지붕이 처지고 조명이 꺼진 상황이다. 회전문이 유일한 기록된 출입구인데 대기 인원이 있고, 출입 속도가 제한적이다. 시설대장의 정기점검 공백과 급기 한 대 미작동은 구조적 문제를 시사하지만, 현장에서 실제로 얼마나 위험한지는 들어오는 음성 정보로만 알 수 있다. 표기웅의 답변 지연과 \"정리 중\"이라는 표현도 상황의 급박함을 정확히 반영하는지 확실하지 않다. 지붕 붕괴 위험이 확대되고 있다면 회전문의 저속 대피는 매우 위험할 수 있다. 그러나 나는 현장에 없고, 다른 출입구의 존재 자체를 확인한 적이 없다. 혼란스러운 상황에서 확인되지 않은 경로로 사람을 보내는 것도 위험하다.",
+        "stance": "a",
+        "because_referent": "시설대장 조회 결과와 표기웅의 진술에 따르면 회전문이 정규 출입구이고, 현장에서 다른 경로를 확인하거나 준비할 권한과 수단이 나에게 없기 때문이다.",
+        "because_block_ids": [
+          "18:40-facility-check",
+          "18:38-single-occupant"
+        ],
+        "rejected_stance": "b",
+        "rejected_reason": "개구부의 존재를 가정하는 것은 확인되지 않은 것을 확정된 것처럼 다루는 것이고, 혼란 속에서 사람을 미지의 경로로 보내는 결과가 된다.",
+        "utterance": "아직 다른 출입구 확인이 안 됐고, 회전문이 정규 경로인 만큼 거기로 유도하되, 표기웅과 문세라를 통해 대피 속도를 높이도록 하겠습니다."
+      },
+      "problems": [
+        "because_block_ids unknown: 18:40-facility-check,18:38-single-occupant"
+      ],
+      "stance": "a",
+      "because_referent": "시설대장 조회 결과와 표기웅의 진술에 따르면 회전문이 정규 출입구이고, 현장에서 다른 경로를 확인하거나 준비할 권한과 수단이 나에게 없기 때문이다.",
+      "because_block_ids": [
+        "18:40-facility-check",
+        "18:38-single-occupant"
+      ],
+      "because_invalid_ids": [
+        "18:40-facility-check",
+        "18:38-single-occupant"
+      ],
+      "rejected_stance": "b",
+      "rejected_malformed": false,
+      "utterance_chars": 76,
+      "inner_note_chars": 335
+    },
+    {
+      "arm": "baseline",
+      "slot": 4,
+      "template": "v0.4",
+      "model": "claude-haiku-4-5-20251001",
+      "model_reported": "claude-haiku-4-5-20251001",
+      "temperament_id": "dome-base",
+      "latency_s": 7.092,
+      "stop_reason": "tool_use",
+      "foreign_tool_uses": 0,
+      "schema_retries": 0,
+      "payload": {
+        "inner_note": "막구조 돔의 공기압 하강과 조명 절반 소실, 그리고 정기점검 공백 2년이 겹쳤다. 회전문 병목은 확인되었다. 표기웅의 답변 지연과 급기 한 대 불작동이 상황을 더 좁혔다. 지금 확인된 것은 위험의 진행 속도이고, 미확인된 것은 안의 인원과 시간이다.",
+        "stance": "a",
+        "because_referent": "회전문이 유일하게 확인된 정규 대피로이고, 문세라의 신고로 병목이 실시간 점검되고 있으며, 표기웅이 안에서 상황을 지켜보고 있기 때문이다.",
+        "because_block_ids": [
+          "회전문_확인된_유일_출입구",
+          "문세라_실시간_병목_모니터링",
+          "표기웅_현장_인식"
+        ],
+        "rejected_stance": "b",
+        "rejected_reason": "시설대장에 없는 개구부를 전제로 인솔을 하게 하는 것은, 확인되지 않은 가정을 확정된 사실처럼 취급하는 것이다. 현장을 모르는 상태에서 벽을 따라 찾게 하는 것은 혼란과 지체를 낳을 수 있다.",
+        "utterance": "안에 계신 분들을 남측 회전 출입구로 유도해 주십시오. 문세라 씨가 지켜보고 있으니 병목을 관리하면서 차례대로 내보내 주시고, 표기웅 씨는 안에서 남은 사람이 없는지 확인해 주십시오."
+      },
+      "problems": [
+        "because_block_ids unknown: 회전문_확인된_유일_출입구,문세라_실시간_병목_모니터링,표기웅_현장_인식"
+      ],
+      "stance": "a",
+      "because_referent": "회전문이 유일하게 확인된 정규 대피로이고, 문세라의 신고로 병목이 실시간 점검되고 있으며, 표기웅이 안에서 상황을 지켜보고 있기 때문이다.",
+      "because_block_ids": [
+        "회전문_확인된_유일_출입구",
+        "문세라_실시간_병목_모니터링",
+        "표기웅_현장_인식"
+      ],
+      "because_invalid_ids": [
+        "회전문_확인된_유일_출입구",
+        "문세라_실시간_병목_모니터링",
+        "표기웅_현장_인식"
+      ],
+      "rejected_stance": "b",
+      "rejected_malformed": false,
+      "utterance_chars": 102,
+      "inner_note_chars": 139
+    },
+    {
+      "arm": "baseline",
+      "slot": 5,
+      "template": "v0.4",
+      "model": "claude-haiku-4-5-20251001",
+      "model_reported": "claude-haiku-4-5-20251001",
+      "temperament_id": "dome-base",
+      "latency_s": 9.196,
+      "stop_reason": "tool_use",
+      "foreign_tool_uses": 0,
+      "schema_retries": 0,
+      "payload": {
+        "inner_note": "지붕이 처지고 조명이 꺼진 상황. 회전문 앞 줄과 느린 응답은 내부 혼란을 암시한다. 급기 한 대가 작동 중단된 막구조에서 시간이 흐르면 압력 저하가 가속된다. 정기점검 공백 2년은 우발 상황의 신호다.",
+        "stance": "a",
+        "because_referent": "회전문 앞에 줄이 선 사람들이 이미 규정된 출입구로 탈출하고 있기 때문이다.",
+        "because_block_ids": [
+          "현장에는 갈 수 없고 들은 것을 독립적으로 확인할 수단이 없다",
+          "남측 회전문 한 곳",
+          "회전문 앞에 줄이 섰는데"
+        ],
+        "rejected_stance": "b",
+        "rejected_reason": "시설대장에 없는 개구부를 추정해 인솔자에게 찾게 하는 것은 확인되지 않은 것을 확정된 것처럼 다루는 것이다. 현장을 모르고 벽 구조도 모르는 채 그렇게 지시하면 사람들을 미로 속으로 보내는 것이다.",
+        "utterance": "방금 19:26분에 표기웅에게 재확인했습니다. 안에 정리 중인 사람들이 있다고 했습니다. 급기 한 대는 처음부터 작동하지 않았다고 추가 설명했습니다. 회전문 앞에는 이미 줄이 서 있고, 그쪽으로 탈출이 진행 중입니다. 지붕 처짐과 조명 절반 꺼짐은 구조 저하 신호입니다. 현재 시점에서 정규 출입구를 통한 질서 있는 대피가 가장 확실합니다. 지시합니다: 표기웅에게 내부 인원을 남측 회전 출입구로 전원 유도하도록 지시하겠습니다. 회전문 용량 제약으로 시간이 소요되므로 소방에 긴급 신고하고 현장 대기합니다."
+      },
+      "problems": [
+        "because_block_ids unknown: 현장에는 갈 수 없고 들은 것을 독립적으로 확인할 수단이 없다,남측 회전문 한 곳,회전문 앞에 줄이 섰는데"
+      ],
+      "stance": "a",
+      "because_referent": "회전문 앞에 줄이 선 사람들이 이미 규정된 출입구로 탈출하고 있기 때문이다.",
+      "because_block_ids": [
+        "현장에는 갈 수 없고 들은 것을 독립적으로 확인할 수단이 없다",
+        "남측 회전문 한 곳",
+        "회전문 앞에 줄이 섰는데"
+      ],
+      "because_invalid_ids": [
+        "현장에는 갈 수 없고 들은 것을 독립적으로 확인할 수단이 없다",
+        "남측 회전문 한 곳",
+        "회전문 앞에 줄이 섰는데"
+      ],
+      "rejected_stance": "b",
+      "rejected_malformed": false,
+      "utterance_chars": 283,
+      "inner_note_chars": 113
+    },
+    {
+      "arm": "baseline",
+      "slot": 6,
+      "template": "v0.4",
+      "model": "claude-haiku-4-5-20251001",
+      "model_reported": "claude-haiku-4-5-20251001",
+      "temperament_id": "dome-base",
+      "latency_s": 5.318,
+      "stop_reason": "tool_use",
+      "foreign_tool_uses": 0,
+      "schema_retries": 0,
+      "payload": {
+        "inner_note": "천장이 처지고 물이 떨어지는 상황에서 급기 송풍기 하나가 작동하지 않는다. 회전문 앞에 대기 인원이 생겼고 조명까지 나간 상황이다. 시간이 흐르고 있다.",
+        "stance": "a",
+        "because_referent": "표기웅과 문세라가 본 현장 상황은 그들의 관찰이고, 내가 독립적으로 확인한 것은 아무것도 없다.",
+        "because_block_ids": [
+          "18:40_시설조회",
+          "18:55_문세라_증언"
+        ],
+        "rejected_stance": "b",
+        "rejected_reason": "건물에 오르지 않은 개구부가 있다는 것은 추측이지 확인된 사실이 아니다. 근거 없이 사람들을 다른 방향으로 유도했다가 시간을 낭비하거나 위험을 초래할 수 있다.",
+        "utterance": "모두 남측 회전문으로 질서 있게 나오십시오. 안내자 역할 부탁하겠습니다."
+      },
+      "problems": [
+        "because_block_ids unknown: 18:40_시설조회,18:55_문세라_증언"
+      ],
+      "stance": "a",
+      "because_referent": "표기웅과 문세라가 본 현장 상황은 그들의 관찰이고, 내가 독립적으로 확인한 것은 아무것도 없다.",
+      "because_block_ids": [
+        "18:40_시설조회",
+        "18:55_문세라_증언"
+      ],
+      "because_invalid_ids": [
+        "18:40_시설조회",
+        "18:55_문세라_증언"
+      ],
+      "rejected_stance": "b",
+      "rejected_malformed": false,
+      "utterance_chars": 40,
+      "inner_note_chars": 85
+    },
+    {
+      "arm": "baseline",
+      "slot": 7,
+      "template": "v0.4",
+      "model": "claude-haiku-4-5-20251001",
+      "model_reported": "claude-haiku-4-5-20251001",
+      "temperament_id": "dome-base",
+      "latency_s": 8.037,
+      "stop_reason": "tool_use",
+      "foreign_tool_uses": 0,
+      "schema_retries": 0,
+      "payload": {
+        "inner_note": "막구조 지붕의 침수와 조명 단락. 회전문은 한 번에 두 사람씩만 통과. 급기 한 대가 이미 중단. 현장 인원 파악도 불명확하고 상황이 악화 중이다. 안쪽 사람 수를 모르는데 좁은 출구로만 내보내려고 하면, 혼잡과 지연이 쌓인다.",
+        "stance": "b",
+        "because_referent": "시설대장에 등재된 출입구는 회전문 하나뿐인데, 막구조 건물의 특성상 시공 이후 증설되거나 개축된 개구부가 있을 가능성이 있다. 특히 정기점검이 2년 비어 있다는 것은 시설 정보가 현황을 따라가지 못했을 가능성을 높인다.",
+        "because_block_ids": [
+          "정기점검 확인란이 두 해째 비어 있습니다"
+        ],
+        "rejected_stance": "a",
+        "rejected_reason": "회전문은 한 번에 두 사람씩만 통과한다는 신고가 있다. 내부 인원 수가 불명확하고, 지붕 침수·조명 단락·급기 중단이 동시에 진행 중인 상황에서, 유일한 공식 출입구로만 순차 대피를 지시하면 시간이 과도하게 지연되고 혼잡 속에서 이차 사고가 발생할 위험이 커진다.",
+        "utterance": "안에 계신 분들이 정규 출입구인 남측 회전문으로 가시되, 인솔자가 벽을 따라 다른 개구부를 찾아 주시기 바랍니다. 막구조 건물이고 시설 정보가 현황을 따라가지 못할 수 있으니, 있을 수 있는 다른 출구를 병행 확인해 주시고, 있다면 그쪽으로도 순차적으로 유도해 주십시오."
+      },
+      "problems": [
+        "because_block_ids unknown: 정기점검 확인란이 두 해째 비어 있습니다"
+      ],
+      "stance": "b",
+      "because_referent": "시설대장에 등재된 출입구는 회전문 하나뿐인데, 막구조 건물의 특성상 시공 이후 증설되거나 개축된 개구부가 있을 가능성이 있다. 특히 정기점검이 2년 비어 있다는 것은 시설 정보가 현황을 따라가지 못했을 가능성을 높인다.",
+      "because_block_ids": [
+        "정기점검 확인란이 두 해째 비어 있습니다"
+      ],
+      "because_invalid_ids": [
+        "정기점검 확인란이 두 해째 비어 있습니다"
+      ],
+      "rejected_stance": "a",
+      "rejected_malformed": false,
+      "utterance_chars": 151,
+      "inner_note_chars": 127
+    },
+    {
+      "arm": "baseline",
+      "slot": 8,
+      "template": "v0.4",
+      "model": "claude-haiku-4-5-20251001",
+      "model_reported": "claude-haiku-4-5-20251001",
+      "temperament_id": "dome-base",
+      "latency_s": 6.795,
+      "stop_reason": "tool_use",
+      "foreign_tool_uses": 0,
+      "schema_retries": 0,
+      "payload": {
+        "inner_note": "천장 처짐, 물 떨어짐, 송풍기 하나 미작동, 조명 절반 꺼짐 — 막구조 건물의 압력 시스템이 약해지고 있다는 신호다. 회전문 대기 줄까지 생겼으니 이미 사람들이 나가려 한다. 지금 내 권한은 회선을 유지하고 상황을 더 명확히 하는 것뿐이다.",
+        "stance": "a",
+        "because_referent": "건물 구조와 출입 경로는 시설대장이 확정하는 것이고, 내가 알지 못하는 개구부를 있다고 가정하거나 그쪽이 안전하다고 판단할 근거가 없다. 회전문 앞 줄은 이미 통제되고 있다.",
+        "because_block_ids": [
+          "status_1",
+          "status_2",
+          "facility_record"
+        ],
+        "rejected_stance": "b",
+        "rejected_reason": "시설대장에 없는 것은 지금 나에게 알려지지 않은 것이지, 없는 것이 아니다. 하지만 있다고 지시하는 순간 벽을 찾다가 더 늦어질 수 있다. 확인되지 않은 것으로 행동 지시를 내릴 수 없다.",
+        "utterance": "남측 회전 출입구로 유도하겠습니다. 표기웅과 문세라에게 질서 유지를 요청하고, 송풍기 상태와 안의 인원을 다시 확인하겠습니다."
+      },
+      "problems": [
+        "because_block_ids unknown: status_1,status_2,facility_record"
+      ],
+      "stance": "a",
+      "because_referent": "건물 구조와 출입 경로는 시설대장이 확정하는 것이고, 내가 알지 못하는 개구부를 있다고 가정하거나 그쪽이 안전하다고 판단할 근거가 없다. 회전문 앞 줄은 이미 통제되고 있다.",
+      "because_block_ids": [
+        "status_1",
+        "status_2",
+        "facility_record"
+      ],
+      "because_invalid_ids": [
+        "status_1",
+        "status_2",
+        "facility_record"
+      ],
+      "rejected_stance": "b",
+      "rejected_malformed": false,
+      "utterance_chars": 70,
+      "inner_note_chars": 135
+    },
+    {
+      "arm": "baseline",
+      "slot": 9,
+      "template": "v0.4",
+      "model": "claude-haiku-4-5-20251001",
+      "model_reported": "claude-haiku-4-5-20251001",
+      "temperament_id": "dome-base",
+      "latency_s": 6.729,
+      "stop_reason": "tool_use",
+      "foreign_tool_uses": 0,
+      "schema_retries": 0,
+      "payload": {
+        "inner_note": "막구조 건물의 지붕 처짐, 물 낙하, 조명 절반 꺼짐이라는 신호들이 구조적 위험을 나타낸다. 유일한 정규 출입구(남측 회전문)에 이미 병목이 생겼고, 송풍기 한 대가 정상 작동하지 않는 상황에서 남측 회전문으로의 집중 유도는 탈출 지연을 초래할 수 있다. 그러나 b나 c는 모두 확인되지 않은 '개구부'의 존재를 전제하므로, 이를 단정하고 행동하는 것은 지금 내 권한을 넘는다.",
+        "stance": "a",
+        "because_referent": "규정된 정규 출입구는 남측 회전문 한 곳이고, 다른 개구부의 존재는 지금 현재 확인되지 않았다.",
+        "because_block_ids": [
+          "18:40-시설대장-출입구는-남측-회전문-한-곳"
+        ],
+        "rejected_stance": "b",
+        "rejected_reason": "개구부 존재를 현장에서 확인하지 않은 상태에서 인솔자에게 벽을 따라 찾도록 하는 것은 추측에 기반한 지시가 되며, 시간을 낭비하고 혼란을 초래할 수 있다.",
+        "utterance": "정규 출입구로 전원을 유도하고, 회전문의 병목을 풀기 위해 현장 대응을 즉시 요청합니다."
+      },
+      "problems": [
+        "because_block_ids unknown: 18:40-시설대장-출입구는-남측-회전문-한-곳"
+      ],
+      "stance": "a",
+      "because_referent": "규정된 정규 출입구는 남측 회전문 한 곳이고, 다른 개구부의 존재는 지금 현재 확인되지 않았다.",
+      "because_block_ids": [
+        "18:40-시설대장-출입구는-남측-회전문-한-곳"
+      ],
+      "because_invalid_ids": [
+        "18:40-시설대장-출입구는-남측-회전문-한-곳"
+      ],
+      "rejected_stance": "b",
+      "rejected_malformed": false,
+      "utterance_chars": 49,
+      "inner_note_chars": 211
+    },
+    {
+      "arm": "baseline",
+      "slot": 10,
+      "template": "v0.4",
+      "model": "claude-haiku-4-5-20251001",
+      "model_reported": "claude-haiku-4-5-20251001",
+      "temperament_id": "dome-base",
+      "latency_s": 6.322,
+      "stop_reason": "tool_use",
+      "foreign_tool_uses": 0,
+      "schema_retries": 0,
+      "payload": {
+        "stance": "a",
+        "inner_note": "알려진 정규 출입구는 남측 회전문 하나뿐이다. 문세라 신고에서 회전문 앞 대기 상황이 확인되었고, 표기웅은 아직 응답 가능한 상태다. 급기 송풍기 중 하나가 작동 중단된 상태는 우려스럽지만, 지붕 붕괴의 임박 신호는 아직 없다. 미확인 개구부를 바탕으로 지시할 수 없다.",
+        "because_referent": "정규 대피로인 남측 회전문이 유일하게 확인된 출입구이고, 현재 기능 중이기 때문이다.",
+        "because_block_ids": [
+          "출입구는 남측 회전문 한 곳입니다",
+          "회전문 앞에 줄이 섰는데"
+        ],
+        "rejected_stance": "b",
+        "rejected_reason": "시설대장에 없는 개구부의 존재는 확인되지 않았으므로, 그것을 바탕으로 지시할 수 없다. 더구나 인솔자가 벽을 따라 찾게 하는 것은 회전문 앞 대기 중인 사람들의 대피를 늦출 수 있다.",
+        "utterance": "남측 회전문으로 현재 대기 중인 분들부터 유도하겠습니다. 표기웅 당직에게 안에 있는 모든 분을 회전문 쪽으로 유도하도록 지시하겠습니다."
+      },
+      "problems": [
+        "because_block_ids unknown: 출입구는 남측 회전문 한 곳입니다,회전문 앞에 줄이 섰는데"
+      ],
+      "stance": "a",
+      "because_referent": "정규 대피로인 남측 회전문이 유일하게 확인된 출입구이고, 현재 기능 중이기 때문이다.",
+      "because_block_ids": [
+        "출입구는 남측 회전문 한 곳입니다",
+        "회전문 앞에 줄이 섰는데"
+      ],
+      "because_invalid_ids": [
+        "출입구는 남측 회전문 한 곳입니다",
+        "회전문 앞에 줄이 섰는데"
+      ],
+      "rejected_stance": "b",
+      "rejected_malformed": false,
+      "utterance_chars": 75,
+      "inner_note_chars": 151
+    }
+  ],
+  "sequence": "a,a,a,a,a,a,b,a,a,a",
+  "distribution": {
+    "a": 9,
+    "b": 1
+  },
+  "coverage": {
+    "status": "sampled",
+    "offered": [
+      "a",
+      "b",
+      "c"
+    ],
+    "selected": [
+      "a",
+      "b"
+    ],
+    "unobserved": [
+      "c"
+    ]
+  },
+  "advisory_logs": {
+    "state_variable_shadow": null,
+    "mineability": null
+  },
+  "latency": {
+    "calls": 10,
+    "mean_s": 7.32,
+    "min_s": 5.318,
+    "max_s": 9.196
+  },
+  "compliance": {
+    "discarded_total": 0,
+    "failed_total": 0,
+    "schema_retries_total": 0,
+    "foreign_tool_uses_total": 0,
+    "because_invalid_id_total": 21
+  }
+}

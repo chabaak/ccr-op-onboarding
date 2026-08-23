@@ -1,0 +1,407 @@
+{
+  "experiment": "DOME-G2-cumulative-r1",
+  "arm": "k1_k2_k3",
+  "call_type": "judgment",
+  "channel": "C-BLOCK",
+  "template": "v0.4",
+  "model": "claude-haiku-4-5-20251001",
+  "transport": "anthropic",
+  "dry_run": false,
+  "pre_registration": {
+    "hypothesis": "현재 G2가 증거 게이트라면 no-key와 K1은 a(남측 회전문 유지)에 머물고, K1+K2에서만 b 또는 c로 옮긴다. K1+K2+K3은 K1+K2보다 성공 선택을 더 키우지 않아야 하며, weak/placebo와 K1+K3 negative는 K1 단독보다 성공 선택을 물질적으로 키우지 않아야 한다.",
+    "n_per_arm": 10,
+    "drop_condition": "K1 단독이 b 또는 c에 30% 이상 닿거나, placebo 또는 negative_control이 b 또는 c를 K1 단독보다 30포인트 이상 키우면 현 G2 stance/evidence가 누설 상태다. K1+K2가 b 또는 c에 80% 미만이면 K2 문장 또는 stance set이 충분히 작동하지 않는다.",
+    "contingencies": [
+      "baseline(no-key)이 b 또는 c에 30% 이상 닿으면 stance label 또는 gate question 자체가 성공 행동을 노출한다.",
+      "K1+K2+K3이 K1+K2와 다른 분포를 보이면 G3 열쇠가 G2 판단에 새고 있다.",
+      "because_block_ids가 없는 arm에서 성공 stance의 필요 전제를 꾸며내면 traceability defect로 별도 기록한다."
+    ],
+    "not_claimed": "이 suite는 G2의 현재 판단 누설만 잰다. G3, full play reachability, casualty ladder는 이 suite alone으로 판정하지 않는다."
+  },
+  "n_effective": 10,
+  "n_overridden": false,
+  "calls": [
+    {
+      "arm": "k1_k2_k3",
+      "slot": 1,
+      "template": "v0.4",
+      "model": "claude-haiku-4-5-20251001",
+      "model_reported": "claude-haiku-4-5-20251001",
+      "temperament_id": "dome-base",
+      "latency_s": 5.404,
+      "stop_reason": "tool_use",
+      "foreign_tool_uses": 0,
+      "schema_retries": 0,
+      "payload": {
+        "inner_note": "정규 출입구는 회전문 한 곳인데 이미 병목이 생겼다. 안에는 내가 파악하지 못한 사람들이 더 있고, 지붕 구조가 위험해 보인다. 미확인 개구부가 실제로 있다는 증거(k2)가 있지만, 그것이 안전한 대피로인지는 모른다.",
+        "stance": "c",
+        "because_referent": "지붕이 처지고 공기 압력이 떨어지는 상황에서 회전문은 이미 혼잡하고, 안에 있는 사람 수도 정확하지 않다. 서쪽 벽 개구부를 통해 실제로 사람들이 나왔다는 것(k2)이 그곳이 통로임을 보여준다.",
+        "because_block_ids": [
+          "k2"
+        ],
+        "rejected_stance": "a",
+        "rejected_reason": "정규 출입구가 이미 병목 상태이고, 천장 처짐과 조명 점멸로 보아 구조 안전성이 불확실하다. 유일한 정규 통로에만 의존하는 것은 위험하다.",
+        "utterance": "서쪽 벽의 자재 반입 슬리브로 이미 여덟 명이 기어 나왔습니다. 그 개구부가 안전한 출입로라고 판단하고, 바깥에 인수할 인원을 먼저 배치한 뒤 인솔자에게 그쪽으로 유도하도록 하겠습니다."
+      },
+      "problems": [],
+      "stance": "c",
+      "because_referent": "지붕이 처지고 공기 압력이 떨어지는 상황에서 회전문은 이미 혼잡하고, 안에 있는 사람 수도 정확하지 않다. 서쪽 벽 개구부를 통해 실제로 사람들이 나왔다는 것(k2)이 그곳이 통로임을 보여준다.",
+      "because_block_ids": [
+        "k2"
+      ],
+      "because_invalid_ids": [],
+      "rejected_stance": "a",
+      "rejected_malformed": false,
+      "utterance_chars": 103,
+      "inner_note_chars": 121
+    },
+    {
+      "arm": "k1_k2_k3",
+      "slot": 2,
+      "template": "v0.4",
+      "model": "claude-haiku-4-5-20251001",
+      "model_reported": "claude-haiku-4-5-20251001",
+      "temperament_id": "dome-base",
+      "latency_s": 5.217,
+      "stop_reason": "tool_use",
+      "foreign_tool_uses": 0,
+      "schema_retries": 0,
+      "payload": {
+        "inner_note": "천장이 처지고 물이 떨어지는 상황에서 정기점검이 2년 이상 미루어진 막구조 건물이다. 표기웅의 말이 일관성이 없고 — 처음엔 혼자, 나중엔 정리 중 — 실제로는 관중석에 아이들과 인솔자가 남아 있다. 한 대의 송풍기가 이미 작동하지 않는 상태다. 이 상황에서 나는 아직 확인되지 않은 것들이 너무 많다.",
+        "stance": "c",
+        "because_referent": "벽 아래 슬리브로 여덟 명이 나온 것은 사실이고, 그곳이 바깥으로 통한다는 것도 실제 통로가 있었다는 뜻이다.",
+        "because_block_ids": [
+          "k2"
+        ],
+        "rejected_stance": "a",
+        "rejected_reason": "정규 대피로는 회전문 한 곳인데, 이미 움직임이 느려서 줄이 선 상황이다. 천장이 처지는 건물에서 한 지점으로의 병목 대피는 위험하고, 표기웅의 정보 신뢰도가 낮다.",
+        "utterance": "서쪽 벽 슬리브를 통해 여덟 명이 나왔습니다. 그 개구부가 바깥으로 곧장 통합니다. 반대편에서 받아 줄 사람을 먼저 붙이겠습니다."
+      },
+      "problems": [],
+      "stance": "c",
+      "because_referent": "벽 아래 슬리브로 여덟 명이 나온 것은 사실이고, 그곳이 바깥으로 통한다는 것도 실제 통로가 있었다는 뜻이다.",
+      "because_block_ids": [
+        "k2"
+      ],
+      "because_invalid_ids": [],
+      "rejected_stance": "a",
+      "rejected_malformed": false,
+      "utterance_chars": 72,
+      "inner_note_chars": 169
+    },
+    {
+      "arm": "k1_k2_k3",
+      "slot": 3,
+      "template": "v0.4",
+      "model": "claude-haiku-4-5-20251001",
+      "model_reported": "claude-haiku-4-5-20251001",
+      "temperament_id": "dome-base",
+      "latency_s": 5.792,
+      "stop_reason": "tool_use",
+      "foreign_tool_uses": 0,
+      "schema_retries": 0,
+      "payload": {
+        "inner_note": "막구조 돔에서 천장이 처지고 물이 떨어지며 조명이 절반 꺼졌다. 정규 출입구인 회전문 앞에는 이미 줄이 섰고 병목이 심하다. 표기웅은 처음 혼자라 했지만 실제로는 아이들과 인솔자가 남아 있었다. 시설대장에 기록되지 않은 서쪽 벽 슬리브로 여덟 명이 이미 나왔다. 이는 현장이 내가 아는 것과 다르며, 상황이 악화되고 있음을 보여준다.",
+        "stance": "c",
+        "because_referent": "표기웅이 상황을 축소 보고했고, 시설도 제대로 파악하지 못했으며, 정규 출입구는 이미 병목 상태다. 슬리브로 나간 여덟 명의 사례가 그 경로가 통한다는 증거다.",
+        "because_block_ids": [
+          "k1",
+          "k2"
+        ],
+        "rejected_stance": "a",
+        "rejected_reason": "회전문 앞에 이미 줄이 섰다는 보고가 있고, 표기웅의 초기 보고가 신뢰할 수 없다. 달리 지시할 근거가 없다는 판단은 들은 말을 무시하는 것이다.",
+        "utterance": "안에 있는 인솔자를 확인합니다. 아이들을 데리고 서쪽 벽을 따라가되, 슬리브 쪽 출입로로 나가도록 하시고, 밖에서 인수 받을 사람을 붙이겠습니다."
+      },
+      "problems": [],
+      "stance": "c",
+      "because_referent": "표기웅이 상황을 축소 보고했고, 시설도 제대로 파악하지 못했으며, 정규 출입구는 이미 병목 상태다. 슬리브로 나간 여덟 명의 사례가 그 경로가 통한다는 증거다.",
+      "because_block_ids": [
+        "k1",
+        "k2"
+      ],
+      "because_invalid_ids": [],
+      "rejected_stance": "a",
+      "rejected_malformed": false,
+      "utterance_chars": 81,
+      "inner_note_chars": 186
+    },
+    {
+      "arm": "k1_k2_k3",
+      "slot": 4,
+      "template": "v0.4",
+      "model": "claude-haiku-4-5-20251001",
+      "model_reported": "claude-haiku-4-5-20251001",
+      "temperament_id": "dome-base",
+      "latency_s": 5.213,
+      "stop_reason": "tool_use",
+      "foreign_tool_uses": 0,
+      "schema_retries": 0,
+      "payload": {
+        "inner_note": "천장이 처지고 물이 떨어지며 조명이 꺼지는 상황에서, 회전문은 한 번에 두 명씩만 통과한다. 시설대장의 급기 송풍기 중 한 대가 원래 안 돈다는 것은 구조적 결함이다. 현장에는 나 외에는 아무도 없고, 들은 말과 조회 결과만 있다.",
+        "stance": "c",
+        "because_referent": "벽 아래 슬리브로 여덟 명이 기어 나온 사실이 그 개구부가 실제로 통한다는 것을 보여주었다.",
+        "because_block_ids": [
+          "k2"
+        ],
+        "rejected_stance": "a",
+        "rejected_reason": "회전문은 시간당 처리 인원이 제한되어 있고, 지붕 구조가 약화된 상황에서 회전문 대기 줄은 그 자체로 위험이다. 절반의 조명이 꺼진 상태에서도 회전문 쪽으로만 모으는 것은 병목이다.",
+        "utterance": "안의 모든 사람을 회전문으로만 내보낼 수 없습니다. 서쪽 슬리브 개구부로 인솔자와 아이들을 유도하고, 바깥에서 받아 줄 인원을 먼저 배치하겠습니다."
+      },
+      "problems": [],
+      "stance": "c",
+      "because_referent": "벽 아래 슬리브로 여덟 명이 기어 나온 사실이 그 개구부가 실제로 통한다는 것을 보여주었다.",
+      "because_block_ids": [
+        "k2"
+      ],
+      "because_invalid_ids": [],
+      "rejected_stance": "a",
+      "rejected_malformed": false,
+      "utterance_chars": 82,
+      "inner_note_chars": 129
+    },
+    {
+      "arm": "k1_k2_k3",
+      "slot": 5,
+      "template": "v0.4",
+      "model": "claude-haiku-4-5-20251001",
+      "model_reported": "claude-haiku-4-5-20251001",
+      "temperament_id": "dome-base",
+      "latency_s": 5.4,
+      "stop_reason": "tool_use",
+      "foreign_tool_uses": 0,
+      "schema_retries": 0,
+      "payload": {
+        "inner_note": "여덟 명이 이미 자재 슬리브로 나갔다는 것은 그 경로가 안 쪽에서 밖으로 통한다는 뜻이다. 내 앞에는 세 가지 길이 있는데, 정규 출입구는 병목이 심하고(한 번에 두 명), 급기 송풍기 하나가 이미 멈춰 있으며, 정기점검이 두 해째 기록되지 않았다. 확인되지 않은 위험이 쌓여 있다. 반면 k2는 이미 벌어진 사건이다.",
+        "stance": "c",
+        "because_referent": "서쪽 벽 아래 슬리브를 통해 여덟 명이 이미 밖으로 나갔기 때문이다.",
+        "because_block_ids": [
+          "k2"
+        ],
+        "rejected_stance": "a",
+        "rejected_reason": "정규 출입구는 병목(한 명에 두 명씩)이 심하고, 급기 송풍기 하나가 멈춰 있으며, 시설 정기점검이 기록되지 않은 상태다. 천장이 처지고 조명이 꺼지는 상황에서 지붕의 구조적 무결성을 확신할 근거가 없다.",
+        "utterance": "서쪽 벽 슬리브로 여덟 명이 이미 나갔으니, 그 경로를 따라 남은 사람들도 그 개구부로 유도하되, 반대편 바깥에서 안전하게 받아 줄 사람을 먼저 붙이겠습니다."
+      },
+      "problems": [],
+      "stance": "c",
+      "because_referent": "서쪽 벽 아래 슬리브를 통해 여덟 명이 이미 밖으로 나갔기 때문이다.",
+      "because_block_ids": [
+        "k2"
+      ],
+      "because_invalid_ids": [],
+      "rejected_stance": "a",
+      "rejected_malformed": false,
+      "utterance_chars": 88,
+      "inner_note_chars": 178
+    },
+    {
+      "arm": "k1_k2_k3",
+      "slot": 6,
+      "template": "v0.4",
+      "model": "claude-haiku-4-5-20251001",
+      "model_reported": "claude-haiku-4-5-20251001",
+      "temperament_id": "dome-base",
+      "latency_s": 6.77,
+      "stop_reason": "tool_use",
+      "foreign_tool_uses": 0,
+      "schema_retries": 0,
+      "payload": {
+        "inner_note": "천장이 처지고 물이 떨어지는 상황에서 정기점검이 2년간 미루어진 막구조 건물의 안전이 의심된다. 표기웅의 답변 딜레이와 \"한 대는 원래 안 돈다\"는 말은 내부 상황이 신고 초기와 다름을 시사한다. 문세라의 신고로 실제 인원이 있음이 확인되었고, k1은 표기웅의 초기 진술이 거짓임을 명확히 한다. 회전문의 처리 속도 문제(한 번에 2명씩)도 있다.",
+        "stance": "c",
+        "because_referent": "막구조 지붕이 실시간으로 위험 신호를 보이는 상황에서, 정규 대피로의 처리 속도는 충분하지 않을 가능성이 높고, 건물 자체의 구조적 완전성을 신뢰할 수 없기 때문이다.",
+        "because_block_ids": [
+          "k2",
+          "k3"
+        ],
+        "rejected_stance": "a",
+        "rejected_reason": "회전문은 처리 능력이 제한적이고(한 번에 2명), 정규 대피로 신뢰도가 낮다. 지붕 처짐 상황에서 회전문 구조 자체도 안전하지 않을 수 있다. 달리 지시할 근거가 \"없다\"는 판단은 이미 얻어진 정보(표기웅의 거짓 진술, 실제 인원 존재, 미사용 개구부의 존재)를 외면하는 것이다.",
+        "utterance": "서쪽 벽 자재 슬리브로 8명이 기어 나온 사실이 있고, 배전반 차단기로 2호 송풍기를 살릴 수 있습니다. 개구부가 실제로 외부와 통하는 것 같으니 바깥에서 먼저 받아 줄 인력을 붙이고, 그쪽으로 유도하겠습니다."
+      },
+      "problems": [],
+      "stance": "c",
+      "because_referent": "막구조 지붕이 실시간으로 위험 신호를 보이는 상황에서, 정규 대피로의 처리 속도는 충분하지 않을 가능성이 높고, 건물 자체의 구조적 완전성을 신뢰할 수 없기 때문이다.",
+      "because_block_ids": [
+        "k2",
+        "k3"
+      ],
+      "because_invalid_ids": [],
+      "rejected_stance": "a",
+      "rejected_malformed": false,
+      "utterance_chars": 117,
+      "inner_note_chars": 194
+    },
+    {
+      "arm": "k1_k2_k3",
+      "slot": 7,
+      "template": "v0.4",
+      "model": "claude-haiku-4-5-20251001",
+      "model_reported": "claude-haiku-4-5-20251001",
+      "temperament_id": "dome-base",
+      "latency_s": 5.63,
+      "stop_reason": "tool_use",
+      "foreign_tool_uses": 0,
+      "schema_retries": 0,
+      "payload": {
+        "stance": "c",
+        "inner_note": "표기웅이 혼자라던 진술이 거짓이었다. k2로 확인된 서쪽 슬리브는 이미 실제 통로로 작동 중이다. 회전문은 문세라 증언으로 병목이 확정되었고, 천장 처짐과 조명 단락은 구조 악화 추세다. 확인되지 않은 것을 확정처럼 올릴 수 없지만, 이미 일어난 사실(아이들이 남아 있음, 슬리브로 사람이 나감)을 외면할 수도 없다.",
+        "because_referent": "안에 남은 사람들이 이미 슬리브를 통해 나가는 방식을 스스로 택했고, 그것이 작동 중이다.",
+        "because_block_ids": [
+          "k2"
+        ],
+        "rejected_stance": "a",
+        "rejected_reason": "회전문은 한 번에 두 사람씩만 통과하는 병목이고, 관중석에는 다수의 아이들이 남아 있다. 정규 대피로만 지시하면 천장 구조 악화 추세 속에서 대피 시간이 길어진다.",
+        "utterance": "서쪽 벽 아래 자재 슬리브로 이미 여덟 명이 나갔습니다. 그곳을 이용하는 인솔자들에게, 바깥에서 받아 줄 요원을 먼저 붙이고 계속 유도하겠습니다."
+      },
+      "problems": [],
+      "stance": "c",
+      "because_referent": "안에 남은 사람들이 이미 슬리브를 통해 나가는 방식을 스스로 택했고, 그것이 작동 중이다.",
+      "because_block_ids": [
+        "k2"
+      ],
+      "because_invalid_ids": [],
+      "rejected_stance": "a",
+      "rejected_malformed": false,
+      "utterance_chars": 81,
+      "inner_note_chars": 177
+    },
+    {
+      "arm": "k1_k2_k3",
+      "slot": 8,
+      "template": "v0.4",
+      "model": "claude-haiku-4-5-20251001",
+      "model_reported": "claude-haiku-4-5-20251001",
+      "temperament_id": "dome-base",
+      "latency_s": 4.198,
+      "stop_reason": "tool_use",
+      "foreign_tool_uses": 0,
+      "schema_retries": 0,
+      "payload": {
+        "inner_note": "세 가지 모두를 한번에 할 수는 없다. 회전문은 병목이고, 천장이 처지는 상황에서 시간을 낭비하면 안 된다. 하지만 내가 본 것이 아니고, 들은 것도 완전하지 않다. 그 슬리브가 정말 밖으로 나는지, 안전한지, 얼마나 더 지탱할지 모른다.",
+        "stance": "c",
+        "utterance": "서쪽 벽 아래 개구부로 나가는 사람들이 있습니다. 바깥에 서 줄 사람부터 붙이겠습니다.",
+        "because_referent": "안에는 천장이 처지고 있고, 정규 출입구는 회전문 병목 때문에 시간이 너무 오래 걸린다",
+        "because_block_ids": [
+          "k2"
+        ],
+        "rejected_stance": "a",
+        "rejected_reason": "회전문은 한 번에 두 사람씩 통과하므로 병목이 되고, 천장이 처지는 상황에서는 다른 경로를 동시에 확보하지 않으면 위험하다"
+      },
+      "problems": [],
+      "stance": "c",
+      "because_referent": "안에는 천장이 처지고 있고, 정규 출입구는 회전문 병목 때문에 시간이 너무 오래 걸린다",
+      "because_block_ids": [
+        "k2"
+      ],
+      "because_invalid_ids": [],
+      "rejected_stance": "a",
+      "rejected_malformed": false,
+      "utterance_chars": 48,
+      "inner_note_chars": 133
+    },
+    {
+      "arm": "k1_k2_k3",
+      "slot": 9,
+      "template": "v0.4",
+      "model": "claude-haiku-4-5-20251001",
+      "model_reported": "claude-haiku-4-5-20251001",
+      "temperament_id": "dome-base",
+      "latency_s": 6.109,
+      "stop_reason": "tool_use",
+      "foreign_tool_uses": 0,
+      "schema_retries": 0,
+      "payload": {
+        "inner_note": "천장이 처지고 물이 떨어지는 상황에서 정기점검이 2년 미실시된 막구조 건물이다. 급기 송풍기 중 한 대는 작동하지 않고 있다. 회전문 앞에 줄이 섰다는 신고와 조명 절반 소실은 내부 혼란 상황을 시사한다. 표기웅의 '혼자' 진술과 이후의 '정리 중'이라는 답변 사이의 불일치가 있다. 현재 건물 구조적 안전성이 의심되는 상태다.",
+        "stance": "c",
+        "because_referent": "우리가 현장을 직접 볼 수 없고, 내부 정보(k2)도 불완전한데, 회전문 통로 혼잡이 확인되었으므로 대안 경로가 반드시 필요하다. 이미 8명이 서쪽 슬리브로 나갔다는 것은 그 경로가 실제로 통함을 보여준다.",
+        "because_block_ids": [
+          "k2"
+        ],
+        "rejected_stance": "a",
+        "rejected_reason": "회전문 앞에 줄이 섰다는 신고가 있는데 정규 출입구 한 곳으로만 전원을 모으면 병목이 악화될 수 있다. 천장 처짐 상황에서 시간 지연은 위험하다.",
+        "utterance": "서쪽 벽면 자재 반입 슬리브로 이미 8명이 나갔습니다. 그 경로가 바깥으로 통하는 것이 확인된 상태입니다. 회전문 혼잡을 피하기 위해 인솔자에게 그 경로로 안내하되, 먼저 바깥에서 받아 줄 사람을 배치하겠습니다."
+      },
+      "problems": [],
+      "stance": "c",
+      "because_referent": "우리가 현장을 직접 볼 수 없고, 내부 정보(k2)도 불완전한데, 회전문 통로 혼잡이 확인되었으므로 대안 경로가 반드시 필요하다. 이미 8명이 서쪽 슬리브로 나갔다는 것은 그 경로가 실제로 통함을 보여준다.",
+      "because_block_ids": [
+        "k2"
+      ],
+      "because_invalid_ids": [],
+      "rejected_stance": "a",
+      "rejected_malformed": false,
+      "utterance_chars": 118,
+      "inner_note_chars": 183
+    },
+    {
+      "arm": "k1_k2_k3",
+      "slot": 10,
+      "template": "v0.4",
+      "model": "claude-haiku-4-5-20251001",
+      "model_reported": "claude-haiku-4-5-20251001",
+      "temperament_id": "dome-base",
+      "latency_s": 6.61,
+      "stop_reason": "tool_use",
+      "foreign_tool_uses": 0,
+      "schema_retries": 0,
+      "payload": {
+        "inner_note": "지붕이 처지고 물이 떨어지는 구조적 위험이 확인되었다. 정규 출입구는 회전문 하나뿐인데 병목이 발생 중이고, 조명이 절반 꺼졌으며, 송풍기 한 대가 작동하지 않는 상황이다. 표기웅의 초기 진술(\"혼자\")이 거짓이었고, 나중 응답이 늦었다는 것은 상황 파악이 불완전함을 시사한다. 벽 아래 슬리브로 이미 8명이 나가간 사실은 그곳이 통로로 기능함을 의미한다. 급기 시스템을 살릴 수 있다는 정보(k3)는 있지만 현장 실행 가능성을 내가 확인할 수 없다. 지금 필요한 것은 안전한 다중 출구 확보다.",
+        "stance": "c",
+        "because_referent": "관중석에 아이들이 남아 있고, 정규 출입구가 병목인 상황에서, 이미 8명이 성공적으로 빠져나간 슬리브가 대안 경로임이 증명되었다.",
+        "because_block_ids": [
+          "k1",
+          "k2"
+        ],
+        "rejected_stance": "a",
+        "rejected_reason": "회전문 병목과 구조적 위험(지붕 처짐, 송풍기 미작동)이 있는 상황에서 단일 정규 경로만 고집하는 것은 탈출 지연을 초래할 수 있다.",
+        "utterance": "관중석에 아이들과 인솔자가 남아 있고, 회전문 앞에 줄이 섰습니다. 서쪽 벽 아래 슬리브로 이미 여덟 명이 기어 나간 사실이 확인됐으므로, 인솔자에게 그 경로를 찾아 안내하되, 바깥에서 받아 줄 사람을 먼저 붙이겠습니다."
+      },
+      "problems": [],
+      "stance": "c",
+      "because_referent": "관중석에 아이들이 남아 있고, 정규 출입구가 병목인 상황에서, 이미 8명이 성공적으로 빠져나간 슬리브가 대안 경로임이 증명되었다.",
+      "because_block_ids": [
+        "k1",
+        "k2"
+      ],
+      "because_invalid_ids": [],
+      "rejected_stance": "a",
+      "rejected_malformed": false,
+      "utterance_chars": 123,
+      "inner_note_chars": 277
+    }
+  ],
+  "sequence": "c,c,c,c,c,c,c,c,c,c",
+  "distribution": {
+    "c": 10
+  },
+  "coverage": {
+    "status": "sampled",
+    "offered": [
+      "a",
+      "b",
+      "c"
+    ],
+    "selected": [
+      "c"
+    ],
+    "unobserved": [
+      "a",
+      "b"
+    ]
+  },
+  "advisory_logs": {
+    "state_variable_shadow": null,
+    "mineability": null
+  },
+  "latency": {
+    "calls": 10,
+    "mean_s": 5.634,
+    "min_s": 4.198,
+    "max_s": 6.77
+  },
+  "compliance": {
+    "discarded_total": 0,
+    "failed_total": 0,
+    "schema_retries_total": 0,
+    "foreign_tool_uses_total": 0,
+    "because_invalid_id_total": 0
+  }
+}
