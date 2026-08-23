@@ -2,10 +2,9 @@
  * Scenario clocks → a sortable number.
  *
  * Datapack clocks are `HH:MM`, plus one authored tie-break: a trailing `+`
- * means "immediately after that minute" (우는다리's `21:04+`, the beat that
- * follows the collapse). Decision D7 gives it half a minute of ordering
- * weight, which sorts it after `21:04` and before the next whole minute
- * without inventing a second time axis.
+ * means "immediately after that minute". Decision D7 gives it half a minute of
+ * ordering weight, which sorts it after the whole-minute stamp and before the
+ * next whole minute without inventing a second time axis.
  */
 
 import { MINUTES_PER_HOUR } from './caps.ts'

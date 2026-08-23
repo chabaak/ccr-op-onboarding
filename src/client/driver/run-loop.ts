@@ -128,7 +128,8 @@ export function createRunLoopDriver(
     inner.start()
     // The opening minute's events — the new run's `meta` above all — arrive as
     // real events, exactly as they did at boot. The operator's speed carries
-    // over: a desk that was paused stays paused, and 08:50 waits for ▶.
+    // over: a desk that was paused stays paused, and the active pack's opening
+    // stamp waits for ▶.
     inner.advance(0)
     inner.clock.setRate(rate)
     carry(kept)

@@ -17,7 +17,8 @@
 //
 // The seam is a shell slot rather than a reach across windows, and the string is
 // taken as given: `run-feed.ts` publishes what it printed, already through
-// `displayStamp`, so `21:04+` is resolved once and never here.
+// `displayStamp`, so a trailing-plus terminal stamp is resolved once and never
+// here.
 //
 // W4 dropped the other half of the port, `initRate()` (line 201) — the ×1 / ×4 /
 // pause row. A day is not a recording to scrub: DEPLOY starts it and the pack's

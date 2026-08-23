@@ -131,5 +131,5 @@ const REPORTS: Record<Run, Report> = {
   3: { facts: factsOf(3), report_body: bodyOf(3) },
 }
 
-/** The filed report of a run — runs 01/02 are the archive, 03 is filed at 21:04. */
+/** The filed report of a run — runs 01/02 are the archive, 03 is filed at the terminal stamp. */
 export const reportOf = (run: Run): Report => REPORTS[run]

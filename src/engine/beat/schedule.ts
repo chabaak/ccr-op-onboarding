@@ -68,9 +68,9 @@ export type ScheduledGate = {
    * compiles to.
    *
    * It CANNOT be resolved here. A gate's availability reads flags earlier gates
-   * set inside the same run (우는다리's G7 is available only where G4 named the
-   * caller), and this schedule is built once, before the first beat. So it is
-   * carried as a compiled string and evaluated when the beat opens — see
+   * set inside the same run, and this schedule is built once, before the first
+   * beat. So it is carried as a compiled string and evaluated when the beat
+   * opens — see
    * `driver.ts`'s `gateLive`. That is also why an unavailable beat stays a
    * `kind: 'gate'` beat here: round membership is assigned at build time off
    * exactly this field, and a beat that changed kind mid-run would renumber the

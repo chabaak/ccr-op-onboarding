@@ -42,10 +42,10 @@
 //   `run_end → final` lands on `TOTAL_MS` for every ledger the seam can carry
 //   (spec-client §3 inv 5, latency rule 3).
 // - **The cadence is injected.** The reference drove it off the browser frame
-//   callback; here it runs on a `Scheduler`, because 21:04 ends the driver's
-//   clock and `advance()` early-returns once it has — a tally that rode the
-//   driver's pump could never finish. There is no spinner anywhere: the wait
-//   is diegetic and the window owns its line.
+//   callback; here it runs on a `Scheduler`, because the active pack's end stamp
+//   stops the driver's clock and `advance()` early-returns once it has — a tally
+//   that rode the driver's pump could never finish. There is no spinner
+//   anywhere: the wait is diegetic and the window owns its line.
 //
 // Import-safe by contract (u3): no DOM at module scope, no stylesheet import,
 // no sibling window import, nothing from engine or composer (C8 / inv 12).

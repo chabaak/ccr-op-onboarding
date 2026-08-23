@@ -31,7 +31,7 @@ export type ClockRate = 0 | 1 | 4
  * stamps needed it too.
  *
  * A whole-minute clock has nowhere to put the weight, and it never needed one:
- * `21:04+` releases with `21:04` and stream order keeps them apart, which is
+ * `HH:MM+` releases with `HH:MM` and stream order keeps them apart, which is
  * the ordering the `+` was carrying in the first place.
  */
 export function mm(stamp: string): number {
@@ -44,9 +44,9 @@ export function mm(stamp: string): number {
  * A seam stamp as a CLOCK COLUMN should print it.
  *
  * The trailing `+` is an ORDERING weight, not a time — `mm()` above resolves
- * `21:04+` to the same minute as `21:04`, because "immediately after 21:04" has
- * nowhere to live on a whole-minute clock and never needed one. A gutter that
- * prints it is showing the reader a timestamp that does not exist.
+ * `HH:MM+` to the same minute as `HH:MM`, because "immediately after this
+ * minute" has nowhere to live on a whole-minute clock and never needed one. A
+ * gutter that prints it is showing the reader a timestamp that does not exist.
  *
  * It reached the screen the moment the run started finishing: until the `+` was
  * parseable the final beat threw, so its four feed lines — the closing tally

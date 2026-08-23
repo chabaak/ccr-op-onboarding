@@ -18,12 +18,12 @@
 // grammar. At run time the answer to a broken predicate is `false`, never an
 // exception.
 //
-// The reason is on the record. `clock.ts`'s `mm()` threw on the authored stamp
-// `21:04+`; the throw unwound through a subscriber into the driver's `step()`,
-// and the run died on its final beat with no `run_end`, no score and no tally
-// (PR #141). Predicates are evaluated at exactly that moment — the close of the
-// day, on the player's build, against data no test fixture wrote. A parse error
-// there must cost one row, not the run.
+// The reason is on the record. `clock.ts`'s `mm()` once threw on an authored
+// trailing-plus terminal stamp; the throw unwound through a subscriber into the
+// driver's `step()`, and the run died on its final beat with no `run_end`, no
+// score and no tally. Predicates are evaluated at exactly that moment — the
+// close of the day, on the player's build, against data no test fixture wrote.
+// A parse error there must cost one row, not the run.
 
 /**
  * The state a predicate reads: the engine's own snapshot shape
@@ -86,11 +86,10 @@ export function readValue(raw: string): PredicateValue {
  * `contract-datapack` §3.6 gave the headline its arithmetic with one rule — a
  * NUMBER counts, a WORD reads — and that rule is right for a unit that counts a
  * crowd (`터널에서 나오지 못한 사람 => 136`) and wrong for a unit that IS a
- * person. 전구간정상 scores 오세라 and 차우진 one person each, and the record
- * has to print WHERE they died (`사망 · 아홉 번째 문 안쪽`), so their values
- * are authored as prose. Under the numbers-only rule the day where the tunnel
- * empties and only 오세라 is left behind closed on 총 사망자 수 0명, with the
- * line above it reading 오세라: 사망.
+ * person. A named-person unit has to print WHERE they died (`사망 · ...`), so
+ * its value is authored as prose. Under the numbers-only rule, a day where the
+ * crowd is safe and only a named person is left behind can close on 총 사망자 수
+ * 0명 while the line above it says that person died.
  *
  * So a person-unit's death is counted from the word the author already wrote.
  * The scorer still invents nothing: `사망` is the pack's own outcome token, in
@@ -183,9 +182,9 @@ function met(term: Term, state: PredicateState): boolean {
     return term.negated ? !on : on
   }
   // A scalar's absence has no natural value the way a flag's does: it means the
-  // meter was never bound (`variable: null` — lint F2, and twelve of 우는다리's
-  // fourteen are), so there is no number to compare. `false` rather than 0,
-  // which would let `fear < 10` match a variable that does not exist.
+  // meter was never bound (`variable: null` — lint F2), so there is no number to
+  // compare. `false` rather than 0, which would let `fear < 10` match a
+  // variable that does not exist.
   if (typeof held !== 'number') return false
   switch (term.comparator) {
     case '>=':

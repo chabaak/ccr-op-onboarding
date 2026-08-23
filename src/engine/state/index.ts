@@ -142,11 +142,11 @@ function reduce(
     // happens to be phrased in: "state did not move, so there is no symptom to
     // show". The rule computes a magnitude, and flags have none, so the literal
     // wording only ever reached scalars — but a `true → true` write moved
-    // nothing either, and rendering "발신자가 통화가 기록되고 있음을 알아챘다" for
-    // the second of two buckets asserting the same flag shows the player a
-    // change that did not happen. The 우는다리 pack's own idiom (G3 and G5 each
-    // assert one flag from two buckets) is one authoring edit away from it, and
-    // §6-2 lint is static — it cannot see which pair of buckets a run visits.
+    // nothing either, and rendering a flag symptom for the second of two
+    // buckets asserting the same flag shows the player a change that did not
+    // happen. A pack with repeated flag-setting buckets is one authoring edit
+    // away from it, and §6-2 lint is static — it cannot see which pair of
+    // buckets a run visits.
     // The entry stays in the journal; §2.1 records ATTEMPTS to change state.
     if (entry.before === entry.after) return null
     const transition: Transition = entry.after === true ? 'set' : 'unset'

@@ -445,8 +445,8 @@ export function createBeatDriver(deps: BeatDriverDeps): BeatDriver {
  * ── Un-hardened prose opens the gate, it does not close it ──────────────────
  *
  * `availability` is one of `contract-datapack`'s F4 slots: packs may still
- * carry free text there pending promotion — 우는다리's G7 says 특정 가지에서만 —
- * and `datapack:lint` FLAGs it as hardening work. Routing that through
+ * carry free text there pending promotion, and `datapack:lint` FLAGs it as
+ * hardening work. Routing that through
  * `holds()` alone would read it as `false` and silently delete a gate from
  * every run, which is a behaviour change no author asked for. So a condition
  * that does not PARSE is treated as "no condition authored yet" and the gate is
@@ -468,18 +468,17 @@ function gateOpen(beat: Beat | undefined, state: StateCorePort): boolean {
  * Does this event's `exposure.extra_condition` hold right now?
  *
  * The slot was authored, compiled and linted, and for a while NOTHING read it:
- * every event in a beat reached the feed unconditionally. 전구간정상 authors its
- * day as exclusive pairs — the 21:22 announcement is either "차량 안에서
- * 대기하십시오" or "차에서 내리십시오", and the closing 개요서 either names
- * 일반 화물 or twelve pallets — so an unread condition does not merely lose a
- * branch, it prints BOTH halves of it in the same minute.
+ * every event in a beat reached the feed unconditionally. A pack may author a
+ * beat as exclusive pairs — one line for each branch — so an unread condition
+ * does not merely lose a branch, it prints BOTH halves of it in the same
+ * minute.
  *
  * ── Un-hardened prose shows the line, it does not delete it ────────────────
  *
  * Exactly `gateOpen`'s rule above, for exactly its reason. `extra_condition` is
  * a `contract-datapack` F4 slot: packs may still carry free text there pending
- * promotion — 우는다리's t5 says 현장(관리동)을 들여다본 런에만 보임 — and
- * `datapack:lint` FLAGs it as hardening work. Routing that through `holds()`
+ * promotion, and `datapack:lint` FLAGs it as hardening work. Routing that
+ * through `holds()`
  * alone would read it as `false` and silently delete two authored events from
  * every run of a pack nobody changed. So a condition that does not PARSE is
  * treated as "no condition authored yet". Only a real predicate is enforced,

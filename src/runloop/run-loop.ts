@@ -22,10 +22,10 @@ import type { MetaStore } from './store.ts'
  *
  * H3 (08-09) — STAYS 4. This was briefly 5, and the reason it was raised is
  * the reason it goes back: four "read as three from the desk" because the
- * file's pages turned on the press rather than at 21:04, so the last day's file
- * was always built on the previous agent's page. That is a page-turn defect,
- * not an allotment that is one short, and the rest of this branch fixes it
- * (`windows/agent-file.ts`). A number raised to paper over a bug has to come
+ * file's pages turned on the press rather than at run end, so the last day's
+ * file was always built on the previous agent's page. That is a page-turn
+ * defect, not an allotment that is one short, and the rest of this branch fixes
+ * it (`windows/agent-file.ts`). A number raised to paper over a bug has to come
  * back down when the bug does, or the compensation outlives its cause and
  * nobody remembers it was one (민서, 08-09).
  *
