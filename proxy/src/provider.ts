@@ -13,7 +13,7 @@ import type { CallRequest, TokenUsage } from "./types.js";
 /**
  * Bedrock Converse, forced through the call's output schema.
  *
- * Ported from `apothecary-llm-layer/src/dialogue-provider.ts`, which has run in
+ * Ported from the earlier LLM service provider, which has run in
  * production; the differences are that the tool spec is built per request (the
  * judgment schema enumerates the gate's stances) and that `strict` is always on,
  * since DDAY binds haiku.

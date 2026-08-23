@@ -16,7 +16,7 @@ npm run sam:validate
 
 ## State: the call path is wired; it has never touched real Bedrock
 
-Started as a copy of `apothecary-llm-layer` (physical architecture §3.6), which
+Started as a copy of the earlier LLM service (physical architecture §3.6), which
 is a stack that has actually run. What came across works and is under test:
 
 | Real today | File |

@@ -1,6 +1,6 @@
 // Post-build smoke on the actual Lambda bundle, not the source tree.
 //
-// Copied from apothecary-llm-layer/scripts/bundle-smoke.cjs. Same acceptance
+// Copied from the earlier LLM service bundle smoke. Same acceptance
 // shape: drive the built artifact with two events and assert the status codes,
 // which catches a bundle that imports something esbuild did not include.
 //

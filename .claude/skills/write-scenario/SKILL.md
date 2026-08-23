@@ -180,9 +180,9 @@ their length by going further. Screen time is a reward, not a default.
 ## 4. Output format
 
 Write a single file:
-`planning/dday-scenario/drafts/<file prefix>-<two-word slug>.md`. The file
-prefix is defined by the §2 assignment; the slug is two Korean words carrying
-the draft's character (e.g. `-깊은우물`).
+`data/scenario/<two-word slug>/draft.md`. The slug is two Korean words carrying
+the draft's character (e.g. `깊은우물`); create that pack directory if it does
+not already exist.
 **This format is read by a machine** — the order and names of sections, the
 table columns, the labels and shapes of items are a contract. A draft that
 deviates stops the compiler with an error. Prose freedom lives inside the
@@ -512,7 +512,7 @@ subjects, weight at the end of the sentence:
    The check memo is a **proposal** — the orchestrator adjudicates the
    classifications (rejects over-promotions and misapplied clauses, and
    records each rejection's reason in the memo).
-   Output: `planning/dday-scenario/paper-check-<slug>.md`
+   Output: `data/scenario/<slug>/paper-check.md`
    (verdict: 통과 / 조건부 통과 / 재작업 + per-lens table + prescriptions +
    adjudication record).
 4. **Revise** — if draft-fixable blockers exist, one reviser sub-agent:

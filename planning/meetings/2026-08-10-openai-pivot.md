@@ -52,7 +52,7 @@
    - 새 저장소는 클론이며, 이후 원본에는 커밋하지 않는다.
 2. **GitHub Organization 아래에 신규 생성** — [`chabaak/ccr-op-onboarding`](https://github.com/chabaak/ccr-op-onboarding)
    - 저장소명은 새 게임 제목 **Central Control Room Operator Onboarding**의 약어다. 즉 제목 변경이 이미 저장소 이름에 반영되어 있다.
-     - **제목만 바꾼다. 시설명(`긴급상황대응실`)은 당분간 그대로 둔다.** 두 작업의 비용이 다르기 때문이다 — 전체 제목은 셸에 있는 파일이 하나도 없어(`index.html`의 `<title>`조차 `ERR-2 · 멈춘 회전문 — 운영자 단말`) 문서 수정 수준이지만, 시설명은 28개 파일에 박혀 있고 그중 `proxy/prompts/{reporter,judgment}/*`와 `proxy/src/prompt-bundle.generated.ts`는 **프롬프트 본문**이라 프로브 재측정을 부른다. `data/scenario/멈춘회전문/*`과 `planning/scenario-writer-brief.md`(팩토리)도 같은 어휘로 쓰여 있다.
+     - **제목만 바꾼다. 시설명(`긴급상황대응실`)은 당분간 그대로 둔다.** 두 작업의 비용이 다르기 때문이다 — 전체 제목은 셸에 있는 파일이 하나도 없어(`index.html`의 `<title>`조차 `ERR-2 · 멈춘 회전문 — 운영자 단말`) 문서 수정 수준이지만, 시설명은 28개 파일에 박혀 있고 그중 `proxy/prompts/{reporter,judgment}/*`와 `proxy/src/prompt-bundle.generated.ts`는 **프롬프트 본문**이라 프로브 재측정을 부른다. `data/scenario/멈춘회전문/*`과 시나리오 팩토리도 같은 어휘로 쓰여 있다.
      - 시설명 변경은 다시 볼 때 `cost:L` · `structural`이며, **새 팩을 쓰기 전에** 결정해야 한다.
    - 개인 계정이 아닌 이유:
      - Issue types 등 신규 Issues/Projects 기능이 조직 단위로 제공된다.
@@ -151,9 +151,9 @@ Discord를 논의 채널로 유지하되, webhook으로 트래킹 내용을 공�
 | 위치 | 성격 |
 | --- | --- |
 | `demos/apothecary` · `demos/darkest-context` | 데모 빌드 본체 |
-| `planning/legacy-services/apothecary-llm-layer/` | 사실상 두 번째 코드베이스 |
-| `planning/concepts/game-concept-*.md` | 채택되지 않은 컨셉 7종 |
-| `planning/handoffs/apothecary-*` · `planning/paper-tests/*` | 데모 시기 산출물 |
+| 레거시 서비스 아카이브 | 사실상 두 번째 코드베이스 |
+| 채택되지 않은 컨셉 문서 | 컨셉 7종 |
+| 데모 시기 핸드오프·종이 테스트 | 데모 시기 산출물 |
 | `proxy/src/{provider,config,handler}.ts` · `proxy/README.md` | **코드 내 언급** |
 | `assets-manifest.json` · `tests/assets/baseline/manifest-baseline.json` | 베이스라인 재생성 필요 |
 | `DISCOVERY.md` · `WORKLINE-*.local.md` · `discovery/u9.md` | 기록 문서 |
