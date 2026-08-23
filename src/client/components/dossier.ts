@@ -54,13 +54,13 @@ export function callsignOf(run: number): string {
 /**
  * The agent AFTER the one `run` sent out — the file's next page (H3, 08-09).
  *
- * WHY IT LIVES HERE. At 21:04 the day is over and the file the operator starts
- * mining into belongs to the agent who has not gone out yet — but the run loop
- * does not name that agent until the press opens their day, so between the
- * close and the press the desk has to head a page for someone the authority has
- * not announced. [u7#c3] forbids the WINDOW doing that arithmetic on the
- * authority's numbers, and rightly: `run`, `runs_left`, `carried` and `archive`
- * are the run loop's and the client mirrors them.
+ * WHY IT LIVES HERE. At run end the file the operator starts mining into
+ * belongs to the agent who has not gone out yet — but the run loop does not
+ * name that agent until the press opens their day, so between the close and the
+ * press the desk has to head a page for someone the authority has not
+ * announced. [u7#c3] forbids the WINDOW doing that arithmetic on the authority's
+ * numbers, and rightly: `run`, `runs_left`, `carried` and `archive` are the run
+ * loop's and the client mirrors them.
  *
  * A callsign is not one of those numbers. The ECHO series is document art this
  * module already mints (`callsignOf` above — the pack carries no callsign at

@@ -165,10 +165,10 @@ export function mount(host: HTMLElement, driver: FixtureDriver): void {
    *
    * True from the moment the day closes until the `meta` that opens the next
    * one, and false the rest of the time. The desk knows this before the run
-   * loop does, because 21:04 is when the operator gets the file back: what they
-   * mine into it from then on is the NEXT agent's handover, and heading that
-   * page with the callsign of the agent who has just come home is what made a
-   * sitting read as ECHO-1, ECHO-1, ECHO-2, ECHO-3.
+   * loop does, because run end is when the operator gets the file back: what
+   * they mine into it from then on is the NEXT agent's handover, and heading
+   * that page with the callsign of the agent who has just come home is what
+   * made a sitting read as ECHO-1, ECHO-1, ECHO-2, ECHO-3.
    *
    * `runs_left` gates it (see the `'tally'` branch): on the last day of an
    * allotment there is no next agent, so the page stays the one that flew.
@@ -212,8 +212,8 @@ export function mount(host: HTMLElement, driver: FixtureDriver): void {
    * with extra steps, and measured on the desk it read as the name simply
    * appearing. The handover types at prose pace because it IS prose and the
    * operator is reading it; this is a single short token doing one job, which is
-   * to be WATCHED arriving on a page that has been blank since 21:04. So it gets
-   * a pace of its own rather than a share of one tuned for sentences.
+   * to be WATCHED arriving on a page that has been blank since run end. So it
+   * gets a pace of its own rather than a share of one tuned for sentences.
    */
   const CALLSIGN_MS_PER_CHAR = 80
 
@@ -270,7 +270,7 @@ export function mount(host: HTMLElement, driver: FixtureDriver): void {
         committedRun = run
         committedAt = opensAt
         // H3 — …and it is stamped for whoever the file was being built for. A
-        // press made after 21:04 commits the INCOMING agent's file, and the
+        // press made after run end commits the INCOMING agent's file, and the
         // chop has to name them and not the agent whose day has just ended.
         committedIncoming = incoming
       }
@@ -402,9 +402,10 @@ export function mount(host: HTMLElement, driver: FixtureDriver): void {
    *
    * The topbar's ×1 / ×4 / pause left with this unit: a day is not a recording
    * the operator scrubs, it is something they commit a file to and then watch.
-   * So the one thing that sets the clock going is a committed file, and 21:04
-   * is the one thing that stops it (`driver/clock.ts` halts at `end`). The
-   * desk boots held at 0 — ECHO-1 does not go in until the operator says so.
+   * So the one thing that sets the clock going is a committed file, and the
+   * active pack's end stamp is the one thing that stops it (`driver/clock.ts`
+   * halts at `end`). The desk boots held at 0 — ECHO-1 does not go in until the
+   * operator says so.
    */
   function startDay(): void {
     driver.clock.setRate(1)
@@ -477,7 +478,7 @@ export function mount(host: HTMLElement, driver: FixtureDriver): void {
     // H3 — the press records NOTHING any more. A page is a sitting that is
     // OVER, and the two writes that used to happen here and on the next `meta`
     // both ran a press too late: the record of what ECHO-1 flew appeared only
-    // once ECHO-2's day had opened, so between 21:04 and the press the desk
+    // once ECHO-2's day had opened, so between run end and the press the desk
     // held no page for the day it had just played and headed the file the
     // operator was mining into with the callsign of the agent who had already
     // come home. Both are now written where they are true — the close (see the
@@ -1105,7 +1106,7 @@ export function mount(host: HTMLElement, driver: FixtureDriver): void {
    * agent on the desk.
    *
    * U5.3 · H3 — a record is a sitting that is OVER, and `filed` holds nothing
-   * else: the entry is written at 21:04 (the `'tally'` branch below) and the
+   * else: the entry is written at run end (the `'tally'` branch below) and the
    * live page moves on to the incoming agent in the same breath. So there is no
    * `flown >= run` filter to apply any more — the last day of an allotment
    * files no entry at all, because it has no successor to hand the page to, and
@@ -1376,7 +1377,7 @@ export function mount(host: HTMLElement, driver: FixtureDriver): void {
       // keep. The last agent's own page simply stays live.
       // H3 (08-09, 민서) — the page does NOT turn here any more.
       //
-      // It used to turn at 21:04, on the same event that closes the day. That
+      // It used to turn at run end, on the same event that closes the day. That
       // put the new page up while the terminal record was still counting itself
       // out beside it, so two surfaces were resolving at once and the operator
       // was handed a file to revise before the day they were revising had
@@ -1388,7 +1389,7 @@ export function mount(host: HTMLElement, driver: FixtureDriver): void {
       // W4 — the close is what hands the file back. Until now the file stayed
       // locked until NEW RUN, so the day's report could not be mined into the
       // day it was written for; the operator had to open tomorrow before
-      // reading today. The file opens at 21:04 and the next press closes it.
+      // reading today. The file opens at run end and the next press closes it.
       board.unlock()
       settled = false
       counted = false
@@ -1491,7 +1492,7 @@ export function mount(host: HTMLElement, driver: FixtureDriver): void {
     run = event.run
     // W4 — the unlock moved to the CLOSE (see the `'tally'` branch above): the
     // day's own report has to be minable into the file it was written for, and
-    // that window is between 21:04 and the press. A new run therefore arrives
+    // that window is between run end and the press. A new run therefore arrives
     // with the file already committed — it must stay locked, and only re-date
     // its stamp to the sitting it now serves.
     if (changedRun && board.isLocked()) {

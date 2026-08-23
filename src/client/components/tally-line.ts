@@ -2,13 +2,13 @@
 //
 // ── Why this file exists ────────────────────────────────────────────────────
 //
-// The day's count used to be prose: `timeline.json`'s `t19`, authored at
-// `21:04+` as "집계. 사망 26(다리 위 24 · 관리동의 임차복 1 · 낙하 구간 아래
-// 둔치 노점상 1) · 부상 71 …". A timeline event is a FIXED event — the engine
+// The day's count used to be prose: a terminal `timeline.json` event authored
+// at the run's closing stamp. A timeline event is a FIXED event — the engine
 // prints every one of them verbatim (`scriptLinesOf`), no run state consulted —
-// so that line said 26 on every run the desk has ever played, while the ledger
-// beside it counted what the run actually scored. A capped-entry day printed
-// 사망 26 in the feed and 사망 9 in 집계표, from the same 21:04.
+// so that line printed the baseline count on every run the desk played, while
+// the ledger beside it counted what the run actually scored. A capped-entry day
+// could print one death count in the feed and another in the ledger from the
+// same run end.
 //
 // 26 is not a wrong number: it is the BASELINE, the day where nothing the agent
 // did set a flag (`src/driver/scorer.ts` `baselineState`). It is wrong only in

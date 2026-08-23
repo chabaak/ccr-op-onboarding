@@ -249,9 +249,9 @@ export function installAudio(deps: AudioDeps): AudioHandle {
         // day ticks up, a row the agent left where it was ticks down. That is
         // the fact the player is owed and the only one the seam carries.
         //
-        // 21:04 on the last day. `score` is emitted immediately before
-        // `run_end` (live-driver `finish()`), so this is the moment just ahead
-        // of the tally — which is where the ending was asked to sit.
+        // Last-day run end. `score` is emitted immediately before `run_end`
+        // (live-driver `finish()`), so this is the moment just ahead of the
+        // tally — which is where the ending was asked to sit.
         const lead = runsLeft === 0 && !collapsed ? (endTheDay(), ENDING_LEAD_MS) : 0
         event.rows.forEach((row, i) => {
           if (row.baseline === null) return

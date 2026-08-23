@@ -27,11 +27,11 @@ export interface ArchiveEntry {
  * x5 — a segment is a RUN and nothing else. The entry's `label` used to be
  * printed under the callsign as the tab's own subtitle, and what the live seam
  * actually puts in that field is the run id (`driver/live/index.ts` —
- * `${slug}-r${run}`), so the rail read `ECHO-1 / 전구간정상-r1`: the pack's slug
- * and the run number, on a tab already headed by the run number, in a window
- * whose whole rail is one scenario. The label is still VALIDATED below — inv 6
- * is about what may reach a player surface, and the cheapest way to keep that
- * true is to keep refusing a bad one even now that none of it is printed.
+ * `${slug}-r${run}`), so the rail could show a pack slug and the run number on
+ * a tab already headed by the run number, in a window whose whole rail is one
+ * scenario. The label is still VALIDATED below — inv 6 is about what may reach
+ * a player surface, and the cheapest way to keep that true is to keep refusing
+ * a bad one even now that none of it is printed.
  */
 export interface ArchiveSegment {
   run: number

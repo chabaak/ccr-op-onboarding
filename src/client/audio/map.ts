@@ -29,7 +29,7 @@ export const TRIGGERS = [
   'ui:click', 'ui:hover', 'door:login', 'ui:window-open', 'ui:window-close', 'ui:drag', 'ui:drop',
   'boot',
   // fired by the last-day latch in index.ts; bound null while
-  // shell/radio-sfx.ts owns the 21:04 swell (coexistence decision)
+  // shell/radio-sfx.ts owns the run-end swell (coexistence decision)
   'ending:collapse',
 ] as const
 

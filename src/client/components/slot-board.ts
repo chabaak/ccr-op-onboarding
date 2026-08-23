@@ -535,9 +535,10 @@ export function createSlotBoard(options: SlotBoardOptions): SlotBoard {
     // (`driver/fixture-driver.ts`), and a reveal that starts on a clock in
     // neither state would strand the handover mid-character — a file the
     // operator is meant to revise, frozen half-written, with no way to finish
-    // it. In a played day the clock has ended by 21:04 and this never arms;
-    // `window.__shell.drain()` is the case that reaches it, because it flushes
-    // the stream without ever advancing the clock to the terminal minute.
+    // it. In a played day the clock has ended at the active pack's terminal
+    // minute and this never arms; `window.__shell.drain()` is the case that
+    // reaches it, because it flushes the stream without ever advancing the
+    // clock to the terminal minute.
     //
     // Same shape as `components/run-feed.ts`'s settle watchdog and for the same
     // reason: rides rAF rather than the driver, so it is alive exactly when the

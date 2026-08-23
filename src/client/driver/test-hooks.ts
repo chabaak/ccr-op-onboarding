@@ -100,7 +100,7 @@ const hooks = new WeakMap<ClockDriver, ClockHook>()
  * `advance` releases the tail of the stream when the clock has reached its
  * terminal minute: a seeded-to-the-end clock is no longer *running*, so the
  * driver's own pump stops short of the flush the run's close owes. That is what
- * makes seeding to 21:04 the TALLY capture key (C16).
+ * makes seeding to the active pack's end stamp the TALLY capture key.
  */
 export function installClockHook(driver: ClockDriver): ClockHook {
   const existing = hooks.get(driver)

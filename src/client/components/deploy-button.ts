@@ -57,7 +57,7 @@ export interface DeployView {
   /** What `#deployState` prints — blank once the day has closed (see header). */
   note: string
   stampOn: boolean
-  /** `"ECHO-3 · 08:50"` — the sitting the file was committed for. */
+  /** `"ECHO-3 · HH:MM"` — the sitting the file was committed for. */
   stampLine: string
   boardState: BoardState
   buttonState: 'ready' | 'deployed'

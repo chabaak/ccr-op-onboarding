@@ -274,10 +274,11 @@ export function createReportView(options: ReportViewOptions): ReportView {
    *
    * The third case used to be "the driver's pump has stopped", which is what
    * killed the beat: the run's own report is released in the same frame the
-   * clock reaches 21:04, so the ONE report a player actually sees was the one
-   * that never wrote itself out (R4 on windows/reports.ts:55). The pump now
-   * outlives the run (`driver/fixture-driver.ts`), so there is no stopped-pump
-   * case left to special-case.
+   * clock reaches the active pack's end stamp, so the ONE report a player
+   * actually sees was the one that never wrote itself out (R4 on
+   * windows/reports.ts:55). The pump now outlives the run
+   * (`driver/fixture-driver.ts`), so there is no stopped-pump case left to
+   * special-case.
    */
   function motionless(): boolean {
     if (animationsFrozen()) return true

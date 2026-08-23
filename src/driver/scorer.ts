@@ -45,7 +45,7 @@ export type OutcomePack = {
  * that is not a choice. Everything else a gate can set is left absent, and an
  * absent flag reads false (`predicates.ts` `met()`), so every unit falls to its
  * unconditional rule — which is exactly what the pack's `baseline_summary`
- * describes. On 우는다리 that is 사망 24 + 1 + 1 = 26.
+ * describes.
  *
  * ── Why this no longer reads `gates.json` ───────────────────────────────────
  *
@@ -62,9 +62,9 @@ export type OutcomePack = {
  * so none is assumed. It is also stabler — adding a gate, or re-authoring a
  * default, can no longer move the baseline out from under the ledger.
  *
- * Flags only: no predicate reads a scalar today, and twelve of the fourteen
- * meters are unbound (lint F2), so a scalar baseline would be describing
- * variables that do not exist.
+ * Flags only: no predicate reads a scalar today. A pack may leave some meters
+ * unbound, so a scalar baseline would be describing variables that do not
+ * exist.
  */
 export function baselineState(pack: OutcomePack): PredicateState {
   const state: PredicateState = {}
@@ -123,16 +123,15 @@ export function scoreUnits(
  * `windows/reports.ts` labels this 총 사망자 수 · 명, so what sums has to be
  * deaths — which is the whole reason §5.2 amendment g widened a row's value and
  * left `total` alone: 강필주 resolves to `6시간 구금` rather than `6`, because
- * six hours of detention added to six deaths is a headline that lies. On
- * 우는다리's baseline day this is 24 + 1 + 1 = 26, which is what `score.json`'s
- * own `baseline_summary` says.
+ * six hours of detention added to six deaths is a headline that lies. The
+ * numeric headline exists to count deaths, not every number-shaped row.
  *
  * What `deathsOf` adds is the OTHER half of the same rule: a unit that is one
  * named person authors its outcome as prose, so that the record can print where
  * they were found, and `사망 · 아홉 번째 문 안쪽` is a death whatever it is
- * spelled with. Counting only numbers closed 전구간정상's rescue day on 총
- * 사망자 수 0명 with 오세라: 사망 printed directly above it. The rule stays the
- * pack's, not the scorer's — see `deathsOf`.
+ * spelled with. Counting only numbers can make a named-person death disappear
+ * from the headline while the row directly above still says they died. The rule
+ * stays the pack's, not the scorer's — see `deathsOf`.
  *
  * A PLAYED run is whatever its own stances scored — it and the baseline agree
  * only when the day moved nothing, and the ledger carries both.
@@ -158,9 +157,9 @@ export function createScorer(
 ): ScorerPort {
   // Checked HERE rather than in `score()`. A composition root that forgot to
   // thread `score.json` in is a wiring defect, and the difference between the
-  // two places is when the run finds out: at boot, loudly, or at 21:04 — inside
-  // the emitter, on the day's last beat, where a throw has already been shown to
-  // take the whole run with it (`mm()` and the `21:04+` stamp, PR #141).
+  // two places is when the run finds out: at boot, loudly, or at the active
+  // pack's terminal beat, where a throw has already been shown to take the
+  // whole run with it (`mm()` and a trailing-plus terminal stamp).
   if (!pack?.units) throw new Error('scorer: the pack carries no `score.units`')
   return {
     score() {

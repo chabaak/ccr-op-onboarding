@@ -146,7 +146,8 @@ const envelope = (kind: FeedKind, clock: string, parts: FeedPart[]): FeedNode =>
   kind,
   classes: ['fl', `fl-${kind}`],
   mark: FEED_MARKS[kind],
-  // The gutter prints a TIME, and `21:04+` is not one — see `displayStamp`.
+  // The gutter prints a TIME, and a trailing-plus stamp is not one — see
+  // `displayStamp`.
   stamp: kind === 'mark' ? null : displayStamp(clock),
   parts,
   data: {},
@@ -769,10 +770,10 @@ export function createRunFeed(host: HTMLElement, driver: FixtureDriver): RunFeed
    *
    * x8 — and it is called for the lines the fanfold DROPS as well as the ones it
    * prints (민서, 08-10), which is why it is a function now. Dropping the
-   * symptom line took the desk clock with it the first time: the demo day's last
-   * minute belongs to a beat whose only line is a symptom, so the clock stopped
-   * at 21:00 on a run that reaches 21:04, and the 집계 line — which reuses this
-   * stamp because `score` carries no clock of its own — was stamped with it.
+   * symptom line took the desk clock with it the first time: a demo day's last
+   * minute can belong to a beat whose only line is a symptom, so the clock
+   * stopped before the run end, and the 집계 line — which reuses this stamp
+   * because `score` carries no clock of its own — was stamped with it.
    * A dropped line is still a minute the run got to. It is not a line the reader
    * has to wait for, and it is dropped inside the reveal pump, so this stays in
    * step with the paper either way.
@@ -1001,9 +1002,10 @@ export function createRunFeed(host: HTMLElement, driver: FixtureDriver): RunFeed
    *
    * `settle` has always drawn this line (`!running && !ended`); until x11 the
    * pump drew a different one (`!running`) and dumped the rest of the day the
-   * moment the clock reached 21:04. They are one predicate now, and the reason
-   * is the whole of x11: an ended run still has paper to print, and a paused one
-   * has an operator waiting who asked for everything to stop.
+   * moment the clock reached the active pack's end stamp. They are one
+   * predicate now, and the reason is the whole of x11: an ended run still has
+   * paper to print, and a paused one has an operator waiting who asked for
+   * everything to stop.
    */
   const halted = (): boolean => !driver.clock.running && !driver.clock.ended
 

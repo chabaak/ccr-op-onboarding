@@ -264,8 +264,8 @@ export function createLiveAdapter(deps: LiveAdapterDeps): FixtureDriver {
         // rejects (transport decision 1). A rejection here is therefore a defect
         // rather than a model failure — stop the run instead of spinning on it.
         //
-        // AND SAY SO. This swallowed one: `mm()` rejected the authored `21:04+`
-        // stamp inside `absorb`, the throw unwound through the emitter into
+        // AND SAY SO. This swallowed one: `mm()` rejected an authored terminal
+        // `+` stamp inside `absorb`, the throw unwound through the emitter into
         // `step()`, and the run died on its final beat — no `run_end`, no
         // score, no TALLY — leaving a desk that looked merely slow. A defect
         // the desk cannot show has to at least leave a trace in the console,

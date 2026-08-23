@@ -118,28 +118,26 @@ const RENDERERS: Record<string, (v: unknown) => string> = {
   TIMELINE_EXCERPT: renderLines,
   // narration (call contracts §2)
   TIMELINE_TAIL: renderLines,
-  // The agent speaks only on gate beats. 멈춘회전문 has nineteen beats and at
-  // most three carry an utterance — one, on a run that hands nothing over. The
-  // other sixteen used to render a labelled section with NOTHING under it,
-  // directly above an instruction not to repeat what is not there. An
-  // instruction with no anchor is where invention starts. Say the silence out
-  // loud instead, the way SCENE_SYMPTOMS says "(변화 없음)".
+  // The agent speaks only on gate beats. Most beats carry no utterance, and
+  // those used to render a labelled section with NOTHING under it, directly
+  // above an instruction not to repeat what is not there. An instruction with
+  // no anchor is where invention starts. Say the silence out loud instead, the
+  // way SCENE_SYMPTOMS says "(변화 없음)".
   //
   // The sentinel names no role: it renders under v0.1–v0.3's `통제관의 발화`
   // header too, and those versions are what live requests until the client's
   // TEMPLATE_VERSION bump lands.
   AGENT_UTTERANCE: (v) => (str(v).trim() ? str(v) : "(없음 — 이번 비트에 발화는 없었다)"),
   // The same hole, one slot over, and it opened wide the day the engine started
-  // honouring `exposure.extra_condition` on the prompt as well as on the feed
-  // (#238). A beat whose every authored row belongs to a branch this run did
-  // not take now hands the model NOTHING here: 멈춘회전문 goes from 2 such beats
-  // to 15 of 31 on a no-intervention run. The label still printed, with an
+  // honouring `exposure.extra_condition` on the prompt as well as on the feed.
+  // A beat whose every authored row belongs to a branch this run did not take
+  // now hands the model NOTHING here. The label still printed, with an
   // instruction under it not to re-narrate what was not there.
   //
-  // Two of those 15 predate #238 — the beats carrying G2 and G3, which author
-  // no timeline row of their own, so an unavailable gate leaves them empty by
-  // the D3 rule itself. The hole was already reachable in production; the
-  // filter only made it the common case.
+  // Gate-only beats with no timeline row of their own predate the filter, so an
+  // unavailable gate can leave this slot empty by the D3 rule itself. The hole
+  // was already reachable in production; the filter only made it the common
+  // case.
   //
   // `이번 비트` and not `이 분`, matching the sentinel above: `이 분` reads as
   // "this person" before it reads as "this minute".

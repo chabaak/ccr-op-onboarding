@@ -2,9 +2,9 @@
 // recorded, plus the WAV writer both halves share.
 //
 // Why synthesis at all when the sourced half exists: the cues here are the ones
-// a CC0 library is worst at. Room tone, a drone that opens as 21:04 approaches,
-// a dissonant symptom chime pitched to sit *under* notice, a radio squelch
-// clipped to 60 ms — these are specified by their function in the game
+// a CC0 library is worst at. Room tone, a drone that opens as run end
+// approaches, a dissonant symptom chime pitched to sit *under* notice, a radio
+// squelch clipped to 60 ms — these are specified by their function in the game
 // (plan-audio §4), not by an object someone recorded, and every library
 // candidate would have to be cut and re-pitched until nothing of the original
 // remained. Generating them means the spec IS the source, the loops close
@@ -190,7 +190,7 @@ function fallbackBurst() {
 }
 
 /**
- * 21:04. It swells, and then it CUTS — the silence after the cut is the cue.
+ * Run end. It swells, and then it CUTS — the silence after the cut is the cue.
  *
  * Not a crash and not a decay. Drawing the collapse as a sound puts the loudest
  * thing in the game on the moment the player has already lost; taking the sound

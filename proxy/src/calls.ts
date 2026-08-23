@@ -181,13 +181,12 @@ const narration: CallSpec = {
   ],
 
   buildTool(slots) {
-    // An EMPTY roster is legal, and it is not an edge case: 7 of 우는다리's 19
-    // beats are `surface: "document"` — a report arriving, a log screen — where
-    // nobody is present because nobody speaks. Requiring >= 1 made 37% of that
-    // pack unrunnable against engine spec §3.1 ("script beats run Call 2 without
-    // exception"), and the only way to satisfy it would be to invent presence,
-    // which also licenses the model to have someone speak in an empty room.
-    // Found 2026-08-03 by running the pack through the real handler.
+    // An EMPTY roster is legal, and it is not an edge case: document-surface
+    // beats can have nobody present because nobody speaks. Requiring >= 1 made
+    // authored packs with those beats unrunnable against engine spec §3.1
+    // ("script beats run Call 2 without exception"), and the only way to
+    // satisfy it would be to invent presence, which also licenses the model to
+    // have someone speak in an empty room.
     const roster = idsOf(slots.PRESENT_NPCS);
     // A QUIET beat: nothing authored happened in this minute on this run. The
     // renderer says so out loud (`prompt.ts`'s FIXED_NPC_ACTION sentinel), and
