@@ -435,8 +435,12 @@ describe("renderer coverage — every RENDERERS entry, not just what suites use"
     );
 
     expect(rendered.system).toContain("구역 표지가 정한다");
+    expect(rendered.system).toContain("말이 닿는 범위도 구역 표지를 따른다");
     expect(rendered.system).not.toContain("사람은 요원 하나뿐이다");
     expect(rendered.system).not.toContain("전부 회선 너머다");
+    expect(rendered.system).not.toMatch(
+      /인물들은 저마다 따로 요원과 통화하고 있다[\s\S]*누가 입을 열든 듣는 사람은 요원뿐이다/,
+    );
     expect(rendered.user).toContain("[회선 너머 — 요원에게만 말한다]\nn1 — 표기웅");
     expect(rendered.user).toContain(
       "[요원 곁 — 서로에게만 말한다. 회선 저쪽에는 말을 걸지 않는다]\nn2 — 보조",
