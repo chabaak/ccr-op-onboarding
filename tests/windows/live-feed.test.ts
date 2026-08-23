@@ -99,11 +99,7 @@ const KINDS: FeedKind[] = ['event', 'radio', 'npc', 'symptom', 'wait', 'fallback
  */
 const UNDRAWN_KINDS: FeedKind[] = ['wait', 'symptom']
 
-/**
- * Reference marks — `docs/design/phase2-ui/app.js:405`, ported verbatim.
- * `wait` and `mark` carry no mark by design (the rule carries `mark`'s; `wait`'s
- * was the breathing dots, and x6 removed the marker they belonged to).
- */
+/** Feed gutter marks owned by the live-feed component. */
 const REFERENCE_MARKS: Record<FeedKind, string> = {
   event: '▸',
   radio: '◈',
@@ -745,10 +741,9 @@ describe('[u5#c3] no digit in npc/symptom nodes', () => {
 
    The `for` field itself is untouched on the frozen seam (`shared/view-driver.ts`,
    `tests/driver/seam-shapes.test.ts`), and `src/driver/live-driver.ts` still
-   emits it; the ADAPTER's queue is built around the bracket. The originals that
-   asked for the phrasings — `docs/design/phase2-ui/README.md`'s latency bullet
-   and spec-client §3 inv 5, whose component table still lists a `WaitingMarker`
-   — now describe a component with no implementation.
+   emits it; the ADAPTER's queue is built around the bracket. The old phrasing
+   contract and spec-client §3 inv 5's `WaitingMarker` row now describe a
+   component with no implementation.
    ═══════════════════════════════════════════════════════════════════════ */
 
 describe('[u5#c5] fallback class comes from the event, never from the text', () => {

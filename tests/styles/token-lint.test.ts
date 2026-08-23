@@ -9,7 +9,6 @@ import { describe, it, expect } from 'vitest'
 import path from 'node:path'
 import {
   ALL_SHEETS,
-  DESIGN_CSS,
   INDEX_CSS,
   REPO,
   RUNTIME_PROPS,
@@ -66,6 +65,20 @@ const SPACING_PROP_RE =
   /^(padding|margin|gap|row-gap|column-gap|(padding|margin)-(top|right|bottom|left|block|inline)(-(start|end))?)$/
 const FONT_PROP_RE = /^(font|font-family|font-size)$/
 const VAR_ONLY_RE = /^var\(\s*--[\w-]+\s*(,[^)]*)?\)$/
+
+const KNOWN_BAD_CSS = `
+.known-bad {
+  color: #fff;
+  background: rgb(1, 2, 3);
+  border-color: red;
+  font-family: Arial, sans-serif;
+  font-size: 16px;
+  font: 700 14px Georgia;
+  padding: 12px 8px;
+  margin-top: 4px;
+  gap: 10px;
+}
+`
 
 describe('[u1#c1] tokens.css is the single style-as-data source', () => {
   it('(a) src/client/styles/tokens.css exists', () => {
@@ -186,25 +199,22 @@ describe('[u1#c1] the spacing scale lives in tokens.css', () => {
 })
 
 describe('[u1#c1] the lint has teeth (guards against a vacuous rule set)', () => {
-  // If someone pasted desktop.css in unchanged, every rule above must fire.
-  const design = read(DESIGN_CSS)
-
-  it('(a) it finds the un-tokenized colors in the design reference', () => {
-    expect(colorLiteralsInValues(design).length).toBeGreaterThan(50)
+  it('(a) it finds un-tokenized colors in a known-bad sample', () => {
+    expect(colorLiteralsInValues(KNOWN_BAD_CSS).length).toBeGreaterThanOrEqual(3)
   })
 
-  it('(b) it finds the un-tokenized font-size / font-family in the design reference', () => {
-    const hits = declarations(scannable(design))
+  it('(b) it finds un-tokenized font-size / font-family declarations in a known-bad sample', () => {
+    const hits = declarations(scannable(KNOWN_BAD_CSS))
       .filter((d) => FONT_PROP_RE.test(d.prop))
       .filter((d) => !VAR_ONLY_RE.test(d.value) && !/^(inherit|initial|unset|revert)$/.test(d.value))
-    expect(hits.length).toBeGreaterThan(10)
+    expect(hits.length).toBeGreaterThanOrEqual(3)
   })
 
-  it('(c) it finds the un-tokenized spacing in the design reference', () => {
-    const hits = declarations(scannable(design))
+  it('(c) it finds un-tokenized spacing in a known-bad sample', () => {
+    const hits = declarations(scannable(KNOWN_BAD_CSS))
       .filter((d) => SPACING_PROP_RE.test(d.prop))
       .filter((d) => parts(d.value).some((p) => LENGTH_VALUE_RE.test(p)))
-    expect(hits.length).toBeGreaterThan(10)
+    expect(hits.length).toBeGreaterThanOrEqual(3)
   })
 })
 

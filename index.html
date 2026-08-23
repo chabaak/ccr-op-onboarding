@@ -12,13 +12,11 @@
       identity, the case, the clock, the D-DAY, the taskbar and the five
       windows — is written by `src/client/shell/`, so nothing here stands in
       for something the driver or the scenario pack owns.
-      Ported from docs/design/phase2-ui/index.html (wallpaper 14..55,
-      topbar 56..104, overlays 279..284); the third-party webfont links are
-      dropped (inv 10 — u10 self-hosts) and the window markup is built at
-      runtime because its geometry comes from applyLayout, never from markup.
-      The wallpaper is no longer a VERBATIM port of 14..55 — x10 dropped the
-      blueprint's four text labels, for the reason recorded on the `.bp` group
-      below. The design file keeps them; it is history, not the target.
+      The third-party webfont links are dropped (inv 10 — u10 self-hosts) and
+      the window markup is built at runtime because its geometry comes from
+      applyLayout, never from markup. The wallpaper names no scenario concept;
+      x10 dropped the blueprint's four text labels, for the reason recorded on
+      the `.bp` group below.
     -->
     <div id="app">
       <a class="skip-link" href="#desktop">본문(데스크)으로 건너뛰기</a>

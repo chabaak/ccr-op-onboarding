@@ -126,10 +126,10 @@ describe('[issue #10] every row carries usable attribution', () => {
     expect(missingPromptKey).toEqual([])
   })
 
-  it('(c) no removed demo or design-reference rows remain', () => {
+  it('(c) no removed demo rows remain', () => {
     const stale = manifest()
       .assets.map(fileOf)
-      .filter((file) => file.startsWith('demos/') || file.startsWith('docs/design/phase2-ui'))
+      .filter((file) => file.startsWith('demos/'))
     expect(stale).toEqual([])
   })
 })

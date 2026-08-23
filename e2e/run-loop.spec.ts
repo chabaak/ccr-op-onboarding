@@ -551,11 +551,11 @@ test.describe('new run unlocks and files the report', () => {
  *    Filter: `-g 'latency'`.
  *
  *    WHERE THE REPORTER'S 6.8–10 s LANDS (measured 08-04, recorded in
- *    DISCOVERY.md). C18 names `waiting.for='report'`; the ported design does
- *    not spend it on a feed line. `docs/design/phase2-ui/README.md:58-60` — the
- *    loop this suite mirrors — closes the day as "feed closes, TALLY opens and
- *    counts up over ~9 s → NEW RUN … files RUN 03's report into the archive",
- *    and [u7#c2] is written as "the count-up pacing ABSORBS the report call".
+ *    DISCOVERY.md). C18 names `waiting.for='report'`; the run loop does not
+ *    spend it on a feed line. The loop this suite mirrors closes the day as
+ *    "feed closes, TALLY opens and counts up over ~9 s → NEW RUN … files RUN
+ *    03's report into the archive", and [u7#c2] is written as "the count-up
+ *    pacing ABSORBS the report call".
  *    So the reporter's latency is covered by the TALLY count-up (third test
  *    below), and the radio calls are covered by the first two.
  *
@@ -573,10 +573,9 @@ test.describe('new run unlocks and files the report', () => {
  *    the live adapter's queue is still built around the bracket — so the tests
  *    below still find their wait, and still find it the same way: off
  *    `window.__shell.frame().events`, never off the DOM. The three phrasings
- *    that used to live here in `WAIT_PHRASE` went with the marker; the design
- *    note that authored them (`docs/design/phase2-ui/README.md`'s latency
- *    bullet) and spec-client §3 inv 5's `WaitingMarker` row now describe a
- *    component no client implements.
+ *    that used to live here in `WAIT_PHRASE` went with the marker; the older
+ *    latency note and spec-client §3 inv 5's `WaitingMarker` row now describe
+ *    a component no client implements.
  *
  *    What the first two tests assert is C18 with the phrasing taken out of it,
  *    plus the claim that replaced it: while a wait is open the desk draws

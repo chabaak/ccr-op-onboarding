@@ -16,8 +16,8 @@
 //
 // C3: nothing here asserts fixture CONTENT. Every id below is the authored id
 // grammar `b-r<run>-<channel><nn>` that C3 itself freezes, and every number is
-// geometry ported verbatim from `docs/design/phase2-ui/app.js:566–602` — not a
-// color/size/font literal, so C11 does not bind (design decision D).
+// owned geometry rather than a color/size/font literal, so C11 does not bind
+// (design decision D).
 import { describe, expect, it } from 'vitest'
 import path from 'node:path'
 import { CLIENT, INDEX_HTML, exists, importable, read, rel, stripComments } from '../shell/shell-utils.ts'

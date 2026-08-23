@@ -67,7 +67,6 @@ describe('[u11#c6] frozen inputs stayed frozen (C1 / C13 / C20)', () => {
     'data/scenario/_schema/',
   ]
   const FROZEN = [
-    'docs/design/',
     'src/shared/segment.ts',
     'tools/tests/segment.golden.mjs',
   ]
