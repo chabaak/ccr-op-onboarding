@@ -52,6 +52,10 @@ const PACK_PARTS = [
   'score',
 ] as const
 
+const OPTIONAL_PACK_PARTS = [
+  'endings',
+] as const
+
 /** Scenario-independent policy the run fetches, relative to `data/`. */
 // `audio-map.json` is balance data like the rest of `data/`, and it is fetched
 // by the client rather than the driver — `src/client/audio/` reads it on the
@@ -70,7 +74,12 @@ function packSlugs(scenarioDir: string): string[] {
 export function publishedDataFiles(root: string = process.cwd()): string[] {
   const scenarioDir = join(root, 'data', 'scenario')
   const scenario = packSlugs(scenarioDir).flatMap((slug) =>
-    PACK_PARTS.map((part) => `scenario/${slug}/${part}.json`),
+    [
+      ...PACK_PARTS.map((part) => `scenario/${slug}/${part}.json`),
+      ...OPTIONAL_PACK_PARTS
+        .map((part) => `scenario/${slug}/${part}.json`)
+        .filter((rel) => existsSync(join(root, 'data', rel))),
+    ],
   )
   return [...scenario, ...POLICY_FILES]
 }

@@ -26,20 +26,39 @@
 //     DOM, sends no op, and nothing imports it but the boot. A curtain that
 //     could send `new_run` would be a second hand on the membrane.
 import { describe, expect, it } from 'vitest'
+import fs from 'node:fs'
 import path from 'node:path'
 import { CLIENT, SHELL_DIR, exists, read, rel, walk } from './shell-utils.ts'
 import {
   ENDING_CLOSE,
   ENDING_NEXT,
   ENDING_WINDOW_CLOSE,
-  SITE_OCCUPANTS,
   endingKindOf,
   endingPlates,
   numbersOf,
+  previewScoreOf,
+  rescueTotalOf,
 } from '../../src/client/shell/ending.ts'
+import type { ScenarioEndings, ScenarioScore } from '../../src/client/shell/pack.ts'
 
 const ENDING_TS = path.join(SHELL_DIR, 'ending.ts')
 const BOOT_TS = path.join(SHELL_DIR, 'boot.ts')
+const REPO = path.resolve(import.meta.dirname, '../..')
+
+const readJson = (relPath: string): unknown =>
+  JSON.parse(fs.readFileSync(path.join(REPO, relPath), 'utf8'))
+
+const rawEndings = readJson('data/scenario/멈춘회전문/endings.json') as {
+  site_occupants: number
+  scored_outside_site: string[]
+  copy: ScenarioEndings['copy']
+}
+const ENDINGS: ScenarioEndings = {
+  siteOccupants: rawEndings.site_occupants,
+  scoredOutsideSite: rawEndings.scored_outside_site,
+  copy: rawEndings.copy,
+}
+const SCORE = readJson('data/scenario/멈춘회전문/score.json') as ScenarioScore
 
 /** Every client `.ts`, source text and repo-relative path. */
 function clientFiles(): { file: string; src: string }[] {
@@ -63,30 +82,30 @@ describe('[x6] the trigger', () => {
     // winning routes both close on zero. `score.json`'s variance note says so:
     // "두 성공 경로 모두 사람 쪽 값이 0이다. … 값은 사람 수가 아니라 다른 칸에
     // 남는다."
-    expect(endingKindOf({ total: 0, runsLeft: 4 })).toBe('good')
+    expect(endingKindOf({ total: 0, runsLeft: 4 }, SCORE)).toBe('good')
   })
 
   it('(b) …on any run of the allotment, not only the last', () => {
     for (const runsLeft of [4, 3, 2, 1, 0]) {
-      expect(endingKindOf({ total: 0, runsLeft })).toBe('good')
+      expect(endingKindOf({ total: 0, runsLeft }, SCORE)).toBe('good')
     }
   })
 
   it('(c) a day that closes with the allotment spent is the bad ending', () => {
-    expect(endingKindOf({ total: 12, runsLeft: 0 })).toBe('bad')
+    expect(endingKindOf({ total: 12, runsLeft: 0 }, SCORE)).toBe('bad')
   })
 
   it('(d) the good ending wins when a day is both', () => {
     // The last run of the allotment, scored 0. It is a rescue that happened to
     // land on the final day, and the operator is owed the ending they earned.
-    expect(endingKindOf({ total: 0, runsLeft: 0 })).toBe('good')
+    expect(endingKindOf({ total: 0, runsLeft: 0 }, SCORE)).toBe('good')
   })
 
   it('(e) an ordinary day earns nothing and the sitting continues', () => {
     // 멈춘회전문's own ladder, minus its floor: 207 untouched, 57 after the
     // headcount, 12 after the west sleeve. Nothing between them ends a sitting.
     for (const total of [1, 3, 12, 21, 57, 185, 206, 207]) {
-      expect(endingKindOf({ total, runsLeft: 3 }), `total ${total} ended the sitting`).toBeNull()
+      expect(endingKindOf({ total, runsLeft: 3 }, SCORE), `total ${total} ended the sitting`).toBeNull()
     }
   })
 
@@ -123,7 +142,11 @@ describe('[x6] the trigger', () => {
     // `src/driver/scorer.ts` `scoreRecord` returns null — not a total of 0 —
     // when no unit resolved, so a short ledger emits no `score` event at all
     // and never reaches `endingKindOf`.
-    expect(endingKindOf({ total: 0, runsLeft: 3 })).toBe('good')
+    expect(endingKindOf({ total: 0, runsLeft: 3 }, SCORE)).toBe('good')
+  })
+
+  it('(h) the good threshold is derived from the pack score predicates', () => {
+    expect(rescueTotalOf(SCORE)).toBe(0)
   })
 })
 
@@ -149,14 +172,14 @@ describe('[x6] the numbers', () => {
     // `score.json` u1's `tallies` states the whole and then narrows it:
     // 그날 안에 있던 736명 가운데 문세라는 자기 단위에서 집계되므로 이 수는
     // 나머지 735명만 센다.
-    expect(SITE_OCCUPANTS).toBe(736)
+    expect(ENDINGS.siteOccupants).toBe(736)
   })
 
   it('(b) the toll printed is the toll the ledger closed on', () => {
     // Never recomputed. The operator watched 총 사망자 수 roll to this number
     // seconds before the veil; a plate that printed a different one would be
     // the single lie on it.
-    expect(numbersOf(day(207, 185, 21, SERA_DEAD)).deaths).toBe(207)
+    expect(numbersOf(ENDINGS, day(207, 185, 21, SERA_DEAD)).deaths).toBe(207)
   })
 
   it('(c) the survivors are the dome minus the toll, and the two numbers sum', () => {
@@ -168,26 +191,26 @@ describe('[x6] the numbers', () => {
     // two numbers deliberately did not sum, because 오세라 walked into the
     // tunnel and was never one of its 341. Anyone reading that history in
     // `SCORED_OUTSIDE_THE_SITE` should not conclude the sum here is a bug.
-    const baseline = numbersOf(day(207, 185, 21, SERA_DEAD))
+    const baseline = numbersOf(ENDINGS, day(207, 185, 21, SERA_DEAD))
     expect(baseline).toEqual({ walkedOut: 529, deaths: 207 })
-    expect(baseline.walkedOut + baseline.deaths).toBe(SITE_OCCUPANTS)
+    expect(baseline.walkedOut + baseline.deaths).toBe(ENDINGS.siteOccupants)
   })
 
   it('(d) a day 문세라 walks out of is counted the same way', () => {
     // The west-sleeve run — `score.json`: 돔 안 9 · 통로 3, and she comes out
     // of the loading bay last. 736 − 12 = 724.
-    expect(numbersOf(day(12, 9, 3, SERA_ALIVE))).toEqual({ walkedOut: 724, deaths: 12 })
+    expect(numbersOf(ENDINGS, day(12, 9, 3, SERA_ALIVE))).toEqual({ walkedOut: 724, deaths: 12 })
   })
 
   it('(e) the rescue day empties the dome', () => {
-    expect(numbersOf(day(0, 0, 0, SERA_ALIVE))).toEqual({ walkedOut: 736, deaths: 0 })
+    expect(numbersOf(ENDINGS, day(0, 0, 0, SERA_ALIVE))).toEqual({ walkedOut: 736, deaths: 0 })
   })
 
   it('(f) an unscored day prints no negative anywhere', () => {
     // Not reachable off a linted pack — the ladder tops out at 207 — but the
     // seam carries numbers, not a promise about their range, and "−7명이 눈밭
     // 으로 걸어 나왔습니다" is the one failure an operator would remember.
-    expect(numbersOf(day(900, 900, 0, SERA_DEAD)).walkedOut).toBe(0)
+    expect(numbersOf(ENDINGS, day(900, 900, 0, SERA_DEAD)).walkedOut).toBe(0)
   })
 
   it('(g) the hold-out subtraction is inert on this pack, and that is deliberate', () => {
@@ -196,11 +219,11 @@ describe('[x6] the numbers', () => {
     // rather than assumed: the mechanism is kept for a pack whose named person
     // stands outside the crowd, and on THIS pack it is untested by construction
     // — `deathsOf` itself is covered in `tests/shared/predicates.test.ts`.
-    const withADeadNamedRow = numbersOf({
+    const withADeadNamedRow = numbersOf(ENDINGS, {
       total: 5,
       rows: [{ label: '문세라', value: SERA_DEAD }],
     })
-    expect(withADeadNamedRow.walkedOut).toBe(SITE_OCCUPANTS - 5)
+    expect(withADeadNamedRow.walkedOut).toBe(ENDINGS.siteOccupants - 5)
   })
 })
 
@@ -211,7 +234,7 @@ describe('[x6] the plates', () => {
    * The untouched day — `score.json`'s `baseline_summary`: 돔 안 185명 ·
    * 에어락 통로 21명 · 문세라 사망, 총 사망 207명. 529 walk out.
    */
-  const numbers = numbersOf({
+  const numbers = numbersOf(ENDINGS, {
     total: 207,
     rows: [
       { label: '돔 안에 있던 사람', value: 185 },
@@ -226,7 +249,7 @@ describe('[x6] the plates', () => {
    * `score.json`: 44 inside, 12 in the airlock passage, and 문세라 is found in
    * the passage. 680 walk out.
    */
-  const other = numbersOf({
+  const other = numbersOf(ENDINGS, {
     total: 57,
     rows: [
       { label: '돔 안에 있던 사람', value: 44 },
@@ -238,7 +261,7 @@ describe('[x6] the plates', () => {
 
   it('(a) each ending is three plates, counted in the head`s meta slot', () => {
     for (const kind of ['good', 'bad'] as const) {
-      const plates = endingPlates(kind, numbers)
+      const plates = endingPlates(kind, numbers, ENDINGS)
       expect(plates).toHaveLength(3)
       expect(plates.map((p) => p.corner)).toEqual(['1 / 3', '2 / 3', '3 / 3'])
     }
@@ -246,7 +269,7 @@ describe('[x6] the plates', () => {
 
   it('(b) every plate is one lead and two paragraphs under it', () => {
     for (const kind of ['good', 'bad'] as const) {
-      for (const plate of endingPlates(kind, numbers)) {
+      for (const plate of endingPlates(kind, numbers, ENDINGS)) {
         expect(plate.lead.length).toBeGreaterThan(0)
         expect(plate.body).toHaveLength(2)
       }
@@ -254,7 +277,7 @@ describe('[x6] the plates', () => {
   })
 
   it('(c) the good ending reads as authored', () => {
-    expect(endingPlates('good', numbers)).toEqual([
+    expect(endingPlates('good', numbers, ENDINGS)).toEqual([
       {
         head: '시뮬레이션 종료',
         corner: '1 / 3',
@@ -286,7 +309,7 @@ describe('[x6] the plates', () => {
   })
 
   it('(d) the bad ending reads as authored, with the day`s own numbers in it', () => {
-    expect(endingPlates('bad', numbers)).toEqual([
+    expect(endingPlates('bad', numbers, ENDINGS)).toEqual([
       {
         head: '시뮬레이션 종료',
         corner: '1 / 3',
@@ -326,7 +349,7 @@ describe('[x6] the plates', () => {
     // appears in any authored line. `numbersOf` still computes it — see the
     // note on `SITE_OCCUPANTS` — but nothing prints it, and this test is the
     // place that would have noticed if something did.
-    const plates = endingPlates('bad', other)
+    const plates = endingPlates('bad', other, ENDINGS)
     expect(plates[0]!.lead).toBe('57명이 한내돔을 탈출하지 못하여 사망했습니다.')
     expect(plates[0]!.body[1]).toBe('시행 횟수가 모두 소진되었습니다.')
   })
@@ -335,10 +358,14 @@ describe('[x6] the plates', () => {
     // Both winning routes close on the same two figures — 736 out, 사망 0명 —
     // so the copy states them and must not drift with whatever the seam
     // happened to send.
-    expect(endingPlates('good', other)).toEqual(endingPlates('good', numbers))
+    expect(endingPlates('good', other, ENDINGS)).toEqual(endingPlates('good', numbers, ENDINGS))
   })
 
-  it('(g) the walk`s two button labels', () => {
+  it('(g) the forced preview numbers are derived from the pack score predicates', () => {
+    expect(numbersOf(ENDINGS, previewScoreOf(SCORE))).toEqual(numbers)
+  })
+
+  it('(h) the walk`s two button labels', () => {
     expect(ENDING_NEXT).toBe('다음')
     expect(ENDING_CLOSE).toBe('창 닫기 시도')
     expect(ENDING_WINDOW_CLOSE).toBe(ENDING_CLOSE)
@@ -350,6 +377,19 @@ describe('[x6] the plates', () => {
 describe('[x6] the ending is an observer', () => {
   it('(a) src/client/shell/ending.ts exists', () => {
     expect(exists(ENDING_TS)).toBe(true)
+  })
+
+  it('(a2) the shell no longer carries pack ending prose or pack constants', () => {
+    const src = code(ENDING_TS)
+    for (const text of [
+      '736명이 무사히 눈밭으로 걸어 나왔습니다.',
+      '집결지에서 센 수는 끝내 맞지 않았고',
+      '한내돔의 기록은 그대로 남았습니다.',
+      'RESCUE_TOTAL',
+      'SITE_OCCUPANTS',
+    ]) {
+      expect(src, `ending.ts still carries ${text}`).not.toContain(text)
+    }
   })
 
   it('(b) exactly one module imports it, and it is the shell boot', () => {

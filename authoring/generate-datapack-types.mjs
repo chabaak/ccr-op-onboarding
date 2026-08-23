@@ -23,8 +23,12 @@ const ROOT = join(dirname(fileURLToPath(import.meta.url)), '..');
 const SCHEMA_DIR = join(ROOT, 'data', 'scenario', '_schema');
 const OUT = join(ROOT, 'src', 'shared', 'datapack.ts');
 
-// pack file order = pipeline §3 table order
-const FILES = ['meta', 'timeline', 'characters', 'places', 'temperament', 'gates', 'truths', 'score', 'symptoms'];
+// pack file order = pipeline §3 table order. Optional files are sidecars:
+// schema/type/lint checked when present, but not required of retirement-bound
+// legacy packs.
+const REQUIRED_FILES = ['meta', 'timeline', 'characters', 'places', 'temperament', 'gates', 'truths', 'score', 'symptoms'];
+const OPTIONAL_FILES = ['endings'];
+const FILES = [...REQUIRED_FILES, ...OPTIONAL_FILES];
 const typeName = (f) => f[0].toUpperCase() + f.slice(1);
 
 const indent = (s) => s.replace(/^/gm, '  ');
@@ -93,7 +97,8 @@ for (const name of FILES) {
 
 out += `/** One scenario's full pack — \`data/scenario/<slug>/\`, keyed by file. */
 export type Datapack = {
-${FILES.map((f) => `  ${f}: ${typeName(f)};`).join('\n')}
+${REQUIRED_FILES.map((f) => `  ${f}: ${typeName(f)};`).join('\n')}
+${OPTIONAL_FILES.map((f) => `  ${f}?: ${typeName(f)};`).join('\n')}
 };
 `;
 

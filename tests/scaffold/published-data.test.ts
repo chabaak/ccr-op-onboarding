@@ -33,13 +33,16 @@ const DATA = path.join(REPO, 'data')
 
 const read = (rel: string): string => readFileSync(path.join(REPO, rel), 'utf8')
 
-/** The `PACK_FILES` array out of a loader, whichever quoting it uses. */
-function packFilesOf(rel: string): string[] {
+/** A string-literal array out of a source file, whichever quoting it uses. */
+function stringArrayOf(rel: string, name: string): string[] {
   const source = read(rel)
-  const match = /const PACK_FILES\s*(?::[^=]+)?=\s*\[([^\]]*)\]/.exec(source)
-  expect(match, `${rel} declares no PACK_FILES array`).not.toBeNull()
+  const match = new RegExp(`const ${name}\\s*(?::[^=]+)?=\\s*\\[([^\\]]*)\\]`).exec(source)
+  expect(match, `${rel} declares no ${name} array`).not.toBeNull()
   return [...(match as RegExpExecArray)[1].matchAll(/['"`]([^'"`]+)['"`]/g)].map((m) => m[1])
 }
+
+/** The `PACK_FILES` array out of a loader. */
+const packFilesOf = (rel: string): string[] => stringArrayOf(rel, 'PACK_FILES')
 
 /**
  * Authoring surfaces that must never reach `dist/` — named, not inferred.
@@ -89,17 +92,21 @@ describe('published data — the allowlist tracks what the client fetches', () =
 
     expect(browser, 'browser loader and Node twin disagree').toEqual(node)
 
-    const fromConfig = [
+    const requiredFromConfig = [
       ...new Set(
-        published
-          .filter((rel) => rel.startsWith('scenario/'))
-          .map((rel) => path.basename(rel, '.json')),
+        stringArrayOf('vite.config.ts', 'PACK_PARTS'),
       ),
     ]
     expect(
-      fromConfig.sort(),
+      requiredFromConfig.sort(),
       'vite.config.ts PACK_PARTS drifted from the loaders PACK_FILES',
     ).toEqual([...browser].sort())
+
+    const optional = stringArrayOf('vite.config.ts', 'OPTIONAL_PACK_PARTS')
+    expect(optional, 'the shell ending sidecar stopped being explicit').toEqual(['endings'])
+    expect(read('src/client/shell/pack.ts'), 'the ending sidecar ships but nothing fetches it').toMatch(
+      /fetchScenarioEndings/,
+    )
   })
 
   it('(b) the policy file the loader fetches is the policy file that ships', () => {

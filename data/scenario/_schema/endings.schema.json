@@ -1,0 +1,54 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "endings.schema.json",
+  "title": "datapack endings.json — 종료 화면 문안과 집계 표시 기준",
+  "description": "팩별 종료 화면 문안과 사망자 수에서 생환자 수를 표시할 때 필요한 산술 기준. 파일은 선택 사항이지만, 존재하면 린트가 이 스키마를 적용한다.",
+  "type": "object",
+  "required": ["site_occupants", "scored_outside_site", "copy"],
+  "additionalProperties": false,
+  "properties": {
+    "site_occupants": {
+      "type": "integer",
+      "minimum": 0,
+      "description": "사건 장소 안에 있던 전체 인원. 생환자 수 = 이 값 - 장소 안 사망자 수."
+    },
+    "scored_outside_site": {
+      "type": "array",
+      "items": { "type": "string", "minLength": 1 },
+      "description": "score.rows 중 장소 밖에서 별도 집계되는 단위의 label. 해당 사망은 site_occupants 차감에서 제외한다."
+    },
+    "copy": {
+      "type": "object",
+      "required": ["good", "bad"],
+      "additionalProperties": false,
+      "properties": {
+        "good": {
+          "type": "array",
+          "minItems": 1,
+          "items": { "$ref": "#/$defs/plate" }
+        },
+        "bad": {
+          "type": "array",
+          "minItems": 1,
+          "items": { "$ref": "#/$defs/plate" }
+        }
+      }
+    }
+  },
+  "$defs": {
+    "plate": {
+      "type": "object",
+      "required": ["head", "lead", "body"],
+      "additionalProperties": false,
+      "properties": {
+        "head": { "type": "string", "minLength": 1 },
+        "lead": { "type": "string", "minLength": 1 },
+        "body": {
+          "type": "array",
+          "minItems": 1,
+          "items": { "type": "string", "minLength": 1 }
+        }
+      }
+    }
+  }
+}
