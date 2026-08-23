@@ -18,10 +18,12 @@ import type { CallType } from "./types.js";
  * report_body last (the SSE tail). Reordering is a shape change and costs a
  * re-validation run.
  *
- * ⚠️ **Every field is a scalar or an array of scalars — no nested objects.** In
- * RB1 (2026-07-30) the model emitted a nested object as a string with the inner
+ * ⚠️ **Nested objects are banned except for narration.event_lines.** In RB1
+ * (2026-07-30) the model emitted a nested object as a string with the inner
  * keys hoisted, on 7 of 17 baseline attempts, and the malformation was
- * arm-correlated — which voids the comparison. Nested objects are banned here.
+ * arm-correlated — which voids the comparison. `event_lines` is the explicit
+ * exception because its id/text pair is the contract that prevents silent loss
+ * of authored `t*` events.
  */
 
 type JsonValue =
@@ -71,6 +73,13 @@ const isFilled = (v: unknown): boolean =>
  */
 const quietBeat = (slots: Record<string, unknown>): boolean =>
   String(slots.FIXED_NPC_ACTION ?? "").trim().length === 0;
+
+const fixedEventIds = (slots: Record<string, unknown>): string[] =>
+  String(slots.FIXED_NPC_ACTION ?? "")
+    .split("\n")
+    .map((line) => /^([t]\d+):\s*(.+)$/.exec(line.trim()))
+    .filter((match): match is RegExpExecArray => match !== null)
+    .map((match) => match[1]!);
 
 const judgment: CallSpec = {
   slots: [
@@ -194,12 +203,33 @@ const narration: CallSpec = {
     // So silence becomes sayable. The base prompt has told the model since v0.4
     // that "비어 있다고 채우지 않는다"; until now the schema contradicted it.
     const quiet = quietBeat(slots);
+    const eventIds = fixedEventIds(slots);
     return {
       name: "narration",
       description: "이 비트의 반응을 기록한다. 정확히 한 번만 호출한다.",
       inputSchema: {
         type: "object",
         properties: {
+          event_lines: {
+            type: "array",
+            items: {
+              type: "object",
+              properties: {
+                id: { type: "string", enum: eventIds },
+                text: {
+                  type: "string",
+                  description:
+                    "해당 id의 고정 사건을 현장 기록으로 한 문장에 적는다. 입력 문장을 복사하지 말고, 같은 사실을 빠뜨리지 않는다.",
+                },
+              },
+              required: ["id", "text"],
+            },
+            minItems: eventIds.length,
+            maxItems: eventIds.length,
+            description: eventIds.length
+              ? "FIXED_NPC_ACTION에 있는 t* 사건마다 정확히 한 항목을 쓴다. id는 그 t* id를 그대로 넣는다."
+              : "FIXED_NPC_ACTION에 t* 사건이 없으므로 빈 배열을 쓴다.",
+          },
           timeline_entries: {
             type: "array",
             items: { type: "string" },
@@ -223,7 +253,7 @@ const narration: CallSpec = {
               : "이 비트에는 아무도 없다. 반드시 빈 배열을 쓴다.",
           },
         },
-        required: ["timeline_entries", "npc_lines"],
+        required: ["event_lines", "timeline_entries", "npc_lines"],
       },
     };
   },
@@ -242,6 +272,34 @@ const narration: CallSpec = {
     // An empty array is still refused everywhere else, because everywhere else
     // there IS something to react to and silence is a dropped beat.
     const quiet = quietBeat(slots);
+    const eventIds = fixedEventIds(slots);
+    if (!Array.isArray(value.event_lines)) {
+      problems.push("event_lines not an array");
+    } else {
+      const ids = value.event_lines.map((line) =>
+        typeof line === "object" && line !== null
+          ? (line as Record<string, unknown>).id
+          : undefined,
+      );
+      if (value.event_lines.length !== eventIds.length) {
+        problems.push("event_lines count does not match fixed events");
+      }
+      if (ids.some((id) => typeof id !== "string" || !eventIds.includes(id))) {
+        problems.push("event_lines id not in fixed events");
+      }
+      if (ids.some((id, index) => id !== eventIds[index])) {
+        problems.push("event_lines ids out of order");
+      }
+      if (
+        value.event_lines.some((line) => {
+          if (typeof line !== "object" || line === null) return true;
+          return !isFilled((line as Record<string, unknown>).text);
+        })
+      ) {
+        problems.push("event_lines has an empty entry");
+      }
+    }
+
     if (!Array.isArray(value.timeline_entries)) {
       problems.push("timeline_entries not an array");
     } else if (!value.timeline_entries.length && !quiet) {

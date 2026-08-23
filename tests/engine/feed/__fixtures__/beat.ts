@@ -17,6 +17,7 @@ export const PRESENT: readonly PresentNpc[] = [
 export const CLOCK = '09:14'
 
 export const SCRIPT_LINE = { id: 't3', text: '무전기에서 잡음이 흘러나온다.' } as const
+export const EVENT_LINE = { id: SCRIPT_LINE.id, text: SCRIPT_LINE.text } as const
 
 export const UTTERANCE = '지금은 문을 열지 않는다.'
 
@@ -58,6 +59,7 @@ export const GOLDEN_BEAT: BeatFeedInput = {
   scriptLines: [SCRIPT_LINE],
   judgment: { utterance: UTTERANCE },
   narration: {
+    event_lines: [EVENT_LINE],
     timeline_entries: [...TIMELINE_ENTRIES],
     npc_lines: [...NPC_LINES],
   },
@@ -86,6 +88,7 @@ export const GOLDEN_ROUND: RoundInput = {
       // because the npc echo rule is per beat — see `assembleExperienced`.
       judgment: { utterance: UTTERANCE },
       narration: {
+        event_lines: [EVENT_LINE],
         timeline_entries: [...TIMELINE_ENTRIES],
         npc_lines: [...NPC_LINES],
       },
@@ -109,13 +112,13 @@ export const ECHO_ON_SCRIPT_BEAT: RoundInput = {
   beats: [
     {
       judgment: { utterance: UTTERANCE },
-      narration: { timeline_entries: [], npc_lines: [`n1: ${UTTERANCE}`] },
+      narration: { event_lines: [], timeline_entries: [], npc_lines: [`n1: ${UTTERANCE}`] },
       present: PRESENT,
     },
     {
       // A script beat: no Call 1 ran, so no utterance and no echo rule.
       judgment: { utterance: '' },
-      narration: { timeline_entries: [], npc_lines: [`n2: ${UTTERANCE}`] },
+      narration: { event_lines: [], timeline_entries: [], npc_lines: [`n2: ${UTTERANCE}`] },
       present: PRESENT,
     },
   ],
@@ -126,6 +129,7 @@ export const ECHO_ON_SCRIPT_BEAT: RoundInput = {
 export const EMPTY_ROSTER_BEAT: BeatFeedInput = {
   clock: CLOCK,
   narration: {
+    event_lines: [],
     timeline_entries: ['팩스 한 장이 트레이 위로 떨어진다.'],
     npc_lines: ['n1: 이건 뭐죠?', 'ghost: 받아 적어.'],
   },

@@ -53,7 +53,7 @@ export type BlockStore = { get(id: string): Block | undefined }
  * client has been shipping for weeks (운영자 + 현장 요원 ECHO) and the one the
  * prompts described (광역 재난상황실의 야간 통제관) were two different games, and
  * this line is what finally picks the second one up. `judgment v0.5` /
- * `narration v0.4` / `reporter v0.4` carry the recast, the register split
+ * `narration v0.5` / `reporter v0.4` carry the recast, the register split
  * (Call 3 존댓말, Calls 1–2 clipped 해라체), the one-NPC-one-line rule and the
  * branch for a beat where the agent said nothing — which is most of them
  * (`driver.ts:133`).
@@ -68,7 +68,7 @@ export type BlockStore = { get(id: string): Block | undefined }
  */
 export const TEMPLATE_VERSION: Readonly<Record<CallType, string>> = Object.freeze({
   judgment: 'v0.5',
-  narration: 'v0.4',
+  narration: 'v0.5',
   reporter: 'v0.4',
 })
 

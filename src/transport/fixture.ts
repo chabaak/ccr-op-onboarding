@@ -45,11 +45,16 @@ function buildJudgment(request: CallRequest<'judgment'>, override?: JudgmentResp
 
 function buildNarration(request: CallRequest<'narration'>, override?: NarrationResponse): NarrationResponse {
   if (override) return cloneJson(override)
+  const eventLines = request.slots.FIXED_NPC_ACTION.split('\n')
+    .map((line) => /^([t]\d+):\s*(.+)$/.exec(line.trim()))
+    .filter((match): match is RegExpExecArray => match !== null)
+    .map((match) => ({ id: match[1]!, text: match[2]! }))
   const npcLines =
     request.slots.PRESENT_NPCS.length > 0
       ? request.slots.PRESENT_NPCS.map((npc) => `${npc.id}: 고정 픽스처 대사.`)
       : ['npc-fixture: 고정 픽스처 대사.']
   return {
+    event_lines: eventLines,
     timeline_entries: [...request.slots.SCENE_SYMPTOMS, '고정 픽스처 서술.'],
     npc_lines: npcLines,
   }

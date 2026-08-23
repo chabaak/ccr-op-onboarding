@@ -166,7 +166,7 @@ export interface EngineHandle extends Engine {
    */
   submitBaseline(): { stance_id: string; desc: string } | null
   applyBeatEffects(): void
-  /** `null` ⇒ no `n`/`q` line is minted for this beat. */
+  /** `null` ⇒ authored `t*` event lines are rendered, with no `n`/`q` mint. */
   applyNarration(response: NarrationResponse | null): void
   /** `null` ⇒ facts come from the objective log and the body is the substitute. */
   applyReport(response: ReporterResponse | null): ReportSentences
@@ -422,13 +422,7 @@ export function createEngine(deps: EngineDeps): EngineHandle {
       // (spec decision 1). `narration` is deliberately absent, so no `n`/`q` is
       // minted before Call 2 has answered.
       const built = buildFeed(
-        {
-          clock: beat.clock,
-          scriptLines: record.scriptLines,
-          judgment: { utterance },
-          present,
-          symptoms: view.SCENE_SYMPTOMS,
-        },
+        { clock: beat.clock, judgment: { utterance }, present, symptoms: view.SCENE_SYMPTOMS },
         ids,
       )
       lines = [...lines, ...built.lines.map((line) => ({ ...line, clock: nextStamp(beat) }))]
@@ -436,25 +430,37 @@ export function createEngine(deps: EngineDeps): EngineHandle {
 
     applyNarration(response: NarrationResponse | null): void {
       const beat = beatNow()
-      if (response !== null) {
-        const record = recordOf(beat)
-        record.narration = {
-          timeline_entries: response.timeline_entries,
-          npc_lines: response.npc_lines,
-        }
-        for (const entry of response.timeline_entries) {
-          lines.push({ kind: 'event', clock: nextStamp(beat), text: entry, sentence_id: ids.next('n') })
-        }
-        const { kept } = classifyNpcLines(response.npc_lines, { present, utterance })
-        for (const npcLine of kept) {
-          lines.push({
-            kind: 'npc',
-            clock: nextStamp(beat),
-            speaker: npcLine.speakerName,
-            text: npcLine.text,
-            sentence_id: ids.next('q'),
-          })
-        }
+      const record = recordOf(beat)
+      const narration: NarrationResponse = response ?? {
+        event_lines: [...(record.scriptLines ?? [])],
+        timeline_entries: [],
+        npc_lines: [],
+      }
+      record.narration = {
+        event_lines: narration.event_lines,
+        timeline_entries: narration.timeline_entries,
+        npc_lines: narration.npc_lines,
+      }
+      for (const eventLine of narration.event_lines) {
+        lines.push({
+          kind: 'event',
+          clock: nextStamp(beat),
+          text: eventLine.text,
+          sentence_id: eventLine.id,
+        })
+      }
+      for (const entry of narration.timeline_entries) {
+        lines.push({ kind: 'event', clock: nextStamp(beat), text: entry, sentence_id: ids.next('n') })
+      }
+      const { kept } = classifyNpcLines(narration.npc_lines, { present, utterance })
+      for (const npcLine of kept) {
+        lines.push({
+          kind: 'npc',
+          clock: nextStamp(beat),
+          speaker: npcLine.speakerName,
+          text: npcLine.text,
+          sentence_id: ids.next('q'),
+        })
       }
       // The timeline window is prose, never symptoms (contract §5's table).
       beats.recordLines(lines.filter((line) => line.kind !== 'symptom').map((line) => line.text))

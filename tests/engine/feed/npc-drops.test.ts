@@ -63,6 +63,7 @@ describe('[e4#A5] a foreign speaker is soft — the line is dropped, the beat su
     const beat = {
       ...GOLDEN_BEAT,
       narration: {
+        event_lines: [],
         timeline_entries: [...TIMELINE_ENTRIES],
         npc_lines: ['ghost: 나도 여기 있었어.', 'stranger: 문 열어.'],
       },
@@ -78,7 +79,7 @@ describe('[e4#A5] a foreign speaker is soft — the line is dropped, the beat su
   it('(g) the engine never throws on model output — a missing `id:` prefix is soft too', () => {
     const beat = {
       ...GOLDEN_BEAT,
-      narration: { timeline_entries: [], npc_lines: ['문 좀 열어주세요.', 'n1: 알겠습니다.'] },
+      narration: { event_lines: [], timeline_entries: [], npc_lines: ['문 좀 열어주세요.', 'n1: 알겠습니다.'] },
     }
     const { lines, drops } = feed(beat)
     expect(drops.map((d) => d.reason)).toEqual(['missing_prefix'])
@@ -89,6 +90,7 @@ describe('[e4#A5] a foreign speaker is soft — the line is dropped, the beat su
     const beat = {
       ...GOLDEN_BEAT,
       narration: {
+        event_lines: [],
         timeline_entries: [],
         npc_lines: [`n1:   ${UTTERANCE.replace(' ', '  ')} `, 'n2: 알겠습니다.'],
       },
@@ -101,7 +103,7 @@ describe('[e4#A5] a foreign speaker is soft — the line is dropped, the beat su
   it('(i) echo detection is conservative — a merely similar line is kept', () => {
     const beat = {
       ...GOLDEN_BEAT,
-      narration: { timeline_entries: [], npc_lines: [`n1: ${UTTERANCE}요?`] },
+      narration: { event_lines: [], timeline_entries: [], npc_lines: [`n1: ${UTTERANCE}요?`] },
     }
     expect(feed(beat).drops).toEqual([])
     expect(feed(beat).lines.filter((l) => l.kind === 'npc')).toHaveLength(1)
@@ -151,6 +153,7 @@ describe('[e4#A6] a dropped line consumes no sequence number', () => {
     const clean = {
       ...GOLDEN_BEAT,
       narration: {
+        event_lines: [],
         timeline_entries: [...TIMELINE_ENTRIES],
         npc_lines: ['n1: 문 좀 열어주세요.', 'n2: 조용히 해.'],
       },

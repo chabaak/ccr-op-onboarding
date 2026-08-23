@@ -36,6 +36,9 @@ export type Block = { id: string; text: string }
  */
 export type PresentNpc = { id: string; name: string; side: 'line' | 'room' }
 
+/** An exposed authored timeline event handed to Call 2 with its `t*` id. */
+export type FixedNpcAction = { id: string; text: string }
+
 // ─── what the client sends ───────────────────────────────────────────────────
 
 /** Three call types exist; no others (spec §4). */
@@ -69,8 +72,9 @@ export type NarrationSlots = {
   /** This beat's Call 1 `utterance`; empty string on a script beat. */
   AGENT_UTTERANCE: string
   /**
-   * A non-contradiction constraint, not something to narrate — the engine has
-   * already rendered it. Must not demand a reply from the agent (spec §4).
+   * A non-contradiction constraint and, for authored timeline rows, an id
+   * source. Exposed `t*` rows render as `t5: text`; gate scene prose may appear
+   * here without an id and does not create an `event_lines` row.
    */
   FIXED_NPC_ACTION: string
   /** Engine delta journal → symptom renderer. Never empty (engine spec §2.3-5). */
@@ -127,6 +131,8 @@ export type JudgmentResponse = {
 }
 
 export type NarrationResponse = {
+  /** Exactly one narrated line for each exposed authored event, carrying its id. */
+  event_lines: FixedNpcAction[]
   /** Reactions and scene texture, one sentence per entry. */
   timeline_entries: string[]
   /** `"<npc_id>: <line>"`. Prefixed strings because nested objects are banned. */

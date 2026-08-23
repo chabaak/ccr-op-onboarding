@@ -2,8 +2,9 @@
  * The round event assembler (contract-engine-composer §5) — the `EXPERIENCED`
  * slot Call 3 reads.
  *
- * Its input table has exactly three rows: authored script events, every beat's
- * Call 2 output (post-drop), and the gate beat's `utterance` plus `inner_note`.
+ * Its input table has exactly three rows: the gate beat's `utterance` plus
+ * `inner_note`, every beat's Call 2 event lines and reaction entries
+ * (post-drop), and authored script events only on the Call 2 fallback path.
  * Symptoms are **not** in that table and are excluded here.
  *
  * This is the one place `inner_note` is allowed to be read. It reaches the
@@ -52,10 +53,6 @@ function assemble(round: RoundInput, audience: Audience): string[] {
   const out: string[] = []
 
   round.beats.forEach((beat, index) => {
-    for (const script of beat.scriptLines ?? []) {
-      out.push(`${EXPERIENCED_PREFIX.SCRIPT}${script.text}`)
-    }
-
     // The gate belongs to the round, and it is decided once, at its beat.
     if (index === 0) {
       if (audience === 'call3' && round.gate.inner_note !== '') {
@@ -64,6 +61,10 @@ function assemble(round: RoundInput, audience: Audience): string[] {
       if (round.gate.utterance !== '') {
         out.push(`${EXPERIENCED_PREFIX.UTTERANCE}${round.gate.utterance}`)
       }
+    }
+
+    for (const eventLine of beat.narration?.event_lines ?? beat.scriptLines ?? []) {
+      out.push(`${EXPERIENCED_PREFIX.SCRIPT}${eventLine.text}`)
     }
 
     for (const entry of beat.narration?.timeline_entries ?? []) {
@@ -107,7 +108,7 @@ export function assembleExperienced(round: RoundInput): string[] {
  * 3's prompt, not the same one reused: the agent's private deliberation is not
  * an objective event, and it is the only §5 row that is not.
  *
- * Everything else — script events, timeline entries, npc lines, the utterance —
+ * Everything else — event lines, timeline entries, npc lines, the utterance —
  * was already on the player's timeline this round, so it stays.
  */
 export function assembleObjectiveLog(round: RoundInput): string[] {

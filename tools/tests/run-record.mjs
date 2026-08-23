@@ -403,6 +403,47 @@ describe('A11 — timeline[]', () => {
     assert.deepEqual(record.timeline, expected)
   })
 
+  test('fixed event lines keep their authored id and precede reactions in each beat', async () => {
+    const { events } = await pass()
+    const seenAuthored = new Set()
+    let checked = 0
+    let beat = []
+
+    const checkBeat = () => {
+      const feed = beat.flatMap((event, index) =>
+        event.type === 'feed' ? [{ index, line: event.line }] : [],
+      )
+      const narrationOff = beat.findIndex(
+        (event) => event.type === 'waiting' && event.for === 'narration' && event.active === false,
+      )
+      const authored = feed.filter(({ line }) => /^t[0-9]+$/.test(line.sentence_id ?? ''))
+      if (authored.length === 0) return
+
+      assert.notEqual(narrationOff, -1, 'authored event lines must come from the Call 2 flush')
+      const firstN = feed.findIndex(({ line }) => /^b-r[0-9]+-n[0-9]+$/.test(line.sentence_id ?? ''))
+      const firstQ = feed.findIndex(({ line }) => line.kind === 'npc')
+      const lastT = Math.max(...authored.map(({ index }) => index))
+
+      for (const { index, line } of authored) {
+        assert.equal(line.kind, 'event', `${line.sentence_id}: authored ids render as event lines`)
+        assert.ok(index > narrationOff, `${line.sentence_id}: authored line rendered before narration ended`)
+        assert.ok(!seenAuthored.has(line.sentence_id), `${line.sentence_id}: authored id rendered twice`)
+        seenAuthored.add(line.sentence_id)
+        checked += 1
+      }
+      if (firstN !== -1) assert.ok(lastT < feed[firstN].index, 'authored event lines must precede reactions')
+      if (firstQ !== -1) assert.ok(lastT < feed[firstQ].index, 'authored event lines must precede npc lines')
+    }
+
+    for (const event of events) {
+      if (event.type === 'beat_start') beat = [event]
+      else if (beat.length > 0) beat.push(event)
+      if (event.type === 'beat_end') checkBeat()
+    }
+
+    assert.ok(checked > 0, 'the fixture run must expose at least one authored event')
+  })
+
   test('reduceEvents derives the same timeline from a raw event stream', async () => {
     const { record, events } = await pass()
     assert.deepEqual(reduceEvents(events).timeline, record.timeline)

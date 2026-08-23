@@ -72,6 +72,7 @@ export const JUDGMENT_200: JudgmentResponse = {
 }
 
 export const NARRATION_200: NarrationResponse = {
+  event_lines: [],
   timeline_entries: ['복도의 조명이 한 칸씩 꺼진다.'],
   npc_lines: ['npc-bujang: 확실합니까.', 'npc-kim: 문을 엽니다.'],
 }
@@ -92,7 +93,7 @@ export const JUDGMENT_KEY_ORDER = [
   'utterance',
 ] as const
 
-export const NARRATION_KEY_ORDER = ['timeline_entries', 'npc_lines'] as const
+export const NARRATION_KEY_ORDER = ['event_lines', 'timeline_entries', 'npc_lines'] as const
 export const REPORTER_KEY_ORDER = ['facts', 'report_body'] as const
 
 /** Every non-2xx body — `{error:{code,message,requestId}}`, never a bare string. */

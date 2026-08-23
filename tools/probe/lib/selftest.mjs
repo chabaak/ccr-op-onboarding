@@ -276,7 +276,7 @@ const narrSuite = () => ({
   slots: {
     TIMELINE_TAIL: ['09:40 회선 A 착신.'],
     AGENT_UTTERANCE: '천천히 말해 주세요. 지금 그쪽이 안전한지부터 듣고 싶습니다.',
-    FIXED_NPC_ACTION: '발신자가 낭독을 멈추고, 대본에 없는 말을 한다.',
+    FIXED_NPC_ACTION: 't1: 발신자가 낭독을 멈추고, 대본에 없는 말을 한다.',
     SCENE_SYMPTOMS: ['발신자의 숨이 눈에 띄게 가빠졌다.'],
     PRESENT_NPCS: [
       { id: 'caller_a', name: '회선 A 발신자' },
@@ -316,13 +316,14 @@ console.log('narration validation:');
 const nspec = CALL_TYPES.narration;
 const nctx = { suite: narrSuite(), arm: 'baseline' };
 const ngood = {
+  event_lines: [{ id: 't1', text: '발신자가 낭독을 멈추고 대본 밖의 말을 꺼낸다.' }],
   timeline_entries: ['수화기 너머의 낭독이 뚝 끊긴다.', '황보람이 콘솔에서 고개를 든다.'],
   npc_lines: ['caller_a: …듣고 있어요?'],
 };
 check('accepts a well-formed narration', () => assert.deepEqual(nspec.validate(ngood, nctx), []));
 check('the schema carries no constraint_echo (contract v1 §3)', () => {
   const props = nspec.buildTool(narrSuite()).input_schema.properties;
-  assert.deepEqual(Object.keys(props), ['timeline_entries', 'npc_lines']);
+  assert.deepEqual(Object.keys(props), ['event_lines', 'timeline_entries', 'npc_lines']);
 });
 check('empty timeline_entries is hard', () =>
   assert.ok(nspec.validate({ ...ngood, timeline_entries: [] }, nctx).some((p) => /timeline_entries empty/.test(p))));
@@ -352,11 +353,18 @@ check('an ordinary line is not mistaken for an utterance echo', () => {
   assert.deepEqual(nspec.validate(ngood, nctx), []);
   assert.equal(nspec.summarize(ngood, nctx).utterance_echo_count, 0);
 });
-check('no nested objects in the narration schema', () => {
+check('only event_lines carries nested objects in the narration schema', () => {
   const props = nspec.buildTool(narrSuite()).input_schema.properties;
   for (const [name, s] of Object.entries(props)) {
     assert.notEqual(s.type, 'object', `${name} is a nested object — banned, see run log A7`);
-    if (s.type === 'array') assert.equal(s.items?.type, 'string', `${name} is not an array of scalars`);
+    if (s.type === 'array') {
+      if (name === 'event_lines') {
+        assert.equal(s.items?.type, 'object', 'event_lines must carry {id,text} objects');
+        assert.deepEqual(Object.keys(s.items.properties), ['id', 'text']);
+      } else {
+        assert.equal(s.items?.type, 'string', `${name} is not an array of scalars`);
+      }
+    }
   }
 });
 // The ONE mechanical half of the misattribution fix, and until this check the

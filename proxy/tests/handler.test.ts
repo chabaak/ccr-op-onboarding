@@ -151,11 +151,11 @@ describe("DDAY proxy HTTP skeleton", () => {
         event(
           JSON.stringify({
             call_type: "narration",
-            template_version: "v0.4",
+            template_version: "v0.5",
             slots: {
               TIMELINE_TAIL: ["09:40 판독 보고 전송."],
               AGENT_UTTERANCE: "",
-              FIXED_NPC_ACTION: "판독 보고가 상황실 단말에 뜬다.",
+              FIXED_NPC_ACTION: "t1: 판독 보고가 상황실 단말에 뜬다.",
               SCENE_SYMPTOMS: ["(변화 없음)"],
               PRESENT_NPCS: [],
             },

@@ -39,6 +39,7 @@ function echoingProvider() {
       utterance: UTTERANCE,
     },
     narration: {
+      event_lines: [],
       timeline_entries: [],
       npc_lines: [`c1: ${UTTERANCE}`, `c2: ${UTTERANCE}`],
     },
