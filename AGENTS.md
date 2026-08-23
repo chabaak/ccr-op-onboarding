@@ -54,11 +54,11 @@ Do not batch work into a list and execute the list. Fixing one thing surfaces mo
 
 ## Scenario authoring
 
-The scenario factory (`write-scenario`) is fed a **brief**, and the writing agent's isolation is a hard rule, not a preference:
+The scenario factory (`write-mechanism-scenario`) is fed a **brief**, and the writing agent's isolation is a hard rule, not a preference:
 
 > **Read no other document in the repository.** No specs, reports, meeting notes, or other drafts. Everything needed is in the brief and the guide.
 
-Technical vocabulary seeps into the prose and the scenario dies. This rule survives every migration and refactor of the skill.
+Technical vocabulary seeps into the prose and the scenario dies. This rule survives every migration and refactor of the skill. A pack is not shippable on compile and lint alone; the measured-authoring loop must pre-register gate probes, run arms, read the raw records, revise, and re-measure until the gate discrimination thresholds hold.
 
 ## Deprecating a scenario pack
 

@@ -142,7 +142,7 @@ export type Temperament = {
   }>;
 };
 
-/** datapack gates.json — 게이트 카드 (정본: gate-hardening-manual §5) */
+/** datapack gates.json — 게이트 카드 (정본: write-mechanism-scenario skill) */
 export type Gates = {
   gates: Array<{
     gate: string;
