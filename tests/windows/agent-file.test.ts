@@ -29,8 +29,8 @@
 //
 // C3: nothing here asserts synthetic fixture CONTENT. The ids used
 // (`b-r2-f03`, `b-r2-b03`, …) are the *authored id grammar* `b-r<run>-<channel><nn>`
-// which C3 itself freezes, and the Korean strings are design-target document art
-// (`docs/design/phase2-ui/data.js` 37–68) or spec-named copy, not fixture text.
+// which C3 itself freezes, and the Korean strings are document copy or
+// spec-named copy, not fixture text.
 import { describe, expect, it } from 'vitest'
 import path from 'node:path'
 import { execFileSync } from 'node:child_process'

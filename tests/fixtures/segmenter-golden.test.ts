@@ -5,15 +5,15 @@
 import { describe, it, expect } from 'vitest'
 import { segmentReportBody } from '../../src/shared/segment.ts'
 import { SPECIES_OF } from '../../src/shared/species.ts'
-import { designTarget, nfc, unitSources } from './fixture-utils.ts'
+import { nfc, unitSources } from './fixture-utils.ts'
+import { REFERENCE_REPORT_R3, REFERENCE_REPORTS } from './fixture-reference.ts'
 import { RAW_BODY, reportOf } from '../../src/client/driver/fixtures/index.ts'
 
 const RUNS = [1, 2, 3] as const
 
 /** The reference bodies, keyed by run — the ids and texts the split must reproduce. */
 function referenceBody(run: 1 | 2 | 3) {
-  const d = designTarget()
-  const report = run === 3 ? d.REPORT_R3 : d.REPORTS.find((r) => r.run === run)
+  const report = run === 3 ? REFERENCE_REPORT_R3 : REFERENCE_REPORTS.find((r) => r.run === run)
   if (!report) throw new Error(`no reference report for run ${run}`)
   return report.body
 }
@@ -49,7 +49,7 @@ describe('[u2f#c7] report_body is the shared segmenter applied to the raw body',
     })
 
     it(`(e${run}) run 0${run}: facts are Call-3 array items and are NOT segmented`, () => {
-      const ref = run === 3 ? designTarget().REPORT_R3.facts : referenceFacts(run)
+      const ref = run === 3 ? REFERENCE_REPORT_R3.facts : referenceFacts(run)
       const got = reportOf(run).facts
       expect(got.map((s) => nfc(s.text))).toEqual(ref.map((s) => nfc(s.text)))
       expect(got.map((s) => s.id)).toEqual(ref.map((s) => s.id))
@@ -79,7 +79,7 @@ describe('[u2f#c7] report_body is the shared segmenter applied to the raw body',
 })
 
 function referenceFacts(run: 1 | 2) {
-  const report = designTarget().REPORTS.find((r) => r.run === run)
+  const report = REFERENCE_REPORTS.find((r) => r.run === run)
   if (!report) throw new Error(`no reference report for run ${run}`)
   return report.facts
 }

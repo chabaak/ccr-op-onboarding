@@ -23,8 +23,7 @@ const SKIN_CSS = path.join(REPO, 'src/client/styles/fonts.css')
 const PACK_CSS = path.join(FONTS_DIR, 'fonts.css')
 
 /**
- * The exact family/weight/style set of the design target's Google Fonts link
- * (docs/design/phase2-ui/index.html, head). Keep in sync with that file.
+ * The exact family/weight/style set this client vendors for its desktop skin.
  */
 const CSS2_QUERY =
   'family=IBM+Plex+Mono:ital,wght@0,300;0,400;0,500;0,600;0,700;1,400' +

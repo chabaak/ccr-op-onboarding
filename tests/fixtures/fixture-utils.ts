@@ -9,10 +9,10 @@ import fs from 'node:fs'
 import path from 'node:path'
 import { fileURLToPath } from 'node:url'
 import type { FeedLine, Sentence, ViewEvent } from '../../src/shared/view-driver.ts'
+import { REFERENCE_TARGET } from './fixture-reference.ts'
 
 export const REPO = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '../..')
 export const FIXTURE_DIR = path.join(REPO, 'src/client/driver/fixtures')
-export const DESIGN_DATA = path.join(REPO, 'docs/design/phase2-ui/data.js')
 
 /** macOS hands back NFD directory names; resolve the pack by normalised match. */
 export function packDir(): string {
@@ -26,75 +26,7 @@ export const nfc = (s: string): string => s.normalize('NFC')
 
 export const HANGUL = /[가-힣ᄀ-ᇿ㄰-㆏]/
 
-/* --- the design target (docs/design/phase2-ui/data.js) --------------------- */
-
-export interface DesignFeedRow {
-  t: string
-  kind: FeedLine['kind']
-  text: string
-  who?: string
-}
-export interface DesignSentence {
-  id: string
-  text: string
-  species: string
-  axis?: string
-  at?: string
-}
-export interface DesignReport {
-  run: number
-  span: string
-  filed: string
-  facts: DesignSentence[]
-  body: DesignSentence[]
-}
-export interface DesignTarget {
-  PORTAL: Record<string, string>
-  RUNSTATE: { run: number; runsTotal: number; remaining: number; startAt: string; slotCap: number }
-  SPECIES: Record<string, { ko: string; mark: string; cls: string }>
-  BLOCKS: {
-    id: string
-    text: string
-    species: string
-    axis: string | null
-    run: number
-    at: string
-    src: string
-    slot: number | null
-  }[]
-  FEED: DesignFeedRow[]
-  REPORTS: DesignReport[]
-  REPORT_R3: DesignReport
-  TALLY: {
-    headline: { label: string; value: number; baseline: number; unit: string }
-    rows: {
-      label: string
-      value: string
-      num?: number[]
-      baseline: string
-      delta: string
-    }[]
-    verdict: string
-    note: string
-  }
-}
-
-let designCache: DesignTarget | null = null
-
-/**
- * `data.js` is a plain script of top-level `const`s with no exports. Evaluating
- * it inside a function body and returning the bindings is the cheapest faithful
- * read — no parser to drift from the file, and the file itself stays untouched.
- */
-export function designTarget(): DesignTarget {
-  if (designCache) return designCache
-  const source = fs.readFileSync(DESIGN_DATA, 'utf8')
-  const read = new Function(
-    `${source}\nreturn { PORTAL, RUNSTATE, SPECIES, DOSSIER, BLOCKS, FEED, REPORTS, REPORT_R3, TALLY };`,
-  ) as () => DesignTarget
-  designCache = read()
-  return designCache
-}
+/* --- the local fixture reference ------------------------------------------ */
 
 /* --- the frozen scenario pack --------------------------------------------- */
 
@@ -135,14 +67,14 @@ let haystackCache: string[] | null = null
 
 /**
  * The provenance haystack: every authored string the fixture is allowed to
- * carry — the frozen pack plus the design target's own literals (spec §5.4:
+ * carry — the frozen pack plus the local fixture reference rows (spec §5.4:
  * "regenerated against 우는다리 — never lorem").
  */
 export function authoredTexts(): string[] {
   if (haystackCache) return haystackCache
   const out: string[] = []
   for (const f of PACK_FILES) deepStrings(packJson(f), out)
-  deepStrings(designTarget(), out)
+  deepStrings(REFERENCE_TARGET, out)
   haystackCache = out.filter((s) => s.trim().length > 0)
   return haystackCache
 }

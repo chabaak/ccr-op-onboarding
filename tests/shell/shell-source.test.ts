@@ -11,7 +11,6 @@ import {
   CLIENT,
   COMPONENTS_DIR,
   INDEX_HTML,
-  REPO,
   SHELL_DIR,
   WINDOWS_DIR,
   clientSources,
@@ -106,13 +105,16 @@ describe('[u3#c9] index.html carries the shell containers and nothing more', () 
 
   it('(g) the guard above is not vacuous — it can see the labels it bans', () => {
     // (f) reads the tree, so it passes for free the day someone breaks how it
-    // reads. Pinned against the vendored design file, which still carries all
-    // four labels on purpose (it is the port source, and history): if the same
-    // needles stop firing there, (f) has stopped being a scan.
+    // reads. This local sample carries every banned label on purpose: if the
+    // same needles stop firing here, (f) has stopped being a scan.
     const DROPPED = ['윤슬', '세명건설', '경간', '정착부', '소선', '축척', '1:400']
-    const design = read(path.join(REPO, 'docs/design/phase2-ui/index.html'))
-    expect(design.length, 'the design fixture is gone — re-aim (f)`s teeth').toBeGreaterThan(0)
-    const seen = DROPPED.filter((needle) => design.includes(needle))
+    const knownBad = `
+      경간 A · 정착부 N-3
+      경간 B · 정착부 S-3
+      윤슬교 종단면 · 축척 1:400 · 세명건설
+      정착부 — 소선 파단
+    `
+    const seen = DROPPED.filter((needle) => knownBad.includes(needle))
     expect(seen.sort()).toEqual([...DROPPED].sort())
   })
 })

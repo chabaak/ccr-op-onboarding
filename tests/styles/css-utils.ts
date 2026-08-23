@@ -13,7 +13,6 @@ import { fileURLToPath } from 'node:url'
 
 export const REPO = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '../..')
 export const STYLES_DIR = path.join(REPO, 'src/client/styles')
-export const DESIGN_CSS = path.join(REPO, 'docs/design/phase2-ui/desktop.css')
 
 /** The sheets u1 owns, in the aggregation order index.css must use ([u1#c4]). */
 export const CORE_SHEETS = ['tokens.css', 'base.css', 'shell.css', 'paper.css'] as const

@@ -19,7 +19,6 @@ export const MANIFEST = path.join(REPO, 'assets-manifest.json')
 export const DIST = path.join(REPO, 'dist')
 export const SCENARIO_DIR = path.join(REPO, 'data/scenario/우는다리')
 
-/** The three families of the port target (docs/design/phase2-ui/index.html lines 7–9). */
 export const IBM_PLEX_MONO = 'IBM Plex Mono'
 export const NANUM_GOTHIC_CODING = 'Nanum Gothic Coding'
 export const NANUM_MYEONGJO = 'Nanum Myeongjo'
@@ -29,7 +28,7 @@ export const KOREAN_FAMILIES = [NANUM_GOTHIC_CODING, NANUM_MYEONGJO] as const
 export const ALL_FAMILIES = [IBM_PLEX_MONO, NANUM_GOTHIC_CODING, NANUM_MYEONGJO] as const
 
 /**
- * Exact family/weight/style set of the design target's Google Fonts link:
+ * Exact family/weight/style set vendored for the client chrome:
  * `IBM+Plex+Mono:ital,wght@0,300;0,400;0,500;0,600;0,700;1,400
  *  &Nanum+Gothic+Coding:wght@400;700
  *  &Nanum+Myeongjo:wght@400;700;800`

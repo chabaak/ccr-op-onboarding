@@ -6,7 +6,8 @@ import { runMerge } from '../acceptance/unit-range.ts'
 import fs from 'node:fs'
 import path from 'node:path'
 import { execFileSync } from 'node:child_process'
-import { REPO, designTarget } from './fixture-utils.ts'
+import { REPO } from './fixture-utils.ts'
+import { REFERENCE_FEED } from './fixture-reference.ts'
 
 const SRC = path.join(REPO, 'src')
 const FIXTURES_REL = 'src/client/driver/fixtures'
@@ -84,7 +85,7 @@ describe('[u2f#c9] the demo fixture is reachable from dev only', () => {
       expect(fs.existsSync(dist)).toBe(false)
       return
     }
-    const needles = ['woodari', 'b-r3-b01', designTarget().FEED[0]?.text ?? '첫 전화']
+    const needles = ['woodari', 'b-r3-b01', REFERENCE_FEED[0]?.text ?? '첫 전화']
     const hits: string[] = []
     // `dist/data/**` is the pack copy the §3.7 plugin emits (C5) — the fixture
     // ban is about bundled CODE, not about the scenario data the app loads.
@@ -98,7 +99,7 @@ describe('[u2f#c9] the demo fixture is reachable from dev only', () => {
 })
 
 describe('[u2f#c10] frozen inputs are read, never written', () => {
-  // progress.json's `frozen_globs` + the design target. NOTE: `src/shared/` as a
+  // progress.json's `frozen_globs`. NOTE: `src/shared/` as a
   // whole is NOT frozen — `view-driver.ts` is this run's own seam (u2). The two
   // consume-only modules of C13 are.
   //
@@ -134,7 +135,6 @@ describe('[u2f#c10] frozen inputs are read, never written', () => {
     'data/scenario/_schema/',
   ]
   const FROZEN = [
-    'docs/design/',
     'src/shared/segment.ts',
     'tools/tests/segment.golden.mjs',
   ]
