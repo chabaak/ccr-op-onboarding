@@ -2,12 +2,10 @@
 // (spec-client §4). Ported from docs/design/phase2-ui/app.js `renderDossier`
 // (203..232) + `data.js` DOSSIER (37..68) onto u1's vendored `.sect` skin.
 //
-// The copy is DOCUMENT ART, not pack data: the pack carries no callsign and no
-// standing orders. What IS pack-fed arrives as the models' own arguments — the
-// callsign and slot cap to `agentModel` (u4 D2/D4). The cover takes none: x6's
-// 임무 is a posting order, and a posting order does not print the shift's hours.
-// The window's pack-fed value is its doc number (`windows/agent-file.ts`, off
-// the fetched slug), which is what `e2e/agent-file.spec.ts` (d) guards.
+// The copy is DOCUMENT ART, not engine data: the pack carries no callsign and
+// no standing orders. What IS pack-fed arrives as the models' own arguments —
+// incident-cover copy to `coverModel`, and the callsign and slot cap to
+// `agentModel` (u4 D2/D4).
 //
 // x7 — 기질 IS GONE FROM THE COVER, and the cover was the only place it appeared,
 // so the sealed section has left the product (민서, 08-09; the consequence was
@@ -105,7 +103,7 @@ const CALLSIGN_KEY = '호출부호'
 /** The class the sheet paints the callsign with. */
 const CALLSIGN_CLASS = 'rd-code'
 
-/** What one agent's page needs. The cover takes nothing — its copy is standing. */
+/** What one agent's page needs. */
 export interface AgentInput {
   /** 인수인계 사항's cap — read from `SLOT_CAP`, so note and board cannot drift (D3). */
   slotCap: number
@@ -117,6 +115,12 @@ export interface AgentInput {
 export interface FiledInput {
   /** 식별's 호출부호 — the agent whose sitting this page records (M1). */
   callsign: string
+}
+
+/** What the selected scenario owns on the AGENT FILE cover. */
+export interface AgentFileCoverCopy {
+  /** 사건 개요's pack-authored fact lines, joined by `\n`. */
+  incident: string
 }
 
 /** A past page's 인수인계 사항 note — the sitting is over and nothing is operable. */
@@ -144,80 +148,31 @@ const FILED_NOTE = '파견 종료. 열람 전용'
  * line becomes its own element in `buildSection` below — see the comment there
  * for the reveal that depends on it.
  *
- * Kept at module scope rather than inline in `coverModel` so the model half
- * stays a value, which `agent-file.test.ts [u4#c2](d)` reads the source of.
+ * The incident facts are selected-pack copy. They are passed in from the window
+ * after it reads `data/scenario/<slug>/incidentCover.json`; keeping them out of
+ * this module is what lets a pack switch move the cover with the pack. The
+ * mission sentence and the dispatch sentence that names the ECHO series stay
+ * here because every pack would otherwise restate the same portal invariant.
  */
-
-/**
- * 사건 개요 — the three-line incident record the whole file hangs off.
- *
- * The date is written 20XX년 XX월 XX일 on purpose. A real date would place the
- * game in a year and invite the reader to check it against a venue that does
- * not exist; the redacted form is what a declassified incident summary looks
- * like, and it dates the file without dating the world. The TIME is exact
- * (18시 38분) because a minute is what an incident log actually pins.
- *
- * It names 요원 ECHO in prose. That is the same agent `callsignOf(1)` mints —
- * see the note there; the two are one fact written twice and must not drift.
- *
- * x10 (민서, 08-10) — THE INCIDENT IS THE SPORTS DOME NOW. The first two lines
- * read 20시 47분 / 해원터널 하행 4.2km 지점에서 흰 연기가 보인다는 신고 until this
- * change. The third is untouched: who 본부 sent is a fact about the AGENT
- * PROGRAMME, not about which building it was.
- *
- * …AND THE SNOW IS IN IT NOW (x10, 민서 08-10). The second line opened straight
- * on the dome until this change; it opens on 폭설이 내리던 날. The weather is not
- * scenery in this pack — `meta.json`'s logline is 대설주의보가 내린 밤, and a
- * 막구조 roof sags because snow is standing on it. A cover that named the
- * sagging and not the snow handed the operator a building failing for no
- * reason, and the cause was the one thing the three lines were silent about.
- * The clause is the PACK'S on the same terms as the time and the place below:
- * if the pack's night ever stops being a snowy one, this string is what is
- * wrong.
- *
- * THESE TWO LINES ARE THE PACK'S, NOT THIS MODULE'S, and that is the standing
- * hazard here. The time has to agree with `data/scenario/<slug>/meta.json`'s
- * `start` — which is what the desk clock opens on — and the place has to agree
- * with the pack's `places.json`, its symptoms, its timeline and every line the
- * feed prints. They are written as literals because the cover is authored copy
- * (the redacted date is a piece of writing, not data), so nothing checks the
- * agreement for us: `PACK_SLUG` in `shell/pack.ts` selects the pack, and this
- * string is trusted to describe it. When these two were written for 해원터널 they
- * matched a pack whose `start` was `20:47`. They were changed ahead of the
- * sports-dome pack landing (민서: "the pack is being deployed right now"), so
- * **if the desk clock does not open on 18:38, one of the two is wrong and it is
- * probably this file.** Check `meta.json`'s `start` before believing this line.
- */
-const INCIDENT =
-  '20XX년 XX월 XX일 18시 38분,\n' +
-  '폭설이 내리던 날, 한내시립스포츠돔에서 천장 가운데가 처진다는 신고가 접수된다.\n' +
-  '긴급상황대응실 본부는 즉시 현장에 요원 ECHO를 파견하여 상황 파악을 시작했다.'
 
 /**
  * 사건 개요's footing — the one line on the cover that is not in the fiction.
  *
  * It says the operator is reading a RECONSTRUCTION of ECHO's radio log, which
- * is the only honest way to explain why a past incident can be replayed with
- * different handovers each time. Printed as body prose it would read as a
- * fourth incident clause and quietly contradict the three above it; it is a
- * small red note under the rule instead, which is how a form footnotes itself.
- * `.sect-note` is what the sheet paints that with.
+ * is the portal-wide reason a past incident can be replayed with different
+ * handovers each time. That explanation belongs to the simulation terminal, not
+ * to one incident's place, weather, time, or cause. Printed as body prose it
+ * would read as a fourth incident clause and quietly contradict the three above
+ * it; it is a small red note under the rule instead, which is how a form
+ * footnotes itself. `.sect-note` is what the sheet paints that with.
  */
 // x7 — the ※ is part of the STRING, not a `::before` (민서, 08-09). The cover's
 // reveal prints text nodes, and a mark painted by the sheet would be on the page
 // before the sentence it belongs to had a character — the one glyph that would
 // give away that the line was coming. It types with the rest.
 const INCIDENT_NOTE = '※ 본 시뮬레이션은 당시 ECHO의 현장 무전 기록을 토대로 재구성되었습니다.'
-
-/**
- * 현장 요원 임무 — one line, and it is the whole posting.
- *
- * x6's 임무 ran three clauses: the posting, what it is for, and the one-way
- * radio. The first is now 사건 개요's third line (본부 파견한다 is the incident's
- * own event, not an order), and the third is a fact the desk teaches by going
- * quiet. What is left is the only clause an operator can hold in their head
- * while choosing what to hand over: find out what it is, and keep people alive.
- */
+const CALLSIGN_SERIES = 'ECHO'
+const INCIDENT_DISPATCH = `긴급상황대응실 본부는 즉시 현장에 요원 ${CALLSIGN_SERIES}를 파견하여 상황 파악을 시작했다.`
 const MISSION = '파견된 현장 위기 대응실에서 긴급 상황의 정체를 파악하고, 인명 피해를 최소화한다.'
 
 /**
@@ -331,12 +286,13 @@ export type DossierSection = RowsSection | FixedSection | OperableSection | File
  * agent in the third person and the reader has to be handed the switch from
  * "this is what happened" to "this is what they were ordered".
  *
- * It takes no argument. 임무 used to print the pack's clock band; a posting
- * order does not print the shift's hours, the topbar clock does
- * (`components/game-clock.ts`), and the window's pack-fed value is its doc
- * number.
+ * It takes the selected pack's incident facts. 임무 used to print the pack's
+ * clock band; a posting order does not print the shift's hours, the topbar clock
+ * does (`components/game-clock.ts`). What remains pack-fed here is authored
+ * incident cover prose, not chrome state or shared mission frame.
  */
-export function coverModel(): DossierSection[] {
+export function coverModel(copy: AgentFileCoverCopy): DossierSection[] {
+  const incident = `${copy.incident}\n${INCIDENT_DISPATCH}`
   return [
     // No slugs on the cover, and that is a decision the merge made rather than
     // inherited. `ui/tutorial-coach` slugged all three of these (`mission`,
@@ -345,7 +301,7 @@ export function coverModel(): DossierSection[] {
     // and a plate narrating a document mid-performance is a second voice over
     // the first. Nothing outside this window points here any more, so nothing
     // here needs a name. `handover` below is the one slug still earning its keep.
-    { title: '사건 개요', state: 'fixed', body: INCIDENT, note: INCIDENT_NOTE },
+    { title: '사건 개요', state: 'fixed', body: incident, note: INCIDENT_NOTE },
     { title: '현장 요원 임무', state: 'fixed', body: MISSION },
     { title: '현장 요원 교신 지침', state: 'fixed', body: COMMS_ORDERS },
   ]
@@ -459,8 +415,6 @@ export function buildDossier(model: readonly DossierSection[], slotHost: HTMLEle
  * `<b>` simply makes the sentence three text nodes instead of one, which
  * `collectCover` handles by keying its line pause to the ROW.
  */
-const CALLSIGN_SERIES = 'ECHO'
-
 function callsignMarked(line: string): Node[] {
   const parts = line.split(CALLSIGN_SERIES)
   if (parts.length === 1) return [document.createTextNode(line)]

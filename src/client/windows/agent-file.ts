@@ -29,6 +29,7 @@ import { createRunState, hasFiledReport } from '../shell/run-state.ts'
 import type { RunPhase, RunState } from '../shell/run-state.ts'
 import { blockCardModel, setPickedBlockId } from '../components/block-card.ts'
 import {
+  type AgentFileCoverCopy,
   agentModel,
   buildDossier,
   callsignOf,
@@ -109,9 +110,39 @@ const FILED_EMPTY = '배치된 문장 없음'
 /** What the file's own doc-number line is called (reference `fh-doc`). */
 const DOC_CAPTION = '문서번호 '
 
+const COVER_PENDING: AgentFileCoverCopy = {
+  incident: '사건 개요를 불러오는 중입니다.',
+}
+
+const isRecord = (value: unknown): value is Record<string, unknown> =>
+  typeof value === 'object' && value !== null
+
+function readIncidentCover(raw: unknown): AgentFileCoverCopy {
+  if (!isRecord(raw) || !isRecord(raw.incident) || !Array.isArray(raw.incident.body)) {
+    throw new Error('scenario pack: incidentCover.json has no incident body')
+  }
+  const lines = raw.incident.body
+  if (lines.length !== 2 || lines.some((line) => typeof line !== 'string' || line.length === 0)) {
+    throw new Error("scenario pack: incidentCover.json 'incident.body' is not two non-empty lines")
+  }
+  return {
+    incident: lines.join('\n'),
+  }
+}
+
+async function fetchIncidentCover(slug: string): Promise<AgentFileCoverCopy> {
+  const url = new URL(`data/scenario/${slug}/incidentCover.json`, document.baseURI)
+  const response = await fetch(url)
+  if (!response.ok) {
+    throw new Error(`scenario pack: ${url.pathname} answered ${response.status}`)
+  }
+  return readIncidentCover(await response.json())
+}
+
 /** Mounts this window's contents into the frame body the shell built. */
 export function mount(host: HTMLElement, driver: FixtureDriver): void {
   const store = createRunState(driver)
+  host.dataset.coverReady = 'false'
 
   const sentences = new Map<string, Sentence>()
   /**
@@ -125,6 +156,7 @@ export function mount(host: HTMLElement, driver: FixtureDriver): void {
   let run = 0
   let slug = ''
   let opensAt = driver.clock.at()
+  let coverCopy = COVER_PENDING
   let committedRun: number | null = null
   let committedAt: string | null = null
   let committedIncoming = false
@@ -337,7 +369,7 @@ export function mount(host: HTMLElement, driver: FixtureDriver): void {
     // element. It has to be repainted here and not left to `turn()`: `sync()`
     // runs from triggers `turn()` does not (the board's own `onChange`, the
     // store subscription, `sendNewRun`), and the pack identity that fills the
-    // slug in resolves asynchronously (`fetchScenarioIdentity` at the foot of
+    // slug in resolves asynchronously (`fetchScenarioInPlay` at the foot of
     // this file) — a page mounted with an unresolved slug would keep printing
     // `…/AF/` for ever if only a rebuild could correct it.
     const doc = sheet.querySelector<HTMLElement>('.fh-doc')
@@ -752,10 +784,9 @@ export function mount(host: HTMLElement, driver: FixtureDriver): void {
    * `coverModel()` prints as 12 text runs across 10 rows. That is deliberate and
    * it is also exactly why 건너뛰기 exists.
    *
-   * (Recomputed 08-10 with the copy, per the rule below: 사건 개요's second line
-   * gained 폭설이 내리던 날 — eleven characters, three of them spaces, all of them
-   * mid-line — so 8 × 36 + 3 × 104 = 600 ms on top of the 18,696 the rates were
-   * last read against. The rates themselves did not move; the page grew.)
+   * The total is a measurement of whichever cover the active pack supplies, not
+   * a contract this module can derive now that the incident body is pack data.
+   * The rates themselves do not move when a pack edits its prose; the page does.
    *
    * x10 — THE FIGURE IS RECOMPUTED, because it had gone stale and a stale total
    * is worse than none. This paragraph said "roughly a quarter-minute", which
@@ -1091,7 +1122,7 @@ export function mount(host: HTMLElement, driver: FixtureDriver): void {
     // reveal costs no row and the document does not jump — see `buildHead`.
     const cover = el('div', 'file-page')
     cover.append(buildHead({ skip: !coverDone && !motionless() }))
-    cover.append(buildDossier(coverModel(), board.root))
+    cover.append(buildDossier(coverModel(coverCopy), board.root))
 
     const past: HTMLElement[] = []
     for (const flown of [...filed.keys()].sort((a, b) => a - b)) {
@@ -1496,17 +1527,22 @@ export function mount(host: HTMLElement, driver: FixtureDriver): void {
   })
 
   // D2 — identity is pack-fed, never a literal. The structure is already up;
-  // this re-prints it with the two fields the pack owns. A pack the shell has
+  // this re-prints it with the fields the pack owns. A pack the shell has
   // already read cannot fail here, and if it did the head simply stays unnamed.
   //
   // x6 — the clock band left with 임무's old body (a posting order does not
-  // print the shift's hours), so what the cover reads from the pack now is the
-  // doc number alone. `identity.end` is no longer used here; the topbar clock
-  // is where the day's terminal time is printed.
+  // print the shift's hours), so what the cover reads from the active pack now
+  // is the doc number and incident-cover facts. The reconstruction note, mission
+  // sentence and ECHO dispatch line stay global portal copy: they explain the
+  // replay frame, document series and standing objective rather than an
+  // incident's venue, weather, clock, or cause.
   void fetchScenarioInPlay()
-    .then((identity) => {
+    .then(async (identity) => {
+      const nextCover = await fetchIncidentCover(identity.slug)
       slug = identity.slug
       opensAt = identity.start
+      coverCopy = nextCover
+      host.dataset.coverReady = 'true'
       turn()
       sync()
     })
