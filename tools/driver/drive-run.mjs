@@ -2,8 +2,8 @@
 // Run driver — one full run of a scenario pack, headless, on the same `src/**`
 // modules the browser bundle runs, writing a run-record to `artifacts/runs/`.
 //
-//   node tools/driver/drive-run.mjs --pack 멈춘회전문 --provider fixture --validate
-//   node tools/driver/drive-run.mjs --pack 멈춘회전문 --provider fixture --determinism-check
+//   node tools/driver/drive-run.mjs --pack <slug> --provider fixture --validate
+//   node tools/driver/drive-run.mjs --pack <slug> --provider fixture --determinism-check
 //
 // WHAT THIS IS. A recorder. It binds e7's live driver, e8's run loop and e6's
 // fixture provider, watches two seams — the `ViewEvent` stream and the transport

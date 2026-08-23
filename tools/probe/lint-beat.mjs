@@ -21,8 +21,8 @@
 // action demands an answer, the model fills the missing agent line with an NPC.
 // This is the check that makes the boundary free to enforce.
 //
-// KNOWN BLIND SPOT — check A is not the only route to defect (1). 멈춘회전문
-// reproduced it with rows that are REPORTED SPEECH from a phone call
+// KNOWN BLIND SPOT — check A is not the only route to defect (1). A retained
+// scenario reproduced it with rows that are REPORTED SPEECH from a phone call
 // ("표기웅에게 안에 몇 명이냐고 다시 물었습니다"): declarative, no `?`, no
 // second-person address, so A passes them clean. Call 2 still dramatizes the
 // reported Q&A back into live dialogue, that re-staging needs the agent's half,
