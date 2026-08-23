@@ -103,7 +103,7 @@ const CALLSIGN_KEY = '호출부호'
 /** The class the sheet paints the callsign with. */
 const CALLSIGN_CLASS = 'rd-code'
 
-/** What one agent's page needs. The cover takes nothing — its copy is standing. */
+/** What one agent's page needs. */
 export interface AgentInput {
   /** 인수인계 사항's cap — read from `SLOT_CAP`, so note and board cannot drift (D3). */
   slotCap: number
@@ -119,7 +119,7 @@ export interface FiledInput {
 
 /** What the selected scenario owns on the AGENT FILE cover. */
 export interface AgentFileCoverCopy {
-  /** 사건 개요's three authored lines, joined by `\n`. */
+  /** 사건 개요's pack-authored fact lines, joined by `\n`. */
   incident: string
   /** 현장 요원 임무's authored line. */
   mission: string
@@ -150,9 +150,12 @@ const FILED_NOTE = '파견 종료. 열람 전용'
  * line becomes its own element in `buildSection` below — see the comment there
  * for the reveal that depends on it.
  *
- * The incident and mission are selected-pack copy. They are passed in from the
- * window after it reads `data/scenario/<slug>/incidentCover.json`; keeping them
- * out of this module is what lets a pack switch move the cover with the pack.
+ * The incident facts and mission are selected-pack copy. They are passed in from
+ * the window after it reads `data/scenario/<slug>/incidentCover.json`; keeping
+ * them out of this module is what lets a pack switch move the cover with the
+ * pack. The dispatch sentence that names the ECHO series stays here because the
+ * pack carries no callsign and every pack would otherwise restate the same
+ * portal invariant.
  */
 
 /**
@@ -171,6 +174,8 @@ const FILED_NOTE = '파견 종료. 열람 전용'
 // before the sentence it belongs to had a character — the one glyph that would
 // give away that the line was coming. It types with the rest.
 const INCIDENT_NOTE = '※ 본 시뮬레이션은 당시 ECHO의 현장 무전 기록을 토대로 재구성되었습니다.'
+const CALLSIGN_SERIES = 'ECHO'
+const INCIDENT_DISPATCH = `긴급상황대응실 본부는 즉시 현장에 요원 ${CALLSIGN_SERIES}를 파견하여 상황 파악을 시작했다.`
 
 /**
  * 현장 요원 교신 지침's standing orders (민서's own words, x5; x6 named 본부).
@@ -289,6 +294,7 @@ export type DossierSection = RowsSection | FixedSection | OperableSection | File
  * cover prose, not chrome state.
  */
 export function coverModel(copy: AgentFileCoverCopy): DossierSection[] {
+  const incident = `${copy.incident}\n${INCIDENT_DISPATCH}`
   return [
     // No slugs on the cover, and that is a decision the merge made rather than
     // inherited. `ui/tutorial-coach` slugged all three of these (`mission`,
@@ -297,7 +303,7 @@ export function coverModel(copy: AgentFileCoverCopy): DossierSection[] {
     // and a plate narrating a document mid-performance is a second voice over
     // the first. Nothing outside this window points here any more, so nothing
     // here needs a name. `handover` below is the one slug still earning its keep.
-    { title: '사건 개요', state: 'fixed', body: copy.incident, note: INCIDENT_NOTE },
+    { title: '사건 개요', state: 'fixed', body: incident, note: INCIDENT_NOTE },
     { title: '현장 요원 임무', state: 'fixed', body: copy.mission },
     { title: '현장 요원 교신 지침', state: 'fixed', body: COMMS_ORDERS },
   ]
@@ -411,8 +417,6 @@ export function buildDossier(model: readonly DossierSection[], slotHost: HTMLEle
  * `<b>` simply makes the sentence three text nodes instead of one, which
  * `collectCover` handles by keying its line pause to the ROW.
  */
-const CALLSIGN_SERIES = 'ECHO'
-
 function callsignMarked(line: string): Node[] {
   const parts = line.split(CALLSIGN_SERIES)
   if (parts.length === 1) return [document.createTextNode(line)]

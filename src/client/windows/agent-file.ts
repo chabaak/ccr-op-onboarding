@@ -123,8 +123,8 @@ function readIncidentCover(raw: unknown): AgentFileCoverCopy {
     throw new Error('scenario pack: incidentCover.json has no incident body')
   }
   const lines = raw.incident.body
-  if (lines.length !== 3 || lines.some((line) => typeof line !== 'string' || line.length === 0)) {
-    throw new Error("scenario pack: incidentCover.json 'incident.body' is not three non-empty lines")
+  if (lines.length !== 2 || lines.some((line) => typeof line !== 'string' || line.length === 0)) {
+    throw new Error("scenario pack: incidentCover.json 'incident.body' is not two non-empty lines")
   }
   if (typeof raw.mission !== 'string' || raw.mission.length === 0) {
     throw new Error("scenario pack: incidentCover.json 'mission' is not a non-empty string")
@@ -374,7 +374,7 @@ export function mount(host: HTMLElement, driver: FixtureDriver): void {
     // element. It has to be repainted here and not left to `turn()`: `sync()`
     // runs from triggers `turn()` does not (the board's own `onChange`, the
     // store subscription, `sendNewRun`), and the pack identity that fills the
-    // slug in resolves asynchronously (`fetchScenarioIdentity` at the foot of
+    // slug in resolves asynchronously (`fetchScenarioInPlay` at the foot of
     // this file) — a page mounted with an unresolved slug would keep printing
     // `…/AF/` for ever if only a rebuild could correct it.
     const doc = sheet.querySelector<HTMLElement>('.fh-doc')
@@ -1536,9 +1536,11 @@ export function mount(host: HTMLElement, driver: FixtureDriver): void {
   // already read cannot fail here, and if it did the head simply stays unnamed.
   //
   // x6 — the clock band left with 임무's old body (a posting order does not
-  // print the shift's hours), so what the cover reads from the pack now is the
-  // doc number and incident-cover sidecar. `identity.end` is no longer used
-  // here; the topbar clock is where the day's terminal time is printed.
+  // print the shift's hours), so what the cover reads from the active pack now
+  // is the doc number and incident-cover sidecar. The reconstruction note and
+  // ECHO dispatch line stay global portal copy: they explain the replay frame
+  // and document series rather than an incident's venue, weather, clock, or
+  // cause.
   void fetchScenarioInPlay()
     .then(async (identity) => {
       const nextCover = await fetchIncidentCover(identity.slug)

@@ -405,7 +405,12 @@ describe('[u4#c2] §3 기질 is sealed by construction', () => {
 
   it('(h) the shipped incident cover sidecar reproduces the previous cover copy byte-for-byte', async () => {
     const { coverModel } = await loadDossier()
+    const raw = JSON.parse(read(path.join(REPO, 'data', 'scenario', '멈춘회전문', 'incidentCover.json'))) as {
+      incident: { body: string[] }
+    }
     const cover = coverModel(incidentCover())
+
+    expect(JSON.stringify(raw), 'pack incident facts must not own the portal ECHO dispatch sentence').not.toContain('ECHO')
 
     expect(cover[0]!.body).toBe(
       [

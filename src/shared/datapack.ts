@@ -33,7 +33,7 @@ export type Meta = {
 /** datapack incidentCover.json — 요원 파일 사건 표지 문안 */
 export type IncidentCover = {
   incident: {
-    /** 사건 개요의 세 줄. 각 항목은 표지에서 별도 줄로 렌더된다. */
+    /** 팩이 소유한 사건 개요 사실 두 줄. 표지의 포털 공통 파견 문장은 클라이언트가 덧붙인다. */
     body: Array<string>;
   };
   /** 현장 요원 임무 섹션의 한 줄 문안. */
