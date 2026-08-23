@@ -32,6 +32,7 @@ export interface ScenarioSwitchOptions extends ScenarioSessionOptions {
 }
 
 export const SELECTED_SCENARIO_KEY = 'ndsp:scenario:selected:v1'
+export const SCENARIO_DESKTOP_RETURN_KEY = 'ndsp:scenario:return-desktop:v1'
 
 function defaultStorage(): StoragePort | null {
   try {
@@ -97,6 +98,27 @@ export function switchScenarioPack(
   if (options.reload === undefined) defaultReload()
   else options.reload()
   return pack
+}
+
+export function returnToScenarioDesktop(
+  index: ScenarioIndex,
+  options: ScenarioSwitchOptions = {},
+): void {
+  const storage = storageOf(options)
+  resetScenarioSession(index, { storage })
+  storage?.removeItem(SELECTED_SCENARIO_KEY)
+  storage?.setItem(SCENARIO_DESKTOP_RETURN_KEY, '1')
+  if (options.reload === undefined) defaultReload()
+  else options.reload()
+}
+
+export function consumeScenarioDesktopReturn(
+  options: ScenarioSessionOptions = {},
+): boolean {
+  const storage = storageOf(options)
+  if (storage?.getItem(SCENARIO_DESKTOP_RETURN_KEY) !== '1') return false
+  storage.removeItem(SCENARIO_DESKTOP_RETURN_KEY)
+  return true
 }
 
 export async function fetchScenarioInPlay(

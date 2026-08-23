@@ -1,0 +1,64 @@
+import { describe, expect, it, vi } from 'vitest'
+import path from 'node:path'
+
+import {
+  ABORT_MISSION_COPY,
+  confirmAbortMission,
+} from '../../src/client/shell/abort-mission.ts'
+import { SHELL_DIR, read, stripComments } from './shell-utils.ts'
+
+const WINDOW_MANAGER_TS = path.join(SHELL_DIR, 'window-manager.ts')
+
+describe('abort mission control', () => {
+  it('(a) asks in plain language what the abort discards', () => {
+    expect(ABORT_MISSION_COPY.head).toBe('시행 중단')
+    expect(ABORT_MISSION_COPY.meta).toBe('현재 시행 폐기')
+    expect(ABORT_MISSION_COPY.yes).toBe('중단')
+    expect(ABORT_MISSION_COPY.no).toBe('취소')
+    expect(`${ABORT_MISSION_COPY.body}\n${ABORT_MISSION_COPY.note}`).toContain('사건 선택 데스크톱')
+    for (const word of ['시행', '블록', '인수인계', '멤브레인']) {
+      expect(ABORT_MISSION_COPY.note).toContain(word)
+    }
+  })
+
+  it('(b) confirming returns through the provided desktop path exactly once', async () => {
+    const open = vi.fn(async () => true)
+    const returnToDesktop = vi.fn()
+
+    await expect(
+      confirmAbortMission({
+        app: {} as HTMLElement,
+        open,
+        returnToDesktop,
+      }),
+    ).resolves.toBe(true)
+
+    expect(open).toHaveBeenCalledWith({} as HTMLElement, ABORT_MISSION_COPY)
+    expect(returnToDesktop).toHaveBeenCalledOnce()
+  })
+
+  it('(c) cancelling leaves the run path untouched', async () => {
+    const returnToDesktop = vi.fn()
+
+    await expect(
+      confirmAbortMission({
+        app: {} as HTMLElement,
+        open: async () => false,
+        returnToDesktop,
+      }),
+    ).resolves.toBe(false)
+
+    expect(returnToDesktop).not.toHaveBeenCalled()
+  })
+
+  it('(d) closing a window still only hides furniture and never aborts', () => {
+    const src = stripComments(read(WINDOW_MANAGER_TS))
+    const handler = /frame\.close\.addEventListener\([\s\S]*?\n    \}\)/.exec(src)?.[0] ?? ''
+
+    expect(handler, 'window close handler is gone').toMatch(/classList\.add\(\s*['"]hidden['"]\s*\)/)
+    expect(handler, 'window close stopped updating the taskbar').toMatch(/syncTaskbar\s*\(\s*\)/)
+    expect(handler, 'window close must not reset a scenario').not.toMatch(
+      /resetScenarioSession|returnToScenarioDesktop|abort|reload/,
+    )
+  })
+})

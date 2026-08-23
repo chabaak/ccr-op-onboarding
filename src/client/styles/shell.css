@@ -191,6 +191,14 @@
 @keyframes taskAlert{0%,100%{border-color:var(--seal);color:var(--alert-txt)}
   50%{border-color:var(--alert-line);color:var(--alert-dim)}}
 .task[disabled]{opacity:.35;cursor:not-allowed}
+.abort-mission{display:flex;align-items:center;height:32px;
+  padding:0 var(--space-10);
+  border:1px solid var(--seal-2);background:var(--chrome-raise);color:var(--seal);
+  font-size:var(--fs-9-5);font-weight:700;letter-spacing:.14em;transition:.15s}
+.abort-mission:hover,.abort-mission:focus-visible{
+  color:var(--txt-max);border-color:var(--seal);background:var(--chrome-focus)}
+.abort-mission:focus-visible{outline:1px solid var(--seal);outline-offset:2px}
+.abort-mission[disabled]{opacity:.4;cursor:wait}
 .tb-hint{margin-left:auto;font-size:var(--fs-8-5);letter-spacing:.16em;color:var(--txt-8);
   padding-right:var(--space-4)}
 
