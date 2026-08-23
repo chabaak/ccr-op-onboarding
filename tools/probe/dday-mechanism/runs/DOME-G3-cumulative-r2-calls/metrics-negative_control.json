@@ -1,0 +1,489 @@
+{
+  "experiment": "DOME-G3-cumulative-r2",
+  "arm": "negative_control",
+  "call_type": "judgment",
+  "channel": "C-BLOCK",
+  "template": "v0.4",
+  "model": "claude-haiku-4-5-20251001",
+  "transport": "anthropic",
+  "dry_run": false,
+  "pre_registration": {
+    "hypothesis": "d/e split 이후 G3가 증거 게이트라면 no-key, K1, K1+K2, placebo, negative_control은 a에 머물고, K1+K2+K3에서만 b로 옮긴다. d는 자유로운 선착대 대기 선택이지만 더는 성공 bucket이 아니며, e는 K4가 없는 이 suite에서 기대하지 않는다.",
+    "n_per_arm": 10,
+    "drop_condition": "baseline, K1, K1+K2, placebo, negative_control 중 어느 arm이든 기대 stance a가 80% 미만이면 no-evidence 또는 non-cumulative arm이 아직 샌다. K1+K2+K3이 기대 stance b에 80% 미만이면 K3→b 연결이 아직 작동하지 않는다.",
+    "expected_stance_by_arm": {
+      "baseline": "a",
+      "k1": "a",
+      "k1_k2": "a",
+      "k1_k2_k3": "b",
+      "placebo": "a",
+      "negative_control": "a"
+    },
+    "contingencies": [
+      "d가 low-evidence arm에서 많이 나오면 자유로운 선착대 대기 option은 더는 보상되지 않지만 stance text가 여전히 a를 이길 만큼 끌린다는 뜻이다.",
+      "e가 K4 없는 arm에서 나오면 key premise가 label에 드러났는데도 모델이 그 전제를 꾸며낸 것이다.",
+      "placebo 또는 negative_control이 b에 30% 이상 닿으면 K3 weak 또는 non-cumulative evidence가 blower path를 열고 있다.",
+      "because_block_ids가 K1+K2 arm에서 K3 또는 K4 전제를 꾸며내면 진단은 prompt traceability 쪽으로도 열린다."
+    ],
+    "not_claimed": "이 suite는 d/e split 이후 G3의 K3 cumulative path만 잰다. 북측문 K4 live route, full play reachability, casualty ladder는 이 suite alone으로 판정하지 않는다."
+  },
+  "n_effective": 10,
+  "n_overridden": false,
+  "calls": [
+    {
+      "arm": "negative_control",
+      "slot": 1,
+      "template": "v0.4",
+      "model": "claude-haiku-4-5-20251001",
+      "model_reported": "claude-haiku-4-5-20251001",
+      "temperament_id": "dome-base",
+      "latency_s": 7.217,
+      "stop_reason": "tool_use",
+      "foreign_tool_uses": 0,
+      "schema_retries": 0,
+      "payload": {
+        "inner_note": "표기웅이 \"혼자\"라고 말했던 시각에 실제로는 아이들과 인솔자가 남아 있었다. 그가 상황을 모르거나, 파악하고도 말하지 않았거나, 의도적으로 왜곡했을 가능성이 있다. 지붕 구조상 급기압이 떨어지면 막이 내려오는데, 현재 급기 하나는 \"원래 안 돈다\"고 표기웅이 말했고, 전 정비기사도 그를 확인했다. 하지만 k3에서 배전반 조작으로 깨울 수 있다는 정보가 있다. 이는 우연이 아니라 당직자가 알아야 할 기본 정보일 가능성이 크다. 북측 문도 도면에 있지만 표기웅이 능동적으로 언급하지 않았다. 현재 회전문 앞 줄이 줄지 않고 있고, 관중석 조명까지 절반이 꺼진 상황은 시스템 전반이 악화되고 있음을 시사한다. 시간이 흐르면 흐를수록 상황은 더 나빠질 것이다.",
+        "stance": "b",
+        "because_referent": "표기웅이 초기에 상황 전체를 알리지 않았고, 현재 회선을 통한 그의 말이 전부 신뢰할 수는 없기 때문입니다. 동시에 2호 송풍기는 고장이 아닌 것으로 보이며, 지붕 구조상 압력 회복이 긴급하기 때문입니다.",
+        "because_block_ids": [
+          "k1",
+          "k3"
+        ],
+        "rejected_stance": "a",
+        "rejected_reason": "회전문 한 곳으로만 대량 인원을 내보내는 것은 현재 줄이 줄지 않는 상황에서 시간을 낭비하는 것이다. 지붕 막이 추가 하강하면 더 위험해진다. 다른 배출구의 확보가 시급하다.",
+        "utterance": "표기웅에게 배전반 B 3번 차단기를 올려 2호 송풍기를 즉시 작동시키라고 지시합니다. 지붕 내부 압력을 회복하는 것이 현재 상황에서 가장 긴급합니다."
+      },
+      "problems": [],
+      "stance": "b",
+      "because_referent": "표기웅이 초기에 상황 전체를 알리지 않았고, 현재 회선을 통한 그의 말이 전부 신뢰할 수는 없기 때문입니다. 동시에 2호 송풍기는 고장이 아닌 것으로 보이며, 지붕 구조상 압력 회복이 긴급하기 때문입니다.",
+      "because_block_ids": [
+        "k1",
+        "k3"
+      ],
+      "because_invalid_ids": [],
+      "rejected_stance": "a",
+      "rejected_malformed": false,
+      "utterance_chars": 83,
+      "inner_note_chars": 367
+    },
+    {
+      "arm": "negative_control",
+      "slot": 2,
+      "template": "v0.4",
+      "model": "claude-haiku-4-5-20251001",
+      "model_reported": "claude-haiku-4-5-20251001",
+      "temperament_id": "dome-base",
+      "latency_s": 7.363,
+      "stop_reason": "tool_use",
+      "foreign_tool_uses": 0,
+      "schema_retries": 0,
+      "payload": {
+        "inner_note": "표기웅은 안에 누가 몇 명인지 정확히 모르고 있었다. 문세라는 관중석과 코트의 인원 수가 맞지 않는다고 했다. 현장 상황을 파악하지 못한 상태에서 당직자에게 어떤 행동을 명령하기 전에, 내가 모르는 것이 무엇인지 확인해야 한다. 회선을 유지하면서 상황을 더 파악하는 것이 먼저다.",
+        "stance": "a",
+        "because_referent": "표기웅이 '혼자'라고 한 시각에 실제로는 관중석에 아이들과 인솔자가 있었고, 문세라는 인원 파악이 맞지 않는다고 했으며, 표기웅 자신도 급기 상태를 정확히 모르고 있었기 때문이다. 송풍기를 임의로 작동시키거나 비상문을 열도록 지시하는 것은 현재 안정적으로 유지 중인 내압을 상실시킬 수 있고, 그 결과가 얼마나 위험한지 현장 정보 없이는 판단할 수 없다.",
+        "because_block_ids": [
+          "k1"
+        ],
+        "rejected_stance": "c",
+        "rejected_reason": "표기웅에게 북측 문을 열라고 지시하기 전에, 그 문의 상태와 열 때의 결과를 더 확인해야 한다. 안쪽 압력으로만 지붕이 떠 있는 상태에서 '큰 개구부'를 열면 그 압력이 빠져 막이 내려온다는 정비기사의 말이 있다. 당직자가 말하지 않은 것이 의도적 은폐인지, 단순히 도면상 존재만 알고 물리적 접근이나 결과를 모르는 것인지 구분하지 않고 지시할 수 없다.",
+        "utterance": "지금 안에 있는 인원을 정확히 파악해야 합니다. 관중석과 코트, 각 위치별로 다시 세어 주십시오. 그 동안 남측 회전문으로의 대피는 계속 진행합니다."
+      },
+      "problems": [],
+      "stance": "a",
+      "because_referent": "표기웅이 '혼자'라고 한 시각에 실제로는 관중석에 아이들과 인솔자가 있었고, 문세라는 인원 파악이 맞지 않는다고 했으며, 표기웅 자신도 급기 상태를 정확히 모르고 있었기 때문이다. 송풍기를 임의로 작동시키거나 비상문을 열도록 지시하는 것은 현재 안정적으로 유지 중인 내압을 상실시킬 수 있고, 그 결과가 얼마나 위험한지 현장 정보 없이는 판단할 수 없다.",
+      "because_block_ids": [
+        "k1"
+      ],
+      "because_invalid_ids": [],
+      "rejected_stance": "c",
+      "rejected_malformed": false,
+      "utterance_chars": 83,
+      "inner_note_chars": 156
+    },
+    {
+      "arm": "negative_control",
+      "slot": 3,
+      "template": "v0.4",
+      "model": "claude-haiku-4-5-20251001",
+      "model_reported": "claude-haiku-4-5-20251001",
+      "temperament_id": "dome-base",
+      "latency_s": 6.214,
+      "stop_reason": "tool_use",
+      "foreign_tool_uses": 0,
+      "schema_retries": 0,
+      "payload": {
+        "inner_note": "압력 구조의 동체 변형과 조명 손실이 시간과 함께 진행 중이고, 동체 내부의 인원이 정확하지 않으며, 출입 통로의 유량이 제한되어 있다. 표기웅은 상황을 완전히 파악하지 못했고, 혼자가 아닌데도 혼자라고 말했다. 이것은 상황 악화의 신호다.</uml:parameter>\n<parameter name=\"stance\">d",
+        "because_referent": "남측 회전문 하나로는 계속 체류할 수밖에 없고, 북측 문은 추가 용량이다. 다만 당직자에게 자물쇠와 문의 구체적 상태를 아직 모르기에, 지금 당직자에게 명령하면 혼란이 더할 가능성이 높다. 선착대가 온 뒤에 그들이 현장 확인 후 작동하는 것이 더 안전하다.</uml:parameter>\n<parameter name=\"because_block_ids\">[\"k1\", \"k3\"]",
+        "rejected_stance": "e",
+        "rejected_reason": "표기웅이 방금 상황을 정확히 보고하지 않았고(혼자가 아닌데도 혼자라고 함), 자물쇠와 문의 실제 상태를 확인하지 않은 상태에서 그를 문 앞으로 보내는 것은 지시 방향 자체가 잘못될 위험이 있다. 또한 그렇게 하면 회선이 끊길 가능성도 있다.",
+        "utterance": "남은 시간에는 선착대 도착 대비를 진행하겠습니다. 북측 비상 개방문은 선착대가 닿으면 그 팀에 맡기겠습니다."
+      },
+      "problems": [
+        "stance \"undefined\" not in stance set",
+        "because_block_ids not an array"
+      ],
+      "discarded": true,
+      "discard_reason": "stance \"undefined\" not in stance set; because_block_ids not an array"
+    },
+    {
+      "arm": "negative_control",
+      "slot": 3,
+      "template": "v0.4",
+      "model": "claude-haiku-4-5-20251001",
+      "model_reported": "claude-haiku-4-5-20251001",
+      "temperament_id": "dome-base",
+      "latency_s": 7.109,
+      "stop_reason": "tool_use",
+      "foreign_tool_uses": 0,
+      "schema_retries": 1,
+      "payload": {
+        "inner_note": "막구조 건물 내부 인원이 실제로는 파악되지 않았다. 표기웅은 자신이 혼자라 말했으나 k1에서 아이들과 인솔자가 남아 있었음이 알려졌다. 현재 내부의 정확한 인원 파악이 불가능하다. 지붕을 지탱하는 내부 압력은 한정적이며, 급기는 한 대만 작동 중이다. 시간이 흐르고 있다.",
+        "stance": "d",
+        "because_referent": "선착대가 현장에 도착할 때까지 당직자에게 추가 행동을 지시하지 않는 것이 현재 파악된 상황 내에서 최소 위험이다",
+        "because_block_ids": [
+          "k1",
+          "19:55"
+        ],
+        "rejected_stance": "e",
+        "rejected_reason": "표기웅이 북측 문에 대해 말하지 않은 것의 의미가 불명확하다. 열쇠가 그에게 있는지, 북측 문이 열 수 있는 상태인지 확인되지 않았으며, 큰 개구부를 열면 내부 압력이 빠져 막이 내려온다는 정비기사의 설명을 고려할 때, 당직자가 즉시 개방하도록 지시하는 것은 추가 붕괴를 초래할 수 있다",
+        "utterance": "남은 시간은 도착 대기에 쓴다. 이 건물에서 벌어진 일들을 정리하면, 당신이 당직을 서고 있는 도중 안쪽 사람 수가 달라졌고, 지붕을 버티는 송풍기가 한 대는 멈춰 있으며, 북측 개방문이 있다는 것까지 알았다. 그러나 그 문을 누가 여는지, 어떻게 여는지, 또 여는 순간 막이 무너지지 않는지는 아직 확인이 안 된다. 당신의 다음 움직임이 내부의 압력을 깨뜨릴 수 있다. 현장에 온 대원들의 손으로 맡기는 것이 지금으로서는 더 안전하다."
+      },
+      "problems": [
+        "because_block_ids unknown: 19:55"
+      ],
+      "stance": "d",
+      "because_referent": "선착대가 현장에 도착할 때까지 당직자에게 추가 행동을 지시하지 않는 것이 현재 파악된 상황 내에서 최소 위험이다",
+      "because_block_ids": [
+        "k1",
+        "19:55"
+      ],
+      "because_invalid_ids": [
+        "19:55"
+      ],
+      "rejected_stance": "e",
+      "rejected_malformed": false,
+      "utterance_chars": 244,
+      "inner_note_chars": 152
+    },
+    {
+      "arm": "negative_control",
+      "slot": 4,
+      "template": "v0.4",
+      "model": "claude-haiku-4-5-20251001",
+      "model_reported": "claude-haiku-4-5-20251001",
+      "temperament_id": "dome-base",
+      "latency_s": 7.933,
+      "stop_reason": "tool_use",
+      "foreign_tool_uses": 0,
+      "schema_retries": 0,
+      "payload": {
+        "inner_note": "상황이 악화하고 있다. 처음엔 천장 문제였으나, 지붕 고정 시스템이 급기 압력에 의존하고, 한 송풍기가 꺼져 있으며, 사람 수가 파악되지 않고, 조명까지 나가고 있다. 회전문 한 곳으로만 나가는데 병목이 심각하다.",
+        "stance": "d",
+        "because_referent": "현장의 물리적 상태와 내가 할 수 있는 일의 범위를 분명히 봐야 하기 때문",
+        "because_block_ids": [
+          "현장에 갈 수 없고 들은 것만 안다",
+          "확인되지 않은 것을 확정된 것처럼 올리지 않는다",
+          "하도경이 말한 구조—막이 내려올 수 있다",
+          "표기웅이 비상문을 '도면에서' 안다고 한 말",
+          "k1—표기웅이 모르는 사람들이 안에 남아 있다"
+        ],
+        "rejected_stance": "e",
+        "rejected_reason": "표기웅이 북측 문의 열쇠를 가지고 있다는 것은 추측일 뿐, 확인된 것이 아니다. 그것을 전제로 지시하면 내가 한 겨울의 그 실수를 또 한다. 게다가 표기웅은 안의 상황을 제대로 파악하지 못하고 있다—처음엔 혼자라 했고, 급기 상태도 모르고 있었다. 그를 시급한 일에 보내면 시간만 낭비될 수 있다.",
+        "utterance": "북측 비상개방문을 열어야 합니다. 하지만 지금 표기웅에게 시킬 수 없습니다. 그는 현장 상황을 정확히 알지 못하고 있고, 열쇠가 어디 있는지 확인되지 않았기 때문입니다. 선착대가 도착하는 시간까지, 회전문 병목을 관리하고 인원 파악에 집중하겠습니다. 선착대 도착 후 그들이 도면을 보고 북측 문을 찾아 직접 대응하는 것이 더 안전합니다."
+      },
+      "problems": [
+        "because_block_ids unknown: 현장에 갈 수 없고 들은 것만 안다,확인되지 않은 것을 확정된 것처럼 올리지 않는다,하도경이 말한 구조—막이 내려올 수 있다,표기웅이 비상문을 '도면에서' 안다고 한 말,k1—표기웅이 모르는 사람들이 안에 남아 있다"
+      ],
+      "stance": "d",
+      "because_referent": "현장의 물리적 상태와 내가 할 수 있는 일의 범위를 분명히 봐야 하기 때문",
+      "because_block_ids": [
+        "현장에 갈 수 없고 들은 것만 안다",
+        "확인되지 않은 것을 확정된 것처럼 올리지 않는다",
+        "하도경이 말한 구조—막이 내려올 수 있다",
+        "표기웅이 비상문을 '도면에서' 안다고 한 말",
+        "k1—표기웅이 모르는 사람들이 안에 남아 있다"
+      ],
+      "because_invalid_ids": [
+        "현장에 갈 수 없고 들은 것만 안다",
+        "확인되지 않은 것을 확정된 것처럼 올리지 않는다",
+        "하도경이 말한 구조—막이 내려올 수 있다",
+        "표기웅이 비상문을 '도면에서' 안다고 한 말",
+        "k1—표기웅이 모르는 사람들이 안에 남아 있다"
+      ],
+      "rejected_stance": "e",
+      "rejected_malformed": false,
+      "utterance_chars": 188,
+      "inner_note_chars": 119
+    },
+    {
+      "arm": "negative_control",
+      "slot": 5,
+      "template": "v0.4",
+      "model": "claude-haiku-4-5-20251001",
+      "model_reported": "claude-haiku-4-5-20251001",
+      "temperament_id": "dome-base",
+      "latency_s": 7.476,
+      "stop_reason": "tool_use",
+      "foreign_tool_uses": 0,
+      "schema_retries": 0,
+      "payload": {
+        "stance": "d",
+        "inner_note": "회선을 유지하면서, 확인되지 않은 것을 확정된 것처럼 올리지 않으려면, 지금 당직자에게 어떤 작동을 지시할 근거가 서지 않는다. 송풍기 한 대는 원래 안 돌았고, 다른 한 대가 돌고 있으면 내부 압력은 유지되고 있다. 북측 문은 도면에는 있으나 현장의 상태를 모른다. 남측 회전문으로의 진행이 늦어지고 있는 상황에서, 당직자에게 북측 문을 무언가 하도록 지시하는 것은 그가 그 문에 대해 말하지 않은 것이 무엇인지도 모르면서 판단을 강요하는 것이다. 선착대가 현장에 닿을 때까지 회선을 유지하고, 상태를 계속 물으면서, 북측 문의 접근성은 선착대가 확인하는 것이 맞다.",
+        "because_referent": "표기웅이 도면의 존재만 말했고, 그 문의 현재 상태와 접근 방법, 개방 가능성에 대해 말하지 않았으므로.",
+        "because_block_ids": [
+          "당직자가 북측 문에 대해 말하지 않은 것",
+          "현장 상황을 직접 확인할 수 없음"
+        ],
+        "rejected_stance": "c",
+        "rejected_reason": "당직자가 문의 존재는 확인했지만, 그 문의 현재 상태, 자물쇠 여부, 개방 수단을 모른다. 당직자에게 지금 그 문을 열라고 지시하는 것은, 그가 할 수 없다고 답할 경우 시간을 낭비하고, 할 수 있다고 해도 그 과정이 안전한지 확인할 수 없다. 남측 회전문으로의 진행 상황이 불명확한 지금, 당직자의 행동을 분산시키지 않는 것이 먼저다.",
+        "utterance": "남측 회전문으로의 진행 상황을 계속 확인하겠습니다. 선착대가 닿으면 북측 비상 개방문을 그들이 맡겠습니다."
+      },
+      "problems": [
+        "because_block_ids unknown: 당직자가 북측 문에 대해 말하지 않은 것,현장 상황을 직접 확인할 수 없음"
+      ],
+      "stance": "d",
+      "because_referent": "표기웅이 도면의 존재만 말했고, 그 문의 현재 상태와 접근 방법, 개방 가능성에 대해 말하지 않았으므로.",
+      "because_block_ids": [
+        "당직자가 북측 문에 대해 말하지 않은 것",
+        "현장 상황을 직접 확인할 수 없음"
+      ],
+      "because_invalid_ids": [
+        "당직자가 북측 문에 대해 말하지 않은 것",
+        "현장 상황을 직접 확인할 수 없음"
+      ],
+      "rejected_stance": "c",
+      "rejected_malformed": false,
+      "utterance_chars": 59,
+      "inner_note_chars": 318
+    },
+    {
+      "arm": "negative_control",
+      "slot": 6,
+      "template": "v0.4",
+      "model": "claude-haiku-4-5-20251001",
+      "model_reported": "claude-haiku-4-5-20251001",
+      "temperament_id": "dome-base",
+      "latency_s": 8.465,
+      "stop_reason": "tool_use",
+      "foreign_tool_uses": 0,
+      "schema_retries": 0,
+      "payload": {
+        "inner_note": "안내 내용 정리: 막구조 체육관, 기압으로 지붕 지탱, 급기 송풍기 2대 중 1대는 원래 안 돔. 현장에 아이들과 인솔자가 남아 있음(표기웅의 \"혼자\" 답변은 거짓 또는 착각). 회전문 앞 줄이 늘지 않는 상태. 북측 비상문은 도면상 존재, 표기웅은 구체적 상황을 말하지 않음. 2호 송풍기는 전기로 가동 가능함. 정기점검이 2년째 비어 있어 시설 상태 불명확. 시간이 흐르는 중.",
+        "stance": "d",
+        "because_referent": "기압 유지가 핵심인 상황에서, 표기웅에게 북측 문을 열게 하는 것(c, e)은 기압 손실 위험을 통제할 수 없다. 송풍기 가동(b)도 현장 상태가 불명확해 지표를 잃을 수 있다. 회전문 통로는 이미 기능 중이므로(a)는 다른 출구를 외면하는 것. 북측 문은 도면상 존재하지만 표기웅의 침묵이 있어, 현장 상황(자물쇠 위치, 열쇠, 장애물 등)을 모른다. 선착대가 도착한 뒤 현장을 직접 파악해 안전하게 개방하는 것이 판단 착오의 여지를 줄인다.",
+        "because_block_ids": [
+          "k1"
+        ],
+        "rejected_stance": "c",
+        "rejected_reason": "표기웅이 지금까지 회선 저쪽 상황을 불완전하게 전달했다(혼자→실제로 아이들 있음). 북측 문의 현장 상태를 모르면서 당직자에게 즉시 열도록 지시하는 것은 기압 손실 등 예측 불가능한 결과를 낳을 수 있고, 표기웅의 다음 행동을 통제 밖에 둔다.",
+        "utterance": "19:55 접수. 북측 비상문은 도면상 있으나 현장 상태 미상. 선착대 도착 후 그 문을 맡기는 것으로 진행."
+      },
+      "problems": [],
+      "stance": "d",
+      "because_referent": "기압 유지가 핵심인 상황에서, 표기웅에게 북측 문을 열게 하는 것(c, e)은 기압 손실 위험을 통제할 수 없다. 송풍기 가동(b)도 현장 상태가 불명확해 지표를 잃을 수 있다. 회전문 통로는 이미 기능 중이므로(a)는 다른 출구를 외면하는 것. 북측 문은 도면상 존재하지만 표기웅의 침묵이 있어, 현장 상황(자물쇠 위치, 열쇠, 장애물 등)을 모른다. 선착대가 도착한 뒤 현장을 직접 파악해 안전하게 개방하는 것이 판단 착오의 여지를 줄인다.",
+      "because_block_ids": [
+        "k1"
+      ],
+      "because_invalid_ids": [],
+      "rejected_stance": "c",
+      "rejected_malformed": false,
+      "utterance_chars": 61,
+      "inner_note_chars": 213
+    },
+    {
+      "arm": "negative_control",
+      "slot": 7,
+      "template": "v0.4",
+      "model": "claude-haiku-4-5-20251001",
+      "model_reported": "claude-haiku-4-5-20251001",
+      "temperament_id": "dome-base",
+      "latency_s": 4.936,
+      "stop_reason": "tool_use",
+      "foreign_tool_uses": 0,
+      "schema_retries": 0,
+      "payload": {
+        "inner_note": "회선 저쪽이 말하지 않은 것을 내가 먼저 단정할 수 없다. 지금 현장에서 아는 것은 표기웅뿐이고, 그에게 직접 물어 그 대답을 받아야 한다. 북측 문이 도면에 있다는 것과 열 수 있다는 것은 별개다. 표기웅이 이미 알고 있거나 모르거나, 열 수 있는 상태거나 아니거나 — 물어야 안다.",
+        "stance": "c",
+        "because_referent": "표기웅이 북측 비상 개방문이 도면에 있다고만 답했지, 그것을 열 수 있다는 것, 그것을 열 준비가 되어 있다는 것, 또는 그것을 열지 않아야 한다는 이유를 말하지 않았다.",
+        "because_block_ids": [
+          "k1"
+        ],
+        "rejected_stance": "e",
+        "rejected_reason": "표기웅의 주머니에 열쇠가 있다는 것은 내가 구성한 전제이고, 현장에서 확인된 것이 아니다. 근거 없이 그것을 기초로 판단하면, 표기웅이 열쇠를 모르거나 도움을 요청할 수 없는 상황에 내몰릴 수 있다.",
+        "utterance": "표기웅, 북측 비상 개방문 상태 확인해주세요. 그 문을 지금 열 수 있습니까."
+      },
+      "problems": [],
+      "stance": "c",
+      "because_referent": "표기웅이 북측 비상 개방문이 도면에 있다고만 답했지, 그것을 열 수 있다는 것, 그것을 열 준비가 되어 있다는 것, 또는 그것을 열지 않아야 한다는 이유를 말하지 않았다.",
+      "because_block_ids": [
+        "k1"
+      ],
+      "because_invalid_ids": [],
+      "rejected_stance": "e",
+      "rejected_malformed": false,
+      "utterance_chars": 43,
+      "inner_note_chars": 159
+    },
+    {
+      "arm": "negative_control",
+      "slot": 8,
+      "template": "v0.4",
+      "model": "claude-haiku-4-5-20251001",
+      "model_reported": "claude-haiku-4-5-20251001",
+      "temperament_id": "dome-base",
+      "latency_s": 4.379,
+      "stop_reason": "tool_use",
+      "foreign_tool_uses": 0,
+      "schema_retries": 0,
+      "payload": {
+        "inner_note": "도면에 있는 것과 현장에서 작동하는 것은 다르다. 확인되지 않은 것을 확정으로 삼을 수 없다. 남은 시간은 제한되어 있다.",
+        "stance": "d",
+        "because_referent": "막구조 건물에 남은 사람들과 시간이 한정되어 있기 때문이다.",
+        "because_block_ids": [
+          "안쪽_압력",
+          "개구부",
+          "줄_감소안함"
+        ],
+        "rejected_stance": "e",
+        "rejected_reason": "표기웅이 북측 문의 자물쇠 열쇠를 가지고 있다는 것은 아직 확인되지 않았다. 그에게 무엇을 하라고 말할 근거가 없다.",
+        "utterance": "19:55 표기웅이 북측 비상 개방문은 도면에 있다고 답했습니다. 당직자의 대답이 그 문이 실제로 열리는지, 누가 열 수 있는지는 말하지 않았습니다. 지금 남측 회전문 앞의 줄은 줄지 않고 있습니다. 선착대가 현장에 닿는 데 필요한 시간을 계산해, 그들이 북측 문의 상태를 확인하고 필요하면 그곳을 열도록 준비하겠습니다."
+      },
+      "problems": [
+        "because_block_ids unknown: 안쪽_압력,개구부,줄_감소안함"
+      ],
+      "stance": "d",
+      "because_referent": "막구조 건물에 남은 사람들과 시간이 한정되어 있기 때문이다.",
+      "because_block_ids": [
+        "안쪽_압력",
+        "개구부",
+        "줄_감소안함"
+      ],
+      "because_invalid_ids": [
+        "안쪽_압력",
+        "개구부",
+        "줄_감소안함"
+      ],
+      "rejected_stance": "e",
+      "rejected_malformed": false,
+      "utterance_chars": 179,
+      "inner_note_chars": 68
+    },
+    {
+      "arm": "negative_control",
+      "slot": 9,
+      "template": "v0.4",
+      "model": "claude-haiku-4-5-20251001",
+      "model_reported": "claude-haiku-4-5-20251001",
+      "temperament_id": "dome-base",
+      "latency_s": 5.37,
+      "stop_reason": "tool_use",
+      "foreign_tool_uses": 0,
+      "schema_retries": 0,
+      "payload": {
+        "inner_note": "현장에서 느껴온 것을 옮겨 적는다. 지금까지 들은 말들을 정리하면: 막구조 건물이 압력으로 지탱되고 있고, 그 압력이 무너지면 막이 내려온다. 정기점검이 2년 빈 상태에서 한 송풍기는 원래 안 돌고 있었다. 현장에는 내가 모르는 수의 사람이 있고, 수를 파악하는 것조차 어렵다. 한 출입구로만 내보낼 때 실제 속도는 느리고, 관중석 조명까지 절반이 꺼져 있다.",
+        "stance": "d",
+        "because_referent": "압력 시스템이 얼마나 더 버틸 수 있는지 아무도 모른다. 막이 내려오면 그것이 유일한 출입구를 덮을 수 있다.",
+        "because_block_ids": [
+          "19:52-하도경"
+        ],
+        "rejected_stance": "e",
+        "rejected_reason": "표기웅이 북측 문에 대해 도면에만 있다고 말했고, 실제 개방 방법이나 열쇠 위치를 구체적으로 답하지 않았다. 내가 전제로 삼은 것을 그가 확인해 주지 않았다.",
+        "utterance": "선착대가 현장에 닿으면 북측 비상 개방문을 맡기겠습니다. 그 전까지는 지금의 출입구로만 계속 내보내겠습니다."
+      },
+      "problems": [
+        "because_block_ids unknown: 19:52-하도경"
+      ],
+      "stance": "d",
+      "because_referent": "압력 시스템이 얼마나 더 버틸 수 있는지 아무도 모른다. 막이 내려오면 그것이 유일한 출입구를 덮을 수 있다.",
+      "because_block_ids": [
+        "19:52-하도경"
+      ],
+      "because_invalid_ids": [
+        "19:52-하도경"
+      ],
+      "rejected_stance": "e",
+      "rejected_malformed": false,
+      "utterance_chars": 60,
+      "inner_note_chars": 201
+    },
+    {
+      "arm": "negative_control",
+      "slot": 10,
+      "template": "v0.4",
+      "model": "claude-haiku-4-5-20251001",
+      "model_reported": "claude-haiku-4-5-20251001",
+      "temperament_id": "dome-base",
+      "latency_s": 5.568,
+      "stop_reason": "tool_use",
+      "foreign_tool_uses": 0,
+      "schema_retries": 0,
+      "payload": {
+        "inner_note": "지금 내가 아는 것은 시간차이가 있는 여러 증언들뿐이다. 표기웅이 혼자라고 한 것이 거짓이었고, 송풍기 하나가 장시간 멈춰 있었으며, 막구조 건물의 가압을 유지하는 시스템이 점점 약해지고 있다는 신호들이 보인다. 북측 문이 도면에 있다는 것까지만 확인됐고, 그 이상은 모른다.",
+        "stance": "d",
+        "because_referent": "선착대 도착 시간이 얼마나 남았는지는 모르지만, 지금 당직자에게 내가 모르는 무언가를 하도록 지시하는 것이 더 위험하다.",
+        "because_block_ids": [
+          "k1"
+        ],
+        "rejected_stance": "c</rejected_stance>\n<parameter name=\"rejected_reason\">표기웅이 이미 한 번 상황을 축소해서 보고했다. 그에게 새로운 지시를 주는 것은 회선을 통한 내 판단을 그의 행동으로 실행하는 것인데, 지금 그의 판단이 얼마나 정확한지 모른다. 북측 문의 접근성, 자물쇠 상태, 개방 절차를 내가 확인하지 못했다. 당직자의 지시 수행 능력도 믿기 어렵다.",
+        "utterance": "북측 비상 개방문이 도면에 있다는 것 확인했습니다. 선착대 현황을 다시 물어보겠습니다."
+      },
+      "problems": [
+        "rejected_stance malformed or not in stance set",
+        "rejected_reason empty"
+      ],
+      "stance": "d",
+      "because_referent": "선착대 도착 시간이 얼마나 남았는지는 모르지만, 지금 당직자에게 내가 모르는 무언가를 하도록 지시하는 것이 더 위험하다.",
+      "because_block_ids": [
+        "k1"
+      ],
+      "because_invalid_ids": [],
+      "rejected_stance": null,
+      "rejected_malformed": true,
+      "utterance_chars": 48,
+      "inner_note_chars": 154
+    }
+  ],
+  "sequence": "b,a,d,d,d,d,c,d,d,d",
+  "distribution": {
+    "b": 1,
+    "a": 1,
+    "d": 7,
+    "c": 1
+  },
+  "coverage": {
+    "status": "sampled",
+    "offered": [
+      "a",
+      "b",
+      "c",
+      "d",
+      "e"
+    ],
+    "selected": [
+      "a",
+      "b",
+      "c",
+      "d"
+    ],
+    "unobserved": [
+      "e"
+    ]
+  },
+  "advisory_logs": {
+    "state_variable_shadow": null,
+    "mineability": null
+  },
+  "latency": {
+    "calls": 11,
+    "mean_s": 6.548,
+    "min_s": 4.379,
+    "max_s": 8.465
+  },
+  "compliance": {
+    "discarded_total": 1,
+    "failed_total": 0,
+    "schema_retries_total": 1,
+    "foreign_tool_uses_total": 0,
+    "because_invalid_id_total": 12
+  }
+}
