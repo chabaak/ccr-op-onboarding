@@ -32,10 +32,10 @@ export function isCallType(value: unknown): value is CallType {
  * A client that sends them is ignored, not trusted.
  *
  * `pack` names the datapack the run is playing, and is the ONLY thing that
- * selects among the per-scenario default prompts. It is a name, not a value:
- * the client says which agent, this tier says what that agent is, and the
- * refusal above is untouched. Optional because the fallback is deliberate —
- * see `FALLBACK_PACK` in `default-prompt.ts`.
+ * selects among the generated default prompts. It is a name, not a value: the
+ * client says which agent, this tier says what that agent is, and the refusal
+ * above is untouched. Optional because the fallback is deliberate; see
+ * `default-prompt.ts`.
  *
  * ⚠️ OPEN: whether `user` arrives pre-rendered from the composer or is rendered
  * here from `slots`. Both layers' templates exist; only the split is undecided.
