@@ -1,0 +1,53 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "default-prompts.schema.json",
+  "title": "scenario default prompts — 팩별 프록시 기본 프롬프트 출처",
+  "description": "프록시 기본 프롬프트 생성기가 읽는 팩별 슬롯 출처 매핑. 슬롯 문구는 측정 suite JSON이나 동결된 manifest 항목이 소유한다.",
+  "type": "object",
+  "required": ["prompts"],
+  "additionalProperties": false,
+  "properties": {
+    "prompts": {
+      "type": "array",
+      "minItems": 1,
+      "items": {
+        "anyOf": [
+          {
+            "type": "object",
+            "required": ["slug", "measured_by"],
+            "additionalProperties": false,
+            "properties": {
+              "slug": { "type": "string", "minLength": 1 },
+              "measured_by": {
+                "type": "string",
+                "pattern": "^tools/probe/dday-mechanism/suites/[^/]+\\.json$"
+              }
+            }
+          },
+          {
+            "type": "object",
+            "required": ["slug", "frozen_slots"],
+            "additionalProperties": false,
+            "properties": {
+              "slug": { "type": "string", "minLength": 1 },
+              "frozen_slots": {
+                "type": "object",
+                "required": ["FLAW", "INCIDENT", "PRIORITY_LIST"],
+                "additionalProperties": false,
+                "properties": {
+                  "FLAW": { "type": "string", "minLength": 1 },
+                  "INCIDENT": { "type": "string", "minLength": 1 },
+                  "PRIORITY_LIST": {
+                    "type": "array",
+                    "minItems": 1,
+                    "items": { "type": "string", "minLength": 1 }
+                  }
+                }
+              }
+            }
+          }
+        ]
+      }
+    }
+  }
+}
