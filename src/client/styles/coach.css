@@ -69,9 +69,9 @@
    hairlines on integer coordinates — antialiasing would smear each of them over
    two device pixels and the mark would read as a soft glow, which is the thing
    that was removed. */
-.coach-edge{fill:none;stroke:var(--seal);stroke-width:1;shape-rendering:crispEdges;opacity:.9}
+.coach-edge{fill:none;stroke:var(--warning);stroke-width:1;shape-rendering:crispEdges;opacity:.9}
 /* The leader is diagonal as often as not, so it keeps its antialiasing. */
-.coach-lead{fill:none;stroke:var(--seal);stroke-width:1.2;stroke-linecap:square;opacity:.85}
+.coach-lead{fill:none;stroke:var(--warning);stroke-width:1.2;stroke-linecap:square;opacity:.85}
 
 /* ─── the plate ──────────────────────────────────────────────────────────── */
 /* `--coach-x` / `--coach-y` are written by `shell/coach.ts` on every measure
@@ -121,14 +121,14 @@
   transition:color .18s,border-color .18s}
 .coach-skip:hover{color:var(--txt-hi);border-color:var(--txt-3)}
 
-.coach-ok{background:var(--seal);border:1px solid var(--seal-2);color:var(--txt-max);
+.coach-ok{background:var(--warning);border:1px solid var(--warning-strong);color:var(--txt-max);
   font-size:var(--fs-11);font-weight:700;
   box-shadow:inset 0 1px 0 var(--sheen-25);
   transition:filter .18s,transform .12s}
 .coach-ok:hover{filter:brightness(1.14)}
 .coach-ok:active{transform:translateY(1px)}
 
-/* Light, because the bar is dark — `--pap-max` was the focus ring when this sat
+/* Light, because the bar is dark — `--surface-text-max` was the focus ring when this sat
    on paper, and on chrome it would be invisible against the seal.
    HAIRLINE, and that is about consistency rather than taste. The layer focuses
    ✓ as each plate opens (so Enter advances the walk), and `:focus-visible` fires

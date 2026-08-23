@@ -1,33 +1,34 @@
 /* ===========================================================================
    win-agent-file.css — WINDOW 1 · AGENT FILE (desktop.css lines 270..349).
 
-   A kraft personnel dossier: ruled form head, numbered sections, a redacted
-   §3 기질, the prompt slots the red thread pins into, and the deploy stamp.
+   A personnel dossier: ruled form head, numbered sections, a redacted §3 기질,
+   the prompt slots the red thread pins into, and the deploy stamp.
    =========================================================================== */
 
 .win-file{--delay:.28s}
+.win-file .win-body{padding:var(--space-20) var(--space-22) var(--space-24)}
 
 .file-head{display:flex;justify-content:space-between;align-items:flex-end;
-  border-bottom:2px solid var(--graphite);padding-bottom:var(--space-7);
+  border-bottom:2px solid var(--surface-text);padding-bottom:var(--space-7);
   margin-bottom:var(--space-14);position:relative}
 .file-head::after{content:'';position:absolute;left:0;right:0;bottom:-4px;height:1px;
-  background:var(--graphite);opacity:.5}
-.fh-doc{font-size:var(--fs-8-5);letter-spacing:.13em;color:var(--faded)}
+  background:var(--surface-text);opacity:.5}
+.fh-doc{font-size:var(--fs-8-5);letter-spacing:.13em;color:var(--surface-muted)}
 /* x5 — the file's own name is a FIXED value, so it is machine print like the
    document number above it. 명조 is reserved for what a person wrote, and
    nobody wrote 현장 요원 운용 파일 — it is what the form is called. */
 .fh-title{font-family:var(--mono);font-weight:700;font-size:var(--fs-17);
-  letter-spacing:.06em;color:var(--pap-hd);margin-top:var(--space-2)}
+  letter-spacing:.06em;color:var(--surface-text-heading);margin-top:var(--space-2)}
 .fh-right{text-align:right}
-.fh-k{font-size:var(--fs-8);letter-spacing:.2em;color:var(--faded)}
-.fh-v{font-size:var(--fs-14);font-weight:700;letter-spacing:.13em;color:var(--seal-2)}
+.fh-k{font-size:var(--fs-8);letter-spacing:.2em;color:var(--surface-muted)}
+.fh-v{font-size:var(--fs-14);font-weight:700;letter-spacing:.13em;color:var(--warning-strong)}
 
 .sect{margin-bottom:var(--space-13);position:relative}
 .sect-hd{display:flex;align-items:baseline;gap:var(--space-8);margin-bottom:var(--space-4)}
 /* …and so are the section titles: 임무 · 행동 원칙 · 기질 · 교신 지침 · 식별 ·
    인수인계 사항 are the form's headings, printed on it before anyone filled it in. */
 .sect-hd h4{font-family:var(--mono);font-size:var(--fs-12);font-weight:700;
-  letter-spacing:.08em;color:var(--pap-1)}
+  letter-spacing:.08em;color:var(--surface-text-1)}
 /* x7 — `.sect-flag` and its two state skins are DELETED (민서, 08-09). The badge
    said 고정 / 조작 가능 / 열람 in the corner of every section head on every page,
    which is the form naming the kind of field beside a heading that already
@@ -45,9 +46,9 @@
    are both flush at the section's own left edge, and 2px of inset was enough to
    make the prose between them look indented against them. Measured before and
    after — heading, body and note now share one left edge. */
-.sect-body{font-family:var(--myeong);font-size:var(--fs-11-5);line-height:1.72;color:var(--pap-3);
+.sect-body{font-family:var(--myeong);font-size:var(--fs-11-5);line-height:1.72;color:var(--surface-text-3);
   text-align:justify;white-space:pre-line}
-.sect.fixed .sect-body{color:var(--pap-4)}
+.sect.fixed .sect-body{color:var(--surface-text-4)}
 /* x7 — the cover's red note: the one line in a section that is not the order
    itself but a warning about it, so it is set apart from the body it follows
    the way the sealed notice used to be — the seal's own red, small, and at a
@@ -55,7 +56,7 @@
    element (`components/dossier.ts` emits it as one) precisely so it can carry
    its own ink without the body having to be marked up mid-sentence. */
 .sect-note{font-size:var(--fs-8-5);line-height:1.7;letter-spacing:.12em;
-  color:var(--seal-2);margin-top:var(--space-6);word-break:keep-all}
+  color:var(--warning-strong);margin-top:var(--space-6);word-break:keep-all}
 /* x7 — the series name where the cover says it in BODY prose. The same ink the
    호출부호 row already wears (`.rd-code` below), so the incident summary and the
    identity it hands to agree on which word is the agent. `components/dossier.ts`
@@ -102,20 +103,20 @@
    heaviest IBM Plex Mono `fonts.css` self-hosts; that is not a defect, it is the
    same weight `.fh-title` and `.sect-hd h4` print at, and it is what `.rd-code`
    has always resolved to for the identical declaration. */
-.rd-echo{font-family:var(--mono);color:var(--seal-2);font-weight:800;letter-spacing:.06em}
+.rd-echo{font-family:var(--mono);color:var(--warning-strong);font-weight:800;letter-spacing:.06em}
 .sect-rows{display:grid;grid-template-columns:96px 1fr;gap:var(--space-2) var(--space-10);
   font-size:var(--fs-10-5);line-height:1.6}
-.sect-rows dt{color:var(--faded);letter-spacing:.06em}
+.sect-rows dt{color:var(--surface-muted);letter-spacing:.06em}
 /* 식별's three rows are typed-in form values (배치 · 권한 read the same on every
    agent's page), not prose — machine print, like the keys beside them. */
-.sect-rows dd{font-family:var(--mono);color:var(--pap-3)}
+.sect-rows dd{font-family:var(--mono);color:var(--surface-text-3)}
 /* x4 — 식별's 호출부호. The rest of 식별 is standing text that reads the same on
    every agent's page (배치 · 권한 never change); the callsign is the ONE value
    that says which agent this page is about, and the file is now a document the
    operator flips through. It is set in the seal's own red so a page turn lands
    on the identity first. `components/dossier.ts` decides which row wears the
    class — the sheet never spells the Korean key. */
-.sect-rows dd.rd-code{color:var(--seal-2);font-weight:800;letter-spacing:.08em}
+.sect-rows dd.rd-code{color:var(--warning-strong);font-weight:800;letter-spacing:.08em}
 
 /* §3 기질's redaction lived here and is DELETED (x7, 민서 08-09).
    `.sect.sealed .sect-body`, `.redact`, `.redact i`, `@keyframes redactIn` and
@@ -151,13 +152,13 @@
    button on the end of each. Justified, the last line of every seat stretched
    its inter-word spaces into rivers wide enough to read as a table. */
 .slots{margin-top:var(--space-8);font-family:var(--myeong);font-size:var(--fs-11-5);
-  line-height:2.05;color:var(--pap-1);text-align:left;word-break:keep-all}
+  line-height:2.05;color:var(--surface-text-1);text-align:left;word-break:keep-all}
 
 /* one seated sentence: an inline run, so the paragraph can break inside it */
 .slot{display:inline}
 .slot::before{content:attr(data-no);font-family:var(--mono);font-size:var(--fs-8);font-weight:700;
-  letter-spacing:.1em;color:var(--seal-2);vertical-align:.15em;margin-right:var(--space-4);
-  padding:0 var(--space-3);border:1px solid var(--seal-a25);border-radius:1px;
+  letter-spacing:.1em;color:var(--warning-strong);vertical-align:.15em;margin-right:var(--space-4);
+  padding:0 var(--space-3);border:1px solid var(--warning-a25);border-radius:1px;
   white-space:nowrap}
 .slot .bcard{display:inline;padding:0;background:transparent;border:0}
 .slot .bc-text{display:inline;font-family:inherit;font-size:inherit;line-height:inherit;
@@ -166,14 +167,14 @@
    CLOSES the run — see the note in `slot-board.ts` on why it is last */
 .slot-pin{display:inline-block;width:7px;height:7px;border-radius:50%;vertical-align:.28em;
   margin-left:var(--space-4);
-  background:radial-gradient(circle at 35% 30%,var(--pin-hi),var(--seal-2));
-  box-shadow:0 0 6px var(--seal-a55)}
-.slot-unset{font-size:var(--fs-8);letter-spacing:.14em;color:var(--faded);
+  background:radial-gradient(circle at 35% 30%,var(--pin-hi),var(--warning-strong));
+  box-shadow:0 0 6px var(--warning-a55)}
+.slot-unset{font-size:var(--fs-8);letter-spacing:.14em;color:var(--surface-muted);
   margin-left:var(--space-5);padding:0 var(--space-5);vertical-align:.15em;
   border:1px solid var(--sh-25);border-radius:1px;background:var(--sheen-28);
   transition:.14s;white-space:nowrap}
-.slot-unset:hover{border-color:var(--seal);color:var(--seal-2);background:var(--seal-wash)}
-.slot.locked::before{color:var(--faded);border-color:var(--sh-25)}
+.slot-unset:hover{border-color:var(--warning);color:var(--warning-strong);background:var(--warning-wash)}
+.slot.locked::before{color:var(--surface-muted);border-color:var(--sh-25)}
 .slot.locked .slot-unset{display:none}
 
 /* the blank — one panel, the line centred in it both ways */
@@ -183,27 +184,27 @@
   transition:background .18s,border-color .18s,box-shadow .18s}
 .slot-blank::before{content:none}
 .slot-blank .slot-empty{font-family:var(--myeong);font-size:var(--fs-11);line-height:1.7;
-  color:var(--faded-2);background:transparent;border:0;word-break:keep-all}
+  color:var(--surface-muted-2);background:transparent;border:0;word-break:keep-all}
 .slot-blank .slot-target{cursor:pointer}
-.slot-blank.droppable{border-color:var(--seal);background:var(--seal-wash);
-  box-shadow:0 0 0 3px var(--seal-a12)}
+.slot-blank.droppable{border-color:var(--warning);background:var(--warning-wash);
+  box-shadow:0 0 0 3px var(--warning-a12)}
 .slot-blank.locked{opacity:.92}
 .slot-blank.locked .slot-empty{opacity:.5}
 
 /* x5 — the zone is a COLUMN: the counter-and-button row, then the note across
    the full page width. See the note in `deploy-button.ts` on why they split. */
 .deploy-zone{margin-top:var(--space-18);margin-bottom:var(--space-10);
-  padding-top:var(--space-12);border-top:2px solid var(--graphite);
+  padding-top:var(--space-12);border-top:2px solid var(--surface-text);
   display:flex;flex-direction:column;gap:var(--space-8)}
 .dz-row{display:flex;align-items:center;justify-content:space-between;gap:var(--space-12)}
-.dz-meta{min-width:0;font-size:var(--fs-9);letter-spacing:.08em;color:var(--faded);line-height:1.6}
-.dz-meta span{color:var(--graphite);font-weight:600}
+.dz-meta{min-width:0;font-size:var(--fs-9);letter-spacing:.08em;color:var(--surface-muted);line-height:1.6}
+.dz-meta span{color:var(--surface-text);font-weight:600}
 #deployState{font-size:var(--fs-9);letter-spacing:.06em;line-height:1.6;
-  color:var(--graphite);font-weight:600;word-break:keep-all}
+  color:var(--surface-text);font-weight:600;word-break:keep-all}
 .btn-deploy{flex:0 0 auto;display:flex;flex-direction:column;align-items:center;gap:var(--space-1);
-  padding:var(--space-9) var(--space-20);background:var(--graphite);color:var(--kraft);
+  padding:var(--space-9) var(--space-20);background:var(--surface-text);color:var(--surface);
   border:1px solid var(--edge);box-shadow:2px 2px 0 var(--sh-35);transition:.14s}
-.btn-deploy:hover:not(:disabled){background:var(--seal-2);box-shadow:2px 2px 0 var(--sh-5);transform:translate(-1px,-1px)}
+.btn-deploy:hover:not(:disabled){background:var(--warning-strong);box-shadow:2px 2px 0 var(--sh-5);transform:translate(-1px,-1px)}
 .btn-deploy:active:not(:disabled){transform:translate(1px,1px);box-shadow:none}
 .btn-deploy:disabled{opacity:.3;cursor:not-allowed;box-shadow:none}
 
@@ -261,7 +262,7 @@
    it was being pressed by nobody, and the coach layer measures targets off
    `getBoundingClientRect`. (An animated property outranks any author
    declaration, so `:hover` cannot repaint a cued button. Nothing is lost: the
-   hover colour and the cue's lit half are the same `--seal-2`.)
+   hover colour and the cue's lit half are the same `--warning-strong`.)
 
    REDUCED MOTION — THE END KEYFRAME IS THE ACTIVATED ONE, AND THAT IS THE WHOLE
    ORDERING. `base.css` collapses every animation to a single 1 ms pass with
@@ -309,9 +310,9 @@
 .btn-deploy.is-cued{animation:dzCue 1s linear infinite both}
 @keyframes dzCue{
   /* the deactivated look — the background `.btn-deploy` itself declares */
-  0%,49.9%{background:var(--graphite)}
+  0%,49.9%{background:var(--surface-text)}
   /* …and the ACTIVATED look, which is also where the animation ENDS */
-  50%,100%{background:var(--seal-2)}}
+  50%,100%{background:var(--warning-strong)}}
 
 .bd-main{font-size:var(--fs-13);font-weight:700;letter-spacing:.28em;text-indent:.28em}
 .bd-sub{font-family:var(--mono);font-size:var(--fs-9);opacity:.72;letter-spacing:.06em}
@@ -319,7 +320,7 @@
 /* deploy stamp */
 .stamp{position:absolute;right:39px;top:132px;z-index:4;pointer-events:none;
   display:none;flex-direction:column;align-items:center;gap:var(--space-2);
-  padding:var(--space-9) var(--space-15);border:3px double var(--seal);color:var(--seal);
+  padding:var(--space-9) var(--space-15);border:3px double var(--warning);color:var(--warning);
   transform:rotate(-11deg);opacity:.82;mix-blend-mode:multiply}
 .stamp.on{display:flex;animation:stampSlam .55s cubic-bezier(.2,1.4,.3,1) both}
 .stamp span{font-family:var(--mono);font-weight:800;font-size:var(--fs-16);letter-spacing:.12em}
@@ -346,10 +347,10 @@
 .pg-nav{flex:0 0 auto}
 .pg-nav{display:flex;align-items:center;justify-content:center;gap:var(--space-10);
   padding:var(--space-6) 0 var(--space-2);border-top:1px solid var(--sh-28)}
-.pg-turn{font-size:var(--fs-13);line-height:1;color:var(--pap-3);background:transparent;
+.pg-turn{font-size:var(--fs-13);line-height:1;color:var(--surface-text-3);background:transparent;
   border:1px solid var(--sh-28);border-radius:2px;padding:var(--space-1) var(--space-8);cursor:pointer}
 .pg-turn:disabled{opacity:.35;cursor:default}
-.pg-count{font-size:var(--fs-8-5);letter-spacing:.16em;color:var(--faded)}
+.pg-count{font-size:var(--fs-8-5);letter-spacing:.16em;color:var(--surface-muted)}
 
 /* ═══ x10 — THE WAY OUT OF THE COVER IS MARKED (민서, 08-10) ══════════════════
    *"After the cover typing is finished, wait 1 second. If the user does not click
@@ -442,7 +443,7 @@
    latch a whole second before the arm would have fired. ══════════════════════ */
 .pg-next{position:relative}
 .pg-next.is-cued::after{content:'';position:absolute;inset:-2px;
-  border:1px solid var(--seal-2);border-radius:3px;pointer-events:none;
+  border:1px solid var(--warning-strong);border-radius:3px;pointer-events:none;
   animation:pgCue 1s linear infinite both}
 @keyframes pgCue{
   /* nothing drawn at all — the arrow wears its own face, unmarked */
@@ -475,10 +476,10 @@
    button goes. */
 .cover-skip{padding:var(--space-2) 0 var(--space-2) var(--space-6);
   background:transparent;border:0;
-  font-size:var(--fs-8-5);letter-spacing:.16em;color:var(--faded);
+  font-size:var(--fs-8-5);letter-spacing:.16em;color:var(--surface-muted);
   text-decoration:underline;text-underline-offset:.3em;cursor:pointer;
   transition:color .14s;white-space:nowrap}
-.cover-skip:hover{color:var(--seal-2)}
+.cover-skip:hover{color:var(--warning-strong)}
 
 /* U5.3 — a finished sitting's page: nothing to press, and no `data-block-id`,
    so no red thread reaches back into a page whose run is over.
@@ -491,6 +492,6 @@
    was said, not a place anything can be put. */
 .filed-file{padding-top:var(--space-2)}
 .filed-para{font-family:var(--myeong);font-size:var(--fs-11-5);line-height:2.05;
-  color:var(--pap-3);text-align:left;word-break:keep-all}
+  color:var(--surface-text-3);text-align:left;word-break:keep-all}
 .filed-s{display:inline}
-.filed-empty{font-size:var(--fs-8-5);color:var(--faded)}
+.filed-empty{font-size:var(--fs-8-5);color:var(--surface-muted)}

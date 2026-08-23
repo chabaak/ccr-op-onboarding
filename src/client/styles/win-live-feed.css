@@ -109,15 +109,15 @@
    weight are kept: the name is still the informative half of the line. */
 .fl-npc .fl-c b{font-weight:600;color:var(--npc)}
 .fl-npc .fl-c q{quotes:'“' '”';font-style:normal}
-.fl-fallback{background:repeating-linear-gradient(135deg,var(--seal-a09) 0 6px,transparent 6px 12px);
-  border-top:1px solid var(--seal-a4);border-bottom:1px solid var(--seal-a4);margin:var(--space-3) 0}
-.fl-fallback .fl-c{color:var(--seal-2);font-size:var(--fs-10-5)}
-.fl-fallback .fl-c::before{color:var(--seal)}
+.fl-fallback{background:repeating-linear-gradient(135deg,var(--warning-a09) 0 6px,transparent 6px 12px);
+  border-top:1px solid var(--warning-a4);border-bottom:1px solid var(--warning-a4);margin:var(--space-3) 0}
+.fl-fallback .fl-c{color:var(--warning-strong);font-size:var(--fs-10-5)}
+.fl-fallback .fl-c::before{color:var(--warning)}
 .fl-mark{grid-template-columns:1fr;padding:var(--space-11) 0 var(--space-12);margin:var(--space-6) 0}
 .fl-mark .fl-c{padding:0;text-align:center;font-size:var(--fs-9-5);
   letter-spacing:.34em;color:var(--feed-rule);position:relative}
 .fl-mark .fl-c::before{display:none}
-.fl-mark .fl-c span{background:var(--fanfold);padding:0 var(--space-12);position:relative;z-index:1}
+.fl-mark .fl-c span{background:var(--surface);padding:0 var(--space-12);position:relative;z-index:1}
 .fl-mark .fl-c::after{content:'';position:absolute;left:0;right:0;top:50%;
   border-top:1px dashed var(--sh-35)}
 /* The tail spacer — air under the last line, so the newest thing printed is not
@@ -163,4 +163,4 @@
    and the red thread are all this colour. It is a READOUT, not a control —
    no pointer affordance, no membrane op, nothing to press. */
 .fl-cite{font-family:var(--mono);font-size:var(--fs-8);letter-spacing:.1em;
-  color:var(--seal);vertical-align:super;margin-left:var(--space-6);white-space:nowrap}
+  color:var(--warning);vertical-align:super;margin-left:var(--space-6);white-space:nowrap}

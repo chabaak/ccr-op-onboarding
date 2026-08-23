@@ -1,6 +1,6 @@
 // [u1#c1] spec-client §3 inv 8 (style-as-data) + run constraint C11.
 //
-// Every color, paper stock, type face/size and spacing step lives in
+// Every color, surface, type face/size and spacing step lives in
 // `styles/tokens.css` as a custom property. No literal hex/rgb/px-size/
 // font-family may appear in any other stylesheet or in any component .ts.
 //

@@ -180,7 +180,7 @@ body:has(#ending) #toast{display:none}
    same lighting over `--good`, built from the shade scale rather than from a
    second green — the desk has one green and inventing a `--good-2` to darken it
    would be a colour that exists only to be a gradient stop. `--good` under
-   white sits at roughly the same contrast as `--seal` does (≈6.4:1 vs ≈6.7:1),
+   white sits at roughly the same contrast as `--warning` does (≈6.4:1 vs ≈6.7:1),
    so the two buttons weigh the same in the hand and only the hue changes: same
    hardware, different answer.
 
@@ -215,7 +215,7 @@ body:has(#ending) #toast{display:none}
    plate, seal into `--alert-line`, so the head is underlined rather than
    accented. It is the same rule doing more of itself, at full strength rather
    than the .7 every other head on the desk draws it at. */
-.end-bad .cf-plate-hd::after{background:linear-gradient(90deg,var(--seal),var(--alert-line));
+.end-bad .cf-plate-hd::after{background:linear-gradient(90deg,var(--warning),var(--alert-line));
   opacity:1}
 .end-bad .cf-plate-hd b{color:var(--alert-txt)}
 .end-bad .cf-plate-hd i{color:var(--alert-dim)}

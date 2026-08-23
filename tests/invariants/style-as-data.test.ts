@@ -1,6 +1,6 @@
 // [u9#c3] spec-client §3 invariant 8 (style-as-data) — run constraint C12.
 //
-// "Colors, paper stocks, type faces/sizes, spacing live in `styles/tokens.css`
+// "Colors, surfaces, type faces/sizes, spacing live in `styles/tokens.css`
 // as custom properties; no literal color/size in component code."
 //
 // SCOPE (P1-D scoping rule, [u9#c6]): **repo-scoped with a proven-dead

@@ -414,10 +414,10 @@ export function printsFeedLine(event: ViewEvent): boolean {
    over a fanfold that has just finished saying what it is about, instead of one
    that has been frozen mid-round.                                            */
 
-/* ── the window's fanfold ────────────────────────────────────────────────── */
+/* ── the window's running record ─────────────────────────────────────────── */
 
-/** The head's first line — the stock, as the reference prints it. */
-const HEAD_STOCK = '연속용지 · 상황실 무전 기록'
+/** The head's first line — the record title, as the reference prints it. */
+const HEAD_TITLE = '상황실 무전 기록'
 /** The head's second line — what this window is, and is not ([u5#c7]). */
 const HEAD_NOTE = '열람 전용 — 이 창은 조작되지 않습니다'
 /** The sitting the header names arrives on the `meta` event, never from here (C3). */
@@ -602,9 +602,9 @@ export function createRunFeed(host: HTMLElement, driver: FixtureDriver): RunFeed
   left.setAttribute('aria-hidden', 'true')
   right.setAttribute('aria-hidden', 'true')
 
-  const stock = el('div', undefined, HEAD_STOCK)
+  const heading = el('div', undefined, HEAD_TITLE)
   const head = el('div', 'feed-head')
-  head.append(stock, el('div', undefined, HEAD_NOTE))
+  head.append(heading, el('div', undefined, HEAD_NOTE))
 
   const list = el('ol')
   list.id = 'feedList'
@@ -940,7 +940,7 @@ export function createRunFeed(host: HTMLElement, driver: FixtureDriver): RunFeed
         callsign = callsignOf(event.run)
         // x12 — the sitting every cue below is stamped with. See `run`.
         run = event.run
-        stock.textContent = HEAD_STOCK + HEAD_SEP + callsign
+        heading.textContent = HEAD_TITLE + HEAD_SEP + callsign
         return false
       case 'feed':
         return appendLine(event.line)

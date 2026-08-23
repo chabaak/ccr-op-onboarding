@@ -2,7 +2,7 @@
    index.css — the single aggregation point for the client skin.
 
    Order is load-bearing: tokens (declare) → base (reset) → shell (desktop
-   chrome + window frame) → paper (the five stocks) → one skin per window.
+   chrome + window frame) → shared surface → one skin per window.
    u10 appends exactly one `./fonts.css` import here; nothing else.
    =========================================================================== */
 
@@ -22,9 +22,9 @@
 @import './confirm.css';
 
 /* The sheet the door hands over. x5b — it stopped being a window and became a
-   plate, so it moved from behind the window skins (where it re-aimed `.bond`)
-   to behind `confirm.css`, whose `.cf-*` rules it now overrides. This order is
-   load-bearing: every rule in it is an override. */
+   plate, so it moved from behind the window skins to behind `confirm.css`,
+   whose `.cf-*` rules it now overrides. This order is load-bearing: every rule
+   in it is an override. */
 @import './win-manual.css';
 
 /* The sheet the door takes back. Third and last of the `.cf-*` family — the

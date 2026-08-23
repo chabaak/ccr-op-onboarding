@@ -1,9 +1,9 @@
 /* ===========================================================================
    tokens.css — style-as-data (spec-client §3 invariant 8)
 
-   Every color, paper stock, type face/size and spacing step used by the
-   client is declared HERE and nowhere else. This sheet declares; it never
-   paints (no element/class rule lives in this file).
+   Every color, surface, type face/size and spacing step used by the client is
+   declared HERE and nowhere else. This sheet declares; it never paints (no
+   element/class rule lives in this file).
 
    Values are vendored from docs/design/phase2-ui/desktop.css (spec-client §8
    porting rule: "CSS may be vendored and adapted ... re-tokenized per
@@ -27,25 +27,24 @@
   --ink-line:#2b333d;
   --blueprint:#4a6072;
 
-  /* paper stocks */
-  --kraft:#d9cdb4;
-  --kraft-2:#cbbd9f;
-  --bond:#f2efe6;
-  --bond-2:#e6e2d5;
-  --fanfold:#e4e6dd;
-  --fanfold-bar:#cfdcc9;
-  --ledger:#efe9dc;
-  --card:#e9e3d3;
+  /* shared document surface — old light neutral values, kept until the palette pivot */
+  --surface:#f2efe6;
+  --surface-inset:#e6e2d5;
+  --surface-border:#3f4a56;
+  --surface-rule:#2b333d;
 
-  /* marks — two accents only: graphite ink + 관인-red */
-  --graphite:#242a30;
-  --graphite-2:#3c444d;
-  --faded:#7d7565;
-  --faded-2:#9b9382;
-  --seal:#b2242c;
-  --seal-2:#8d1a20;
-  --seal-wash:rgba(178,36,44,.10);
-  --thread:#a8272f;
+  /* surface text tiers */
+  --surface-text:#242a30;
+  --surface-text-strong:#3c444d;
+  --surface-muted:#7d7565;
+  --surface-muted-2:#9b9382;
+
+  /* accents — one signal, one warning, one evidence-thread ink */
+  --signal:#8fb8d8;
+  --warning:#b2242c;
+  --warning-strong:#8d1a20;
+  --warning-wash:rgba(178,36,44,.10);
+  --evidence-thread:#a8272f;
   --highlight:#e8d24a;
 
   --shadow-win:0 2px 0 rgba(0,0,0,.5), 0 28px 64px -20px rgba(0,0,0,.9),
@@ -118,23 +117,23 @@
   --alert-dim:#8d7c7d;
 }
 
-/* ─── ink on paper ────────────────────────────────────────────────────── */
+/* ─── text on document surfaces ───────────────────────────────────────── */
 :root{
-  --pap-max:#12171c;
-  --pap-hd:#1a1f24;
-  --pap-1:#22282e;
-  --pap-2:#1e242a;
-  --pap-3:#3b434b;
-  --pap-4:#5b6068;
-  --pap-5:#6f7781;
-  --pap-6:#a89f8b;
-  --pap-7:#948b78;
+  --surface-text-max:#12171c;
+  --surface-text-heading:#1a1f24;
+  --surface-text-1:#22282e;
+  --surface-text-2:#1e242a;
+  --surface-text-3:#3b434b;
+  --surface-text-4:#5b6068;
+  --surface-text-5:#6f7781;
+  --surface-text-6:#a89f8b;
+  --surface-text-7:#948b78;
   --redact:#15191d;
   --good:#2f6b3e;
   --slotted-ink:#7a6512;
 }
 
-/* ─── fanfold (LIVE FEED) inks ────────────────────────────────────────── */
+/* ─── LIVE FEED inks ──────────────────────────────────────────────────── */
 :root{
   --feed-1:#252b23;
   --feed-2:#20261e;
@@ -152,7 +151,7 @@
   --band-2:rgba(150,180,145,.22);
 }
 
-/* ─── index-card stock (BLOCK STORE) + sprocket hardware ──────────────── */
+/* ─── block card face + sprocket hardware ─────────────────────────────── */
 :root{
   --card-face:#f6f2e6;
   --punch-1:#8d846f;
@@ -207,18 +206,18 @@
   --sheen-warm:rgba(255,250,235,.5);
 }
 
-/* ─── 관인-red at low alpha + the red thread ──────────────────────────── */
+/* ─── warning at low alpha + the evidence thread ──────────────────────── */
 :root{
-  --seal-a08:rgba(178,36,44,.08);
-  --seal-a09:rgba(178,36,44,.09);
-  --seal-a12:rgba(178,36,44,.12);
-  --seal-a13:rgba(178,36,44,.13);
-  --seal-a25:rgba(178,36,44,.25);
-  --seal-a4:rgba(178,36,44,.4);
-  --seal-a5:rgba(178,36,44,.5);
-  --seal-a55:rgba(178,36,44,.55);
-  --thread-a55:rgba(168,39,47,.55);
-  --thread-a8:rgba(168,39,47,.8);
+  --warning-a08:rgba(178,36,44,.08);
+  --warning-a09:rgba(178,36,44,.09);
+  --warning-a12:rgba(178,36,44,.12);
+  --warning-a13:rgba(178,36,44,.13);
+  --warning-a25:rgba(178,36,44,.25);
+  --warning-a4:rgba(178,36,44,.4);
+  --warning-a5:rgba(178,36,44,.5);
+  --warning-a55:rgba(178,36,44,.55);
+  --evidence-thread-a55:rgba(168,39,47,.55);
+  --evidence-thread-a8:rgba(168,39,47,.8);
   --horizon:rgba(120,24,28,.16);
   --highlight-a62:rgba(232,210,74,.62);
 }

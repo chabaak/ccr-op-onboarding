@@ -1173,7 +1173,7 @@ describe('[x10] the page-turn cue marks the way out of the cover', () => {
     // A BOX, drawn AROUND the button: a border and no fill, so the arrow's own face
     // shows through unchanged. `background` here would make it a plate over the
     // control rather than a mark around it.
-    expect(box).toMatch(/\bborder:[^;]*var\(--seal-2\)/)
+    expect(box).toMatch(/\bborder:[^;]*var\(--warning-strong\)/)
     expect(box, 'the cue paints a fill — the arrow must show through').not.toMatch(/background/)
     expect(box).toMatch(/content:''/)
 

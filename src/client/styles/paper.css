@@ -1,43 +1,21 @@
 /* ===========================================================================
-   paper.css — the five paper stocks (desktop.css lines 235..269).
+   paper.css — legacy import slot for shared window surfaces.
 
-   kraft (AGENT FILE dossier) · green-bar fanfold (LIVE FEED) · white bond
-   (REPORTS) · ruled ledger (TALLY) · index-card stock (BLOCK STORE).
-   Each stock paints from its own token — the stock IS the data.
+   The old material model gave each window body its own class. The design target
+   has one terminal surface instead, so this file now owns only the shared body
+   surface and scrollbars; window-specific layout remains in the window sheets.
+   The filename stays because `index.css` order treats it as the fourth core
+   sheet.
    =========================================================================== */
 
-.paper{color:var(--graphite);overflow-y:auto;overflow-x:hidden}
-.paper::-webkit-scrollbar{width:9px}
-.paper::-webkit-scrollbar-track{background:var(--sh-07)}
-.paper::-webkit-scrollbar-thumb{background:var(--sh-24);border:2px solid transparent;background-clip:content-box}
-.paper::-webkit-scrollbar-thumb:hover{background:var(--sh-4);background-clip:content-box}
+.surface{background:var(--surface);color:var(--surface-text);overflow-y:auto;overflow-x:hidden}
+.surface::-webkit-scrollbar{width:9px}
+.surface::-webkit-scrollbar-track{background:var(--sh-07)}
+.surface::-webkit-scrollbar-thumb{background:var(--sh-24);border:2px solid transparent;background-clip:content-box}
+.surface::-webkit-scrollbar-thumb:hover{background:var(--sh-4);background-clip:content-box}
 
-/* kraft — dossier stock, warm and fibrous */
-.kraft{background:
-  linear-gradient(115deg,var(--sheen-35),transparent 40%),
-  radial-gradient(120% 60% at 80% 0%,var(--sheen-warm),transparent 60%),
-  var(--kraft);
-  padding:var(--space-20) var(--space-22) var(--space-24)}
-.kraft::before{content:'';position:absolute;inset:0;pointer-events:none;opacity:.5;
-  background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='160' height='160'%3E%3Cfilter id='f'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.9' numOctaves='3'/%3E%3CfeColorMatrix type='saturate' values='0'/%3E%3C/filter%3E%3Crect width='160' height='160' filter='url(%23f)' opacity='.5'/%3E%3C/svg%3E");
-  mix-blend-mode:multiply}
-
-/* bond — white report stock */
-.bond{background:
-  linear-gradient(180deg,var(--sheen-5),transparent 30%),
-  var(--bond)}
-
-/* ledger — ruled 집계표 stock */
-.ledger{background:var(--ledger);padding:0}
-
-/* index card — one punch hole per card, faint rule every 28px */
-.card-stock{background:
-  repeating-linear-gradient(0deg,transparent 0 27px,var(--sh-025) 27px 28px),
-  var(--card);
-  padding:var(--space-10) var(--space-12) var(--space-16)}
-
-/* fanfold — continuous green-bar paper, sprocket holes both edges */
-.fanfold{background:var(--fanfold);padding:0 var(--space-34)}
+/* LIVE FEED hardware still lives beside the shared body rule until the layout
+   pass removes it; it does not vary by registry data. */
 .sprocket{position:absolute;top:0;bottom:0;width:33px;z-index:3;
   background:
     radial-gradient(circle at 16.5px 14.25px, var(--sprocket-hole) 0 4.65px, var(--sh-28) 4.65px 6px, transparent 6.3px)

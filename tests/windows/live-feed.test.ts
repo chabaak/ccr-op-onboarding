@@ -942,7 +942,7 @@ describe('[u5#c9] the window renders, never authors', () => {
   // is itself part of the guard — do not put either departure back.
   it('(c) run-feed.ts authors exactly the five declared chrome literals', () => {
     const ALLOWED = new Set([
-      '연속용지 · 상황실 무전 기록',
+      '상황실 무전 기록',
       '열람 전용 — 이 창은 조작되지 않습니다',
       // x8's NPC frame. Chrome, and the one piece of it that is a SENTENCE: the
       // feed is the agent's radio record, so an NPC's answer is printed as the
