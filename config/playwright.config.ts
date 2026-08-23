@@ -1,4 +1,6 @@
 import { defineConfig, devices } from 'playwright/test'
+import path from 'node:path'
+import { fileURLToPath } from 'node:url'
 
 // Chromium only, desktop only, minimum viewport 1280×800 (plan-client-build §2).
 // The runner is imported from `playwright/test`: the `playwright` package ships
@@ -32,6 +34,7 @@ const UNIT_PORT = 5174
 const PREVIEW_PORT = 5175
 const DEV_PORT = 5176
 const OUT_DIR = 'dist-e2e'
+const REPO = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..')
 const unitURL = `http://localhost:${UNIT_PORT}/ccr-op-onboarding/`
 const previewURL = `http://localhost:${PREVIEW_PORT}/ccr-op-onboarding/`
 const devURL = `http://localhost:${DEV_PORT}/ccr-op-onboarding/`
@@ -99,6 +102,7 @@ export default defineConfig({
       // `--mode development` alone is not enough: `vite build` pins NODE_ENV to
       // production, and `import.meta.env.DEV` follows NODE_ENV first. Without
       // this the fixtures are folded away and the desk boots the placeholder run.
+      cwd: REPO,
       env: { NODE_ENV: 'development' },
       url: unitURL,
       reuseExistingServer: !process.env.CI,
@@ -107,6 +111,7 @@ export default defineConfig({
     {
       lane: 'dev',
       command: `npm run dev -- --port ${DEV_PORT} --strictPort`,
+      cwd: REPO,
       url: devURL,
       reuseExistingServer: !process.env.CI,
       timeout: 120_000,
@@ -116,6 +121,7 @@ export default defineConfig({
       // The full build, not `vite build` alone: `npm run build` is what the DoD
       // gates on, and its `check` step is what keeps the datapack honest.
       command: `npm run build && npm run preview -- --port ${PREVIEW_PORT} --strictPort`,
+      cwd: REPO,
       url: previewURL,
       reuseExistingServer: !process.env.CI,
       timeout: 240_000,
