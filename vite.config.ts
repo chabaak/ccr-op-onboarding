@@ -33,7 +33,7 @@ import { defineConfig, type Plugin } from 'vite'
 /**
  * The scenario parts the run fetches, per pack. Kept identical to `PACK_FILES`
  * in `src/client/driver/live/pack.ts` and `tools/driver/run/pack.mjs` —
- * `tests/invariants/published-data.test.ts` fails when the three drift.
+ * `tests/scaffold/published-data.test.ts` fails when the three drift.
  *
  * `places` / `truths` / `hardening` / `draft.md` are authoring surfaces no seam
  * consumes, and `_schema/` is authoring-time validation. None of them ship.
@@ -54,6 +54,11 @@ const PACK_PARTS = [
 
 const OPTIONAL_PACK_PARTS = [
   'endings',
+] as const
+
+/** Scenario sidecars the shell fetches outside the engine pack loader. */
+const SHELL_PACK_PARTS = [
+  'incidentCover',
 ] as const
 
 /** Scenario-independent policy the run fetches, relative to `data/`. */
@@ -77,6 +82,7 @@ export function publishedDataFiles(root: string = process.cwd()): string[] {
   const scenario = packSlugs(scenarioDir).flatMap((slug) =>
     [
       ...PACK_PARTS.map((part) => `scenario/${slug}/${part}.json`),
+      ...SHELL_PACK_PARTS.map((part) => `scenario/${slug}/${part}.json`),
       ...OPTIONAL_PACK_PARTS
         .map((part) => `scenario/${slug}/${part}.json`)
         .filter((rel) => existsSync(join(root, 'data', rel))),

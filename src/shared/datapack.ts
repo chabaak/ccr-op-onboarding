@@ -30,6 +30,16 @@ export type Meta = {
   dday?: string | null;
 };
 
+/** datapack incidentCover.json — 요원 파일 사건 표지 문안 */
+export type IncidentCover = {
+  incident: {
+    /** 사건 개요의 세 줄. 각 항목은 표지에서 별도 줄로 렌더된다. */
+    body: Array<string>;
+  };
+  /** 현장 요원 임무 섹션의 한 줄 문안. */
+  mission: string;
+};
+
 /** datapack timeline.json — 무개입 고정 타임라인 */
 export type Timeline = {
   events: Array<{
@@ -289,6 +299,7 @@ export type ScenarioIndex = {
 /** One scenario's full pack — `data/scenario/<slug>/`, keyed by file. */
 export type Datapack = {
   meta: Meta;
+  incidentCover: IncidentCover;
   timeline: Timeline;
   characters: Characters;
   places: Places;

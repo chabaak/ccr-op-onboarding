@@ -161,10 +161,13 @@ interface DossierSection {
   note?: string
 }
 
+interface AgentFileCoverCopy {
+  incident: string
+  mission: string
+}
+
 interface DossierModule {
-  // x6 — no argument. 임무 was the clock band's one reader on this window and
-  // it is a posting order now; the band is the topbar clock's.
-  coverModel(): DossierSection[]
+  coverModel(copy: AgentFileCoverCopy): DossierSection[]
   agentModel(input: { slotCap: number; callsign: string }): DossierSection[]
   // x5 — `deployed` left `FiledInput` with the count that used to be printed
   // from it. The page's own paragraph is where a past sitting's size is read.
@@ -203,6 +206,17 @@ const loadDossier = async (): Promise<DossierModule> =>
 const loadDeployButton = async (): Promise<DeployButtonModule> =>
   (await import(importable(DEPLOY_BUTTON_TS))) as unknown as DeployButtonModule
 
+function incidentCover(slug = '멈춘회전문'): AgentFileCoverCopy {
+  const raw = JSON.parse(read(path.join(REPO, 'data', 'scenario', slug, 'incidentCover.json'))) as {
+    incident: { body: string[] }
+    mission: string
+  }
+  return {
+    incident: raw.incident.body.join('\n'),
+    mission: raw.mission,
+  }
+}
+
 /* ══ [u4#c2] spec-client §3 inv 4 (I13) ══════════════════════════════════ */
 
 /** Anything shaped like temperament data, in either vocabulary. */
@@ -240,7 +254,7 @@ describe('[u4#c2] §3 기질 is sealed by construction', () => {
   it('(a) neither the dossier input nor any section carries a temperament-shaped key', async () => {
     const { coverModel, agentModel, filedModel } = await loadDossier()
     const input = { slotCap: 4, callsign: 'ECHO-1' }
-    const sections = [...coverModel(), ...agentModel(input), ...filedModel({ callsign: 'ECHO' })]
+    const sections = [...coverModel(incidentCover()), ...agentModel(input), ...filedModel({ callsign: 'ECHO' })]
     const keys = deepKeys(sections)
 
     // x7 — THE VACUITY GUARD, and it is why this test needed touching at all.
@@ -296,8 +310,8 @@ describe('[u4#c2] §3 기질 is sealed by construction', () => {
 
     const firstAgent = agentModel(input)
     const secondAgent = agentModel({ slotCap: 4, callsign: 'ECHO-1' })
-    const firstCover = coverModel()
-    const secondCover = coverModel()
+    const firstCover = coverModel(incidentCover())
+    const secondCover = coverModel(incidentCover())
 
     expect(JSON.stringify({ slotCap: input.slotCap, callsign: input.callsign })).toBe(before)
     expect(JSON.stringify(secondAgent)).toBe(JSON.stringify(firstAgent))
@@ -329,7 +343,7 @@ describe('[u4#c2] §3 기질 is sealed by construction', () => {
 
   it('(e) the two models carry the ratified titles and flags, and no numbers', async () => {
     const { coverModel, agentModel } = await loadDossier()
-    const cover = coverModel()
+    const cover = coverModel(incidentCover())
     const agent = agentModel({ slotCap: 4, callsign: 'ECHO-1' })
 
     // C1 — the document reads the cover first, then the agent's own page, and
@@ -387,6 +401,20 @@ describe('[u4#c2] §3 기질 is sealed by construction', () => {
     expect(agent[1]!.note).toContain('4')
     // 식별 carries the callsign it was handed (M1).
     expect(JSON.stringify(agent[0]!.rows)).toContain('ECHO-1')
+  })
+
+  it('(h) the shipped incident cover sidecar reproduces the previous cover copy byte-for-byte', async () => {
+    const { coverModel } = await loadDossier()
+    const cover = coverModel(incidentCover())
+
+    expect(cover[0]!.body).toBe(
+      [
+        '20XX년 XX월 XX일 18시 38분,',
+        '폭설이 내리던 날, 한내시립스포츠돔에서 천장 가운데가 처진다는 신고가 접수된다.',
+        '긴급상황대응실 본부는 즉시 현장에 요원 ECHO를 파견하여 상황 파악을 시작했다.',
+      ].join('\n'),
+    )
+    expect(cover[1]!.body).toBe('파견된 현장 위기 대응실에서 긴급 상황의 정체를 파악하고, 인명 피해를 최소화한다.')
   })
 
   /*

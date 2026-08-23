@@ -1,10 +1,9 @@
 // What reaches the deployed site out of `data/`.
 //
-// `data/` is authoring input. Six files per pack plus one policy file are the
-// only parts any seam fetches — `src/client/driver/live/pack.ts` says so in
-// `PACK_FILES`, and `tools/driver/run/pack.mjs` says the same for the Node
-// twin. Everything else beside them is an authoring surface: `draft.md` is the
-// compile SOURCE and carries every gate, key condition and truth in the case.
+// `data/` is authoring input. The engine pack files, explicit shell sidecars,
+// and policy files are the only parts any seam fetches. Everything else beside
+// them is an authoring surface: `draft.md` is the compile SOURCE and carries
+// every gate, key condition and truth in the case.
 //
 // `vite.config.ts` used to copy `data/scenario` and `data/policy` recursively,
 // so all of it shipped and `dist/data/scenario/<slug>/draft.md` was readable on
@@ -101,6 +100,12 @@ describe('published data — the allowlist tracks what the client fetches', () =
       requiredFromConfig.sort(),
       'vite.config.ts PACK_PARTS drifted from the loaders PACK_FILES',
     ).toEqual([...browser].sort())
+
+    const sidecars = stringArrayOf('vite.config.ts', 'SHELL_PACK_PARTS')
+    expect(sidecars, 'the shell incident-cover sidecar stopped being explicit').toEqual(['incidentCover'])
+    expect(read('src/client/windows/agent-file.ts'), 'the incident-cover sidecar ships but nothing fetches it').toMatch(
+      /incidentCover\.json/,
+    )
 
     const optional = stringArrayOf('vite.config.ts', 'OPTIONAL_PACK_PARTS')
     expect(optional, 'the shell ending sidecar stopped being explicit').toEqual(['endings'])

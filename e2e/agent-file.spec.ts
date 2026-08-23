@@ -92,8 +92,13 @@ async function boot(page: Page): Promise<void> {
   await page.goto('./')
   await expect(page.locator(FILE)).toBeVisible()
   await expect(page.locator(`${FILE} .sect`)).toHaveCount(3)
+  await waitCoverReady(page)
   await landCover(page)
   await page.waitForFunction(() => (window as unknown as Handles).__agentFile !== undefined)
+}
+
+async function waitCoverReady(page: Page): Promise<void> {
+  await expect(page.locator(`${FILE} [data-cover-ready="true"]`)).toHaveCount(1)
 }
 
 /** Press 건너뛰기 if the cover is still printing itself; else leave it alone. */
@@ -900,6 +905,7 @@ test.describe('[x7] every page is headed, and the cover types itself out', () =>
     await page.goto('./')
     await expect(page.locator(FILE)).toBeVisible()
     await expect(page.locator(`${FILE} .sect`)).toHaveCount(3)
+    await waitCoverReady(page)
 
     const skip = page.locator(SKIP)
     await expect(skip, 'the cover offered no way past its own reveal').toBeVisible()
@@ -945,6 +951,7 @@ test.describe('[x7] every page is headed, and the cover types itself out', () =>
 
     // Keyboard alone reaches it, which is the half a mouse test cannot see.
     await page.goto('./')
+    await waitCoverReady(page)
     await expect(page.locator(SKIP)).toBeVisible()
     await page.locator(SKIP).focus()
     await page.keyboard.press('Enter')
@@ -965,6 +972,7 @@ test.describe('[x7] every page is headed, and the cover types itself out', () =>
     await page.goto('./')
     await expect(page.locator(FILE)).toBeVisible()
     await expect(page.locator(`${FILE} .sect`)).toHaveCount(3)
+    await waitCoverReady(page)
 
     const dossier = page.locator(`${FILE} #dossier`)
     const first = ((await dossier.textContent()) ?? '').length
