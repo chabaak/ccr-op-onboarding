@@ -55,6 +55,12 @@ Write the world under these constraints:
   descriptions and quotes may add texture, but they must not be the only key.
 - A key is a condition class: axis x referent x species. Write several example
   sentences for each condition; a one-sentence key is a lottery.
+- Every required key must be mineable before the gate it opens. A key behind its
+  own gate is a wall, not a puzzle: the player cannot hand over a sentence the
+  run could not yet have produced.
+- Required paths need scripted supply. Agent and NPC generations can enrich the
+  ore, but they are nondeterministic; never make a generated line the sole
+  carrier of a premise the player must learn to solve a gate.
 
 The channel has its own physics. Breaking these rules produces a scenario shape
 the engine cannot make fair, even if the JSON compiles:
@@ -239,7 +245,11 @@ Hardening rules that are errors, not taste:
    Fix format errors directly. Do not silently paraphrase sentence text.
 4. **Paper pass.** Before calls, inspect every gate for timeline preemption,
    fixture slack, non-commensurable options, escape stances, dead-row candidates,
-   key condition coverage, and default bucket score leakage.
+   key condition coverage, and default bucket score leakage. For every
+   `key_examples[].mined_from`, verify the source is available before that gate's
+   clock and does not require that same gate's success. Mark any required key
+   whose only carrier is generated prose as blocked; generated lines are optional
+   ore only.
 5. **Question screen.** For each load-bearing gate, create a cheap successor
    suite under `tools/probe/dday-mechanism/suites/` with no evidence blocks and a
    provisional commensurable stance set. Run `--print-prompt` and `--dry-run`.
@@ -268,7 +278,12 @@ Hardening rules that are errors, not taste:
    node .claude/skills/read-mechanism-run/extract.mjs <experiment-id>
    ```
    Report raw sequences, N, discarded calls, fabricated block ids, and each
-   preregistered criterion. Never report a percentage without raw counts.
+   preregistered criterion. For placebo, negative-control, or other near-miss
+   arms, also check whether the almost-right injection leaves a legible trace in
+   reports: quoted then rejected, belief-only movement, or a clear miss the
+   player could learn from. A gate can discriminate correctly and still feel
+   arbitrary if near misses leave no report trace. Never report a percentage
+   without raw counts.
 10. **Revise and re-measure.** Pull only one lever per round when attribution
     matters: question, stance set, key block, fixture timeline, scoring fairness,
     or prompt shape. Re-measure with a successor suite.
@@ -286,6 +301,8 @@ Close an authoring pass with:
 - suite ids and run artifact directories
 - per-arm raw sequences and tallies
 - verdict against each preregistered threshold
+- near-miss trace readout: which almost-right injections appeared in reports,
+  which vanished, and whether that gives the player learnable feedback
 - remaining risks and out-of-scope findings
 - verification commands and results
 
