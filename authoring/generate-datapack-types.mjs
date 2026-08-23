@@ -26,8 +26,9 @@ const OUT = join(ROOT, 'src', 'shared', 'datapack.ts');
 // pack file order = pipeline §3 table order. Optional files are sidecars:
 // schema/type/lint checked when present, but not required of retirement-bound
 // legacy packs. `incidentCover` is required because the active AGENT FILE
-// cover reads it.
-const REQUIRED_FILES = ['meta', 'incidentCover', 'timeline', 'characters', 'places', 'temperament', 'gates', 'truths', 'score', 'symptoms'];
+// cover reads it; `incidentBrief` is required because the desktop pack picker
+// opens it before a scenario switch.
+const REQUIRED_FILES = ['meta', 'incidentCover', 'incidentBrief', 'timeline', 'characters', 'places', 'temperament', 'gates', 'truths', 'score', 'symptoms'];
 const OPTIONAL_FILES = ['endings'];
 const FILES = [...REQUIRED_FILES, ...OPTIONAL_FILES];
 const ROOT_FILES = ['index'];

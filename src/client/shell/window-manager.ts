@@ -39,6 +39,8 @@ export interface WindowManager {
   readonly frames: readonly WindowFrame[]
   /** Re-computes the default arrangement for `viewport` ([u3#c2]). */
   arrange(viewport: Viewport): void
+  /** Hides every managed window, leaving the desktop itself visible. */
+  closeAll(): void
   focus(key: WindowKey): void
 }
 
@@ -96,6 +98,11 @@ export function createWindowManager(deps: Deps): WindowManager {
     if (frame.root.classList.contains('hidden')) return open(key)
     if (!frame.root.classList.contains('focused')) return focus(key)
     frame.root.classList.add('hidden')
+    syncTaskbar()
+  }
+
+  function closeAll(): void {
+    for (const frame of frames) frame.root.classList.add('hidden')
     syncTaskbar()
   }
 
@@ -253,5 +260,5 @@ export function createWindowManager(deps: Deps): WindowManager {
   buildTaskbar()
   syncTaskbar()
 
-  return { frames, arrange, focus }
+  return { frames, arrange, closeAll, focus }
 }

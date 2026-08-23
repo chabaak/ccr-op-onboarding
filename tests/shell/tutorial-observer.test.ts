@@ -103,7 +103,7 @@ describe('[x3] the walk exists and is wired exactly once', () => {
     expect(importers).toEqual([rel(BOOT_TS)])
   })
 
-  it('(c) exactly one module imports the LAYER, and it is the walk', () => {
+  it('(c) only the walk and the post-ending notice import the LAYER', () => {
     // New with the rewrite. The coach is a general-purpose overlay — a plate
     // beside an arbitrary selector — and that makes it exactly the sort of thing
     // a later unit would reach for to explain something else on the desk. It is
@@ -114,7 +114,11 @@ describe('[x3] the walk exists and is wired exactly once', () => {
     const importers = clientFiles()
       .filter(({ src }) => /from\s+'\.{1,2}\/(shell\/)?coach\.ts'/.test(src))
       .map(({ file }) => file)
-    expect(importers).toEqual([rel(TUTORIAL_TS)])
+      .sort()
+    expect(importers).toEqual([
+      'src/client/shell/scenario-desktop.ts',
+      rel(TUTORIAL_TS),
+    ])
   })
 
   it('(d) the boot mounts it, and does not await it', () => {

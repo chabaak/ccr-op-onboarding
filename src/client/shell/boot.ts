@@ -22,6 +22,7 @@ import { openSignIn, signInSkipped } from './sign-in.ts'
 import { installTutorial } from './tutorial.ts'
 import { fetchScenarioEndings, fetchScenarioIdentity, fetchScenarioIndex, fetchScenarioScore } from './pack.ts'
 import type { ScenarioIdentity } from './pack.ts'
+import { installScenarioDesktop } from './scenario-desktop.ts'
 import { scenarioPackInPlay } from './pack-session.ts'
 import { PORTAL, TASKBAR_HINT } from './portal-identity.ts'
 import { clearRunState } from './run-state.ts'
@@ -191,6 +192,8 @@ function runPump(driver: FixtureDriver): void {
 
 export async function bootShell(): Promise<void> {
   const body = document.body
+  const app = must('#app')
+  const desktop = must('#desktop')
   holdDesk(body)
 
   // 0 — the door (plan-playtest O1). Mounted BEFORE the pack fetch so the first
@@ -200,7 +203,7 @@ export async function bootShell(): Promise<void> {
   // opening builds no second hold, it only defers the reveal at the bottom of
   // this function. `signInSkipped` is what keeps the e2e lane pointed at the
   // desk (see its doc comment).
-  const door = signInSkipped(window) ? null : openSignIn(must('#app'), body)
+  const door = signInSkipped(window) ? null : openSignIn(app, body)
 
   // Resolved at the hand-over (step 6), when the desk is what the player is
   // looking at — see 4c.
@@ -277,11 +280,18 @@ export async function bootShell(): Promise<void> {
 
   // 4 — the three windows and the taskbar, then the computed desk arrangement.
   const desk = createWindowManager({
-    desk: must('#desktop'),
+    desk: desktop,
     taskbar: must('#taskbar'),
     registry: WINDOW_REGISTRY,
     driver,
     hint: TASKBAR_HINT,
+  })
+  const scenarioDesktop = installScenarioDesktop({
+    app,
+    desktop,
+    index: scenarioIndex,
+    localStorage: window.localStorage,
+    sessionStorage: window.sessionStorage,
   })
   desk.arrange({ width: window.innerWidth, height: window.innerHeight })
   window.addEventListener('resize', () => {
@@ -296,7 +306,7 @@ export async function bootShell(): Promise<void> {
   // as `__shell` below).
   const threads = threadLayer.createThreadLayer({
     host: must<SVGSVGElement>('#threads'),
-    root: must('#app'),
+    root: app,
     slotted: () => Object.values(driver.frame().store.slots),
   })
   if (import.meta.env.DEV) window.__threads = threads
@@ -319,7 +329,7 @@ export async function bootShell(): Promise<void> {
   // during boot and carries `runs_left`, which the ending cue reads.
   installAudio({
     driver,
-    root: must('#app'),
+    root: app,
     controls: document.querySelector<HTMLElement>('.clk-rate'),
     baseUrl: document.baseURI,
     fetch: (url, init) => window.fetch(url, init),
@@ -381,7 +391,7 @@ export async function bootShell(): Promise<void> {
     await door
     // x5b — the sheet is a centred plate now and places itself, so it no longer
     // takes the viewport it used to size a window against.
-    await openManual(must('#app'))
+    await openManual(app)
     sfxHandOver()
   }
   const revealed = revealDesk(
@@ -414,6 +424,17 @@ export async function bootShell(): Promise<void> {
   // the curtain it eventually raises is measured against a desk that is up.
   if (endingData !== null) {
     const [endings, score] = endingData
-    installEnding(window, { driver, deskReady: revealed, endings, score })
+    installEnding(window, {
+      driver,
+      deskReady: revealed,
+      endings,
+      score,
+      onGoodEnding: async () => {
+        scenarioDesktop.unlockAll()
+        await scenarioDesktop.showUnlockNotice()
+        desk.closeAll()
+      },
+      onBadEnding: () => scenarioDesktop.restartCurrent(),
+    })
   }
 }

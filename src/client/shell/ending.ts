@@ -58,9 +58,9 @@ import type { ScenarioEndings, ScenarioScore } from './pack.ts'
 import { button, el, must } from './dom.ts'
 import { feedDrained } from './feed-drain.ts'
 
-/** The one control's two labels: the plates that advance, and the one that asks the browser to leave. */
+/** The one control's two labels: the plates that advance, and the one that continues from the ending. */
 export const ENDING_NEXT = '다음'
-export const ENDING_CLOSE = '창 닫기 시도'
+export const ENDING_CLOSE = '확인'
 export const ENDING_WINDOW_CLOSE = ENDING_CLOSE
 
 /** The pause between the ledger's last number and the veil. See the header. */
@@ -278,9 +278,9 @@ function holdChrome(on: boolean): void {
 /**
  * Walks the three plates and resolves the moment the last one is answered.
  *
- * It resolves as the final action goes on, not after it: both endings make the
- * same request of the browser, and a refused close leaves this finished plate
- * mounted over the final feed and result.
+ * It resolves as the final action goes on, after releasing the held chrome:
+ * GOOD unlocks the desktop files and BAD starts the same pack over, both in
+ * `bootShell`, because this observer still owns no scenario state.
  *
  * NOT DISMISSIBLE, and there is no Escape here — which is the one place this
  * departs from `shell/manual.ts`. Escape skips the BRIEFING because a keyboard
@@ -304,10 +304,8 @@ export function openEnding(
 ): Promise<void> {
   const plates = endingPlates(kind, numbers, ending)
 
-  // The desk goes inert and STAYS inert. Nothing here puts it back: the only
-  // continuations of this screen are a closed tab or this mounted ending, and a
-  // desk that became operable again behind the last plate would be offering a
-  // sitting that has already been scored.
+  // The desk goes inert for the walk. It is released before this resolves so
+  // the caller can either reveal the desktop files or reload into a clean run.
   holdChrome(true)
 
   const root = el('div', kind === 'good' ? 'end-good' : 'end-bad')
@@ -364,7 +362,7 @@ export function openEnding(
     // reader of a DOM dump: three presses, and only the last one ends the
     // session.
     go.dataset.step = String(at + 1)
-    go.dataset.op = last ? 'close_window' : 'next'
+    go.dataset.op = last ? 'continue' : 'next'
 
     // Re-trigger the step animation. Removing the class and reading a layout
     // property is what makes the SAME animation run again on an element that
@@ -388,6 +386,8 @@ export function openEnding(
         return
       }
       answered = true
+      root.remove()
+      holdChrome(false)
       resolve()
     }
     go.addEventListener('click', advance)
@@ -494,19 +494,6 @@ function ledgerLanded(): Promise<void> {
   })
 }
 
-/* ── the exit ────────────────────────────────────────────────────────────── */
-
-/**
- * Ask the browser to close the tab, swallowing the common refusal paths.
- */
-function closeWindow(host: Window): void {
-  try {
-    host.close()
-  } catch {
-    // A refused close is the expected case, not an error worth reporting.
-  }
-}
-
 /* ── the walk ────────────────────────────────────────────────────────────── */
 
 export interface EndingPorts {
@@ -515,6 +502,8 @@ export interface EndingPorts {
   deskReady: Promise<void>
   endings: ScenarioEndings
   score: ScenarioScore
+  onGoodEnding?: () => Promise<void> | void
+  onBadEnding?: () => Promise<void> | void
 }
 
 /**
@@ -527,9 +516,13 @@ export interface EndingPorts {
  */
 let raised = false
 
-/** Stops the portal, drops the veil, and then leaves. */
+async function continueAfter(kind: EndingKind, ports: EndingPorts): Promise<void> {
+  if (kind === 'good') await ports.onGoodEnding?.()
+  else await ports.onBadEnding?.()
+}
+
+/** Stops the portal, drops the veil, and then hands off to the shell. */
 async function raise(
-  host: Window,
   driver: FixtureDriver,
   kind: EndingKind,
   numbers: EndingNumbers,
@@ -557,7 +550,6 @@ async function raise(
   // whatever is left, exactly as it does for any other pause).
   driver.clock.setRate(0)
   await openEnding(must('#app'), kind, numbers, ending)
-  closeWindow(host)
 }
 
 /**
@@ -586,7 +578,8 @@ async function walkEnding(host: Window, ports: EndingPorts): Promise<void> {
   const forced = endingForced(host)
   if (forced !== null) {
     await deskReady
-    await raise(host, driver, forced, numbersOf(endings, previewScoreOf(score)), endings)
+    await raise(driver, forced, numbersOf(endings, previewScoreOf(score)), endings)
+    await continueAfter(forced, ports)
     return
   }
 
@@ -633,7 +626,8 @@ async function walkEnding(host: Window, ports: EndingPorts): Promise<void> {
   await ledgerLanded()
   await feedDrained()
   await sleep(host, HELD_BEAT_MS)
-  await raise(host, driver, kind, numbers, endings)
+  await raise(driver, kind, numbers, endings)
+  await continueAfter(kind, ports)
 }
 
 /**

@@ -26,8 +26,8 @@ export const ALL_SHEETS = [...CORE_SHEETS, ...WINDOW_SHEETS] as const
 export const TOKENS_CSS = path.join(STYLES_DIR, 'tokens.css')
 export const INDEX_CSS = path.join(STYLES_DIR, 'index.css')
 
-/** Custom properties written by the runtime (u3's WindowFrame) rather than by tokens.css. */
-export const RUNTIME_PROPS = new Set(['--x', '--y', '--w', '--h', '--z', '--delay'])
+/** Custom properties written by the runtime rather than by tokens.css. */
+export const RUNTIME_PROPS = new Set(['--x', '--y', '--w', '--h', '--z', '--delay', '--file-x', '--file-y'])
 
 export function exists(p: string): boolean {
   return fs.existsSync(p)

@@ -625,15 +625,20 @@ const meta = {
 const outDir = join(resolve(outRoot), slug);
 mkdirSync(outDir, { recursive: true });
 
-// ---------- incident cover sidecar ----------
-// Authored cover prose is not derivable from the draft without paraphrasing the
+// ---------- authored sidecars ----------
+// Authored portal prose is not derivable from the draft without paraphrasing the
 // incident. Treat it like the hardening overlay: it lives beside the draft, is
 // required by lint, and is copied when compile targets a different output root.
-const incidentCoverSource = resolve(dirname(resolve(draftPath)), 'incidentCover.json');
-try {
-  JSON.parse(readFileSync(incidentCoverSource, 'utf8'));
-} catch (e) {
-  die(`incidentCover.json: cannot read/parse — ${e.message}`);
+const REQUIRED_SIDECARS = ['incidentCover', 'incidentBrief'];
+const sidecarSources = new Map();
+for (const name of REQUIRED_SIDECARS) {
+  const source = resolve(dirname(resolve(draftPath)), `${name}.json`);
+  try {
+    JSON.parse(readFileSync(source, 'utf8'));
+  } catch (e) {
+    die(`${name}.json: cannot read/parse — ${e.message}`);
+  }
+  sidecarSources.set(name, source);
 }
 
 // ---------- hardening overlay ----------
@@ -702,9 +707,11 @@ if (!existsSync(hardeningPath)) {
   writeJSON('hardening.json', {});
   notes.push('hardening.json 없음 — 빈 오버레이를 생성했다 (하드닝 전 기본 상태)');
 }
-const incidentCoverTarget = join(outDir, 'incidentCover.json');
-if (resolve(incidentCoverSource) !== resolve(incidentCoverTarget)) {
-  copyFileSync(incidentCoverSource, incidentCoverTarget);
+for (const [name, source] of sidecarSources) {
+  const target = join(outDir, `${name}.json`);
+  if (resolve(source) !== resolve(target)) {
+    copyFileSync(source, target);
+  }
 }
 copyFileSync(resolve(draftPath), join(outDir, 'draft.md'));
 

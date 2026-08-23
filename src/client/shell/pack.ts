@@ -2,10 +2,10 @@
 //
 // The shell starts with `data/scenario/index.json`: the ordered list of packs
 // and the one tutorial designation the portal auto-opens. Then it reads the
-// selected pack surfaces it owns: `meta.json` for the chrome/clock band and
-// `endings.json` for the terminal curtain. Score predicates are read only for
-// the ending trigger and preview tally; the ledger itself still comes from the
-// driver seam.
+// selected pack surfaces it owns: `meta.json` for the chrome/clock band,
+// `incidentBrief.json` for the desktop file confirmation and `endings.json` for
+// the terminal curtain. Score predicates are read only for the ending trigger
+// and preview tally; the ledger itself still comes from the driver seam.
 //
 // The pack is authored data (frozen this run), so it is parsed defensively:
 // the terminal stamp is written `21:04+` there — the trailing `+` marks an
@@ -57,6 +57,11 @@ export interface ScenarioScoreUnit {
 
 export interface ScenarioScore {
   units: readonly ScenarioScoreUnit[]
+}
+
+export interface ScenarioIncidentBrief {
+  lead: string
+  body: readonly string[]
 }
 
 const isRecord = (value: unknown): value is Record<string, unknown> =>
@@ -183,6 +188,13 @@ function readScore(raw: unknown): ScenarioScore {
   }
 }
 
+function readIncidentBrief(raw: unknown): ScenarioIncidentBrief {
+  if (!isRecord(raw) || typeof raw.lead !== 'string' || !isStringArray(raw.body) || raw.body.length === 0) {
+    throw new Error('scenario pack: incidentBrief.json is not a readable brief')
+  }
+  return { lead: raw.lead, body: raw.body }
+}
+
 async function fetchDataJson(path: string): Promise<unknown> {
   const url = new URL(path, document.baseURI)
   const response = await fetch(url)
@@ -214,4 +226,9 @@ export async function fetchScenarioEndings(slug: string): Promise<ScenarioEnding
 /** Fetches the score predicates the ending uses for trigger and preview totals. */
 export async function fetchScenarioScore(slug: string): Promise<ScenarioScore> {
   return readScore(await fetchScenarioJson('score', slug))
+}
+
+/** Fetches the pack-owned brief shown before switching to a desktop scenario. */
+export async function fetchScenarioIncidentBrief(slug: string): Promise<ScenarioIncidentBrief> {
+  return readIncidentBrief(await fetchScenarioJson('incidentBrief', slug))
 }
