@@ -312,6 +312,13 @@ interface ThreadSnapshot {
   boxes: Box[]
 }
 
+interface SlotThreadSnapshot {
+  d: string
+  endpoint: [number, number]
+  slot: Box
+  viewBox: string
+}
+
 async function threadSnapshot(page: Page, selectors: string[]): Promise<ThreadSnapshot> {
   let snapshot: ThreadSnapshot | null = null
   await expect
@@ -343,10 +350,38 @@ async function threadSnapshot(page: Page, selectors: string[]): Promise<ThreadSn
   return snapshot!
 }
 
+async function slotThreadSnapshot(page: Page): Promise<SlotThreadSnapshot> {
+  const snapshot = await page.evaluate(
+    ([pathSelector, slotSelector, hostSelector]) => {
+      const path = document.querySelector(pathSelector as string)
+      const slot = document.querySelector(slotSelector as string)
+      const host = document.querySelector(hostSelector as string)
+      if (!path || !slot || !host) return null
+      const d = path.getAttribute('d') ?? ''
+      const nums = [...d.matchAll(/-?\d+(?:\.\d+)?/g)].map((m) => Number(m[0]))
+      if (nums.length !== 6) return null
+      const r = slot.getBoundingClientRect()
+      return {
+        d,
+        endpoint: [nums[4], nums[5]] as [number, number],
+        slot: { x: r.x, y: r.y, width: r.width, height: r.height },
+        viewBox: host.getAttribute('viewBox') ?? '',
+      }
+    },
+    [PATH, `${FILE} [data-block-id]`, THREADS] as [string, string, string],
+  )
+  expect(snapshot, 'slot endpoint snapshot is unreadable').not.toBeNull()
+  return snapshot!
+}
+
 function near(actual: number, expected: number, tol = 2): void {
   expect(Math.abs(actual - expected), `expected ${actual} within ${tol} of ${expected}`).toBeLessThanOrEqual(
     tol,
   )
+}
+
+function distance(a: readonly [number, number], b: readonly [number, number]): number {
+  return Math.hypot(a[0] - b[0], a[1] - b[1])
 }
 
 /* ══ [u8#c1] every filled slot is threaded by id ═════════════════════════ */
@@ -533,27 +568,35 @@ test.describe('endpoints track windows during drag', () => {
   test('endpoints track windows during drag — a viewport resize re-draws and re-fits the viewBox', async ({
     page,
   }) => {
-    const before = await slotEndpoint(page)
+    const before = await slotThreadSnapshot(page)
+    const minMove = 24
     await page.setViewportSize({ width: 1440, height: 900 })
     await expect(page.locator(PATH)).toHaveCount(1)
-    await expect
-      .poll(async () => (await page.locator(THREADS).getAttribute('viewBox')) ?? '')
-      .toBe('0 0 1440 900')
 
     // The layer re-draws on its OWN rAF after the resize re-flows the desk —
     // that self-driven convergence is the claim, so nothing forces a redraw
-    // here. But a one-shot read can land mid-convergence under a loaded worker
+    // here. But separate reads can straddle convergence under a loaded worker
     // pool (measured: endpoint at the old layout, slot box at the new one), so
-    // the read polls until the thread has re-fit to where the slot now is.
+    // the poll reads the viewBox, path and slot rect in one page task. It waits
+    // for both halves of the resize: the host has the new viewport, and the
+    // slot endpoint is attached to the slot's new layout by a visible amount.
+    let after: SlotThreadSnapshot | null = null
     await expect
       .poll(async () => {
-        const [x] = await slotEndpoint(page)
-        const b = await box(page, `${FILE} [data-block-id]`)
-        return Math.abs(x - (b.x + 6))
-      }, { message: 'the slot endpoint never re-fit to the resized layout' })
-      .toBeLessThanOrEqual(2)
-    const after = await slotEndpoint(page)
-    expect(after[0] === before[0] && after[1] === before[1]).toBe(false)
+        after = await slotThreadSnapshot(page)
+        const fitted =
+          after.viewBox === '0 0 1440 900' &&
+          Math.abs(after.endpoint[0] - (after.slot.x + 6)) <= 2 &&
+          Math.abs(after.endpoint[1] - (after.slot.y + after.slot.height / 2)) <= 2
+        if (!fitted) return 0
+        return distance(after.endpoint, before.endpoint)
+      }, { message: 'the slot endpoint never re-fit to the resized layout by a visible amount' })
+      .toBeGreaterThanOrEqual(minMove)
+
+    expect(after!.viewBox).toBe('0 0 1440 900')
+    near(after!.endpoint[0], after!.slot.x + 6)
+    near(after!.endpoint[1], after!.slot.y + after!.slot.height / 2)
+    expect(distance(after!.endpoint, before.endpoint)).toBeGreaterThanOrEqual(minMove)
   })
 
   test('endpoints track windows during drag — collapsing a window drops its threads', async ({ page }) => {
