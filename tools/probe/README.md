@@ -126,10 +126,11 @@ both are paper instruments with zero calls.
 
 ## Suite anatomy
 
-Suites are data, under `tools/probe/dday-mechanism/suites/`. Proxy prompt-parity
-fixtures live under `tests/fixtures/probe/suites/`; they are copies or retired
-SMOKE sheets used only to exercise the renderer parity gate. See
-`DOME-G1-baseline.json` for a worked retained measurement suite.
+Suites are data, under `tools/probe/dday-mechanism/suites/`. The retained DOME
+suites are measurement evidence and stay single-source; the proxy parity gate
+reads the retained judgment suite directly. Retired SMOKE sheets used only to
+exercise narration/reporter parity live under `tests/fixtures/probe/suites/`.
+See `DOME-G1-baseline.json` for a worked retained measurement suite.
 
 ```jsonc
 {
