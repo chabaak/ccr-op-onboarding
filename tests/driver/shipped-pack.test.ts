@@ -281,4 +281,20 @@ describe('the shipped pack plays its day to the end', () => {
       ).toBe(false)
     }
   })
+
+  it('(f) normal-path narration keeps authored event-line bytes under their t ids', async () => {
+    const authoredById = new Map(TIMELINE.events.map((event) => [event.id, event.text]))
+    const events = await playOneRun()
+    const authoredRows = events
+      .filter((event): event is Extract<ViewEvent, { type: 'feed' }> => event.type === 'feed')
+      .map((event) => event.line)
+      .filter((line) => line.kind === 'event' && line.sentence_id?.startsWith('t'))
+
+    expect(authoredRows.length, 'normal path rendered no authored event rows').toBeGreaterThan(0)
+    for (const row of authoredRows) {
+      expect(row.text, `${row.sentence_id} changed between timeline.json and LIVE FEED`).toBe(
+        authoredById.get(row.sentence_id!),
+      )
+    }
+  })
 })

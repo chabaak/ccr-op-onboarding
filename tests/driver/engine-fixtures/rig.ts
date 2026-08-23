@@ -117,6 +117,23 @@ export function unusableTransport(only: CallType, drop: string): SpyTransport {
   }
 }
 
+/** A successful 200 with a deliberately raw body, for driver shape guards. */
+export function rawBodyTransport(only: CallType, body: unknown): SpyTransport {
+  const fixture = createFixtureProvider()
+  const sent: CallRequest[] = []
+  return {
+    mode: 'live',
+    sent,
+    types: () => sent.map((request) => request.call_type),
+    async send<T extends CallType>(request: CallRequest<T>): Promise<TransportResult<T>> {
+      sent.push(request)
+      const result = await fixture.send(request)
+      if (!result.ok || request.call_type !== only) return result
+      return { ...result, body: body as CallResponse[T] }
+    },
+  }
+}
+
 // ── the call-order recorder (A6 · A7) ────────────────────────────────────────
 
 export type CallRecord = { name: string; value: unknown }

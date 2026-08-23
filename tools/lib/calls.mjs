@@ -311,30 +311,11 @@ const narration = {
     const problems = [];
     if (!input || typeof input !== 'object') return ['response was not an object'];
 
-    // A quiet beat may legally come back with nothing — the same predicate the
-    // schema above is built from. Kept in step with `proxy/src/calls.ts`: a
-    // validator that refuses what its own schema permits turns an obedient
-    // model into a retry, and the retry count is what this file is measured on.
+    // Kept in step with `proxy/src/calls.ts`: event-line content is repaired
+    // where the authored beat events are in hand, so this hard boundary is
+    // shape only. An array can be reconciled; a non-array cannot be iterated.
     const quiet = !String(suite.slots?.FIXED_NPC_ACTION ?? '').trim();
-    const eventIds = fixedEventIds(suite);
     if (!Array.isArray(input.event_lines)) problems.push('event_lines not an array');
-    else {
-      const ids = input.event_lines.map((line) =>
-        line && typeof line === 'object' ? line.id : undefined,
-      );
-      if (input.event_lines.length !== eventIds.length)
-        problems.push('event_lines count does not match fixed events');
-      if (ids.some((id) => typeof id !== 'string' || !eventIds.includes(id)))
-        problems.push('event_lines id not in fixed events');
-      if (ids.some((id, index) => id !== eventIds[index]))
-        problems.push('event_lines ids out of order');
-      if (
-        input.event_lines.some(
-          (line) => !line || typeof line !== 'object' || !String(line.text ?? '').trim(),
-        )
-      )
-        problems.push('event_lines has an empty entry');
-    }
 
     if (!Array.isArray(input.timeline_entries)) problems.push('timeline_entries not an array');
     else if (!input.timeline_entries.length && !quiet) problems.push('timeline_entries empty');

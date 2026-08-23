@@ -93,6 +93,22 @@ describe("a quiet beat is sayable, and answerable with nothing", () => {
     ).toContain("timeline_entries empty");
   });
 
+  it("does not refuse event-line content the engine can repair", () => {
+    expect(
+      narration.validate(
+        {
+          event_lines: [
+            { id: "unknown", text: "없는 사건이다." },
+            { id: "t1", text: "  " },
+          ],
+          timeline_entries: ["현장이 술렁였다."],
+          npc_lines: [],
+        },
+        loudSlots,
+      ),
+    ).toEqual([]);
+  });
+
   it("tells the model the empty array is the answer, not merely legal", () => {
     expect(descriptionOf(quietSlots)).toContain("빈 배열이 정답이다");
     expect(descriptionOf(quietSlots)).not.toContain("2~3개");

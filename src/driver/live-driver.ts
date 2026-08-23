@@ -74,7 +74,13 @@ function readJudgment(body: AnyBody): CallResponse['judgment'] | null {
 }
 
 function readNarration(body: AnyBody): CallResponse['narration'] | null {
-  return 'event_lines' in body && 'timeline_entries' in body && 'npc_lines' in body ? body : null
+  if (body === null || typeof body !== 'object') return null
+  const value = body as Partial<CallResponse['narration']>
+  return Array.isArray(value.event_lines) &&
+    Array.isArray(value.timeline_entries) &&
+    Array.isArray(value.npc_lines)
+    ? (value as CallResponse['narration'])
+    : null
 }
 
 function readReporter(body: AnyBody): CallResponse['reporter'] | null {
