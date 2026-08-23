@@ -10,7 +10,7 @@
 // itself into a result.
 
 import { readFileSync, readdirSync, existsSync } from 'node:fs';
-import { basename, join, resolve } from 'node:path';
+import { basename, join, relative, resolve } from 'node:path';
 
 const REPO = resolve(process.argv[2] === '--repo' ? process.argv[3] : '.');
 const arg = process.argv.slice(2).find((a) => !a.startsWith('--') && a !== REPO);
@@ -22,14 +22,48 @@ if (!arg) {
 const RUNS = join(REPO, 'tools/probe/dday-mechanism/runs');
 const SUITES = join(REPO, 'tools/probe/dday-mechanism/suites');
 
-const runDir = existsSync(arg) ? resolve(arg) : join(RUNS, `${arg}-calls`);
-if (!existsSync(runDir)) {
-  console.error(`no run directory at ${runDir}`);
+const readJson = (p) => JSON.parse(readFileSync(p, 'utf8'));
+
+const armMetricFiles = (dir) =>
+  readdirSync(dir)
+    .filter((f) => /^metrics-.*\.json$/.test(f))
+    .map((f) => join(dir, f));
+
+const metricExperiment = (dir) => {
+  const experiments = [
+    ...new Set(
+      armMetricFiles(dir)
+        .map((p) => readJson(p).experiment)
+        .filter((v) => typeof v === 'string' && v.length > 0),
+    ),
+  ];
+  return experiments.length === 1 ? experiments[0] : null;
+};
+
+const findRunDirByExperiment = (experimentId) => {
+  const matches = readdirSync(RUNS, { withFileTypes: true })
+    .filter((entry) => entry.isDirectory())
+    .map((entry) => join(RUNS, entry.name))
+    .filter((dir) => metricExperiment(dir) === experimentId);
+  if (matches.length > 1) {
+    console.error(`multiple run directories record experiment "${experimentId}":`);
+    for (const match of matches) console.error(`  ${match}`);
+    process.exit(1);
+  }
+  return matches[0] ?? null;
+};
+
+const conventionalRunDir = join(RUNS, `${arg}-calls`);
+const runDir = existsSync(arg)
+  ? resolve(arg)
+  : existsSync(conventionalRunDir)
+    ? conventionalRunDir
+    : findRunDirByExperiment(arg);
+if (!runDir || !existsSync(runDir)) {
+  console.error(`no run directory found for ${arg}`);
   process.exit(1);
 }
-const experiment = basename(runDir).replace(/-calls$/, '');
-
-const readJson = (p) => JSON.parse(readFileSync(p, 'utf8'));
+const experiment = metricExperiment(runDir) ?? basename(runDir).replace(/-calls$/, '');
 
 // The suite is matched on its `experiment` field, not its filename — the two
 // can legitimately differ.
@@ -80,6 +114,7 @@ if (!suite) {
 } else {
   const first = readJson(armFiles[0].path);
   say(`suite      ${suite._file}`);
+  say(`run        ${relative(REPO, runDir)}`);
   say(`model      ${suite.model}   template ${suite.template_version}   temperament ${suite.temperament}`);
   say(`channel    ${suite.channel}   call_type ${suite.call_type}`);
   say(`n_per_arm  ${suite.pre_registration?.n_per_arm ?? '?'}   transport ${first.transport ?? '?'}`);
