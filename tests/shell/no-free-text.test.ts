@@ -5,8 +5,8 @@
 // (The DOM half of this lives in `e2e/shell.spec.ts` › 'a11y'; this is the
 // source-level guard, so a regression is caught before a browser is involved.)
 //
-// Also pins run-wide C4: sessionStorage is the ONLY storage allowed and
-// localStorage is forbidden everywhere.
+// Also pins run-wide C4: run/session state stays in sessionStorage, while
+// localStorage is reserved for the accepted scenario-unlock list.
 import { describe, it, expect } from 'vitest'
 import {
   CLIENT,
@@ -111,9 +111,12 @@ describe('[u3#c7] the controls are buttons', () => {
   })
 })
 
-describe('[C4] storage — sessionStorage only, never localStorage', () => {
-  it('(a) no client source touches localStorage', () => {
-    expect(hits(surfaces(), /\blocalStorage\b/)).toEqual([])
+describe('[C4] storage — sessionStorage for runs, localStorage only for scenario unlocks', () => {
+  it('(a) localStorage is confined to the accepted scenario-unlock flow', () => {
+    expect(hits(surfaces(), /\blocalStorage\b/)).toEqual([
+      'src/client/shell/boot.ts',
+      'src/client/shell/scenario-desktop.ts',
+    ])
   })
 
   it('(b) no client source touches document.cookie or indexedDB', () => {

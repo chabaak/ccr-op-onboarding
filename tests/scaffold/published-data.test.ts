@@ -102,9 +102,12 @@ describe('published data — the allowlist tracks what the client fetches', () =
     ).toEqual([...browser].sort())
 
     const sidecars = stringArrayOf('vite.config.ts', 'SHELL_PACK_PARTS')
-    expect(sidecars, 'the shell incident-cover sidecar stopped being explicit').toEqual(['incidentCover'])
+    expect(sidecars, 'the shell sidecars stopped being explicit').toEqual(['incidentCover', 'incidentBrief'])
     expect(read('src/client/windows/agent-file.ts'), 'the incident-cover sidecar ships but nothing fetches it').toMatch(
       /incidentCover\.json/,
+    )
+    expect(read('src/client/shell/pack.ts'), 'the incident-brief sidecar ships but nothing fetches it').toMatch(
+      /fetchScenarioIncidentBrief/,
     )
 
     const optional = stringArrayOf('vite.config.ts', 'OPTIONAL_PACK_PARTS')

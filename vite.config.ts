@@ -59,6 +59,7 @@ const OPTIONAL_PACK_PARTS = [
 /** Scenario sidecars the shell fetches outside the engine pack loader. */
 const SHELL_PACK_PARTS = [
   'incidentCover',
+  'incidentBrief',
 ] as const
 
 /** Scenario-independent policy the run fetches, relative to `data/`. */

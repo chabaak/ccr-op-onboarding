@@ -367,7 +367,7 @@ describe('[x6] the plates', () => {
 
   it('(h) the walk`s two button labels', () => {
     expect(ENDING_NEXT).toBe('다음')
-    expect(ENDING_CLOSE).toBe('창 닫기 시도')
+    expect(ENDING_CLOSE).toBe('확인')
     expect(ENDING_WINDOW_CLOSE).toBe(ENDING_CLOSE)
   })
 })
@@ -431,40 +431,47 @@ describe('[x6] the ending is an observer', () => {
     expect(src).not.toMatch(/createScoreTally/)
   })
 
-  it('(g) both endings exit by asking the browser to close, never by resetting the desk', () => {
+  it('(g) both endings hand off after the plate instead of closing the tab', () => {
     const src = code(ENDING_TS)
     const raise = /async function raise[\s\S]*?^}/m.exec(src)?.[0] ?? ''
-    expect(raise, 'raise() no longer asks the browser to close the tab').toMatch(
-      /await\s+openEnding\s*\([\s\S]*?\)\s*closeWindow\s*\(\s*host\s*\)/,
-    )
-    expect(raise, 'Bad still branches to a reset path').not.toMatch(/kind\s*===|resetDesk/)
+    expect(raise, 'raise() stopped opening the ending plate').toMatch(/await\s+openEnding\s*\(/)
+    expect(raise, 'raise() still asks the browser to close the tab').not.toMatch(/host\.close|closeWindow/)
 
-    expect(src, 'the final action no longer attempts to close the tab').toMatch(/host\.close\s*\(\s*\)/)
-    expect(src, 'a refused close still clears the final feed/result').not.toMatch(
-      /sessionStorage\s*\.\s*clear/,
-    )
-    expect(src, 'a refused close still reloads the page').not.toMatch(/location\s*\.\s*reload/)
+    const handoff = /async function continueAfter[\s\S]*?^}/m.exec(src)?.[0] ?? ''
+    expect(handoff, 'GOOD no longer unlocks through the shell callback').toMatch(/onGoodEnding/)
+    expect(handoff, 'BAD no longer restarts through the shell callback').toMatch(/onBadEnding/)
   })
 
-  it('(h) the final plate stays mounted when the browser refuses to close', () => {
+  it('(h) the final press removes the ending and releases the desk', () => {
     const src = code(ENDING_TS)
-    expect(src, 'the reset fallback returned').not.toMatch(/function\s+resetDesk/)
     expect(src, 'the ending still clears persisted run state').not.toMatch(/sessionStorage\s*\.\s*clear/)
-    expect(src, 'the ending still reloads after a refused close').not.toMatch(/location\s*\.\s*reload/)
+    expect(src, 'the ending still owns a reload path').not.toMatch(/location\s*\.\s*reload/)
 
     const advance = /const advance = \(\): void => \{[\s\S]*?go\.addEventListener/.exec(src)?.[0] ?? ''
-    expect(advance, 'the final press still hides the ending screen').not.toMatch(/end-out|remove\(|replaceChildren\(\)/)
+    expect(advance, 'the final press no longer removes the ending screen').toMatch(/root\.remove\s*\(\s*\)/)
+    expect(advance, 'the desk remains inert after the ending').toMatch(/holdChrome\s*\(\s*false\s*\)/)
   })
 
-  it('(i) Good and Bad expose the same window-close final action', () => {
+  it('(i) Good and Bad expose the same continue final action', () => {
     const src = code(ENDING_TS)
     const paint = /function paint\(\): void \{[\s\S]*?body\.classList\.add/.exec(src)?.[0] ?? ''
     expect(paint, 'the final label still varies by ending').not.toMatch(/kind\s*===/)
-    expect(paint, 'the final button does not name the window-close attempt').toMatch(
+    expect(paint, 'the final button does not name the continue action').toMatch(
       /go\.(?:textContent|title)\s*=\s*last\s*\?\s*ENDING_CLOSE\s*:\s*ENDING_NEXT/,
     )
-    expect(paint, 'Bad still exposes a non-window-close final op').toMatch(
-      /go\.dataset\.op\s*=\s*last\s*\?\s*['"]close_window['"]\s*:\s*['"]next['"]/,
+    expect(paint, 'Bad still exposes a different final op').toMatch(
+      /go\.dataset\.op\s*=\s*last\s*\?\s*['"]continue['"]\s*:\s*['"]next['"]/,
+    )
+  })
+
+  it('(j) boot wires GOOD to the desktop and BAD to the reusable reset path', () => {
+    const src = code(BOOT_TS)
+    expect(src, 'boot no longer installs the scenario desktop').toMatch(/installScenarioDesktop\s*\(/)
+    expect(src, 'GOOD no longer unlocks scenario files').toMatch(/onGoodEnding[\s\S]*?unlockAll\s*\(/)
+    expect(src, 'GOOD no longer shows the final notice').toMatch(/onGoodEnding[\s\S]*?showUnlockNotice\s*\(/)
+    expect(src, 'GOOD no longer closes the three windows').toMatch(/onGoodEnding[\s\S]*?closeAll\s*\(/)
+    expect(src, 'BAD no longer restarts through the desktop/session helper').toMatch(
+      /onBadEnding[\s\S]*?restartCurrent\s*\(/,
     )
   })
 })

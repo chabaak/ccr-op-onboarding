@@ -38,6 +38,14 @@ export type IncidentCover = {
   };
 };
 
+/** datapack incidentBrief.json — 선택 전 사건 개요 문안 */
+export type IncidentBrief = {
+  /** 확인판의 첫 문장. 사건 장소와 출발 상황처럼 이 팩만의 개요를 쓴다. */
+  lead: string;
+  /** 확인판 보조 문장. 다른 팩도 그대로 쓸 포털 공통 문장은 넣지 않는다. */
+  body: Array<string>;
+};
+
 /** datapack timeline.json — 무개입 고정 타임라인 */
 export type Timeline = {
   events: Array<{
@@ -298,6 +306,7 @@ export type ScenarioIndex = {
 export type Datapack = {
   meta: Meta;
   incidentCover: IncidentCover;
+  incidentBrief: IncidentBrief;
   timeline: Timeline;
   characters: Characters;
   places: Places;

@@ -32,7 +32,7 @@ if (!packDir) {
 }
 const PACK = resolve(packDir);
 const SCHEMA_DIR = join(PACK, '..', '_schema');
-const REQUIRED_FILES = ['meta', 'incidentCover', 'timeline', 'characters', 'places', 'temperament', 'gates', 'truths', 'score', 'symptoms', 'hardening'];
+const REQUIRED_FILES = ['meta', 'incidentCover', 'incidentBrief', 'timeline', 'characters', 'places', 'temperament', 'gates', 'truths', 'score', 'symptoms', 'hardening'];
 const OPTIONAL_FILES = ['endings'];
 
 const errors = [];
