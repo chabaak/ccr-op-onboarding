@@ -12,7 +12,7 @@ Pipeline stages 1–2: compile the draft, then lint the produced datapack.
 
 | Script | Stage | Transformation |
 |---|---|---|
-| `compile-datapack.mjs` | 1 · Compile | draft (write-scenario §4 format) → `data/scenario/<slug>/` |
+| `compile-datapack.mjs` | 1 · Compile | draft (`write-mechanism-scenario` format) → `data/scenario/<slug>/` |
 | `lint-datapack.mjs` | 2 · Lint | datapack → violation list (`data/scenario/_schema` + lint rules) |
 | `generate-datapack-types.mjs` | — | `data/scenario/_schema/*.schema.json` → `src/shared/datapack.ts` |
 

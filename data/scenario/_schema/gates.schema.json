@@ -1,7 +1,7 @@
 {
   "$schema": "https://json-schema.org/draft/2020-12/schema",
   "$id": "gates.schema.json",
-  "title": "datapack gates.json — 게이트 카드 (정본: gate-hardening-manual §5)",
+  "title": "datapack gates.json — 게이트 카드 (정본: write-mechanism-scenario skill)",
   "description": "카드 필드는 정본 스키마 그대로다. buckets·edge_predicates는 하드닝 산출물 — 컴파일은 빈 배열로 통과시키고 린트가 '하드닝 미완'을 플래그한다(pipeline §3). · key_conditions·key_examples는 필수가 아니다 — 그래프 선행 방식은 자물쇠를 두지 않는다.",
   "type": "object",
   "required": [

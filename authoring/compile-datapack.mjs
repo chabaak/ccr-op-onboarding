@@ -4,7 +4,7 @@
 //
 //   node compile-datapack.mjs <draft.md> [out-root]     (default out-root: data/scenario)
 //
-// The draft format (write-scenario skill §4) is a PARSE CONTRACT: sections,
+// The draft format (write-mechanism-scenario skill) is a PARSE CONTRACT: sections,
 // table columns, bullet labels and shapes are fixed. Anything this script
 // cannot parse is an error in the draft, not a case for the compiler to
 // guess — compile is extraction, not authoring (pipeline §3). All sentence
