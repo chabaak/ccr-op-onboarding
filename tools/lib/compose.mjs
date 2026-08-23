@@ -50,27 +50,11 @@ const renderStanceSet = (set) =>
 const renderTimeline = (t) => (Array.isArray(t) ? t.join('\n') : String(t ?? ''));
 
 // NPCs render grouped by `side` when the suite marks it. The grouping is not
-// cosmetic: room-side characters kept stepping into the agent's seat and
-// addressing the person on the line, and a prose rule alone did not stop it —
-// the model had to infer the two sides from names. Naming the sides in the
-// payload makes the boundary structural. `side` is optional; without it the
-// list renders flat, so existing suites are unaffected.
-// The labels carry the rule, not just the grouping. Stating it in the distant
-// constraint list left a residual leak; stating it beside the names removed it.
-//
-// The labels moved with the fiction (prompts v0.5/v0.4): the agent is a field
-// officer at the site's crisis post, not a night controller in a regional
-// situation room. `room` is now "beside the agent", which is what every
-// room-side row in the shipped packs already meant — 우는다리 calls the place
-// 위기 대응실 in its own draft. The MECHANISM is untouched; only the name of the
-// place the two sides sit in.
-//
-// ⚠️ `room` is mechanism kept for packs that author it; the SHIPPING pack does
-// not. 멈춘회전문 has zero room-side rows, which is why narration v0.4 states
-// "요원 곁에는 아무도 없다" flatly rather than as a condition — a conditional
-// left a seat open beside the agent, and an open seat is where 기록관 came from.
-// A pack that authors room rows makes the prompt and this label disagree. If one
-// ever does, the prompt sentence has to come back as a condition.
+// cosmetic: the model must not infer who is on the line and who is beside the
+// agent from names alone. The labels carry the staging rule beside the names,
+// and the base prompt treats those labels as the source of truth for the beat.
+// `side` is optional; without it the list renders flat, so existing suites are
+// unaffected.
 const SIDE_LABELS = {
   line: '회선 너머 — 요원에게만 말한다',
   room: '요원 곁 — 서로에게만 말한다. 회선 저쪽에는 말을 걸지 않는다',

@@ -414,6 +414,54 @@ describe("renderer coverage — every RENDERERS entry, not just what suites use"
     // ...and the system prompt must carry the branch that tells it what to do.
     expect(rendered.system).toContain("요원이 말하지 않은 비트");
   });
+
+  it("derives narration staging from the side labels in the current beat", () => {
+    const rendered = renderCall(
+      {
+        call_type: "narration",
+        template_version: "v0.5",
+        slots: {
+          TIMELINE_TAIL: ["18:40 요원: 천천히 말해."],
+          AGENT_UTTERANCE: "천천히 말해.",
+          FIXED_NPC_ACTION: "t1: 표기웅이 수화기를 고쳐 쥔다.",
+          SCENE_SYMPTOMS: ["숨이 가빠졌다."],
+          PRESENT_NPCS: [
+            { id: "n1", name: "표기웅", side: "line" },
+            { id: "n2", name: "보조", side: "room" },
+          ],
+        },
+      },
+      DEFAULT_PROMPT as unknown as Record<string, unknown>,
+    );
+
+    expect(rendered.system).toContain("구역 표지가 정한다");
+    expect(rendered.system).not.toContain("사람은 요원 하나뿐이다");
+    expect(rendered.system).not.toContain("전부 회선 너머다");
+    expect(rendered.user).toContain("[회선 너머 — 요원에게만 말한다]\nn1 — 표기웅");
+    expect(rendered.user).toContain(
+      "[요원 곁 — 서로에게만 말한다. 회선 저쪽에는 말을 걸지 않는다]\nn2 — 보조",
+    );
+  });
+
+  it("keeps a line-only roster on the existing line-side wording", () => {
+    const rendered = renderCall(
+      {
+        call_type: "narration",
+        template_version: "v0.5",
+        slots: {
+          TIMELINE_TAIL: ["18:40 요원: 천천히 말해."],
+          AGENT_UTTERANCE: "천천히 말해.",
+          FIXED_NPC_ACTION: "t1: 표기웅이 수화기를 고쳐 쥔다.",
+          SCENE_SYMPTOMS: ["숨이 가빠졌다."],
+          PRESENT_NPCS: [{ id: "n1", name: "표기웅", side: "line" }],
+        },
+      },
+      DEFAULT_PROMPT as unknown as Record<string, unknown>,
+    );
+
+    expect(rendered.user).toContain("[회선 너머 — 요원에게만 말한다]\nn1 — 표기웅");
+    expect(rendered.user).not.toContain("[요원 곁");
+  });
 });
 
 describe("the default prompt is this tier's, not the client's", () => {
