@@ -1,0 +1,260 @@
+# DOME-G2-cumulative-r1 — arm `negative_control`
+
+| field | value |
+|---|---|
+| call type | judgment |
+| channel | C-BLOCK |
+| template | v0.4 |
+| model | `claude-haiku-4-5-20251001` |
+| transport | anthropic |
+| temperament | dome-base |
+| N planned | 10 |
+| N kept | 10 |
+
+## Pre-registration
+
+- **Hypothesis:** 현재 G2가 증거 게이트라면 no-key와 K1은 a(남측 회전문 유지)에 머물고, K1+K2에서만 b 또는 c로 옮긴다. K1+K2+K3은 K1+K2보다 성공 선택을 더 키우지 않아야 하며, weak/placebo와 K1+K3 negative는 K1 단독보다 성공 선택을 물질적으로 키우지 않아야 한다.
+- **Drop condition:** K1 단독이 b 또는 c에 30% 이상 닿거나, placebo 또는 negative_control이 b 또는 c를 K1 단독보다 30포인트 이상 키우면 현 G2 stance/evidence가 누설 상태다. K1+K2가 b 또는 c에 80% 미만이면 K2 문장 또는 stance set이 충분히 작동하지 않는다.
+- **Contingency:** baseline(no-key)이 b 또는 c에 30% 이상 닿으면 stance label 또는 gate question 자체가 성공 행동을 노출한다.
+- **Contingency:** K1+K2+K3이 K1+K2와 다른 분포를 보이면 G3 열쇠가 G2 판단에 새고 있다.
+- **Contingency:** because_block_ids가 없는 arm에서 성공 stance의 필요 전제를 꾸며내면 traceability defect로 별도 기록한다.
+
+## Calls (verbatim)
+
+### 01
+
+latency 4.517s · stop_reason `tool_use` · schema_retries 0 · foreign_tool_uses 0
+
+```json
+{
+  "inner_note": "안에 남은 사람들의 실제 숫자도, 지붕 상태도, 회전문 밖의 대기 상황도 확인되지 않았다. 가장 위험한 것은 이미 거기 있는 사람들을 더 위태롭게 만드는 것이다.",
+  "stance": "a",
+  "because_referent": "현장 상황을 직접 볼 수 없고 들은 정보도 모순되고 있기 때문이다.",
+  "because_block_ids": [
+    "k1"
+  ],
+  "rejected_stance": "b",
+  "rejected_reason": "시설대장에 없는 개구부를 추정하는 것은 확인되지 않은 것을 확정된 것처럼 취급하는 것이다. 나는 그렇게 할 수 없다.",
+  "utterance": "19:26 현재 안에 남은 인원의 정확한 숫자를 다시 확인하겠습니다. 동시에 회전문 앞 대기 상황과 지붕 상태를 인솔자에게 재차 확인한 뒤, 현재 확인된 정규 출입구인 남측 회전 출입구로 단계적으로 유도하겠습니다."
+}
+```
+
+### 02
+
+latency 8.246s · stop_reason `tool_use` · schema_retries 0 · foreign_tool_uses 0
+
+problems: because_block_ids unknown: 18:40
+
+```json
+{
+  "inner_note": "지붕이 처지고 물이 떨어지는 상황이므로 구조 안정성이 위험하다. 남측 회전문은 현재 한 번에 두 사람씩만 통과한다고 보고되었고, 안에 아이들과 인솔자가 남아 있다. 어떤 개구부도 확인되지 않았다.",
+  "stance": "a",
+  "because_referent": "정규 대피로인 남측 회전문이 유일하게 확인된 출입구이고, 시설대장 기록에 다른 개구부가 없기 때문이다.",
+  "because_block_ids": [
+    "18:40"
+  ],
+  "rejected_stance": "b",
+  "rejected_reason": "벽을 따라 찾게 하는 것은 미확인된 개구부를 가정한 판단이고, 그 사이 구조 붕괴 위험이 증가한다.",
+  "utterance": "남측 회전 출입구로 전원을 유도하겠습니다."
+}
+```
+
+### 03
+
+latency 6.907s · stop_reason `tool_use` · schema_retries 0 · foreign_tool_uses 0
+
+problems: because_block_ids unknown: facility_single_exit,unverified_opening,my_role_limits
+
+```json
+{
+  "inner_note": "천장이 처지고 물이 떨어지며 조명이 꺼지는 상황에서 막구조 지붕의 압력 손실이 진행 중이다. 회전문 앞에 줄이 섰다는 것은 정규 출입구가 병목이 되고 있다는 신호다. 하지만 내가 알 수 있는 것은 여기까지다. 보이지 않는 개구부의 존재, 그 위치, 안전성, 외부 수용 여건은 모두 현장에서만 확인 가능한 것들이다.",
+  "stance": "a",
+  "because_referent": "정규 출입구가 유일하게 확인된 탈출 경로이고, 현장의 다른 가능성들은 내가 검증할 수 없기 때문이다.",
+  "because_block_ids": [
+    "facility_single_exit",
+    "unverified_opening",
+    "my_role_limits"
+  ],
+  "rejected_stance": "b",
+  "rejected_reason": "시설대장에 없는 개구부를 전제로 행동하도록 지시하는 것은 확인되지 않은 것을 확정된 것처럼 올리는 것이고, 이는 내가 스스로에게 약속한 우선순위를 위반한다. 또한 아이들을 벽을 따라 찾게 하는 것은 현장 상황을 모르는 내가 인솔자를 특정 행동으로 묶는 것인데, 그 동안 회전문 병목은 해소되지 않는다.",
+  "utterance": "표기웅과 문세라의 보고를 종합하면, 안에는 아이들과 인솔자가 남아 있고, 회전문 앞에 줄이 섰으며, 천장 상황이 악화 중입니다. 현장에서 확인된 출입구는 남측 회전문 한 곳뿐입니다. 시설대장에 기록된 다른 개구부는 없습니다. 인솔자에게 이 경로로 아이들을 유도하도록 지시합니다."
+}
+```
+
+### 04
+
+latency 5.14s · stop_reason `tool_use` · schema_retries 0 · foreign_tool_uses 0
+
+problems: because_block_ids unknown: priority_1,priority_2
+
+```json
+{
+  "inner_note": "천장이 처지고 물이 떨어지는 상황에서 정기점검이 2년째 비어 있고, 송풍기 한 대가 원래 안 돈다는 것은 구조적 결함의 신호다. 회전문 앞에 줄이 섰다는 것은 정규 출입구가 병목이 될 수 있음을 의미한다. 하지만 개구부의 존재, 위치, 안전성은 모두 확인되지 않은 것이다.",
+  "stance": "a",
+  "because_referent": "현장에 갈 수 없고, 들은 것을 독립적으로 확인할 수 없는 지위에서 확인되지 않은 것을 단정할 수 없다.",
+  "because_block_ids": [
+    "priority_1",
+    "priority_2"
+  ],
+  "rejected_stance": "b",
+  "rejected_reason": "개구부의 존재 자체가 확인되지 않았다. 시설대장에 없다는 것이 없다는 뜻은 아니지만, 있다고 가정해서 인솔자를 그쪽으로 보내는 것은 미확인된 것을 확정된 것처럼 행동하는 것이다.",
+  "utterance": "회전문 쪽이 병목이라는 건 알겠으나, 다른 출입구는 지금 확인된 것이 없습니다. 인솔자에게 남측 회전문으로 전원을 유도하도록 지시하겠습니다."
+}
+```
+
+### 05
+
+latency 7.841s · stop_reason `tool_use` · schema_retries 0 · foreign_tool_uses 0
+
+problems: because_block_ids unknown: 회전문 한 곳,정리 중,한 번에 두 사람씩만
+
+```json
+{
+  "inner_note": "지붕이 처지고 물이 떨어지는 상황. 회전문은 한 번에 두 명씩만 통과. 급기 송풍기 중 한 대가 원래 안 돈다는 것은 구조적 결함. 얼마나 많은 사람이 안에 있는지 정확히 모른다. 표기웅의 진술이 모순되었다.",
+  "stance": "a",
+  "because_referent": "정규 출입구인 남측 회전문이 확인된 유일한 대피 경로이고, 추측되는 개구부는 아직 확인되지 않았으며 그것이 어디로 통하는지도 모르기 때문이다.",
+  "because_block_ids": [
+    "회전문 한 곳",
+    "정리 중",
+    "한 번에 두 사람씩만"
+  ],
+  "rejected_stance": "b",
+  "rejected_reason": "벽을 따라 찾는 개구부는 현재 존재 여부조차 확인되지 않았고, 막구조 건물에서 표기된 출입구 외의 통로를 가정하는 것은 위험한 추측이다. 또한 인솔자에게 찾게 하는 것은 현장 상황을 모르는 상태에서 판단을 미루는 것과 같다.",
+  "utterance": "남측 회전 출입구로 유도합니다. 좁은 문 때문에 시간이 걸리겠지만, 그곳이 확인된 유일한 정규 대피로입니다."
+}
+```
+
+### 06
+
+latency 5.012s · stop_reason `tool_use` · schema_retries 0 · foreign_tool_uses 0
+
+problems: because_block_ids unknown: 18:40,19:26
+
+```json
+{
+  "inner_note": "막구조 천장이 처지고 물이 떨어지며, 급기 송풍기 한 대가 작동하지 않는 상황이다. 회전문 앞에 줄이 서 있고 조명이 절반 꺼진 상태다. 표기웅이 혼자라던 것과 달리 관중석에 아이들과 인솔자가 남아 있다. 확인되지 않은 개구부를 근거로 정규 출입구를 우회하는 것은 더 큰 위험을 초래할 수 있다.",
+  "stance": "a",
+  "because_referent": "현재 확인된 정보는 남측 회전 출입구뿐이고, 안에 남은 사람들을 알려지지 않은 경로로 내보내는 것보다는 유일하게 확인된 통로를 통해 질서 있게 대피시키는 것이 안전하다.",
+  "because_block_ids": [
+    "18:40",
+    "19:26"
+  ],
+  "rejected_stance": "b",
+  "rejected_reason": "시설대장에 오르지 않은 개구부의 존재를 확정할 근거가 없다. 아이들과 인솔자를 벽을 따라 찾게 하는 것은 현장 상황을 정확히 모르는 상태에서 위험한 판단이다.",
+  "utterance": "지금 확인된 것은 남측 회전 출입구가 유일한 통로라는 것입니다. 회전문 앞에 줄이 서 있다는 신고가 있었으므로, 인솔자에게 아이들을 질서 있게 그쪽으로 유도하도록 요청하겠습니다."
+}
+```
+
+### 07
+
+latency 4.785s · stop_reason `tool_use` · schema_retries 0 · foreign_tool_uses 0
+
+problems: because_block_ids unknown: emergency_facility_layout,confirmed_exit,unconfirmed_alternatives
+
+```json
+{
+  "inner_note": "막구조 지붕이 처지고 물이 떨어지는 상황에서 정기점검이 2년째 미실시되었다. 회전문 앞에 줄이 서 있고 조명까지 꺼졌다. 현장에 직접 가지 못하고 들은 말만으로 판단해야 한다.",
+  "stance": "a",
+  "because_referent": "표기웅과 시설대장 조회로 확인된 정규 대피로는 남측 회전문 하나이고, b와 c는 현장 확인 없이 추정하는 것이다.",
+  "because_block_ids": [
+    "emergency_facility_layout",
+    "confirmed_exit",
+    "unconfirmed_alternatives"
+  ],
+  "rejected_stance": "b",
+  "rejected_reason": "개구부가 있는지, 있다면 어디인지 확인되지 않았고, 인솔자가 벽을 따라 찾도록 지시하는 것은 확정되지 않은 경로로 사람들을 보내는 것이다. 현장 상황이 악화 중일 때 시간을 낭비할 수 없다.",
+  "utterance": "현재까지 확인된 출입구는 남측 회전문이 정규 대피로입니다. 즉시 그곳으로 인솔자를 통해 질서 있게 유도하겠습니다."
+}
+```
+
+### 08
+
+latency 5.73s · stop_reason `tool_use` · schema_retries 0 · foreign_tool_uses 0
+
+```json
+{
+  "inner_note": "막구조 지붕이 처지고 물이 떨어지며 조명까지 꺼지고 있다. 정기점검 기록이 2년 비어 있고 한 대 송풍기는 이미 작동 불능 상태다. 현장에 내가 직접 갈 수 없고, 회전문 앞 줄은 이미 이동을 지연시키고 있다. 남은 사람들이 몇 명인지, 그들의 정확한 위치가 어디인지 확인되지 않았다. 알려진 것은 표기웅의 말이 거짓이었다는 뿐이다.",
+  "stance": "a",
+  "because_referent": "현재 확인된 유일한 출입로는 남측 회전문이고, 그곳이 정규 대피로다. 미확인 개구부를 근거로 행동할 수 없다.",
+  "because_block_ids": [
+    "k1"
+  ],
+  "rejected_stance": "b",
+  "rejected_reason": "시설대장에 기록되지 않은 개구부의 존재는 추론일 뿐 확인되지 않았다. 내가 확인 수단 없이 그것을 있다고 보고 인솔자에게 벽을 찾게 하는 것은 확정되지 않은 것을 확정된 것처럼 올리는 것이다.",
+  "utterance": "남측 회전 출입구로 정원을 조정해 전원을 유도하겠습니다. 현재 상황에서 그것이 확인된 유일한 대피로입니다."
+}
+```
+
+### 09
+
+latency 6.157s · stop_reason `tool_use` · schema_retries 0 · foreign_tool_uses 0
+
+```json
+{
+  "inner_note": "지붕이 처지고 물이 떨어지는 상황에서 막구조의 압력이 빠지고 있다. 정기점검이 2년 비어있고, 송풍기 하나는 작동하지 않으며, 조명까지 꺼졌다. 현장에 내가 모르는 사람들이 있다. 회전문 앞에 줄이 섰다는 것은 대피 경로가 체증되거나 막혔다는 신호다.",
+  "stance": "c",
+  "because_referent": "막구조 지붕이 고장난 상황에서 회전문이라는 유일한 공식 출입구가 이미 체증 상태이기 때문에, 인솔자와 아이들을 그곳으로 유도하는 것은 시간을 낭비하고 위험을 키우는 일이다.",
+  "because_block_ids": [
+    "k1",
+    "k3"
+  ],
+  "rejected_stance": "a",
+  "rejected_reason": "회전문 앞에 이미 줄이 서 있고, 지붕 상황이 악화 중인데 유일한 정규 경로로만 보내는 것은 현장 정보를 무시하는 판단이다. 시간이 흐를수록 위험이 커진다.",
+  "utterance": "인솔자에게 연락을 붙여서 벽을 따라 비상 개구부를 찾아 나가게 하겠습니다. 그 개구부가 바깥으로 통한다고 보고, 소방에 반대편 대기를 먼저 붙이겠습니다."
+}
+```
+
+### 10
+
+latency 6.48s · stop_reason `tool_use` · schema_retries 0 · foreign_tool_uses 0
+
+```json
+{
+  "inner_note": "막구조 건물이 진행 중인 붕괴 위험을 나타내는 신호들이 있다. 천장 처짐, 누수, 조명 절반 소실, 급기 송풍기 1대 작동 불능. 회전문에서 병목이 생겼다는 신고가 있고, 정확한 수용 인원을 파악하지 못했다. 지금 내가 할 수 있는 것은 현장과 수용 인원을 명확히 파악하는 것이고, 그 다음 판단이어야 한다.",
+  "stance": "a",
+  "because_referent": "확인되지 않은 개구부를 근거로 표준 절차를 우회할 수 없기 때문입니다.",
+  "because_block_ids": [
+    "k1"
+  ],
+  "rejected_stance": "b",
+  "rejected_reason": "시설대장 미기재 개구부의 존재는 추정일 뿐 확인되지 않았으며, 이를 근거로 인솔자에게 벽을 따라 찾게 하는 것은 내가 아는 안전한 경로를 버리고 미지의 방향으로 유도하는 것입니다.",
+  "utterance": "지금 안에 몇 명인지 정확히 파악한 뒤, 정규 출입구인 남측 회전문 안내를 시작하겠습니다. 동시에 119와 소방청에 현황을 보고하고, 회전문 병목을 풀기 위해 동측 출입 통로나 추가 경로 확보를 긴급 조회하겠습니다."
+}
+```
+
+## Arm table
+
+| # | stance | rejected_stance | because_referent | because_block_ids |
+|---|---|---|---|---|
+| 01 | a | b | 현장 상황을 직접 볼 수 없고 들은 정보도 모순되고 있기 때문이다. | k1 |
+| 02 | a | b | 정규 대피로인 남측 회전문이 유일하게 확인된 출입구이고, 시설대장 기록에 다른 개구부가 없기 때문이다. | 18:40 |
+| 03 | a | b | 정규 출입구가 유일하게 확인된 탈출 경로이고, 현장의 다른 가능성들은 내가 검증할 수 없기 때문이다. | facility_single_exit unverified_opening my_role_limits |
+| 04 | a | b | 현장에 갈 수 없고, 들은 것을 독립적으로 확인할 수 없는 지위에서 확인되지 않은 것을 단정할 수 없다. | priority_1 priority_2 |
+| 05 | a | b | 정규 출입구인 남측 회전문이 확인된 유일한 대피 경로이고, 추측되는 개구부는 아직 확인되지 않았으며 그것이 어디로 통하는지도 모르기 때문이다. | 회전문 한 곳 정리 중 한 번에 두 사람씩만 |
+| 06 | a | b | 현재 확인된 정보는 남측 회전 출입구뿐이고, 안에 남은 사람들을 알려지지 않은 경로로 내보내는 것보다는 유일하게 확인된 통로를 통해 질서 있게 대피시키는 것이 안전하다. | 18:40 19:26 |
+| 07 | a | b | 표기웅과 시설대장 조회로 확인된 정규 대피로는 남측 회전문 하나이고, b와 c는 현장 확인 없이 추정하는 것이다. | emergency_facility_layout confirmed_exit unconfirmed_alternatives |
+| 08 | a | b | 현재 확인된 유일한 출입로는 남측 회전문이고, 그곳이 정규 대피로다. 미확인 개구부를 근거로 행동할 수 없다. | k1 |
+| 09 | c | a | 막구조 지붕이 고장난 상황에서 회전문이라는 유일한 공식 출입구가 이미 체증 상태이기 때문에, 인솔자와 아이들을 그곳으로 유도하는 것은 시간을 낭비하고 위험을 키우는 일이다. | k1 k3 |
+| 10 | a | b | 확인되지 않은 개구부를 근거로 표준 절차를 우회할 수 없기 때문입니다. | k1 |
+
+**Sequence (kept calls):** `a,a,a,a,a,a,a,a,c,a`
+
+**Stance coverage (sampled diagnostic):** offered `a`, `b`, `c` · unobserved in this arm: `b`
+
+> Diagnostic only — absence at this N is not a dead delta row. The architecture spec §3.1 write test is a static check on the delta table plus the reachability audit (§5.2 B1); a stance unobserved across every arm is a lead for that check, not a failure verdict. Carried to the verdict card (§9.2) as a diagnostic.
+
+## Advisory logs (§5.3)
+
+_Operator-written. Observation only — these never affect distributions,
+boundary laws, or pass/drop judgments._
+
+**State-variable shadow log** — which candidate variables (architecture spec
+§3.1 pool) would this run have moved, and which payload symptom mapped to which?
+
+**Mineability log** — would `utterance` / `inner_note` survive as mining
+material? Block count, specificity (names, quantities, referents), and whether
+it says anything the payload did not already say.
+
+## Pairing verdict
+
+_Operator writes this against the other arms. Sequences, not rates (§9.2)._
