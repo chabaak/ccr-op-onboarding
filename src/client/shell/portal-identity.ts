@@ -15,9 +15,9 @@ export interface PortalIdentity {
 /**
  * x1 (08-08) — the portal is renamed and its vocabulary de-escalated.
  *
- * "국가재난모의포털" oversold the day the scenario actually runs: 우는다리 is a
- * bridge, a night shift and a handful of calls, not a national disaster, and a
- * portal that announces 재난 in its own title sets the player up for a scale
+ * "국가재난모의포털" oversold the scale of a single sitting: the operator works
+ * one case, one shift and a finite set of calls, not a national disaster, and
+ * a portal that announces 재난 in its own title sets the player up for a scale
  * the game never delivers. The name, the code it abbreviates (NDSP = National
  * Disaster Simulation Portal → ERR = Emergency Response Room), the issuing
  * body and the 災 chop all moved together — a half-renamed portal reads as a
