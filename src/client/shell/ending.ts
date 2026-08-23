@@ -10,11 +10,11 @@
 // hardware of the last screen from the first one, and the only thing that has
 // changed between them is what it says.
 //
-// TWO ENDINGS, ONE TRIGGER EACH. GOOD is the day whose `score` closes on
-// `RESCUE_TOTAL` — on pack 멈춘회전문 that is zero, reachable by either of the
-// two winning routes. BAD is the day that closes with no runs left to spend.
-// GOOD WINS when both land on the same day: an operator who empties the dome on
-// their last try has passed, and the counter is not the thing being judged.
+// TWO ENDINGS, ONE TRIGGER EACH. GOOD is the day whose `score` closes on the
+// best death total derivable from the pack's own scoring predicates. BAD is the
+// day that closes with no runs left to spend. GOOD WINS when both land on the
+// same day: an operator who reaches the best outcome on their last try has
+// passed, and the counter is not the thing being judged.
 //
 // IT IS AN OBSERVER, exactly like `shell/tutorial.ts` and `audio/index.ts`. It
 // reads the §5.2 stream and the DOM, sends no op, mounts no control on the
@@ -48,79 +48,15 @@
 // a sitting that can end is a sitting that can end again.
 //
 // Import-safe (u3 / inv 12): no DOM at module scope, no stylesheet import,
-// nothing from engine or composer. The three-plate copy and the arithmetic
+// nothing from engine or composer. The three-plate rendering and the arithmetic
 // under it are pure functions, so the whole of what this module SAYS is
 // testable without a desk to say it on.
 import type { FixtureDriver, ViewEvent } from '../driver/index.ts'
-import { deathsOf } from '../../shared/predicates.ts'
+import { deathsOf, identifiers, resolve } from '../../shared/predicates.ts'
+import type { PredicateState, PredicateValue } from '../../shared/predicates.ts'
+import type { ScenarioEndings, ScenarioScore } from './pack.ts'
 import { button, el, must } from './dom.ts'
 import { feedDrained } from './feed-drain.ts'
-
-/* ── the numbers the copy is written against ─────────────────────────────── */
-
-/**
- * How many people are inside the dome when the roof starts coming down.
- *
- * The pack's own figure, from `score.json`'s u1 `tallies`, which states the
- * whole and then explains what it itself counts: 그날 안에 있던 736명 가운데
- * 문세라는 자기 단위에서 집계되므로 이 수는 나머지 735명만 센다. The ending
- * needs the whole dome, not u1's denominator, so it takes the 736.
- */
-export const SITE_OCCUPANTS = 736
-
-/**
- * The scored units who were never among those 736 — on this pack, none.
- *
- * This is the one place the switch from 전구간정상 changed a fact and not only
- * a number, so it is worth saying why the list is empty rather than deleting
- * it. There, 오세라 was 터널 점검 용역 반장: she walked INTO the tunnel and was
- * never one of its 341 occupants, so her death had to be subtracted before the
- * crowd's arithmetic could run, and the plate's two numbers deliberately did
- * not sum. Here 문세라 is 인솔 겸 심판 — she is inside the dome from the first
- * minute, one of the 736, and `score.json` scores her separately only because a
- * named person is a different KIND of row from a crowd count, not because she
- * is standing somewhere else.
- *
- * So every death the tally reports happened among the 736, `walkedOut` is a
- * plain subtraction, and the two printed numbers do sum. The mechanism is kept
- * rather than inlined: it is the pack that is simple here, not the rule.
- */
-const SCORED_OUTSIDE_THE_SITE: readonly string[] = []
-
-/**
- * The death toll that means the dome was emptied.
- *
- * Zero, and reachable two ways — `score.json` puts u1, u2 and 문세라 all at
- * their best on either `vent_restored` or `north_opened`. Both winning routes
- * pay their price in a column that is not people: 표기웅 is charged either way,
- * the sign-off is investigated on one, and the membrane cannot be re-inflated
- * on the other.
- */
-const RESCUE_TOTAL = 0
-
-/**
- * What the preview lanes count as the day, tally and all.
- *
- * `?ending=bad` opens the walk with no day behind it, so its numbers have to
- * come from somewhere: this is the UNTOUCHED day, the one `score.json`'s
- * `baseline_summary` calls 총 사망 207명 … 이것은 지어낸 값이 아니라 그날의
- * 기록이다. A preview of the losing ending showing the toll the real event
- * produced is the most honest placeholder available, and it is never used on a
- * real run.
- *
- * All four scored rows, because `numbersOf` reads the row list and a stand-in
- * that dropped one would quietly show a different number than the game does.
- * The values are the baseline outcomes, verbatim from `score.json`.
- */
-const PREVIEW_SCORE: { total: number; rows: readonly ScoredRow[] } = {
-  total: 207,
-  rows: [
-    { label: '돔 안에 있던 사람', value: 185 },
-    { label: '남측 에어락 통로에 갇힌 사람', value: 21 },
-    { label: '문세라', value: '사망 · 집결지 세 번째 명단' },
-    { label: '표기웅', value: '아무것도 남지 않음' },
-  ],
-}
 
 /** The one control's two labels: the plates that advance, and the one that asks the browser to leave. */
 export const ENDING_NEXT = '다음'
@@ -164,8 +100,11 @@ export interface EndingPlate {
  * GOOD WINS. Both conditions are true of the day where the operator empties the
  * tunnel on their last attempt, and that day is a pass.
  */
-export function endingKindOf(input: { total: number; runsLeft: number }): EndingKind | null {
-  if (input.total === RESCUE_TOTAL) return 'good'
+export function endingKindOf(
+  input: { total: number; runsLeft: number },
+  score: ScenarioScore,
+): EndingKind | null {
+  if (input.total === rescueTotalOf(score)) return 'good'
   // `<= 0` rather than `=== 0` — the seam clamps at zero already, and an
   // ending that failed to fire because a counter went one past it would be a
   // silent loss of the only screen this module owns.
@@ -180,19 +119,16 @@ export interface ScoredRow {
 }
 
 /**
- * The two numbers the bad ending prints, from the day's own tally.
+ * The two numbers the bad ending prints, from the day's own tally and pack
+ * ending config.
  *
  * `deaths` is the seam's `total` UNCHANGED — the headline the operator watched
- * the ledger roll to seconds earlier, 총 사망자 수 207명. An ending that quietly
- * printed a different toll than the record it is closing would be the one lie
- * on the plate.
+ * the ledger roll to seconds earlier. An ending that quietly printed a
+ * different toll than the record it is closing would be the one lie on it.
  *
- * `walkedOut` is `736 - total` on this pack, because every scored death
- * happened among the 736 (`SCORED_OUTSIDE_THE_SITE` is empty and says why). The
- * subtraction of `outside` stays in the code all the same: it is the general
- * rule, and a pack whose named person stands outside the crowd — 전구간정상 was
- * one — needs it back without a rewrite. On the untouched day: 736 − 207 = 529,
- * against a tally of 185 + 21 + 문세라.
+ * `walkedOut` is the pack's site-occupant count minus deaths that happened
+ * inside that site. Packs with scored units outside the site name those labels
+ * in `endings.json`, so this rule stays general without hard-coding a case.
  *
  * `deathsOf` is the pack's own rule, borrowed rather than restated
  * (`shared/predicates.ts`, and `components/tally-line.ts` reads the same tally
@@ -205,101 +141,62 @@ export interface ScoredRow {
  * neither a negative crowd nor a negative toll is a sentence the plate may
  * print.
  */
-export function numbersOf(score: { total: number; rows: readonly ScoredRow[] }): EndingNumbers {
+export function numbersOf(
+  ending: Pick<ScenarioEndings, 'siteOccupants' | 'scoredOutsideSite'>,
+  score: { total: number; rows: readonly ScoredRow[] },
+): EndingNumbers {
   let outside = 0
   for (const row of score.rows) {
-    if (SCORED_OUTSIDE_THE_SITE.includes(row.label)) outside += deathsOf(row.value)
+    if (ending.scoredOutsideSite.includes(row.label)) outside += deathsOf(row.value)
   }
   const inside = Math.max(0, score.total - outside)
-  return { walkedOut: Math.max(0, SITE_OCCUPANTS - inside), deaths: score.total }
+  return { walkedOut: Math.max(0, ending.siteOccupants - inside), deaths: score.total }
+}
+
+/* ── score-derived values ───────────────────────────────────────────────── */
+
+function scoredRowsOf(score: ScenarioScore, state: PredicateState): readonly ScoredRow[] {
+  const rows: ScoredRow[] = []
+  for (const unit of score.units) {
+    const value = resolve(unit.predicates, state)
+    if (value !== null) rows.push({ label: unit.label, value })
+  }
+  return rows
+}
+
+function totalOfRows(rows: readonly { value: PredicateValue }[]): number {
+  return rows.reduce((sum, row) => sum + deathsOf(row.value), 0)
+}
+
+/**
+ * The best death total the pack's score predicates can produce.
+ *
+ * This derives the good-ending threshold from authored score branches instead
+ * of restating it in source. Each conditional score branch contributes one
+ * candidate state made from the identifiers it names; the score reader then
+ * resolves every unit exactly as the ledger does. The empty state is included
+ * so a pack whose best day is also its baseline still has a defined threshold.
+ */
+export function rescueTotalOf(score: ScenarioScore): number {
+  const states: PredicateState[] = [{}]
+  for (const unit of score.units) {
+    for (const predicate of unit.predicates) {
+      const head = predicate.slice(0, Math.max(0, predicate.indexOf('=>'))).trim()
+      if (head === '') continue
+      const state: PredicateState = {}
+      for (const id of identifiers(head)) state[id] = true
+      states.push(state)
+    }
+  }
+  return Math.min(...states.map((state) => totalOfRows(scoredRowsOf(score, state))))
+}
+
+export function previewScoreOf(score: ScenarioScore): { total: number; rows: readonly ScoredRow[] } {
+  const rows = scoredRowsOf(score, {})
+  return { total: totalOfRows(rows), rows }
 }
 
 /* ── the copy ────────────────────────────────────────────────────────────── */
-
-/** A plate before its counter and its numbers are put in. */
-interface PlateCopy {
-  head: string
-  lead: string
-  body: readonly string[]
-}
-
-/**
- * THE GOOD ENDING (민서, 08-09; re-authored for 멈춘회전문 08-10). Replace these
- * strings, not the module.
- *
- * Three beats, and the same white-line rule the briefing follows: a reader who
- * takes in only the three leads still leaves with 736명이 나왔다 → 인원이 제때
- * 확인되었다 → 임용되었다, which is the whole of what the day meant.
- *
- * It carries no substitution. The good day's numbers are not a variable — both
- * winning routes close on 736 and 0 — so the copy states them. Neither route is
- * named, for the same reason: the plate has to be true of whichever one the
- * operator found.
- */
-const GOOD_COPY: readonly PlateCopy[] = [
-  {
-    head: '시뮬레이션 종료',
-    lead: '736명이 무사히 눈밭으로 걸어 나왔습니다.',
-    body: [
-      '문세라는 코트에 남은 아이들을 마지막까지 세었고, 살아서 나왔습니다.',
-      '사망 0명 — 지금까지 확인된 최선의 기록입니다.',
-    ],
-  },
-  {
-    head: '훈련 강평',
-    lead: '안에 사람이 있다는 것이 제때 확인되었습니다.',
-    body: [
-      '한내돔 참사의 원인은 아무도 인원을 세지 않은 것이었습니다. 같은 질문이 이번에는 제때 회선에 올랐습니다.',
-      '운영자는 흩어진 기록을 모아 현장 요원에게 전달하고, 이것이 생환자 수를 결정합니다.',
-    ],
-  },
-  {
-    head: '모의 과정 완료',
-    lead: '평가를 통과하셨습니다.',
-    body: [
-      '본 단말의 모의 과정은 여기서 종료됩니다. 기록은 귀하의 인사 자료에 편입됩니다.',
-      '한내돔에는 귀하가 없었지만, 다음 긴급 상황에는 있을 것입니다. 실제 회선에서 뵙겠습니다.',
-    ],
-  },
-]
-
-/**
- * THE BAD ENDING (민서, 08-09; re-authored for 멈춘회전문 08-10). Replace these
- * strings, not the module.
- *
- * `{walkedOut}` and `{deaths}` are filled from the day's own `score` event —
- * this ending is reachable on any of the ladder's losing days, so the plate
- * reports the toll the operator actually produced rather than a written-in
- * number. The second plate's strong sentence is deliberately the same in both
- * endings: what the operator does is the same job either way, and only the
- * sentence before it changes.
- */
-const BAD_COPY: readonly PlateCopy[] = [
-  {
-    head: '시뮬레이션 종료',
-    lead: '{deaths}명이 한내돔을 탈출하지 못하여 사망했습니다.',
-    body: [
-      '집결지에서 센 수는 끝내 맞지 않았고, 회전문이 천천히 도는 사이 지붕은 점점 내려앉았습니다.',
-      '시행 횟수가 모두 소진되었습니다.',
-    ],
-  },
-  {
-    head: '훈련 강평',
-    lead: '안에 사람이 있다는 것이 제때 확인되지 않았습니다.',
-    body: [
-      '한내돔 참사의 원인은 아무도 인원을 세지 않은 것이었습니다. 이번에도 같은 자리에서 확인이 늦었습니다.',
-      '운영자는 흩어진 기록을 모아 현장 요원에게 전달하고, 이것이 생환자 수를 결정합니다.',
-    ],
-  },
-  {
-    head: '모의 과정 완료',
-    lead: '평가가 보류되었습니다.',
-    body: [
-      '본 단말의 모의 과정은 여기서 종료됩니다. 동일 사건으로 재평가가 편성됩니다.',
-      '한내돔의 기록은 그대로 남았습니다. 다음 시행에서 다시 뵙겠습니다.',
-    ],
-  },
-]
 
 /** The two slots any line may carry, and nothing else — an unknown one is left alone. */
 const SLOT = /\{(walkedOut|deaths)\}/g
@@ -319,8 +216,12 @@ function fill(line: string, numbers: EndingNumbers): string {
  * the deploy confirmation both use, so it lands in one fixed column across all
  * three plates and reads as progress rather than as part of a title.
  */
-export function endingPlates(kind: EndingKind, numbers: EndingNumbers): readonly EndingPlate[] {
-  const copy = kind === 'good' ? GOOD_COPY : BAD_COPY
+export function endingPlates(
+  kind: EndingKind,
+  numbers: EndingNumbers,
+  ending: Pick<ScenarioEndings, 'copy'>,
+): readonly EndingPlate[] {
+  const copy = ending.copy[kind]
   return copy.map((plate, index) => ({
     head: plate.head,
     corner: `${index + 1} / ${copy.length}`,
@@ -395,8 +296,13 @@ function holdChrome(on: boolean): void {
  * gives: remounting would replay the entrance three times and would drop focus
  * off the control being pressed.
  */
-export function openEnding(app: HTMLElement, kind: EndingKind, numbers: EndingNumbers): Promise<void> {
-  const plates = endingPlates(kind, numbers)
+export function openEnding(
+  app: HTMLElement,
+  kind: EndingKind,
+  numbers: EndingNumbers,
+  ending: Pick<ScenarioEndings, 'copy'>,
+): Promise<void> {
+  const plates = endingPlates(kind, numbers, ending)
 
   // The desk goes inert and STAYS inert. Nothing here puts it back: the only
   // continuations of this screen are a closed tab or this mounted ending, and a
@@ -521,7 +427,11 @@ const sleep = (host: Window, ms: number): Promise<void> =>
  * ending: a desk with no run loop behind it (the placeholder boot) has not spent
  * an allotment, it never had one.
  */
-function earned(driver: FixtureDriver): Promise<{ kind: EndingKind; numbers: EndingNumbers }> {
+function earned(
+  driver: FixtureDriver,
+  ending: Pick<ScenarioEndings, 'siteOccupants' | 'scoredOutsideSite'>,
+  score: ScenarioScore,
+): Promise<{ kind: EndingKind; numbers: EndingNumbers }> {
   return new Promise((resolve) => {
     let runsLeft: number | null = null
     for (const event of driver.frame().events) {
@@ -535,12 +445,15 @@ function earned(driver: FixtureDriver): Promise<{ kind: EndingKind; numbers: End
         return
       }
       if (event.type !== 'score') return
-      const kind = endingKindOf({ total: event.total, runsLeft: runsLeft ?? Number.POSITIVE_INFINITY })
+      const kind = endingKindOf(
+        { total: event.total, runsLeft: runsLeft ?? Number.POSITIVE_INFINITY },
+        score,
+      )
       if (kind === null) return
       done = true
       // The whole event, not just its total: `numbersOf` has to see which of
       // the scored units was standing outside the crowd to begin with.
-      resolve({ kind, numbers: numbersOf({ total: event.total, rows: event.rows }) })
+      resolve({ kind, numbers: numbersOf(ending, { total: event.total, rows: event.rows }) })
     })
   })
 }
@@ -600,6 +513,8 @@ export interface EndingPorts {
   driver: FixtureDriver
   /** Resolves at the hand-over, when the desk is what the operator is looking at. */
   deskReady: Promise<void>
+  endings: ScenarioEndings
+  score: ScenarioScore
 }
 
 /**
@@ -613,7 +528,13 @@ export interface EndingPorts {
 let raised = false
 
 /** Stops the portal, drops the veil, and then leaves. */
-async function raise(host: Window, driver: FixtureDriver, kind: EndingKind, numbers: EndingNumbers): Promise<void> {
+async function raise(
+  host: Window,
+  driver: FixtureDriver,
+  kind: EndingKind,
+  numbers: EndingNumbers,
+  ending: Pick<ScenarioEndings, 'copy'>,
+): Promise<void> {
   if (raised) return
   raised = true
   // The portal stops: the desk under the veil should be as still as the plate
@@ -635,7 +556,7 @@ async function raise(host: Window, driver: FixtureDriver, kind: EndingKind, numb
   // still running (and there `run-feed.ts`'s own settle watchdog is what lands
   // whatever is left, exactly as it does for any other pause).
   driver.clock.setRate(0)
-  await openEnding(must('#app'), kind, numbers)
+  await openEnding(must('#app'), kind, numbers, ending)
   closeWindow(host)
 }
 
@@ -660,17 +581,17 @@ async function raise(host: Window, driver: FixtureDriver, kind: EndingKind, numb
  * resolve on the spot — but "it is usually free" is not the reason it is absent.)
  */
 async function walkEnding(host: Window, ports: EndingPorts): Promise<void> {
-  const { driver, deskReady } = ports
+  const { driver, deskReady, endings, score } = ports
 
   const forced = endingForced(host)
   if (forced !== null) {
     await deskReady
-    await raise(host, driver, forced, numbersOf(PREVIEW_SCORE))
+    await raise(host, driver, forced, numbersOf(endings, previewScoreOf(score)), endings)
     return
   }
 
   // Armed BEFORE the hand-over is awaited — see `earned()`.
-  const day = earned(driver)
+  const day = earned(driver, endings, score)
   await deskReady
   const { kind, numbers } = await day
 
@@ -712,7 +633,7 @@ async function walkEnding(host: Window, ports: EndingPorts): Promise<void> {
   await ledgerLanded()
   await feedDrained()
   await sleep(host, HELD_BEAT_MS)
-  await raise(host, driver, kind, numbers)
+  await raise(host, driver, kind, numbers, endings)
 }
 
 /**

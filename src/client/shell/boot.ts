@@ -20,7 +20,7 @@ import { installEnding } from './ending.ts'
 import { openManual } from './manual.ts'
 import { openSignIn, signInSkipped } from './sign-in.ts'
 import { installTutorial } from './tutorial.ts'
-import { PACK_DISPLAY_NAME, fetchScenarioIdentity } from './pack.ts'
+import { PACK_DISPLAY_NAME, fetchScenarioEndings, fetchScenarioIdentity, fetchScenarioScore } from './pack.ts'
 import type { ScenarioIdentity } from './pack.ts'
 import { PORTAL, TASKBAR_HINT } from './portal-identity.ts'
 import { clearRunState } from './run-state.ts'
@@ -221,6 +221,13 @@ export async function bootShell(): Promise<void> {
 
   // 1 — the scenario pack.
   const identity = await fetchScenarioIdentity()
+  const endingData = await Promise.all([
+    fetchScenarioEndings(identity.slug),
+    fetchScenarioScore(identity.slug),
+  ]).catch((cause) => {
+    console.error('scenario ending unavailable — the desk will continue without a curtain', cause)
+    return null
+  })
   renderIdentity()
 
   // 2 — the driver behind the §5.2 seam. Nothing above this line knows it.
@@ -404,5 +411,8 @@ export async function bootShell(): Promise<void> {
   //
   // It waits on `revealed` rather than `atTheDesk` for the walk's own reason:
   // the curtain it eventually raises is measured against a desk that is up.
-  installEnding(window, { driver, deskReady: revealed })
+  if (endingData !== null) {
+    const [endings, score] = endingData
+    installEnding(window, { driver, deskReady: revealed, endings, score })
+  }
 }

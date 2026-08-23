@@ -17,7 +17,7 @@
 // implements the subset of JSON Schema
 // they actually use, so the schema files stay the single source of truth.
 
-import { readFileSync } from 'node:fs';
+import { existsSync, readFileSync } from 'node:fs';
 import { join, resolve, basename } from 'node:path';
 // The predicate grammar has ONE implementation, and this is how lint reaches it
 // rather than carrying a second. `datapack:lint` runs
@@ -32,7 +32,8 @@ if (!packDir) {
 }
 const PACK = resolve(packDir);
 const SCHEMA_DIR = join(PACK, '..', '_schema');
-const FILES = ['meta', 'timeline', 'characters', 'places', 'temperament', 'gates', 'truths', 'score', 'symptoms', 'hardening'];
+const REQUIRED_FILES = ['meta', 'timeline', 'characters', 'places', 'temperament', 'gates', 'truths', 'score', 'symptoms', 'hardening'];
+const OPTIONAL_FILES = ['endings'];
 
 const errors = [];
 const warns = [];
@@ -41,8 +42,17 @@ const flags = [];
 // ---------- load ----------
 
 const pack = {};
-for (const name of FILES) {
+for (const name of REQUIRED_FILES) {
   const path = join(PACK, `${name}.json`);
+  try {
+    pack[name] = JSON.parse(readFileSync(path, 'utf8'));
+  } catch (e) {
+    errors.push(`${name}.json: cannot read/parse — ${e.message}`);
+  }
+}
+for (const name of OPTIONAL_FILES) {
+  const path = join(PACK, `${name}.json`);
+  if (!existsSync(path)) continue;
   try {
     pack[name] = JSON.parse(readFileSync(path, 'utf8'));
   } catch (e) {
@@ -138,7 +148,8 @@ function validate(schema, data, path, root) {
   }
 }
 
-for (const name of FILES) {
+for (const name of [...REQUIRED_FILES, ...OPTIONAL_FILES]) {
+  if (!(name in pack)) continue;
   let schema;
   try {
     schema = JSON.parse(readFileSync(join(SCHEMA_DIR, `${name}.schema.json`), 'utf8'));
@@ -719,7 +730,8 @@ if (unfilledPresent) flags.push(`timeline: present null on ${unfilledPresent} ev
 // ---------- report ----------
 
 function report() {
-  console.log(`pack   ${basename(PACK)}  (${FILES.length} files + draft.md)`);
+  const fileCount = REQUIRED_FILES.length + OPTIONAL_FILES.filter((name) => name in pack).length;
+  console.log(`pack   ${basename(PACK)}  (${fileCount} files + draft.md)`);
   console.log(`schema ${SCHEMA_DIR}\n`);
   const groups = [
     ['ERROR', errors, '✗'],

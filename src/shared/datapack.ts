@@ -255,6 +255,26 @@ export type Symptoms = ({
   }>;
 }>);
 
+/** datapack endings.json — 종료 화면 문안과 집계 표시 기준 */
+export type Endings = {
+  /** 사건 장소 안에 있던 전체 인원. 생환자 수 = 이 값 - 장소 안 사망자 수. */
+  site_occupants: number;
+  /** score.rows 중 장소 밖에서 별도 집계되는 단위의 label. 해당 사망은 site_occupants 차감에서 제외한다. */
+  scored_outside_site: Array<string>;
+  copy: {
+    good: Array<{
+      head: string;
+      lead: string;
+      body: Array<string>;
+    }>;
+    bad: Array<{
+      head: string;
+      lead: string;
+      body: Array<string>;
+    }>;
+  };
+};
+
 /** One scenario's full pack — `data/scenario/<slug>/`, keyed by file. */
 export type Datapack = {
   meta: Meta;
@@ -266,4 +286,5 @@ export type Datapack = {
   truths: Truths;
   score: Score;
   symptoms: Symptoms;
+  endings?: Endings;
 };
