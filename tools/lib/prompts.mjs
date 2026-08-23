@@ -6,12 +6,10 @@
 //   system  — the default prompt. FLAW · INCIDENT · PRIORITY_LIST come from here.
 //   user    — the per-call template, filled from datapack + engine state +
 //             player blocks.
-//   temperament — probe FIXTURES only. The production source of truth is
-//             `data/scenario/<slug>/temperament.json` (its own schema); these
-//             .md files are the prose stand-ins the mechanism program's D-TEMP
-//             channel varies. When the composer learns to render
-//             temperament.json into the slot, these should be generated from a
-//             pack so probe and production cannot disagree.
+//   temperament — probe test fixtures only. The production source of truth is
+//             `data/scenario/<slug>/temperament.json` (its own schema); the
+//             markdown stand-ins live under `tests/fixtures/probe/temperament`
+//             until #70 teaches the harness to render from pack data directly.
 //
 // The system and user layers both belong to the proxy (physical architecture
 // §3.10, decided 08-03): the client posts slot VALUES and the proxy renders both
@@ -39,5 +37,5 @@ const PROXY_PROMPTS = join(REPO, 'proxy', 'prompts');
 export const PROMPTS = {
   systemRoot: PROXY_PROMPTS,
   userRoot: PROXY_PROMPTS,
-  temperamentRoot: join(REPO, 'tools', 'probe', 'fixtures', 'temperament'),
+  temperamentRoot: join(REPO, 'tests', 'fixtures', 'probe', 'temperament'),
 };

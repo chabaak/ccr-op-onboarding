@@ -121,7 +121,7 @@ describe('the shipped pack renders the temperament it was measured with', () => 
       typeof renderTemperament
     >[0]
     const fixture = fs.readFileSync(
-      path.join(REPO, 'tools/probe/fixtures/temperament/dome-base.md'),
+      path.join(REPO, 'tests/fixtures/probe/temperament/dome-base.md'),
       'utf8',
     )
     expect(collapse(renderTemperament(pack))).toBe(collapse(fixture))
