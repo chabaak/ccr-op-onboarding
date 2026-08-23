@@ -1,0 +1,126 @@
+{
+  "_what": "멈춘회전문 G3 — a에 factual authority를 준 뒤 baseline/k1_k2/placebo가 a에 머물고 K3 live가 b로 이동하는지 재는 축소 기준선.",
+  "_authoring_provenance": {
+    "owner": "mechanism measurement",
+    "baseline_construction": "baseline은 no-key다. k1_k2 arm이 evidence-short-of-K3 default check이고, k1_k2_k3 arm이 송풍기 전제의 live arm이다.",
+    "excerpt_rule": "기존 DOME-G3-r6의 게이트 전 기록을 그대로 쓴다. arm 차이는 C-BLOCK의 BLOCKS뿐이다.",
+    "round": "round 5 pre-registration only; no model arm has been run from this suite.",
+    "revision": "r2는 이미 측정된 사전등록이므로 유지한다. r3는 stance a rewrite 이후 round-5 scope에 따라 k1과 negative_control을 줄인 successor다."
+  },
+  "experiment": "DOME-G3-cumulative-r3",
+  "call_type": "judgment",
+  "channel": "C-BLOCK",
+  "template_version": "v0.4",
+  "model": "claude-haiku-4-5-20251001",
+  "temperament": "dome-base",
+  "max_tokens": 1024,
+  "timeout_ms": 120000,
+  "pre_registration": {
+    "hypothesis": "stance a rewrite가 G3 default에 자기 근거를 주면 no-key, K1+K2, placebo는 pressure-preserving a에 머물고, K1+K2+K3에서만 blower path b로 옮긴다. K1+K2+K3도 a에 머물면 gate가 반대 방향으로 죽은 것이고, low-evidence arm이 c/d/e로 가면 a label authority가 아직 부족하다.",
+    "n_per_arm": 10,
+    "call_cost": 40,
+    "drop_condition": "baseline, K1+K2, placebo 중 어느 arm이든 기대 stance a가 80% 미만이면 low-evidence 또는 placebo arm이 아직 샌다. K1+K2+K3이 기대 stance b에 80% 미만이면 K3→b 연결이 아직 작동하지 않거나 a가 과교정됐다. n=10 screen이므로 7/10과 8/10, 2/10과 3/10 경계는 definitive result로 보지 않는다.",
+    "expected_stance_by_arm": {
+      "baseline": "a",
+      "k1_k2": "a",
+      "k1_k2_k3": "b",
+      "placebo": "a"
+    },
+    "contingencies": [
+      "baseline이 a로 가지 않고 c 또는 d로 갈 경우, payout 제거와 a rewrite 이후에도 north-door label이 default를 이긴다는 뜻이다.",
+      "k1_k2_k3이 b로 가지 않고 a에 머물면 default authority가 너무 강해져 evidence가 gate를 움직이지 못한다.",
+      "placebo가 b에 30% 이상 닿으면 K3 weak evidence가 blower path를 열고 있다.",
+      "because_block_ids와 inner_note가 low-evidence arm에서 K3 또는 K4 전제를 꾸며내면 traceability defect는 남아 있다."
+    ],
+    "not_claimed": "이 suite는 method 3인 stance a authority rewrite만 잰다. K4 route, full play reachability, casualty ladder, score tuning, prompts, other gates는 이 suite alone으로 판정하지 않는다."
+  },
+  "slots": {
+    "FLAW": "[결함] 너는 회선 저쪽 사람이 자기에게 불리한 것을 빼고 말할 수 있다는 것을 자주 잊는다.",
+    "INCIDENT": "[내력] 지난겨울, 네가 접수 분류를 한 칸 낮춰 적은 신고가 하나 있었다.",
+    "PRIORITY_LIST": [
+      "회선을 유지한다 — 끊기면 아무것도 알 수 없다",
+      "확인되지 않은 것을 확정된 것처럼 올리지 않는다"
+    ],
+    "TIMELINE_EXCERPT": [
+      "18:38 한내돔 야간 당직 표기웅이 신고했습니다. 천장 가운데가 처지고 물이 떨어진다고 했고, 행사는 끝났고 자기 혼자라고 했습니다",
+      "18:40 한내돔 시설대장을 조회했습니다. 공기 압력으로 지붕을 띄우는 막구조이고 급기 송풍기는 두 대, 출입구는 남측 회전문 한 곳입니다. 정기점검 확인란이 두 해째 비어 있습니다",
+      "18:55 모르는 번호가 들어왔습니다. 문세라라고 했고, 회전문 앞에 줄이 섰는데 한 번에 두 사람씩만 돈다고 했습니다. 방금 관중석 조명 절반이 꺼졌다고 덧붙였습니다",
+      "19:26 표기웅에게 안에 몇 명이냐고 다시 물었습니다. 대답이 한 박자 늦게 돌아왔고 정리 중이라고 했습니다. 급기를 묻자 한 대는 원래 안 돈다고 했습니다",
+      "19:33 문세라가 다시 걸어 왔습니다. 관중석에서 센 수와 코트에서 센 수가 맞지 않고, 아까 말한 수는 자기 팀만 센 것이었다고 했습니다. 앞쪽 줄이 줄지 않는다고 했습니다",
+      "19:52 전 정비기사 하도경과 연결됐습니다. 급기가 도느냐고 되물었고, 나머지 한 대는 자기가 있을 때부터 안 돌았다고 했습니다. 지금 사람이 걸어 다닐 수 있는 것은 안쪽 압력이 지붕을 들고 있기 때문이고, 큰 개구부를 열면 그 압력이 빠져 막이 내려온다고 덧붙였습니다",
+      "19:55 표기웅에게 북측 비상 개방문이 있느냐고 물었습니다. 도면에 있다고 답했습니다"
+    ],
+    "GATE_QUESTION": "남은 시간을 어디에 쓰겠습니까",
+    "STANCE_SET": [
+      {
+        "id": "a",
+        "label": "안쪽 압력이 지붕을 들고 있으므로, 이미 열린 서쪽 통로만 유지해 새 개구부를 막는다"
+      },
+      {
+        "id": "b",
+        "label": "멈춰 있는 송풍기가 고장이 아닐 수 있다고 보고, 당직자에게 그것을 지금 돌리게 한다"
+      },
+      {
+        "id": "c",
+        "label": "당직자가 북측 문에 대해 말하지 않은 것이 있다고 보고, 당직자에게 그 문을 지금 열게 한다"
+      },
+      {
+        "id": "d",
+        "label": "북측 문을 여는 데 필요한 도구가 현장에 아직 없다고 보아, 선착대가 닿으면 그 문을 맡긴다"
+      },
+      {
+        "id": "e",
+        "label": "북측 문 자물쇠 열쇠가 표기웅의 주머니에 있다는 전제로, 그를 문 앞으로 보내 즉시 열게 한다"
+      }
+    ]
+  },
+  "arms": {
+    "baseline": {
+      "BLOCKS": []
+    },
+    "k1_k2": {
+      "BLOCKS": [
+        {
+          "id": "k1",
+          "text": "표기웅이 혼자라고 말한 시각에 관중석에는 아이들과 인솔자가 남아 있었습니다."
+        },
+        {
+          "id": "k2",
+          "text": "서쪽 벽 아래 자재 반입 슬리브로 여덟 명이 기어 나왔습니다."
+        }
+      ]
+    },
+    "k1_k2_k3": {
+      "BLOCKS": [
+        {
+          "id": "k1",
+          "text": "표기웅이 혼자라고 말한 시각에 관중석에는 아이들과 인솔자가 남아 있었습니다."
+        },
+        {
+          "id": "k2",
+          "text": "서쪽 벽 아래 자재 반입 슬리브로 여덟 명이 기어 나왔습니다."
+        },
+        {
+          "id": "k3",
+          "text": "배전반 B 3번 차단기를 올리면 2호 송풍기가 대기에서 깨어납니다."
+        }
+      ]
+    },
+    "placebo": {
+      "BLOCKS": [
+        {
+          "id": "k1",
+          "text": "표기웅이 혼자라고 말한 시각에 관중석에는 아이들과 인솔자가 남아 있었습니다."
+        },
+        {
+          "id": "k2",
+          "text": "서쪽 벽 아래 자재 반입 슬리브로 여덟 명이 기어 나왔습니다."
+        },
+        {
+          "id": "k3_weak",
+          "text": "송풍기 두 대 가운데 한 대가 오래전부터 돌지 않았습니다."
+        }
+      ]
+    }
+  }
+}
