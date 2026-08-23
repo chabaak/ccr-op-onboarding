@@ -15,8 +15,11 @@
 //   2. A fixed action that ASKS the controller something guarantees (1) — the
 //      dialogue needs an answer and the only available speakers are NPCs.
 //
-// The rule lives in planning/dday-engine-minimal-request.md §6.1 and the call
-// contract §3; this is the check that makes it free to enforce.
+// Rule: Call 2 may continue a beat after the fixed action and the agent
+// utterance are already on the timeline, but it may not require a fresh agent
+// reply. The call contract gives Call 2 only NPC speech slots; if the fixed
+// action demands an answer, the model fills the missing agent line with an NPC.
+// This is the check that makes the boundary free to enforce.
 //
 // KNOWN BLIND SPOT — check A is not the only route to defect (1). 멈춘회전문
 // reproduced it with rows that are REPORTED SPEECH from a phone call
@@ -76,7 +79,7 @@ if (asksQuestion || addresses) {
       '  Call 2는 요원 대사를 만들 수 없다(요원은 PRESENT_NPCS에 없다).',
       '  대화에 구멍이 남으면 모델이 NPC로 그것을 메우고, 그 발화는 상태를 움직이지 못한다(I3/W4).',
       '  → 응답을 요구하지 않는 고정 사건으로 바꾸거나, 답이 다음 Call 1의 utterance가 되도록 비트를 이어 붙인다.',
-      '  근거: planning/dday-engine-minimal-request.md §6.1 (실측 4/5)',
+      '  근거: Call 2에는 NPC 발화 슬롯만 있으므로 고정 사건은 새 요원 응답을 요구하지 않아야 한다.',
     ].filter(Boolean),
   );
 }

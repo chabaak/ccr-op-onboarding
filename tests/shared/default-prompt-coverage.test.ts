@@ -10,8 +10,9 @@
 //   2. an entry exists but has drifted from the suite that measured it, so the
 //      probe numbers describe a prompt nobody sends any more.
 //
-// Reading the suite JSON as the expected value is the point of (2). A literal
-// copied into this file would drift in exactly the same silence.
+// Reading the suite JSON as the expected value is the point of (2) for live
+// suites. The fallback pack keeps an inline frozen copy because the
+// proof-of-concept suite that measured it has been retired.
 //
 // This reads across the tier boundary, which is allowed in this direction:
 // physical §3.3 bars `proxy/**` from importing `src/**`, and says nothing about
@@ -35,9 +36,22 @@ type Suite = { slots: { FLAW: string; INCIDENT: string; PRIORITY_LIST: string[] 
  * the test below fails if an entry appears without one — an agent nobody
  * measured is exactly what this file exists to catch.
  */
-const MEASURED_BY: Readonly<Record<string, string>> = {
-  전구간정상: 'tools/probe/dday-mechanism/suites/CSTRUCT-priority-reorder-J1-A.json',
+const MEASURED_BY: Readonly<Record<string, string | null>> = {
+  전구간정상: null,
   멈춘회전문: 'tools/probe/dday-mechanism/suites/DOME-G1-baseline.json',
+}
+
+const FROZEN_LEGACY_SLOTS: Readonly<Record<string, Suite['slots']>> = {
+  전구간정상: {
+    FLAW: "[결함] 너는 잘못된 정보에 속을 수 있다.",
+    INCIDENT: "[내력] 삼 년 전 겨울, 네가 서둘러 내린 판단 하나가 아직 남아 있다.",
+    PRIORITY_LIST: [
+      "확인되지 않은 주장에 따라 잘못 움직일 위험을 먼저 줄인다.",
+      "대응이 늦어져 피해가 커질 위험을 먼저 줄인다.",
+      "판단을 마친 뒤 근거를 시간순으로 정리한다.",
+      "외부에 공유하기 전 사건 시각을 명확히 남긴다.",
+    ],
+  },
 }
 
 describe('the proxy default prompt covers the shipped pack', () => {
@@ -61,17 +75,18 @@ describe('the proxy default prompt covers the shipped pack', () => {
     expect(defaultPromptFor('a-pack-that-was-never-authored')).toBe(DEFAULT_PROMPTS[FALLBACK_PACK])
   })
 
-  it('(d) every entry matches the suite that measured it, slot for slot', () => {
+  it('(d) every entry matches its measured or frozen source, slot for slot', () => {
     for (const [slug, entry] of Object.entries(DEFAULT_PROMPTS)) {
       const suitePath = MEASURED_BY[slug]
-      expect(suitePath, `"${slug}" ships an agent no suite measured`).toBeDefined()
-      const suite = readJson(suitePath!) as Suite
-      expect(entry.FLAW, `${slug} FLAW drifted from ${suitePath}`).toBe(suite.slots.FLAW)
-      expect(entry.INCIDENT, `${slug} INCIDENT drifted from ${suitePath}`).toBe(
-        suite.slots.INCIDENT,
-      )
-      expect(entry.PRIORITY_LIST, `${slug} PRIORITY_LIST drifted from ${suitePath}`).toEqual(
-        suite.slots.PRIORITY_LIST,
+      const expected = suitePath
+        ? (readJson(suitePath) as Suite).slots
+        : FROZEN_LEGACY_SLOTS[slug]
+      const source = suitePath ?? 'frozen legacy slots'
+      expect(expected, `"${slug}" ships an agent with no measured or frozen source`).toBeDefined()
+      expect(entry.FLAW, `${slug} FLAW drifted from ${source}`).toBe(expected!.FLAW)
+      expect(entry.INCIDENT, `${slug} INCIDENT drifted from ${source}`).toBe(expected!.INCIDENT)
+      expect(entry.PRIORITY_LIST, `${slug} PRIORITY_LIST drifted from ${source}`).toEqual(
+        expected!.PRIORITY_LIST,
       )
     }
   })

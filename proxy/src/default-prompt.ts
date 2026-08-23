@@ -39,8 +39,8 @@ const freeze = (slots: {
 /**
  * One agent per scenario, keyed by datapack slug.
  *
- * 전구간정상 — from `tools/probe/dday-mechanism/suites/CSTRUCT-priority-reorder-J1-A.json`,
- * the suite the mechanism program measured C-BLOCK on.
+ * 전구간정상 — frozen legacy prompt slots retained for the fallback pack after
+ * the closed proof-of-concept probe records were retired.
  *
  * 멈춘회전문 — from the three DOME suites (`DOME-G1-baseline`, `DOME-G2`,
  * `DOME-G3`), which carry these three slots identically. Its priorities are a

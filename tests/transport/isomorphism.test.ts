@@ -121,13 +121,14 @@ describe('[e6#A10] the §11 wire names are consumed, never re-declared', () => {
 
 describe('[e6#A10] tsconfig.core.json is the mechanical guard', () => {
   it('compiles src/transport (so `npm run check` is the real gate)', () => {
-    const raw = fs.readFileSync(path.join(REPO, 'tsconfig.core.json'), 'utf8')
+    const raw = fs.readFileSync(path.join(REPO, 'config/tsconfig.core.json'), 'utf8')
     const json = raw
       .replace(/\/\*[\s\S]*?\*\//g, '')
       .replace(/(^|\s)\/\/.*$/gm, '$1')
       .replace(/,(\s*[}\]])/g, '$1')
     const config = JSON.parse(json) as { include?: string[]; compilerOptions?: { types?: string[] } }
-    expect(config.include).toContain('src/transport')
+    const includes = (config.include ?? []).map((entry) => entry.replace(/^\.\.\//, ''))
+    expect(includes).toContain('src/transport')
     expect(config.compilerOptions?.types).toEqual([])
   })
 })

@@ -2,7 +2,7 @@
   "_what": "멈춘회전문 G1 — 무개입 시행이 기본 stance a에 앉는가, 그리고 진실 1을 실은 문장이 b/c로 옮기는가. 그래프 선행 방식의 첫 게이트 확인이다: 이 팩은 기질 조건절도 열쇠 조건도 쓰지 않으므로, 움직임이 있다면 자물쇠가 아니라 문장 자체가 결정적이어서 움직인 것이다.",
   "_authoring_provenance": {
     "owner": "민서 (시나리오 라인)",
-    "pack": "data/scenario/멈춘회전문 — draft 원본은 planning/dday-scenario/drafts/자유주제-01.md",
+    "pack": "data/scenario/멈춘회전문 — draft 원본은 data/scenario/멈춘회전문/draft.md",
     "slots_source": "TIMELINE_EXCERPT·GATE_QUESTION·STANCE_SET 전부 컴파일된 팩에서 그대로 뽑았다. 손으로 고친 곳 없음.",
     "excerpt_rule": "첫 시행에 요원이 쥐는 것만 — G1 시각 이전이고 조건 칸이 비어 있는 행. 세 행이다.",
     "live_construction": "진실 1의 강한 문장. placebo는 같은 진실의 약한 문장으로, 초안이 미끼로 지정해 둔 바로 그 문장이다."

@@ -9,7 +9,7 @@ A test is a **(call type × suite)** pair.
 
 | | what it is | where it lives | changing it costs |
 |---|---|---|---|
-| **suite** | one probe: gate, arms, N, pre-registration | `planning/<program>/suites/*.json` | data only, no code |
+| **suite** | one probe: gate, arms, N, pre-registration | `tools/probe/<program>/suites/*.json` | data only, no code |
 | **call type** | one shape of model call: schema, validation, summary | one entry in `tools/lib/calls.mjs` + a prompt pair | ~40 lines |
 | **probe kind** | which slots a probe may vary across arms | one entry in `CHANNEL_SLOTS` | 1 line |
 | **transport** | how the call reaches a model | one function in `lib/transport.mjs` | ~40 lines |
@@ -24,10 +24,10 @@ the thing belongs in a call type instead.
 The common case. Copy a suite, change the data, run it. No code.
 
 ```bash
-cp tools/probe/dday-mechanism/suites/E0-shape-revalidation.json \
-   tools/probe/dday-mechanism/suites/E1-cblock-placebo.json
+cp tools/probe/dday-mechanism/suites/DOME-G1-baseline.json \
+   tools/probe/dday-mechanism/suites/MY-G1-baseline.json
 # edit: experiment, pre_registration, arms (add placebo)
-node tools/probe/run.mjs tools/probe/dday-mechanism/suites/E1-cblock-placebo.json --print-prompt=placebo
+node tools/probe/run.mjs tools/probe/dday-mechanism/suites/MY-G1-baseline.json --print-prompt=placebo
 ```
 
 The one thing to get right is `channel`: it decides which slots the arms are

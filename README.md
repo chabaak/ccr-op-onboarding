@@ -29,8 +29,9 @@ npm run audio:table # refresh audio binding table; requires ffprobe on PATH
 src/            browser bundle + isomorphic core (engine, composer, client)
 authoring/      authoring-time preprocessing: datapack compile, lint, type generation
 tools/          Node-only executables: probe runner, beat driver, shared call libs
+config/         TypeScript, Vitest, and Playwright configuration moved out of root
 proxy/          LLM tier: Lambda + Bedrock, deployed separately from Pages
-planning/       planning archive, including meeting notes and legacy research
+planning/       meeting-note archive only
 public/assets/  static assets served as-is
 data/           balance-as-data: datapacks, policy, prompt inputs
 docs/           kept design reference and orchestration note
@@ -39,8 +40,7 @@ docs/           kept design reference and orchestration note
 
 ## Contributing
 
-See [CONTRIBUTING.md](./CONTRIBUTING.md). **Important:** verify your git identity before your
-first commit (this repo must be attributed to personal accounts, not corporate ones).
+See [AGENTS.md](./AGENTS.md) for contribution and repository rules.
 
 ## License
 

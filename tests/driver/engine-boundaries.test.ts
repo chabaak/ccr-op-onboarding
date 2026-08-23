@@ -44,7 +44,10 @@ const FROZEN_SUITES: Readonly<Record<string, string>> = {
   // RE-PINNED (2026-08-21, issue #43): the seam fixture moved from deleted
   // prose docs into `data/contracts/view-driver-seam.ts`; the assertions still
   // compare the same six declarations against `src/shared/view-driver.ts`.
-  'seam-shapes.test.ts': '30082520d4d0557aa34823a5be41491d4abb95ae08fe1ac6a8c5731161d86634',
+  //
+  // RE-PINNED (issue #53): the only change is the local compile smoke command,
+  // now `tsc -p config/tsconfig.core.json` after the config file moved.
+  'seam-shapes.test.ts': '84007d2ffb890549a2b27d427d4a31dc17dee16004d5f9f5f19d3f00302e36be',
 }
 
 function sha256(file: string): string {

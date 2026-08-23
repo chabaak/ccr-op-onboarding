@@ -74,7 +74,7 @@ is absent. To prove the browser's live path reaches the deployed Bedrock proxy
 without changing its production CORS policy, run the loopback-only relay:
 
 ```bash
-cp .env.example .env.local
+cp config/env.local.example .env.local
 npm run dev:api
 ```
 

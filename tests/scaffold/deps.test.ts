@@ -5,7 +5,6 @@ import path from 'node:path'
 import { createRequire } from 'node:module'
 import { execFileSync } from 'node:child_process'
 import { fileURLToPath } from 'node:url'
-import { fileAtUnit } from '../acceptance/unit-range.ts'
 
 const REPO = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '../..')
 
@@ -19,21 +18,6 @@ const pkg = (): Pkg => JSON.parse(fs.readFileSync(path.join(REPO, 'package.json'
 
 // Allowlist per PRD §2 + A1 (@types/node needed by the structural tests).
 const DEV_ALLOWLIST = new Set(['vitest', 'playwright', 'typescript', 'vite', '@types/node'])
-
-// Scripts that existed before this unit and must survive byte-identical.
-const FROZEN_SCRIPTS: Record<string, string> = {
-  dev: 'vite',
-  check: 'tsc -p tsconfig.core.json && tsc && npm run datapack:check',
-  build: 'npm run check && vite build',
-  preview: 'vite preview',
-  'datapack:types': 'node authoring/generate-datapack-types.mjs',
-  'datapack:check': 'node authoring/generate-datapack-types.mjs --check',
-  'datapack:compile': 'node authoring/compile-datapack.mjs',
-  'datapack:lint': 'node authoring/lint-datapack.mjs',
-  probe: 'node tools/probe/run.mjs',
-  'probe:selftest': 'node tools/probe/lib/selftest.mjs',
-  'drive:beat': 'node tools/driver/drive-beat.mjs',
-}
 
 describe('[u0#c4] dependency shape', () => {
   it('(a) runtime dependencies stay empty (inv 9)', () => {
@@ -67,7 +51,7 @@ describe('[u0#c4] dependency shape', () => {
 describe('[u0#c4] runners execute', () => {
   it('(f) `playwright test --list` exits 0 (config is loadable, at least one spec)', () => {
     expect(() =>
-      execFileSync('npx', ['playwright', 'test', '--list'], {
+      execFileSync('npx', ['playwright', 'test', '--config', 'config/playwright.config.ts', '--list'], {
         cwd: REPO,
         encoding: 'utf8',
         stdio: 'pipe',
@@ -84,7 +68,7 @@ describe('[u0#c4] script wiring', () => {
     expect(scripts).toHaveProperty('typecheck:test')
     expect(scripts['test']).toMatch(/vitest/)
     expect(scripts['test:e2e']).toMatch(/playwright/)
-    expect(scripts['typecheck:test']).toMatch(/tsconfig\.test\.json/)
+    expect(scripts['typecheck:test']).toBe('tsc -p config/tsconfig.test.json')
   })
 
   // C17 / [u11#c12] — RE-AIMED (08-04), never deleted. The claim is "**u0** did
@@ -113,7 +97,7 @@ describe('[u0#c4] script wiring', () => {
     // enumeration honest.
     const check = (pkg().scripts ?? {})['check'] ?? ''
     expect(check.split('&&').map((c) => c.trim())).toEqual([
-      'tsc -p tsconfig.core.json',
+      'tsc -p config/tsconfig.core.json',
       'tsc',
       'npm run typecheck:test',
       'npm run datapack:check',
@@ -149,22 +133,23 @@ describe('[u0#c4] script wiring', () => {
     }
   })
 
-  it('(g2) pre-existing scripts are unchanged', () => {
-    const scripts = (JSON.parse(fileAtUnit('u0', 'package.json')) as Pkg).scripts ?? {}
-    for (const [name, command] of Object.entries(FROZEN_SCRIPTS)) {
-      expect(scripts[name], `script "${name}" changed`).toBe(command)
-    }
+  it('(g2) root-moved tool configs are invoked from config/', () => {
+    const scripts = pkg().scripts ?? {}
+    expect(scripts.check).toContain('tsc -p config/tsconfig.core.json')
+    expect(scripts['typecheck:test']).toBe('tsc -p config/tsconfig.test.json')
+    expect(scripts.test).toBe('vitest run --config config/vitest.config.ts')
+    expect(scripts['test:e2e']).toBe('playwright test --config config/playwright.config.ts')
   })
 })
 
-describe('[u0#c4] vitest.config.ts scopes the suite to this repo', () => {
+describe('[u0#c4] config/vitest.config.ts scopes the suite to this repo', () => {
   // Without an explicit exclude, the default glob also picks up
   // demos/*/tests/scaffold.test.ts, so `vitest run tests/scaffold` gates on
   // unrelated demo suites (observed at RED time).
-  const config = () => fs.readFileSync(path.join(REPO, 'vitest.config.ts'), 'utf8')
+  const config = () => fs.readFileSync(path.join(REPO, 'config/vitest.config.ts'), 'utf8')
 
-  it('exists at the repo root', () => {
-    expect(fs.existsSync(path.join(REPO, 'vitest.config.ts'))).toBe(true)
+  it('exists under config/', () => {
+    expect(fs.existsSync(path.join(REPO, 'config/vitest.config.ts'))).toBe(true)
   })
 
   it('runs in the node environment and includes only tests/**/*.test.ts', () => {

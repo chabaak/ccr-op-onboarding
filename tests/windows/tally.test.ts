@@ -788,7 +788,7 @@ describe('[u7#c9] run-wide hard constraints hold in this unit', () => {
   // `chromium` project, port 5174) is a build+preview, and the dev host is
   // fenced to the one surviving spec file that cannot exist anywhere else.
   it('(g) C5 — the e2e runner serves a real build', () => {
-    const config = stripComments(read(path.join(REPO, 'playwright.config.ts')))
+    const config = stripComments(read(path.join(REPO, 'config/playwright.config.ts')))
     expect(config).toMatch(/npm run preview/)
     expect(config).toMatch(/npm run build/)
 
