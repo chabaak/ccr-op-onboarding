@@ -72,7 +72,7 @@ describe('conditions — the F1/F4 form', () => {
   })
 
   it('(f) an UNBOUND scalar is false, not zero', () => {
-    // Twelve of 우는다리's fourteen meters carry `variable: null` (lint F2), so
+    // A pack can carry authored meters with `variable: null` (lint F2), so
     // a scalar term can name something the state has no number for. Reading it
     // as 0 would let `통제욕 < 10` match a variable that does not exist.
     expect(holds('control < 10', STATE)).toBe(false)
@@ -203,8 +203,8 @@ describe('what a value costs — the 총 사망자 수 rule', () => {
   })
 
   it('(r) a person-unit that resolves to 사망 counts one, wherever they were found', () => {
-    // The defect this closes. 전구간정상 scores 오세라 and 차우진 one person
-    // each, and the record prints WHERE they died — so their values are prose,
+    // The defect this closes. A one-person score unit can print WHERE someone
+    // died — so its value is prose,
     // and a headline that summed numbers only closed the rescue day on
     // 총 사망자 수 0명 with 오세라: 사망 printed directly above it.
     expect(deathsOf('사망 · 아홉 번째 문 안쪽')).toBe(1)

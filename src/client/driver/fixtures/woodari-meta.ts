@@ -93,7 +93,7 @@ export const WOODARI_TALLY: TallyRow[] = [
 /**
  * The bridge casualty breakdown — the `score` event carries values, not the
  * printed strings, so a view can render them any way it likes
- * (`data/scenario/우는다리/score.json`, variance note for the entry-capped run).
+ * (the legacy demo run's entry-capped case).
  *
  * Only 사망 is a NUMBER, and that is the seam's rule rather than a choice here:
  * `total` is the sum of the numeric values (`src/driver/scorer.ts` `totalOf`),

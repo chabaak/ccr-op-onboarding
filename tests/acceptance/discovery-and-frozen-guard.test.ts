@@ -23,19 +23,9 @@ describe('[u11#c6] frozen inputs stayed frozen (C1 / C13 / C20)', () => {
   // run's own merge range, in (m); the live checks keep the still-frozen set.
   //
   // RELEASED again (08-05, the score-predicate hardening):
-  // `data/scenario/우는다리/` is the pack, and the pack is the game's content.
-  // The freeze said "the run must not rewrite its OWN inputs", which stopped
-  // being a live claim the moment that run merged — the same argument that
-  // released `spec-client.md` above. Left as it was, the pack could never be
-  // hardened: `predicates`, `edge_predicates` and the meter bindings are all
-  // authored INTO it, and lint has been reporting them as the hardening
-  // worklist (F1–F4) with nowhere to do the work.
-  //
-  // `data/scenario/_schema/` stays frozen, and the distinction is the point:
-  // the pack is content and revises with the scenario; the schemas are the
-  // ratified law that content is checked against, and nothing about the run's
-  // merge expired that. §3.6's grammar was deliberately sized to fit the
-  // already-ratified `string[]` so hardening never needs to touch them.
+  // Scenario pack content is not part of the live frozen set; packs are content
+  // and revise with scenario work. `_schema/` later left the frozen set too
+  // when the legal pack shape widened.
   //
   // The same release carries a second repair (08-06), on the same expiry: the
   // timeline printed `(갈림길 Gn의 자리)` on six lines of a player surface,
@@ -50,7 +40,7 @@ describe('[u11#c6] frozen inputs stayed frozen (C1 / C13 / C20)', () => {
   // #110 with the rest. What kept `_schema/` frozen past that was a SECOND
   // claim, made in the last sentence above: §3.6's grammar was sized so that
   // hardening would never need to touch the schemas. That claim held for packs
-  // authored the way 우는다리 and 전구간정상 were. It does not hold for a pack
+  // authored in the earlier factory shape. It does not hold for a pack
   // authored endings-first: 멈춘회전문's gates open on what the agent believes
   // rather than on a key it holds, so they carry no `key_conditions` and no
   // `key_examples`, and its temperament carries no `clauses` — and all three
@@ -63,7 +53,6 @@ describe('[u11#c6] frozen inputs stayed frozen (C1 / C13 / C20)', () => {
   // before this still validates after it.
   const RELEASED = [
     'src/shared/species.ts',
-    'data/scenario/우는다리/',
     'data/scenario/_schema/',
   ]
   const FROZEN = [

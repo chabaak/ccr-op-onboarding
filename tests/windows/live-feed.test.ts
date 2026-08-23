@@ -16,7 +16,7 @@
 //
 // C3: the only fixture CONTENT this file names is structural (kinds, clocks,
 // digits) — no synthetic literal is asserted, and the digit scan runs over
-// u2f's real 우는다리 stream.
+// u2f's real canned stream.
 import { describe, expect, it } from 'vitest'
 import fs from 'node:fs'
 import path from 'node:path'
@@ -522,7 +522,7 @@ describe('x11 the reveal pump charges time for lines, never for events', () => {
     expect(feedGapMs('08:00', '10:00')).toBe(LIVE_FEED_DEFAULT_GAP_POLICY.gapMaxMs)
     expect(LIVE_FEED_DEFAULT_GAP_POLICY).toEqual({ gapMaxMs: LIVE_FEED_PACING.gapMaxMs })
     expect(source, 'a pack-specific gap justification leaked back into the renderer').not.toMatch(
-      /멈춘회전문|우는다리|Woodari|woodari/,
+      /멈춘회전문|Woodari|woodari/,
     )
   })
 

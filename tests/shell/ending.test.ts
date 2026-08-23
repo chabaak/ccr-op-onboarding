@@ -132,7 +132,7 @@ describe('[x6] the trigger', () => {
 
   it('(g) a total of 0 IS the good ending, and this pack cannot double-check it', () => {
     // INVERTED at the 멈춘회전문 switch (08-10), and worth stating as a loss
-    // rather than editing quietly. Under 전구간정상 the rescue closed on 1, so
+    // rather than editing quietly. Under the earlier rescue pack the day closed on 1, so
     // this test could also stand guard over a hazard it got for free: a 0 that
     // the seam produced from an unscored or short ledger must not read as the
     // best day ever played. Here 0 is the win, so the two cases are no longer
@@ -187,7 +187,7 @@ describe('[x6] the numbers', () => {
     // 인솔 겸 심판 and is inside from the first minute — so nothing is held out
     // of the subtraction. The untouched day: 736 − 207 = 529.
     //
-    // This is the fact that CHANGED at the switch. Under 전구간정상 the plate's
+    // This is the fact that CHANGED at the switch. Under the earlier rescue pack the plate's
     // two numbers deliberately did not sum, because 오세라 walked into the
     // tunnel and was never one of its 341. Anyone reading that history in
     // `SCORED_OUTSIDE_THE_SITE` should not conclude the sum here is a bug.

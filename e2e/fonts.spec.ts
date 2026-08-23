@@ -29,8 +29,8 @@ const SHORT_KOREAN_SLICE_BUDGET = 6
 // DISCOVERY.md for the numbers the finished desk measures.
 
 const LATIN_SAMPLE = 'NDSP-2 OPERATOR TERMINAL 0123456789 // report'
-const KOREAN_SHORT = '우는다리'
-const KOREAN_SAMPLE = '우는다리 운영자 단말 — 정착부 결함 보고서 전송 대기 중, 민원 14건 확인.'
+const KOREAN_SHORT = '멈춘회전문'
+const KOREAN_SAMPLE = '멈춘회전문 운영자 단말 — 막구조 결함 보고서 전송 대기 중, 대설주의보 확인.'
 
 const FAMILIES = ['IBM Plex Mono', 'Nanum Gothic Coding', 'Nanum Myeongjo'] as const
 
@@ -120,7 +120,7 @@ function isFontUrl(url: string): boolean {
  *
  * u10 merged onto a desk whose windows were still empty, and calibrated the two
  * slicing oracles below against that page: 24 files, 300 KB. u4–u7 then filled
- * all five windows with the 우는다리 material, and a per-`unicode-range` sheet
+ * all five windows with scenario material, and a per-`unicode-range` sheet
  * answers more Korean prose with more slices BY DESIGN — the finished desk's
  * first render measures 50 of the 492 shipped slices (≈1.05 MB), and the probe
  * sheet the suite injects then re-requests them under its own absolute URLs.
@@ -384,7 +384,7 @@ test('unicode-range slicing keeps a short Korean string to a handful of slices',
   // C17 / [u11#c12] — RE-AIMED (08-04), never deleted, and the budget is
   // UNCHANGED at six. What is COUNTED is now only what the probe caused. Two
   // things made the old count unmeasurable on the finished desk: the desk's own
-  // first render pulls the slices its 우는다리 prose needs (dozens, legitimately),
+  // first render pulls the slices its scenario prose needs (dozens, legitimately),
   // and a probe sheet that re-declares the SAME family names re-resolves every
   // one of them. So the probe now stands on its own family name and its own
   // query tag: nothing on the desk can render in it, and every request it

@@ -1,6 +1,5 @@
-// [u2f] RUN 01–03 report material, regenerated from the design target against
-// the frozen 우는다리 pack (spec-client §5.4 — authored sentences with real ids,
-// never lorem).
+// [u2f] RUN 01–03 report material, kept as a canned DEV fixture stream with
+// stable ids and prose.
 //
 // spec-client §5.2 amendment: sentence identity is engine-minted —
 // `b-r<run>-<channel><nn>` — and **species derives from the channel, never from

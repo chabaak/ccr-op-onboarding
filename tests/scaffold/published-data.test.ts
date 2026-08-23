@@ -26,6 +26,7 @@ import {
   stripDesignNotes,
   stripScoreNotes,
 } from '../../vite.config.ts'
+import { TUTORIAL_SLUG } from '../helpers/scenario.ts'
 
 const REPO = path.resolve(import.meta.dirname, '../..')
 const DATA = path.join(REPO, 'data')
@@ -148,7 +149,7 @@ describe('published data — the allowlist tracks what the client fetches', () =
     // `gates.json` must ship — the engine reads it every run — but two of its
     // authored fields say how the mechanism works. `standard_form` spells a
     // gate's answer out; `branch_note` does the same for outcomes.
-    const authored = readFileSync(path.join(DATA, 'scenario/우는다리/gates.json'), 'utf8')
+    const authored = readFileSync(path.join(DATA, 'scenario', TUTORIAL_SLUG, 'gates.json'), 'utf8')
     const shipped = stripDesignNotes(authored)
 
     expect(authored, 'the authored file should still carry its design notes').toMatch(
@@ -199,7 +200,7 @@ describe('published data — the allowlist tracks what the client fetches', () =
     // `characters.json` ships — the run reads the cast — but each character
     // carries a `strands` block of `gate_ids`/`truth_ids`, the author's index of
     // where that person sits in the gate structure. 서지형's is ["G1","G4","G7"].
-    const authored = readFileSync(path.join(DATA, 'scenario/우는다리/characters.json'), 'utf8')
+    const authored = readFileSync(path.join(DATA, 'scenario', TUTORIAL_SLUG, 'characters.json'), 'utf8')
     const shipped = stripCharacterNotes(authored)
 
     expect(authored, 'the authored file should still carry its strands').toMatch(/"strands"/)
@@ -227,7 +228,7 @@ describe('published data — the allowlist tracks what the client fetches', () =
     // 21:04. The rest of the file is written for a human: `baseline_summary`
     // states the no-intervention ending, and `attributed_gates` names the gates
     // a unit hangs off — gate structure on a fetchable URL (invariant 6).
-    const authored = readFileSync(path.join(DATA, 'scenario/우는다리/score.json'), 'utf8')
+    const authored = readFileSync(path.join(DATA, 'scenario', TUTORIAL_SLUG, 'score.json'), 'utf8')
     const shipped = stripScoreNotes(authored)
 
     expect(authored, 'the authored file should still carry its baseline').toMatch(

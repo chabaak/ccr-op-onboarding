@@ -163,12 +163,11 @@ async function seamStore(page: Page): Promise<SeamStore> {
  * The pack slug the CLIENT actually asked the server for.
  *
  * RE-AIMED (08-09). Both callers used to read `#caseName`, which carried the
- * slug until `ui(x2)` (#212) pointed it at `PACK_DISPLAY_NAME` — a display name
- * that is `전 구간 정상` where the slug is `전구간정상`, and which `shell/pack.ts`
- * says outright is "DELIBERATELY not derived from `PACK_SLUG` — there is no
+ * slug until the chrome pointed it at the pack display name, which
+ * `shell/pack.ts` says outright is "DELIBERATELY not derived from `PACK_SLUG` — there is no
  * rule". So the chrome stopped being a slug source, silently: `(d)` compared
  * the doc number against a string with spaces in it, and `(e)` fetched
- * `data/scenario/전 구간 정상/meta.json`, got the dev server's index.html and
+ * a display-name path, got the dev server's index.html and
  * died parsing it as JSON. Neither is caught by CI, which runs the `preview`
  * project alone.
  *

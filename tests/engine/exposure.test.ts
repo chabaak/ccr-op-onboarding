@@ -77,7 +77,7 @@ describe('[e3#F4] a ROW reaches the prompt only where its exposure holds', () =>
   })
 
   it('(b) un-hardened PROSE shows the row — F4 is opt-in, and packs still carry it', () => {
-    // 우는다리's t5 says 현장(관리동)을 들여다본 런에만 보임. Reading that through
+    // A prose note such as 열린 가지에서만. Reading that through
     // `holds()` alone answers false and silently deletes an authored row from
     // every run of a pack nobody changed; `datapack:lint` FLAGs it as hardening
     // work instead, and the engine shows the line. Same rule as `availability`.

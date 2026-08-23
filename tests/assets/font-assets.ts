@@ -8,6 +8,7 @@
 import fs from 'node:fs'
 import path from 'node:path'
 import { fileURLToPath } from 'node:url'
+import { TUTORIAL_DIR } from '../helpers/scenario.ts'
 
 export const REPO = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '../..')
 export const FONTS_DIR = path.join(REPO, 'public/assets/fonts')
@@ -17,7 +18,7 @@ export const INDEX_CSS = path.join(STYLES_DIR, 'index.css')
 export const TOKENS_CSS = path.join(STYLES_DIR, 'tokens.css')
 export const MANIFEST = path.join(REPO, 'assets-manifest.json')
 export const DIST = path.join(REPO, 'dist')
-export const SCENARIO_DIR = path.join(REPO, 'data/scenario/우는다리')
+export const SCENARIO_DIR = TUTORIAL_DIR
 
 export const IBM_PLEX_MONO = 'IBM Plex Mono'
 export const NANUM_GOTHIC_CODING = 'Nanum Gothic Coding'

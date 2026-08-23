@@ -13,7 +13,7 @@
 // C3 (placeholder fixtures being retired): NOTHING here asserts fixture
 // CONTENT. Every expectation is read back out of the driver's own stream
 // through `window.__shell.frame().events`, so the suite binds to whatever run
-// the shell boots — placeholder today, u2f's 우는다리 material tomorrow.
+// the shell boots.
 import { expect, test } from 'playwright/test'
 import type { Locator, Page } from 'playwright/test'
 import fs from 'node:fs'
@@ -569,8 +569,8 @@ test.describe('archive segmentation and highlight marks', () => {
     // inverts: it used to prove the label's time span reached the tab, and now
     // it proves that no part of the seam's `label` does. That field is the
     // authority's, and what it holds depends on which authority is driving —
-    // `RUN 03 / 08:50 — 21:04` from the fixture loop, `전구간정상-r3` from the live
-    // adapter. Neither is something this rail promises to render.
+    // `RUN 03 / 08:50 — 21:04` from the fixture loop or a live adapter run key.
+    // Neither is something this rail promises to render.
     // x7 — the tabs are DISTINCT and carry none of the seam's label. What they
     // are is no longer spelled here.
     //
@@ -583,8 +583,8 @@ test.describe('archive segmentation and highlight marks', () => {
     //
     // What only THIS lane can prove is the negative below: whatever the tab
     // says, no part of the authority's `label` reaches it. That field holds
-    // `RUN 03 / 08:50 — 21:04` under the fixture loop and `전구간정상-r3` under the
-    // live adapter, and neither is something the rail promises to render.
+    // `RUN 03 / 08:50 — 21:04` under the fixture loop and a live adapter run key,
+    // and neither is something the rail promises to render.
     expect(new Set(labels).size, 'two sittings share a tab label').toBe(labels.length)
     for (const [i, entry] of meta!.archive.entries()) {
       expect(labels[i]!.trim().length, 'a tab rendered no name at all').toBeGreaterThan(0)

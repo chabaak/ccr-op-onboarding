@@ -1,15 +1,15 @@
-// [e3] — hand-built minimal datapacks. spec §3: the real 우는다리 pack is frozen
-// and read-only; only `schedule.test.ts` touches it, and only its schedule.
-// Everything with authored effects/predicates is a fixture, because the real
-// pack is pre-hardening (every `effects` is `{deltas:{},flags:{}}`).
+// [e3] — hand-built minimal datapacks. spec §3: the real tutorial pack is read
+// from disk for schedule integration; everything with authored
+// effects/predicates is a fixture so the tested shape is explicit.
 import fs from 'node:fs'
 import path from 'node:path'
 import { fileURLToPath } from 'node:url'
 import type { Timeline, Gates, Characters, Temperament } from '../../../../src/shared/datapack.ts'
 import type { BeatPack } from '../../../../src/engine/beat/ports.ts'
+import { TUTORIAL_DIR } from '../../../helpers/scenario.ts'
 
 export const REPO = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '../../../..')
-export const PACK_DIR = path.join(REPO, 'data/scenario/우는다리')
+export const PACK_DIR = TUTORIAL_DIR
 
 type Ev = Timeline['events'][number]
 type G = Gates['gates'][number]
@@ -140,8 +140,7 @@ export function trustPack(): BeatPack {
 }
 
 // ── A4 · multi-event order at one clock ─────────────────────────────────────
-// Mirrors 우는다리's 10:40 (t4 then t5) with effects the real pre-hardening pack
-// does not yet carry, so the applied order is distinguishable.
+// Uses two co-timed rows with effects so the applied order is distinguishable.
 export function multiEventPack(): BeatPack {
   return pack([
     ev('t4', '10:40', { effects: { deltas: { alpha: 1 }, flags: { fa: true } } }),
@@ -156,8 +155,8 @@ export function multiEventPack(): BeatPack {
 // depending on the stance the caller submits at 09:00.
 //
 // `unhardened` is the third case and the one that keeps this inert for packs
-// that have not opted in: prose in the slot (우는다리's G7 carries 특정
-// 가지에서만) is not a predicate, and the gate must still be asked.
+// that have not opted in: prose in the slot is not a predicate, and the gate
+// must still be asked.
 export function availabilityPack(unhardened = false): BeatPack {
   return pack(
     [ev('a1', '09:00'), ev('a2', '10:00')],
@@ -186,9 +185,8 @@ export function availabilityPack(unhardened = false): BeatPack {
 // arrive as one run in which the branch was both taken and not taken.
 //
 // `unhardened` is the inert case, and it is the same argument `availability`
-// makes: prose in the slot is not a predicate (우는다리's t5 says 현장(관리동)을
-// 들여다본 런에만 보임), so the row must still be shown rather than deleted from
-// every run of a pack nobody hardened.
+// makes: prose in the slot is not a predicate, so the row must still be shown
+// rather than deleted from every run of a pack nobody hardened.
 export function exposurePack(unhardened = false): BeatPack {
   const opened = unhardened ? '열린 가지에서만' : 'opened'
   return pack(

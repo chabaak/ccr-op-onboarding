@@ -1,8 +1,7 @@
 // [e7] — the scripted run the live-driver suites drive.
 //
-// Hand-built, like e3's and e5's fixtures: the frozen 우는다리 pack is
-// pre-hardening (every `effects` is empty) and reading it would make these
-// suites depend on scenario content they are not about. What IS real here is
+// Hand-built, like e3's and e5's fixtures: reading a scenario pack would make
+// these suites depend on content they are not about. What IS real here is
 // everything downstream — the schedule builder, the state core, the beat
 // driver, the feed builders, the composer and the transport all run unmodified.
 //

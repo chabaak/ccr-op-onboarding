@@ -1,19 +1,6 @@
 {
   "prompts": [
     {
-      "slug": "전구간정상",
-      "frozen_slots": {
-        "FLAW": "[결함] 너는 잘못된 정보에 속을 수 있다.",
-        "INCIDENT": "[내력] 삼 년 전 겨울, 네가 서둘러 내린 판단 하나가 아직 남아 있다.",
-        "PRIORITY_LIST": [
-          "확인되지 않은 주장에 따라 잘못 움직일 위험을 먼저 줄인다.",
-          "대응이 늦어져 피해가 커질 위험을 먼저 줄인다.",
-          "판단을 마친 뒤 근거를 시간순으로 정리한다.",
-          "외부에 공유하기 전 사건 시각을 명확히 남긴다."
-        ]
-      }
-    },
-    {
       "slug": "멈춘회전문",
       "measured_by": "tools/probe/dday-mechanism/suites/DOME-G1-baseline.json"
     }

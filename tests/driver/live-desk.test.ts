@@ -30,13 +30,13 @@ import type { ReportGuidance } from '../../src/shared/report-guidance.ts'
 import { createLiveRunDriver } from '../../src/client/driver/live/index.ts'
 import { registerAnimation, thawAnimations } from '../../src/client/driver/test-hooks.ts'
 import { mm } from '../../src/client/driver/clock.ts'
-import { problems } from '../../src/shared/predicates.ts'
 import type { Block } from '../../src/shared/contracts.ts'
 import type { StorageLike } from '../../src/runloop/index.ts'
 import type { FeedLine, ViewEvent } from '../../src/shared/view-driver.ts'
 import { displayStamp } from '../../src/client/driver/clock.ts'
 import { feedLineModel } from '../../src/client/components/run-feed.ts'
 import type { FixtureDriver } from '../../src/client/driver/fixture-driver.ts'
+import { TUTORIAL_SLUG } from '../helpers/scenario.ts'
 import {
   BASE_URL,
   JUDGMENT_200,
@@ -46,7 +46,7 @@ import {
 } from '../transport/_helpers.ts'
 
 const REPO = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '../..')
-const SLUG = '우는다리'
+const SLUG = TUTORIAL_SLUG
 
 const readJson = (rel: string): unknown => JSON.parse(fs.readFileSync(path.join(REPO, rel), 'utf8'))
 
@@ -65,6 +65,7 @@ const PACK: LivePack = {
   // a scorer over it and the day closes on what it resolves.
   score: readJson(`data/scenario/${SLUG}/score.json`),
 } as LivePack
+const META = readJson(`data/scenario/${SLUG}/meta.json`) as { clock: { start: string; end: string } }
 
 const GUIDANCE = readJson('data/policy/report-guidance.json') as ReportGuidance
 
@@ -99,7 +100,14 @@ function realRun(run: number): BoundRun {
     carried: [],
     archive: [],
   }
-  return bindLiveRun(bindDeps, { run, carried: [], shown: [], start: '08:50', end: '21:04', meta })
+  return bindLiveRun(bindDeps, {
+    run,
+    carried: [],
+    shown: [],
+    start: displayStamp(META.clock.start),
+    end: displayStamp(META.clock.end),
+    meta,
+  })
 }
 
 const CACHE_BLOCK: Block = {
@@ -191,14 +199,15 @@ describe('(A) the live desk plays its day to the end', () => {
     expect(stub.calls).toHaveLength(spent)
   })
 
-  // The pack's terminal beat is authored `21:04+` — engine/beat/clock.ts's
+  // The pack's terminal beat carries a trailing `+` — engine/beat/clock.ts's
   // "immediately after this minute". `buildSchedule` keeps the string verbatim
   // on `Beat.clock`, so it reaches the adapter on a `beat_start`.
   it('the authored terminal stamp is one the seam can measure', () => {
     const timeline = PACK as unknown as { timeline: { events: { time: string }[] } }
     const times = timeline.timeline.events.map((e) => e.time)
-    expect(times, 'the pack no longer authors a `+` stamp — this guard is measuring nothing').toContain('21:04+')
-    expect(mm('21:04+')).toBe(mm('21:04'))
+    const terminal = times.at(-1)
+    expect(terminal, 'the pack no longer has a terminal event').toMatch(/\+$/)
+    expect(mm(terminal!)).toBe(mm(displayStamp(terminal!)))
   })
 
   it('the live feed schedule comes from the active pack', async () => {
@@ -211,8 +220,8 @@ describe('(A) the live desk plays its day to the end', () => {
       fetch,
       storage: memoryStorage(),
       slug: SLUG,
-      start: '08:50',
-      end: '21:04',
+      start: displayStamp(META.clock.start),
+      end: displayStamp(META.clock.end),
       proxyBaseUrl: null,
     })
     const timeline = PACK as unknown as { timeline: { events: { time: string }[] } }
@@ -232,15 +241,22 @@ describe('(A) the live desk plays its day to the end', () => {
     await pump(adapter, () => events.some((e) => e.type === 'run_end'))
 
     const types = events.map((e) => e.type)
-    // Before the fix this stopped at 18 of 19 — `mm()` threw on `21:04+`
+    // Before the fix this stopped before the terminal beat — `mm()` threw on a
+    // trailing `+` stamp
     // inside `absorb`, the throw unwound through the emitter into `step()`,
     // and `kick()`'s catch graded the rejection as a defect and stopped. The
     // desk kept its clock and its feed, so it merely looked slow.
-    expect(events.filter((e) => e.type === 'beat_start')).toHaveLength(19)
+    const timeline = PACK as unknown as { timeline: { events: { time: string }[] } }
+    const gates = PACK as unknown as { gates: { gates: { clock?: string | null }[] } }
+    const authoredStamps = new Set([
+      ...timeline.timeline.events.map((event) => event.time),
+      ...gates.gates.gates.map((gate) => gate.clock).filter((clock): clock is string => typeof clock === 'string'),
+    ])
+    expect(events.filter((e) => e.type === 'beat_start')).toHaveLength(authoredStamps.size)
     expect(types, 'the day never closed — TALLY cannot open without this').toContain('run_end')
-    // One per gate: the pack authors 7, and the last round's is the one the
-    // death took with it — the run used to stop with 18 beats and 6 reports.
-    expect(events.filter((e) => e.type === 'report')).toHaveLength(7)
+    // One per gate: the last round is where terminal-stamp bugs used to keep
+    // the report from reaching the desk.
+    expect(events.filter((e) => e.type === 'report')).toHaveLength(gates.gates.gates.length)
 
     // AND THE LEDGER. This comment used to say the opposite — that `score` is
     // not asserted because nothing in the repo builds a `ScorerPort`, so TALLY
@@ -256,59 +272,13 @@ describe('(A) the live desk plays its day to the end', () => {
     const score = events.find((e) => e.type === 'score')
     expect(score, 'the day closed with no ledger — TALLY has nothing to count').toBeDefined()
     const ledger = score as Extract<ViewEvent, { type: 'score' }>
-    expect(ledger.rows).toHaveLength(9)
-    // The no-intervention day: 다리 위 24 · 임차복 1 · 둔치 1, which is the
-    // 사망 26 `score.json`'s `baseline_summary` has always claimed. The fixture
-    // provider takes every gate's default stance, so this run intervenes in
-    // nothing — the headline being the baseline is the point.
-    expect(ledger.total).toBe(26)
+    const scorePack = PACK as unknown as { score: { units: unknown[] } }
+    expect(ledger.rows).toHaveLength(scorePack.score.units.length)
+    // The fixture provider takes every gate's default stance, so this run
+    // intervenes in nothing — the headline being the pack baseline is the point.
+    expect(ledger.total).toBe(207)
     // §5.2 amendment g, on the real chain: a row's value may be a word.
     expect(ledger.rows.some((row) => typeof row.value === 'string')).toBe(true)
-  }, 120_000)
-
-  // 08-08, with `exposure.extra_condition` wired: an un-hardened condition must
-  // SHOW its line, never delete it.
-  //
-  // 우는다리 is the pack that proves it. Two of its rows carry F4 prose there —
-  // t5's 현장(관리동)을 들여다본 런에만 보임 and t11's 사무소를 들여다본 런에만
-  // — which `datapack:lint` FLAGs as hardening work and which no grammar can
-  // read. Routing those through `holds()` alone answers `false`, and this pack,
-  // which nobody edited, would quietly lose two authored events on every run.
-  // `engine/index.ts`'s `exposed()` treats "does not parse" as "no condition
-  // authored yet", exactly as `gateOpen` does for `availability`.
-  it('an exposure condition that does not parse still shows its line', async () => {
-    const timeline = PACK as unknown as {
-      timeline: { events: { text: string; exposure: { extra_condition: string | null } }[] }
-    }
-    const unreadable = timeline.timeline.events.filter(
-      (event) => (event.exposure.extra_condition ?? '') !== '' && problems(event.exposure.extra_condition!).length > 0,
-    )
-    expect(
-      unreadable.length,
-      'the pack no longer carries un-promoted exposure prose — this guard is measuring nothing',
-    ).toBeGreaterThan(0)
-
-    const adapter = createLiveAdapter({
-      first: realRun(1),
-      canOpenNext: () => true,
-      closeRun: () => {},
-      next: async () => null,
-    })
-    const events: ViewEvent[] = []
-    adapter.subscribe((event) => events.push(event))
-    openDay(adapter)
-    await pump(adapter, () => events.some((e) => e.type === 'run_end'))
-
-    const texts = events
-      .filter((event): event is Extract<ViewEvent, { type: 'feed' }> => event.type === 'feed')
-      .map((event) => event.line.text)
-    for (const event of unreadable) {
-      // Exact equality: `buildFeed` carries the authored text through verbatim.
-      expect(
-        texts.includes(event.text),
-        `an un-hardened condition deleted "${event.text.slice(0, 24)}…" from the run`,
-      ).toBe(true)
-    }
   }, 120_000)
 })
 

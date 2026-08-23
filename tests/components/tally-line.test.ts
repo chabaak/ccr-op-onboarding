@@ -8,23 +8,18 @@
 // pure, and the rendering half — that the line lands in the fanfold on `score`
 // — is `e2e/run-loop.spec.ts`'s.
 import { describe, expect, it } from 'vitest'
-import fs from 'node:fs'
-import path from 'node:path'
-import { fileURLToPath } from 'node:url'
 import { tallyLineText } from '../../src/client/components/tally-line.ts'
 import { baselineState, createScorer } from '../../src/driver/scorer.ts'
 import { deathsOf } from '../../src/shared/predicates.ts'
 import type { OutcomePack, ScorePack } from '../../src/driver/scorer.ts'
 import type { PredicateState } from '../../src/shared/predicates.ts'
 import type { ViewEvent } from '../../src/shared/view-driver.ts'
+import { tutorialPart } from '../helpers/scenario.ts'
 
-const REPO = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '../..')
-const read = (rel: string): string => fs.readFileSync(path.join(REPO, rel), 'utf8')
-
-const PACK = JSON.parse(read('data/scenario/우는다리/score.json')) as ScorePack
-const TIMELINE = JSON.parse(read('data/scenario/우는다리/timeline.json')) as {
+const PACK = tutorialPart<ScorePack>('score')
+const TIMELINE = tutorialPart<{
   events: { id: string; time: string; text: string }[]
-}
+}>('timeline')
 const BASELINE: PredicateState = baselineState({ timeline: TIMELINE } as unknown as OutcomePack)
 
 /** The `score` event a run ending in `state` puts on the seam. */
@@ -33,19 +28,20 @@ const ledgerOf = (state: PredicateState): Extract<ViewEvent, { type: 'score' }> 
   return { type: 'score', ...scored }
 }
 
-/** Every day the death axis can land on — the three G6 outcomes, plus G7. */
+/** Representative days the tutorial pack can score. */
 const DAYS: Record<string, PredicateState> = {
   baseline: BASELINE,
-  capped: { ...BASELINE, entry_capped: true },
-  cancelled: { ...BASELINE, cancel_requested: true },
-  witnessed: { ...BASELINE, hatch_opened: true, caretaker_evacuated: true },
+  counted: { ...BASELINE, headcount_pressed: true },
+  west: { ...BASELINE, west_sleeve_opened: true },
+  restored: { ...BASELINE, vent_restored: true },
 }
 
 describe('the feed’s 집계 line and the ledger report ONE run', () => {
   it('(a) the headline in the line is the ledger’s own total, on every day', () => {
     // The defect this closes. `timeline.json`'s t19 printed 사망 26 on all four
     // of these, because a fixed event is printed without reading state; the
-    // ledger counted 26 · 9 · 0 · 25. Same 21:04, two numbers.
+    // The authored timeline is fixed prose, while the ledger reads the run's
+    // predicate state. Same clock, different possible numbers.
     for (const [day, state] of Object.entries(DAYS)) {
       const ledger = ledgerOf(state)
       expect(tallyLineText(ledger), `${day}: the line dropped the ledger's total`).toContain(
@@ -58,25 +54,21 @@ describe('the feed’s 집계 line and the ledger report ONE run', () => {
     const totals = Object.fromEntries(
       Object.entries(DAYS).map(([day, state]) => [day, ledgerOf(state).total]),
     )
-    expect(totals).toEqual({ baseline: 26, capped: 9, cancelled: 0, witnessed: 25 })
+    expect(totals).toEqual({ baseline: 207, counted: 57, west: 12, restored: 0 })
   })
 
   it('(c) the breakdown names the counting axes, and only those', () => {
     const ledger = ledgerOf(BASELINE)
     const line = tallyLineText(ledger)
-    // 24 + 1 + 1. `강필주` resolves to 6시간 구금 and `부상자` to 71명 — words,
-    // not counts, so they are the ledger's rows and never the headline's parts.
-    expect(line).toBe('집계. 사망 26(다리 위의 인파 24 · 임차복 1 · 둔치의 사람들 1).')
-    expect(line).not.toContain('강필주')
-    expect(line).not.toContain('부상자')
+    // 185 + 21 + 1. `표기웅` resolves to prose that does not count, so it is the
+    // ledger's row and never one of the headline's parts.
+    expect(line).toBe('집계. 사망 207(돔 안에 있던 사람 185 · 남측 에어락 통로에 갇힌 사람 21 · 문세라 1).')
+    expect(line).not.toContain('표기웅')
   })
 
   it('(d) the parts sum to the headline — the line never does its own arithmetic', () => {
-    // Summed by `deathsOf`, the rule the scorer totalled with: on 우는다리 that
-    // is the numeric rows and nothing else, because every unit it counts is a
-    // crowd. A pack whose unit is one named person (전구간정상's 오세라) puts a
-    // PROSE row in this sum, and the guard holds there for the same reason —
-    // one definition of what a value costs, on both sides of the seam.
+    // Summed by `deathsOf`, the rule the scorer totalled with: numeric rows
+    // count themselves, and a person-unit prose death counts one.
     for (const state of Object.values(DAYS)) {
       const ledger = ledgerOf(state)
       const summed = ledger.rows.map((row) => deathsOf(row.value)).reduce((a, b) => a + b, 0)
@@ -85,8 +77,9 @@ describe('the feed’s 집계 line and the ledger report ONE run', () => {
   })
 
   it('(d2) a named person the day killed is one of the parts, printed as its count', () => {
-    // 전구간정상's rescue day, as it reaches the feed: the crowd is out and the
-    // headline is 오세라 alone. Before `deathsOf` this line read 집계. 사망 0.
+    // A one-person rescue day, as it reaches the feed: the crowd is out and
+    // the headline is the named person alone. Before `deathsOf` this line read
+    // 집계. 사망 0.
     const rescued: Extract<ViewEvent, { type: 'score' }> = {
       type: 'score',
       total: 1,

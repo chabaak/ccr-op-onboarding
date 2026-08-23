@@ -1,4 +1,4 @@
-// [e10] the two rigs the acceptance suite drives, both over the real 우는다리
+// [e10] the two rigs the acceptance suite drives, both over the real tutorial
 // pack and the real merged `src/**` slice.
 //
 // Nothing here re-implements a rule. The schedule builder, the state core, the
@@ -14,8 +14,8 @@
 // about what that factory and its collaborators produce — not about a second
 // binding written for this suite.
 //
-// The pack is the frozen 우는다리 datapack, deliberately: §8-2 asks for a beat
-// whose effect moves `trust`, §8-8 for a run that generates lines on every
+// The pack is the manifest tutorial datapack, deliberately: §8-2 asks for a
+// beat whose effect moves `trust`, §8-8 for a run that generates lines on every
 // channel, and §8-5 for a real Call 1 → Call 3 trace. A hand-built fixture
 // could satisfy each of those and still leave the shipped scenario broken.
 
@@ -49,12 +49,13 @@ import type {
 import type { ReportGuidance } from '../../../src/shared/report-guidance.ts'
 import type { FeedLine, ViewEvent } from '../../../src/shared/view-driver.ts'
 import type { EnginePack } from '../../driver/engine-fixtures/pack.ts'
+import { TUTORIAL_DIR, TUTORIAL_SLUG } from '../../helpers/scenario.ts'
 
 const HERE = path.dirname(fileURLToPath(import.meta.url))
 const REPO = path.resolve(HERE, '../../..')
 
 /** The shipped scenario. §8's criteria are about this pack, not about a stand-in. */
-export const PACK_SLUG = '우는다리'
+export const PACK_SLUG = TUTORIAL_SLUG
 
 /**
  * The two ids §8-10 names. Both are minted by the run below — `n02` is the
@@ -85,13 +86,12 @@ const readJson = (file: string): unknown => JSON.parse(fs.readFileSync(file, 'ut
  * them — exactly what `tools/driver/run/pack.mjs` does for the headless runner.
  */
 export function loadPack(): EnginePack {
-  const dir = path.join(REPO, 'data', 'scenario', PACK_SLUG)
   return {
-    timeline: readJson(path.join(dir, 'timeline.json')) as Timeline,
-    gates: readJson(path.join(dir, 'gates.json')) as Gates,
-    characters: readJson(path.join(dir, 'characters.json')) as Characters,
-    temperament: readJson(path.join(dir, 'temperament.json')) as Temperament,
-    symptoms: readJson(path.join(dir, 'symptoms.json')) as Symptoms,
+    timeline: readJson(path.join(TUTORIAL_DIR, 'timeline.json')) as Timeline,
+    gates: readJson(path.join(TUTORIAL_DIR, 'gates.json')) as Gates,
+    characters: readJson(path.join(TUTORIAL_DIR, 'characters.json')) as Characters,
+    temperament: readJson(path.join(TUTORIAL_DIR, 'temperament.json')) as Temperament,
+    symptoms: readJson(path.join(TUTORIAL_DIR, 'symptoms.json')) as Symptoms,
   }
 }
 

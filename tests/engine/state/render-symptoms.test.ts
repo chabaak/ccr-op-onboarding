@@ -12,12 +12,11 @@
 import { describe, it, expect } from 'vitest'
 import fs from 'node:fs'
 import path from 'node:path'
-import { fileURLToPath } from 'node:url'
 import type { Symptoms } from '../../../src/shared/datapack.ts'
 import { renderSymptoms, type DeltaEntry } from '../../../src/engine/state/index.ts'
+import { TUTORIAL_DIR } from '../../helpers/scenario.ts'
 
-const REPO = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '../../..')
-const PACK = path.join(REPO, 'data/scenario/우는다리')
+const PACK = TUTORIAL_DIR
 
 function readPack(): Symptoms {
   return JSON.parse(fs.readFileSync(path.join(PACK, 'symptoms.json'), 'utf8')) as Symptoms
@@ -218,7 +217,7 @@ describe('renderSymptoms — §2.3-2 flags', () => {
   })
 
   it('the real transition still renders when the same flag is asserted twice', () => {
-    // The 우는다리 idiom: two buckets each assert one flag. The first write moves
+    // The scenario idiom: two buckets each assert one flag. The first write moves
     // it, the second does not — and only the first is a symptom.
     const journal = [flag('tip_traced', false, true), flag('tip_traced', true, true)]
     expect(renderSymptoms(journal, pack)).toEqual(['조회가 걸렸다'])
@@ -348,27 +347,27 @@ describe('renderSymptoms — §2.2 {who} substitution', () => {
   })
 })
 
-describe('renderSymptoms — determinism and the real 우는다리 pack', () => {
+describe('renderSymptoms — determinism and the real tutorial pack', () => {
   it('is a pure function of its input — two calls deep-equal', () => {
     const pack = readPack()
-    const journal = [scalar('fear', 55, 80, 'G7:c'), scalar('trust', 40, 20, 'G7:c')]
+    const journal = [scalar('defensiveness', 60, 70, 'G7:c'), scalar('trust', 55, 35, 'G7:c')]
     expect(renderSymptoms(journal, pack)).toEqual(renderSymptoms(journal, pack))
   })
 
   it('renders the shipped pack without a digit and without throwing', () => {
     const pack = readPack()
-    const journal = [scalar('trust', 40, 20, 'G7:c'), scalar('fear', 55, 80, 'G7:c')]
+    const journal = [scalar('defensiveness', 60, 70, 'G7:c'), scalar('trust', 55, 35, 'G7:c')]
     const out = renderSymptoms(journal, pack)
     expect(out.length).toBe(2)
     expect(out.join('')).not.toMatch(/[0-9]/)
-    // fear moved 25, trust moved 20 → fear first (§2.3-3).
-    expect(out[0]).toContain('빨라지고')
+    // trust moved 20, defensiveness moved 10 → trust first (§2.3-3).
+    expect(out[0]).toContain('문세라')
   })
 
   it('picks the shipped pack\'s min-1 band for a small move', () => {
     const pack = readPack()
-    expect(renderSymptoms([scalar('trust', 40, 42)], pack)).toEqual([
-      '발신자의 대답이 반 박자 빨라졌다',
+    expect(renderSymptoms([scalar('trust', 55, 56)], pack)).toEqual([
+      '문세라가 알겠다는 말 뒤에 자기가 본 것을 덧붙였습니다',
     ])
   })
 })

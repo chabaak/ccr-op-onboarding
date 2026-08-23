@@ -6,9 +6,6 @@
 // which intervened scores differently from one that did not. A synthetic pack
 // would satisfy both by construction and prove nothing.
 import { describe, it, expect } from 'vitest'
-import fs from 'node:fs'
-import path from 'node:path'
-import { fileURLToPath } from 'node:url'
 import {
   baselineState,
   createScorer,
@@ -18,11 +15,9 @@ import {
 } from '../../src/driver/scorer.ts'
 import type { OutcomePack, ScorePack } from '../../src/driver/scorer.ts'
 import type { PredicateState } from '../../src/shared/predicates.ts'
+import { tutorialPart } from '../helpers/scenario.ts'
 
-const REPO = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '../..')
-const PACK = JSON.parse(
-  fs.readFileSync(path.join(REPO, 'data/scenario/우는다리/score.json'), 'utf8'),
-) as ScorePack
+const PACK = tutorialPart<ScorePack>('score')
 
 /**
  * The baseline day — COMPUTED from the pack, not typed out here. It is the
@@ -30,22 +25,20 @@ const PACK = JSON.parse(
  * anyone chooses, and no gate outcome is guaranteed to any run.
  */
 const OUTCOME = {
-  timeline: JSON.parse(
-    fs.readFileSync(path.join(REPO, 'data/scenario/우는다리/timeline.json'), 'utf8'),
-  ),
+  timeline: tutorialPart('timeline'),
 } as OutcomePack
 
 const UNTOUCHED: PredicateState = baselineState(OUTCOME)
 
 describe('the baseline day scores the pack’s own summary', () => {
-  it('(a) the headline is 26 — the sum `baseline_summary` has always claimed', () => {
-    // 다리 위 24 · 관리동의 임차복 1 · 둔치 노점상 1. If this drifts, either the
+  it('(a) the headline is 207 — the sum `baseline_summary` has always claimed', () => {
+    // 돔 안 185 · 남측 에어락 통로 21 · 문세라 1. If this drifts, either the
     // pack's prose or its predicates moved without the other.
     const units = scoreUnits(PACK, UNTOUCHED)
-    expect(totalOf(units)).toBe(26)
+    expect(totalOf(units)).toBe(207)
 
     const summary = (PACK as unknown as { baseline_summary: string }).baseline_summary
-    expect(summary, 'the pack no longer states the baseline this guard checks').toContain('사망 26')
+    expect(summary, 'the pack no longer states the baseline this guard checks').toContain('총 사망 207명')
   })
 
   it('(b) every unit resolves — a linted pack leaves none unscored', () => {
@@ -54,42 +47,38 @@ describe('the baseline day scores the pack’s own summary', () => {
     expect(scoreUnits(PACK, UNTOUCHED)).toHaveLength(PACK.units.length)
   })
 
-  it('(c) only deaths sum; outcomes and durations read', () => {
+  it('(c) only deaths sum; outcomes read without counting unless they name a death', () => {
     const byId = new Map(scoreUnits(PACK, UNTOUCHED).map((u) => [u.id, u.value]))
-    expect(byId.get('u4')).toBe('테러 혐의 구속')
-    // Six HOURS of detention. As a number it would add six deaths to the
-    // headline, which is why amendment g widened a row's value and left `total`.
-    expect(byId.get('u5')).toBe('6시간 구금')
-    expect(byId.get('u9')).toBe('71명')
+    expect(byId.get('u3')).toBe('사망 · 집결지 실종자 명단')
+    expect(byId.get('u4')).toBe('열쇠가 나온 것만 적히고, 누구 것인지는 오르지 않음')
     expect(typeof byId.get('u1')).toBe('number')
   })
 })
 
 describe('a run that intervened scores differently', () => {
-  it('(d) the cancelled day empties the bridge and the headline goes to 0', () => {
-    const cancelled: PredicateState = { ...UNTOUCHED, cancel_requested: true }
-    const units = scoreUnits(PACK, cancelled)
+  it('(d) restoring the vents empties the dome and the headline goes to 0', () => {
+    const restored: PredicateState = { ...UNTOUCHED, vent_restored: true }
+    const units = scoreUnits(PACK, restored)
     expect(totalOf(units)).toBe(0)
     const byId = new Map(units.map((u) => [u.id, u.value]))
-    expect(byId.get('u8')).toBe('미확인 — 재개통 예정')
+    expect(byId.get('u3')).toBe('생존 · 서쪽 슬리브로 마지막에 걸어 나온다')
   })
 
-  it('(e) capping entry is a partial save, not a whole one', () => {
-    // `variance_notes`: 다리 위 200명 — 사망 7 · 부상 19.
-    const capped: PredicateState = { ...UNTOUCHED, entry_capped: true }
+  it('(e) opening only the west sleeve is a partial save, not a whole one', () => {
+    const capped: PredicateState = { ...UNTOUCHED, west_sleeve_opened: true }
     const byId = new Map(scoreUnits(PACK, capped).map((u) => [u.id, u.value]))
-    expect(byId.get('u1')).toBe(7)
-    expect(byId.get('u9')).toBe('19명')
-    expect(totalOf(scoreUnits(PACK, capped))).toBe(9)
+    expect(byId.get('u1')).toBe(9)
+    expect(byId.get('u2')).toBe(3)
+    expect(totalOf(scoreUnits(PACK, capped))).toBe(12)
   })
 
-  it('(f) the witnessed ending needs BOTH gates, and the order proves it', () => {
-    const named: PredicateState = { ...UNTOUCHED, caller_named: true }
-    const witnessed: PredicateState = { ...named, hatch_opened: true }
+  it('(f) the stronger rescue branch beats the earlier headcount branch', () => {
+    const counted: PredicateState = { ...UNTOUCHED, headcount_pressed: true }
+    const rescued: PredicateState = { ...counted, north_opened: true }
     const idOf = (state: PredicateState): unknown =>
-      new Map(scoreUnits(PACK, state).map((u) => [u.id, u.value])).get('u4')
-    expect(idOf(witnessed)).toBe('공식 입회 증인')
-    expect(idOf(named)).toBe('참고인')
+      new Map(scoreUnits(PACK, state).map((u) => [u.id, u.value])).get('u1')
+    expect(idOf(rescued)).toBe(0)
+    expect(idOf(counted)).toBe(44)
   })
 })
 
@@ -115,18 +104,17 @@ describe('the baseline day — §5.2 amendment h', () => {
     // its defaults. It does not: `default_stance` is what the engine
     // substitutes when CALL 1 FAILED, so that baseline was "what a network
     // error would have scored". Only the fixed timeline is guaranteed.
-    expect(UNTOUCHED.bridge_collapsed).toBe(true)
-    expect(UNTOUCHED.crowd_on_bridge).toBe(true)
-    // G5's default bucket sets this. It is a gate outcome, so it is not owed.
-    expect(UNTOUCHED.logs_requested).toBeUndefined()
-    expect(UNTOUCHED.cancel_requested).toBeUndefined()
-    expect(UNTOUCHED.caretaker_evacuated).toBeUndefined()
+    expect(Object.keys(UNTOUCHED)).toEqual([])
+    // G1's non-default bucket sets this. It is a gate outcome, so it is not owed.
+    expect(UNTOUCHED.headcount_pressed).toBeUndefined()
+    expect(UNTOUCHED.west_sleeve_opened).toBeUndefined()
+    expect(UNTOUCHED.vent_restored).toBeUndefined()
 
     // Which leaves every unit on its unconditional rule — the ending
     // `baseline_summary` describes, and the only one no choice can claim.
     const byId = new Map(scoreUnits(PACK, UNTOUCHED, UNTOUCHED).map((u) => [u.id, u.value]))
-    expect(byId.get('u6')).toBe('(원본) 소실')
-    expect(byId.get('u1')).toBe(24)
+    expect(byId.get('u4')).toBe('열쇠가 나온 것만 적히고, 누구 것인지는 오르지 않음')
+    expect(byId.get('u1')).toBe(185)
   })
 
   it('(k2) the baseline cannot be moved by re-authoring a gate’s default', () => {
@@ -134,25 +122,19 @@ describe('the baseline day — §5.2 amendment h', () => {
     // pack whose gates changed wholesale scores the same baseline. Before the
     // correction this number moved with `default_stance`, silently.
     const gatesMoved = baselineState(OUTCOME)
-    expect(totalOf(scoreUnits(PACK, gatesMoved, gatesMoved))).toBe(26)
-    expect(Object.keys(gatesMoved).sort()).toEqual([
-      'bridge_collapsed',
-      'caller_arrested',
-      'crowd_on_bridge',
-      'kang_detained',
-      'logs_destroyed',
-    ])
+    expect(totalOf(scoreUnits(PACK, gatesMoved, gatesMoved))).toBe(207)
+    expect(Object.keys(gatesMoved).sort()).toEqual([])
   })
 
   it('(l) an intervened run carries the untouched value beside its own', () => {
-    const cancelled: PredicateState = { ...UNTOUCHED, cancel_requested: true }
-    const scorer = createScorer(PACK, () => cancelled, UNTOUCHED)
+    const restored: PredicateState = { ...UNTOUCHED, vent_restored: true }
+    const scorer = createScorer(PACK, () => restored, UNTOUCHED)
     const ledger = scorer.score()
     expect(ledger.total).toBe(0)
-    expect(ledger.baseline_total).toBe(26)
-    const bridge = ledger.rows[0]!
-    expect(bridge.value).toBe(0)
-    expect(bridge.baseline).toBe(24)
+    expect(ledger.baseline_total).toBe(207)
+    const dome = ledger.rows[0]!
+    expect(dome.value).toBe(0)
+    expect(dome.baseline).toBe(185)
   })
 })
 
@@ -161,8 +143,8 @@ describe('the two halves the two consumers take', () => {
     const port = createScorer(PACK, () => UNTOUCHED, UNTOUCHED).score()
     const record = scoreRecord(PACK, UNTOUCHED)
 
-    expect(port.rows[0]).toEqual({ label: PACK.units[0]!.label, value: 24, baseline: 24 })
-    expect(record?.units[0]).toEqual({ id: 'u1', value: 24 })
+    expect(port.rows[0]).toEqual({ label: PACK.units[0]!.label, value: 185, baseline: 185 })
+    expect(record?.units[0]).toEqual({ id: 'u1', value: 185 })
     expect(port.total).toBe(record?.total)
     // A rendered sheet shows labels and has no use for `u1`; an archive is
     // indexed, and prose labels move when the scenario is edited. That is why
@@ -176,7 +158,7 @@ describe('the two halves the two consumers take', () => {
     // its state at construction would score the opening beat, every run.
     let state: PredicateState = UNTOUCHED
     const scorer = createScorer(PACK, () => state, UNTOUCHED)
-    state = { ...UNTOUCHED, cancel_requested: true }
+    state = { ...UNTOUCHED, vent_restored: true }
     expect(scorer.score().total).toBe(0)
   })
 
@@ -193,75 +175,50 @@ describe('the two halves the two consumers take', () => {
   })
 })
 
-// ── The shipped pack's rescue day ───────────────────────────────────────────
+// ── One-person units ────────────────────────────────────────────────────────
 //
-// 우는다리 above cannot reach this: every unit of its that counts is a crowd,
-// authored as a number. 전구간정상 scores two units that are ONE PERSON each
-// (오세라 · 차우진), and a person's outcome is prose because the record prints
-// where they were found. The day the tunnel empties and only 오세라 is left
-// behind therefore closed on 총 사망자 수 0명 — with 오세라: 사망 · 아홉 번째
-// 문 안쪽 printed one line above it.
-const SHIPPED = JSON.parse(
-  fs.readFileSync(path.join(REPO, 'data/scenario/전구간정상/score.json'), 'utf8'),
-) as ScorePack
+// The real tutorial pack already has a one-person unit, but this is scorer
+// arithmetic rather than scenario coverage. A hand-built score pack states the
+// shape directly: one crowd row, one person who may die in prose, one bystander.
+const ONE_PERSON: ScorePack = {
+  units: [
+    { id: 'u1', label: 'crowd', predicates: ['opened => 0', '=> 10'] },
+    { id: 'u2', label: 'operator', predicates: ['rescued => 생존 · 집결지', '=> 사망 · 기계실'] },
+    { id: 'u3', label: 'witness', predicates: ['named => 생존 · 입건', '=> 사망 · 대기실'] },
+  ],
+}
 
 describe('a unit that is one person counts as one', () => {
-  /** Every gate answered the way that empties the tunnel — 가이드 §5's best run. */
-  const RESCUED: PredicateState = {
-    vent_panel_opened: true,
-    pallet_named: true,
-    doors_opened: true,
-  }
+  const RESCUED: PredicateState = { opened: true, named: true }
 
-  it('(m) the day nobody drives out still counts 오세라', () => {
-    const units = scoreUnits(SHIPPED, RESCUED)
+  it('(m) the day the crowd gets out still counts the person left behind', () => {
+    const units = scoreUnits(ONE_PERSON, RESCUED)
     const byId = new Map(units.map((u) => [u.id, u.value]))
-    // The crowd got out; the person who opened the doors for them did not.
     expect(byId.get('u1')).toBe(0)
-    expect(byId.get('u2')).toBe('사망 · 아홉 번째 문 안쪽')
+    expect(byId.get('u2')).toBe('사망 · 기계실')
     expect(byId.get('u3')).toBe('생존 · 입건')
     expect(totalOf(units)).toBe(1)
   })
 
-  it('(n) the one run that saves her is the only one that scores no death', () => {
-    // `variance_notes`: "오세라 단위가 사는 길은 하나뿐이다 — 갱구로 몰아낸
-    // 41의 런에서 맨 뒤로 걸어 나오는 것." So the headline there is the crowd's
-    // own 41 and nothing else.
-    const drivenOut: PredicateState = {
-      vent_panel_opened: true,
-      pallet_named: true,
-      driven_out: true,
-    }
-    const byId = new Map(scoreUnits(SHIPPED, drivenOut).map((u) => [u.id, u.value]))
-    expect(byId.get('u2')).toBe('생존 · 갱구 밖 집결지에서 발견된다')
-    expect(totalOf(scoreUnits(SHIPPED, drivenOut))).toBe(41)
+  it('(n) the branch that saves the person removes that death from the headline', () => {
+    const drivenOut: PredicateState = { opened: true, named: true, rescued: true }
+    const byId = new Map(scoreUnits(ONE_PERSON, drivenOut).map((u) => [u.id, u.value]))
+    expect(byId.get('u2')).toBe('생존 · 집결지')
+    expect(totalOf(scoreUnits(ONE_PERSON, drivenOut))).toBe(0)
   })
 
-  it('(o) the untouched day is the crowd PLUS the two who are named', () => {
-    // 136 · 오세라 사망 · 차우진 사망 = 138. Two corrections meet in this
-    // number. The pack used to call this day 137 — the crowd axis standing in
-    // for the headline, which is what let the rescue day be called "the 0 run".
-    // And 차우진 rides inside u1's own 341, so the ladder now counts the OTHER
-    // 340 (137 → 136 on every branch where he does not get out); scored the old
-    // way he would be counted once by the crowd and once by name.
+  it('(o) the untouched day is the crowd plus the two people named by prose', () => {
     const nothing: PredicateState = {}
-    expect(totalOf(scoreUnits(SHIPPED, nothing))).toBe(136 + 1 + 1)
-    const summary = (SHIPPED as unknown as { baseline_summary: string }).baseline_summary
-    expect(summary).toContain('총 사망자 138명')
+    expect(totalOf(scoreUnits(ONE_PERSON, nothing))).toBe(10 + 1 + 1)
   })
 
-  it('(p) the crowd axis never counts 차우진 — his branch is his own', () => {
-    // The double count this closes, stated as a property rather than a number:
-    // a run where he walks out and a run where he dies differ in the HEADLINE
-    // by exactly one, and the crowd value they share is identical. It is shared
-    // because u1 reads neither `pallet_named`'s survival nor `indemnified` —
-    // it counts the other 340 either way.
-    const dies: PredicateState = { vent_panel_opened: true }
-    const lives: PredicateState = { vent_panel_opened: true, indemnified: true }
+  it('(p) the crowd axis never counts the named person — their branch is their own', () => {
+    const dies: PredicateState = { opened: true }
+    const lives: PredicateState = { opened: true, rescued: true }
     const crowd = (s: PredicateState): unknown =>
-      new Map(scoreUnits(SHIPPED, s).map((u) => [u.id, u.value])).get('u1')
+      new Map(scoreUnits(ONE_PERSON, s).map((u) => [u.id, u.value])).get('u1')
 
     expect(crowd(dies)).toBe(crowd(lives))
-    expect(totalOf(scoreUnits(SHIPPED, dies)) - totalOf(scoreUnits(SHIPPED, lives))).toBe(1)
+    expect(totalOf(scoreUnits(ONE_PERSON, dies)) - totalOf(scoreUnits(ONE_PERSON, lives))).toBe(1)
   })
 })
