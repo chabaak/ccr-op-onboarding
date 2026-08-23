@@ -2,9 +2,9 @@
   "$schema": "https://json-schema.org/draft/2020-12/schema",
   "$id": "incidentCover.schema.json",
   "title": "datapack incidentCover.json — 요원 파일 사건 표지 문안",
-  "description": "AGENT FILE 표지의 사건 개요 사실 문안과 현장 요원 임무 문안. 표지는 선택된 사건의 시각, 장소, 날씨, 신고 문장을 담으므로 meta.json과 분리된 팩별 문안 파일로 관리한다.",
+  "description": "AGENT FILE 표지의 사건 개요 사실 문안. 표지는 선택된 사건의 시각, 장소, 날씨, 신고 문장을 담으므로 meta.json과 분리된 팩별 문안 파일로 관리한다.",
   "type": "object",
-  "required": ["incident", "mission"],
+  "required": ["incident"],
   "additionalProperties": false,
   "properties": {
     "incident": {
@@ -20,11 +20,6 @@
           "description": "팩이 소유한 사건 개요 사실 두 줄. 표지의 포털 공통 파견 문장은 클라이언트가 덧붙인다."
         }
       }
-    },
-    "mission": {
-      "type": "string",
-      "minLength": 1,
-      "description": "현장 요원 임무 섹션의 한 줄 문안."
     }
   }
 }

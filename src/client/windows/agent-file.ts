@@ -112,7 +112,6 @@ const DOC_CAPTION = '문서번호 '
 
 const COVER_PENDING: AgentFileCoverCopy = {
   incident: '사건 개요를 불러오는 중입니다.',
-  mission: '현장 요원 임무를 불러오는 중입니다.',
 }
 
 const isRecord = (value: unknown): value is Record<string, unknown> =>
@@ -126,12 +125,8 @@ function readIncidentCover(raw: unknown): AgentFileCoverCopy {
   if (lines.length !== 2 || lines.some((line) => typeof line !== 'string' || line.length === 0)) {
     throw new Error("scenario pack: incidentCover.json 'incident.body' is not two non-empty lines")
   }
-  if (typeof raw.mission !== 'string' || raw.mission.length === 0) {
-    throw new Error("scenario pack: incidentCover.json 'mission' is not a non-empty string")
-  }
   return {
     incident: lines.join('\n'),
-    mission: raw.mission,
   }
 }
 
@@ -1537,10 +1532,10 @@ export function mount(host: HTMLElement, driver: FixtureDriver): void {
   //
   // x6 — the clock band left with 임무's old body (a posting order does not
   // print the shift's hours), so what the cover reads from the active pack now
-  // is the doc number and incident-cover sidecar. The reconstruction note and
-  // ECHO dispatch line stay global portal copy: they explain the replay frame
-  // and document series rather than an incident's venue, weather, clock, or
-  // cause.
+  // is the doc number and incident-cover facts. The reconstruction note, mission
+  // sentence and ECHO dispatch line stay global portal copy: they explain the
+  // replay frame, document series and standing objective rather than an
+  // incident's venue, weather, clock, or cause.
   void fetchScenarioInPlay()
     .then(async (identity) => {
       const nextCover = await fetchIncidentCover(identity.slug)

@@ -163,7 +163,6 @@ interface DossierSection {
 
 interface AgentFileCoverCopy {
   incident: string
-  mission: string
 }
 
 interface DossierModule {
@@ -209,11 +208,9 @@ const loadDeployButton = async (): Promise<DeployButtonModule> =>
 function incidentCover(slug = '멈춘회전문'): AgentFileCoverCopy {
   const raw = JSON.parse(read(path.join(REPO, 'data', 'scenario', slug, 'incidentCover.json'))) as {
     incident: { body: string[] }
-    mission: string
   }
   return {
     incident: raw.incident.body.join('\n'),
-    mission: raw.mission,
   }
 }
 
@@ -411,6 +408,7 @@ describe('[u4#c2] §3 기질 is sealed by construction', () => {
     const cover = coverModel(incidentCover())
 
     expect(JSON.stringify(raw), 'pack incident facts must not own the portal ECHO dispatch sentence').not.toContain('ECHO')
+    expect(raw, 'pack incident facts must not own the shared mission frame').not.toHaveProperty('mission')
 
     expect(cover[0]!.body).toBe(
       [

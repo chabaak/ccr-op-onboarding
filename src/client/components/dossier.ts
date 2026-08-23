@@ -121,8 +121,6 @@ export interface FiledInput {
 export interface AgentFileCoverCopy {
   /** 사건 개요's pack-authored fact lines, joined by `\n`. */
   incident: string
-  /** 현장 요원 임무's authored line. */
-  mission: string
 }
 
 /** A past page's 인수인계 사항 note — the sitting is over and nothing is operable. */
@@ -150,12 +148,11 @@ const FILED_NOTE = '파견 종료. 열람 전용'
  * line becomes its own element in `buildSection` below — see the comment there
  * for the reveal that depends on it.
  *
- * The incident facts and mission are selected-pack copy. They are passed in from
- * the window after it reads `data/scenario/<slug>/incidentCover.json`; keeping
- * them out of this module is what lets a pack switch move the cover with the
- * pack. The dispatch sentence that names the ECHO series stays here because the
- * pack carries no callsign and every pack would otherwise restate the same
- * portal invariant.
+ * The incident facts are selected-pack copy. They are passed in from the window
+ * after it reads `data/scenario/<slug>/incidentCover.json`; keeping them out of
+ * this module is what lets a pack switch move the cover with the pack. The
+ * mission sentence and the dispatch sentence that names the ECHO series stay
+ * here because every pack would otherwise restate the same portal invariant.
  */
 
 /**
@@ -176,6 +173,7 @@ const FILED_NOTE = '파견 종료. 열람 전용'
 const INCIDENT_NOTE = '※ 본 시뮬레이션은 당시 ECHO의 현장 무전 기록을 토대로 재구성되었습니다.'
 const CALLSIGN_SERIES = 'ECHO'
 const INCIDENT_DISPATCH = `긴급상황대응실 본부는 즉시 현장에 요원 ${CALLSIGN_SERIES}를 파견하여 상황 파악을 시작했다.`
+const MISSION = '파견된 현장 위기 대응실에서 긴급 상황의 정체를 파악하고, 인명 피해를 최소화한다.'
 
 /**
  * 현장 요원 교신 지침's standing orders (민서's own words, x5; x6 named 본부).
@@ -288,10 +286,10 @@ export type DossierSection = RowsSection | FixedSection | OperableSection | File
  * agent in the third person and the reader has to be handed the switch from
  * "this is what happened" to "this is what they were ordered".
  *
- * It takes the selected pack's cover copy. 임무 used to print the pack's clock
- * band; a posting order does not print the shift's hours, the topbar clock does
- * (`components/game-clock.ts`). What remains pack-fed here is authored incident
- * cover prose, not chrome state.
+ * It takes the selected pack's incident facts. 임무 used to print the pack's
+ * clock band; a posting order does not print the shift's hours, the topbar clock
+ * does (`components/game-clock.ts`). What remains pack-fed here is authored
+ * incident cover prose, not chrome state or shared mission frame.
  */
 export function coverModel(copy: AgentFileCoverCopy): DossierSection[] {
   const incident = `${copy.incident}\n${INCIDENT_DISPATCH}`
@@ -304,7 +302,7 @@ export function coverModel(copy: AgentFileCoverCopy): DossierSection[] {
     // the first. Nothing outside this window points here any more, so nothing
     // here needs a name. `handover` below is the one slug still earning its keep.
     { title: '사건 개요', state: 'fixed', body: incident, note: INCIDENT_NOTE },
-    { title: '현장 요원 임무', state: 'fixed', body: copy.mission },
+    { title: '현장 요원 임무', state: 'fixed', body: MISSION },
     { title: '현장 요원 교신 지침', state: 'fixed', body: COMMS_ORDERS },
   ]
 }
