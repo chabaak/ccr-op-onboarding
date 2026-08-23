@@ -234,7 +234,25 @@ describe('[#97] Call 2 repairs imperfect event_lines instead of dropping the bea
     ])
   })
 
-  it('(f) repaired narration keeps Call 3 fed without changing reporter scope', async () => {
+  it('(f) a non-object response body still falls back before the engine repairs content', async () => {
+    const events = await drain(
+      makeRig({
+        shaped: true,
+        transport: rawBodyTransport('narration', 'not an object'),
+      }),
+    )
+
+    expect(fallbacks(events).filter((event) => event.call === 2)).toEqual([
+      { type: 'fallback', call: 2, code: UNUSABLE_PAYLOAD_CODE, beat: 0 },
+      { type: 'fallback', call: 2, code: UNUSABLE_PAYLOAD_CODE, beat: 1 },
+    ])
+    expect(authoredFeed(events)).toEqual([
+      { id: 't1', text: '남측 관측소가 신호를 놓쳤다.' },
+      { id: 't2', text: '실장이 회선을 열었다.' },
+    ])
+  })
+
+  it('(g) repaired narration keeps Call 3 fed without changing reporter scope', async () => {
     const events = await drain(
       makeRig({
         shaped: true,
