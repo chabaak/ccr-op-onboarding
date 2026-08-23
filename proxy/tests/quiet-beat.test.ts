@@ -1,3 +1,6 @@
+import { readFileSync } from "node:fs";
+import { dirname, join } from "node:path";
+import { fileURLToPath } from "node:url";
 import { describe, expect, it } from "vitest";
 
 import { CALL_SPECS } from "../src/calls.js";
@@ -30,6 +33,17 @@ import { renderCall } from "../src/prompt.js";
  * the permission only makes the invention informed.
  */
 
+const REPO = join(dirname(fileURLToPath(import.meta.url)), "..", "..");
+
+type Timeline = {
+  events: { id: string; text: string }[];
+};
+
+const shippedTimeline = JSON.parse(
+  readFileSync(join(REPO, "data", "scenario", "멈춘회전문", "timeline.json"), "utf8"),
+) as Timeline;
+const shippedFirstBeat = shippedTimeline.events[0]!;
+
 const quietSlots = {
   TIMELINE_TAIL: ["19:26 재시도 끝에 전화가 재연결되었다."],
   AGENT_UTTERANCE: "",
@@ -39,6 +53,14 @@ const quietSlots = {
 };
 
 const loudSlots = { ...quietSlots, FIXED_NPC_ACTION: "t1: 천장 가운데가 내려오고 있다." };
+const reactionSlots = { ...loudSlots, SCENE_SYMPTOMS: ["천장 균열이 길어졌다."] };
+const shippedFirstBeatSlots = {
+  TIMELINE_TAIL: [],
+  AGENT_UTTERANCE: "",
+  FIXED_NPC_ACTION: `${shippedFirstBeat.id}: ${shippedFirstBeat.text}`,
+  SCENE_SYMPTOMS: ["(변화 없음)"],
+  PRESENT_NPCS: [],
+};
 
 const narration = CALL_SPECS.narration;
 
@@ -80,7 +102,23 @@ describe("a quiet beat is sayable, and answerable with nothing", () => {
     expect(narration.validate({ event_lines: [], timeline_entries: [], npc_lines: [] }, quietSlots)).toEqual([]);
   });
 
-  it("still refuses an empty timeline where something DID happen", () => {
+  it("accepts the shipped first beat with an event and nothing to react to", () => {
+    expect(userMessage(shippedFirstBeatSlots)).toContain(shippedFirstBeat.text);
+    expect(descriptionOf(shippedFirstBeatSlots)).toContain("빈 배열이 정답이다");
+    expect(descriptionOf(shippedFirstBeatSlots)).not.toContain("2~3개");
+    expect(
+      narration.validate(
+        {
+          event_lines: [{ id: shippedFirstBeat.id, text: shippedFirstBeat.text }],
+          timeline_entries: [],
+          npc_lines: [],
+        },
+        shippedFirstBeatSlots,
+      ),
+    ).toEqual([]);
+  });
+
+  it("still refuses an empty timeline where there is something to react to", () => {
     expect(
       narration.validate(
         {
@@ -88,7 +126,7 @@ describe("a quiet beat is sayable, and answerable with nothing", () => {
           timeline_entries: [],
           npc_lines: [],
         },
-        loudSlots,
+        reactionSlots,
       ),
     ).toContain("timeline_entries empty");
   });
@@ -112,14 +150,16 @@ describe("a quiet beat is sayable, and answerable with nothing", () => {
   it("tells the model the empty array is the answer, not merely legal", () => {
     expect(descriptionOf(quietSlots)).toContain("빈 배열이 정답이다");
     expect(descriptionOf(quietSlots)).not.toContain("2~3개");
-    expect(descriptionOf(loudSlots)).toContain("2~3개");
+    expect(descriptionOf(loudSlots)).toContain("빈 배열이 정답이다");
+    expect(descriptionOf(loudSlots)).not.toContain("2~3개");
+    expect(descriptionOf(reactionSlots)).toContain("2~3개");
   });
 
   it("asks the same question in both places — the schema cannot permit what the validator refuses", () => {
     // The failure this guards is silent and expensive: a schema that allows an
     // empty array while the validator rejects it turns an obedient model into a
-    // fallback on every quiet beat. Both read `quietBeat`; this holds them to
-    // agreeing on the boundary cases a single predicate makes identical.
+    // fallback on every quiet beat. Both read the no-event predicate; this holds
+    // them to agreeing on the boundary cases a single predicate makes identical.
     for (const value of ["", "   ", undefined, null]) {
       const slots = { ...quietSlots, FIXED_NPC_ACTION: value };
       expect(descriptionOf(slots), `FIXED_NPC_ACTION=${String(value)}`).toContain("빈 배열이 정답이다");

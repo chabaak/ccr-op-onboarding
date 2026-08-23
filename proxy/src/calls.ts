@@ -61,7 +61,7 @@ const isFilled = (v: unknown): boolean =>
   typeof v === "string" && v.trim().length > 0;
 
 /**
- * Nothing authored happened in this beat on this run.
+ * No fixed event is visible in this beat on this run.
  *
  * `buildTool` and `validate` both ask it, and they must get the same answer or
  * the schema would permit a shape the validator then refuses — a fallback for a
@@ -71,8 +71,22 @@ const isFilled = (v: unknown): boolean =>
  * is usable, and answers false for a non-string. This asks whether the beat is
  * quiet, and a missing slot is quiet in exactly the same way an empty one is.
  */
-const quietBeat = (slots: Record<string, unknown>): boolean =>
+const noEventBeat = (slots: Record<string, unknown>): boolean =>
   String(slots.FIXED_NPC_ACTION ?? "").trim().length === 0;
+
+const NO_CHANGE_SYMPTOM = "(변화 없음)";
+
+const hasReactionAnchor = (slots: Record<string, unknown>): boolean => {
+  const roster = idsOf(slots.PRESENT_NPCS);
+  if (roster.length > 0) return true;
+  const symptoms = Array.isArray(slots.SCENE_SYMPTOMS) ? slots.SCENE_SYMPTOMS : [];
+  return symptoms.some(
+    (symptom) => typeof symptom === "string" && symptom.trim() !== "" && symptom.trim() !== NO_CHANGE_SYMPTOM,
+  );
+};
+
+const noReactionBeat = (slots: Record<string, unknown>): boolean =>
+  !hasReactionAnchor(slots);
 
 const fixedEventIds = (slots: Record<string, unknown>): string[] =>
   String(slots.FIXED_NPC_ACTION ?? "")
@@ -188,20 +202,8 @@ const narration: CallSpec = {
     // satisfy it would be to invent presence, which also licenses the model to
     // have someone speak in an empty room.
     const roster = idsOf(slots.PRESENT_NPCS);
-    // A QUIET beat: nothing authored happened in this minute on this run. The
-    // renderer says so out loud (`prompt.ts`'s FIXED_NPC_ACTION sentinel), and
-    // this is the other half — without it the sentinel only makes the invention
-    // informed. `2~3개` plus a validator that refuses an empty array is a
-    // CONTRACT TO WRITE, so a beat with no anchor left the model two sentences
-    // to produce and only the previous beats to produce them from; what came
-    // back rode `feed.ts:40` onto the paper as `kind: 'event'`, the same mark
-    // and the same face as a row the author wrote. On these beats the invented
-    // line is not beside the record — it IS the record, because the beat's only
-    // other line is a symptom and the fanfold stopped printing those (x8).
-    //
-    // So silence becomes sayable. The base prompt has told the model since v0.4
-    // that "비어 있다고 채우지 않는다"; until now the schema contradicted it.
-    const quiet = quietBeat(slots);
+    const noEvent = noEventBeat(slots);
+    const noReaction = noReactionBeat(slots);
     const eventIds = fixedEventIds(slots);
     return {
       name: "narration",
@@ -232,8 +234,10 @@ const narration: CallSpec = {
           timeline_entries: {
             type: "array",
             items: { type: "string" },
-            description: quiet
+            description: noEvent
               ? "이번 비트에는 기록된 사건이 없다. 앞 비트를 이어 붙여 채우지 않는다 — 쓸 것이 없으면 빈 배열이 정답이다. 그래도 쓸 것이 있다면(장면의 변화가 무언가를 말하고 있다면) 한 항목은 한 문장이고, 현장에서 남기는 짧은 기록이라 해라체로 끝맺는다."
+              : noReaction
+                ? "고정 사건은 event_lines에만 적는다. 이 비트에는 반응할 인물도 장면 변화도 없으므로 timeline_entries는 빈 배열이 정답이다."
               : "고정 사건에 뒤따르는 반응과 장면의 결. 2~3개. 한 항목은 한 문장이다 — 마침표는 항목의 맨 끝에 하나뿐이고, 항목 안에서 두 문장을 잇지 않는다. 이미 타임라인에 있는 것(고정 사건·요원 발화)은 다시 쓰지 않는다. 현장에서 남기는 짧은 기록이다 — 해라체로 끝맺는다.",
           },
           // `maxItems: 1` is the ONE mechanical half of the misattribution fix
@@ -265,14 +269,14 @@ const narration: CallSpec = {
     // `event_lines` content is repaired where the authored beat events are in
     // hand. Here the hard boundary is shape only: an array can be reconciled,
     // but a non-array cannot even be iterated safely.
-    const quiet = quietBeat(slots);
+    const noReaction = noReactionBeat(slots);
     if (!Array.isArray(value.event_lines)) {
       problems.push("event_lines not an array");
     }
 
     if (!Array.isArray(value.timeline_entries)) {
       problems.push("timeline_entries not an array");
-    } else if (!value.timeline_entries.length && !quiet) {
+    } else if (!value.timeline_entries.length && !noReaction) {
       problems.push("timeline_entries empty");
     } else if (value.timeline_entries.some((e) => !isFilled(e))) {
       problems.push("timeline_entries has an empty entry");
