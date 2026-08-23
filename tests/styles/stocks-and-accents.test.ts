@@ -1,149 +1,132 @@
-// [u1#c2] spec-client §8 porting rule — the stock, accent and face token set is
-// owned by `tokens.css`.
+// [u1#c2] spec-client §8 porting rule + design-system surface contract.
 //
-// The five paper stocks (kraft · fanfold · bond · ledger) + card stock, the two
-// accents only (graphite ink + 관인-red `--seal`) and the three-face type system
-// must stay under the same custom-property names, or under a documented rename
-// map.
-import { describe, it, expect } from 'vitest'
+// This test used to preserve five literal paper stocks. That concept is gone:
+// the terminal has one shared window surface, and style-as-data still requires
+// every surface, text tier, rule and accent to be declared in `tokens.css`.
+import { describe, expect, it } from 'vitest'
 import path from 'node:path'
-import {
-  STYLES_DIR,
-  TOKENS_CSS,
-  customProps,
-  read,
-  ruleBodies,
-} from './css-utils.ts'
+import { STYLES_DIR, TOKENS_CSS, customProps, read, ruleBodies } from './css-utils.ts'
 
 const tokens = customProps(read(TOKENS_CSS))
-const tokensRaw = read(TOKENS_CSS)
-const renameDoc = tokensRaw + '\n' + read(path.join(STYLES_DIR, 'RENAME-MAP.md'))
-
-/** `--old -> --new` / `--old → --new` lines in tokens.css comments or RENAME-MAP.md. */
-function renameMap(): Map<string, string> {
-  const out = new Map<string, string>()
-  for (const m of renameDoc.matchAll(/(--[\w-]+)\s*(?:->|→|=>)\s*(--[\w-]+)/g)) {
-    out.set(m[1]!, m[2]!)
-  }
-  return out
-}
-
-/** The token name in tokens.css that carries `ownedName`, or null. */
-function resolve(ownedName: string): string | null {
-  if (tokens.has(ownedName)) return ownedName
-  const mapped = renameMap().get(ownedName)
-  return mapped && tokens.has(mapped) ? mapped : null
-}
-
-function valueOf(ownedName: string): string | null {
-  const name = resolve(ownedName)
-  return name === null ? null : (tokens.get(name) ?? null)
-}
-
 const norm = (v: string): string => v.toLowerCase().replace(/\s+/g, '')
 const unquote = (v: string): string => v.replace(/['"]/g, '').toLowerCase()
 
-const OWNED_TOKEN_VALUES = new Map<string, string>([
-  ['--kraft', '#d9cdb4'],
-  ['--kraft-2', '#cbbd9f'],
-  ['--fanfold', '#e4e6dd'],
-  ['--fanfold-bar', '#cfdcc9'],
-  ['--bond', '#f2efe6'],
-  ['--bond-2', '#e6e2d5'],
-  ['--ledger', '#efe9dc'],
-  ['--card', '#e9e3d3'],
-  ['--graphite', '#242a30'],
-  ['--graphite-2', '#3c444d'],
-  ['--seal', '#b2242c'],
-  ['--seal-2', '#8d1a20'],
-  ['--seal-wash', 'rgba(178,36,44,.10)'],
-  ['--thread', '#a8272f'],
-])
+const SURFACE_TOKENS = [
+  '--surface',
+  '--surface-inset',
+  '--surface-border',
+  '--surface-rule',
+]
 
-const STOCK_TOKENS = ['--kraft', '--kraft-2', '--fanfold', '--fanfold-bar', '--bond', '--bond-2', '--ledger', '--card']
-const ACCENT_TOKENS = ['--graphite', '--graphite-2', '--seal', '--seal-2', '--seal-wash', '--thread']
-/**
- * `--kmono` is no longer a token of its own (x5, 08-08). It is still listed
- * here on purpose: `resolve()` follows the `--kmono -> --mono` line in
- * tokens.css, so every assertion below still has to find a real face with a
- * real stack behind the old name.
- */
-const FACE_TOKENS = ['--mono', '--kmono', '--myeong']
+const SURFACE_TEXT_TOKENS = [
+  '--surface-text',
+  '--surface-text-strong',
+  '--surface-muted',
+  '--surface-muted-2',
+  '--surface-text-max',
+  '--surface-text-heading',
+  '--surface-text-1',
+  '--surface-text-2',
+  '--surface-text-3',
+  '--surface-text-4',
+  '--surface-text-5',
+]
 
-describe('[u1#c2] the owned paper stocks survive re-tokenization', () => {
-  it.each(STOCK_TOKENS)('(a) %s is declared in tokens.css (or rename-mapped)', (name) => {
-    expect(resolve(name)).not.toBeNull()
+const ACCENT_TOKENS = [
+  '--signal',
+  '--warning',
+  '--warning-strong',
+  '--warning-wash',
+  '--evidence-thread',
+]
+
+const OLD_STOCK_TOKENS = [
+  '--kraft',
+  '--kraft-2',
+  '--fanfold',
+  '--fanfold-bar',
+  '--bond',
+  '--bond-2',
+  '--ledger',
+  '--card',
+]
+
+const OLD_STOCK_CLASSES = ['kraft', 'fanfold', 'bond', 'ledger', 'card-stock']
+const FACE_TOKENS = ['--mono', '--myeong']
+
+function valueOf(name: string): string {
+  return tokens.get(name) ?? ''
+}
+
+function declared(names: readonly string[]): string[] {
+  return names.filter((name) => !tokens.has(name))
+}
+
+describe('[issue #107] shared surface tokens replace paper stocks', () => {
+  it('(a) the new surface, rule, text and accent tokens are declared', () => {
+    expect(declared([...SURFACE_TOKENS, ...SURFACE_TEXT_TOKENS, ...ACCENT_TOKENS])).toEqual([])
   })
 
-  it('(b) each stock keeps its owned value', () => {
-    const drift = STOCK_TOKENS.filter((n) => norm(valueOf(n) ?? '') !== norm(OWNED_TOKEN_VALUES.get(n) ?? ''))
-    expect(drift).toEqual([])
+  it('(b) retired paper stock tokens are not declared', () => {
+    expect(OLD_STOCK_TOKENS.filter((name) => tokens.has(name))).toEqual([])
   })
 
-  it('(c) paper.css defines a rule per stock class', () => {
+  it('(c) paper.css owns one shared surface class and no stock classes', () => {
     const css = read(path.join(STYLES_DIR, 'paper.css'))
-    const missing = ['kraft', 'fanfold', 'bond', 'ledger', 'card-stock'].filter(
-      (cls) => ruleBodies(css, new RegExp(`\\.${cls}(?![\\w-])`)).length === 0,
+    expect(ruleBodies(css, /\.surface(?![\w-])/).length).toBeGreaterThan(0)
+    const surviving = OLD_STOCK_CLASSES.filter(
+      (cls) => ruleBodies(css, new RegExp(`\\.${cls}(?![\\w-])`)).length > 0,
     )
-    expect(missing).toEqual([])
+    expect(surviving).toEqual([])
   })
 
-  it('(d) each stock class paints with its own stock token, not a literal', () => {
+  it('(d) the shared surface class paints only through the surface token family', () => {
     const css = read(path.join(STYLES_DIR, 'paper.css'))
-    const pairs: [string, string][] = [
-      ['kraft', '--kraft'],
-      ['fanfold', '--fanfold'],
-      ['bond', '--bond'],
-      ['ledger', '--ledger'],
-      ['card-stock', '--card'],
-    ]
-    const offenders = pairs
-      .filter(([cls, token]) => {
-        const body = ruleBodies(css, new RegExp(`\\.${cls}(?![\\w-])`)).join(';')
-        const name = resolve(token) ?? token
-        return !body.includes(`var(${name}`)
-      })
-      .map(([cls, token]) => `.${cls} does not use var(${token})`)
-    expect(offenders).toEqual([])
+    const body = ruleBodies(css, /\.surface(?![\w-])/).join(';')
+    expect(body).toContain('background:var(--surface)')
+    expect(body).toContain('color:var(--surface-text)')
+  })
+
+  it('(e) the window registry no longer carries a stock field or stock values', () => {
+    const src = read(path.join(path.dirname(STYLES_DIR), 'shell/window-registry.ts'))
+    expect(src).not.toMatch(/\bstock\b/)
+    expect(src).not.toMatch(/\b(kraft|fanfold|bond|ledger|card-stock)\b/)
+  })
+
+  it('(f) the window frame always installs the shared surface class', () => {
+    const src = read(path.join(path.dirname(STYLES_DIR), 'components/window-frame.ts'))
+    expect(src).toContain("'win-body surface'")
+    expect(src).not.toMatch(/def\.stock/)
   })
 })
 
-describe('[u1#c2] two accents only — graphite ink + 관인-red', () => {
-  it.each(ACCENT_TOKENS)('(a) %s is declared in tokens.css (or rename-mapped)', (name) => {
-    expect(resolve(name)).not.toBeNull()
+describe('[issue #107] accents are named for terminal roles, not paper marks', () => {
+  it('(a) signal and warning are separate token slots', () => {
+    expect(tokens.has('--signal')).toBe(true)
+    expect(tokens.has('--warning')).toBe(true)
+    expect(norm(valueOf('--signal'))).not.toBe(norm(valueOf('--warning')))
   })
 
-  it('(b) the accent tokens keep their owned values', () => {
-    const drift = ACCENT_TOKENS.filter((n) => norm(valueOf(n) ?? '') !== norm(OWNED_TOKEN_VALUES.get(n) ?? ''))
-    expect(drift).toEqual([])
+  it('(b) warning and evidence-thread colours remain tokenized', () => {
+    for (const name of ['--warning', '--warning-strong', '--warning-wash', '--evidence-thread']) {
+      expect(valueOf(name), `${name} is empty`).not.toBe('')
+    }
   })
 })
 
-describe('[u1#c2] the three-face type system survives', () => {
-  it.each(FACE_TOKENS)('(a) %s is declared in tokens.css (or rename-mapped)', (name) => {
-    expect(resolve(name)).not.toBeNull()
+describe('[u1#c2] the two-face type system survives', () => {
+  it.each(FACE_TOKENS)('(a) %s is declared in tokens.css', (name) => {
+    expect(tokens.has(name)).toBe(true)
   })
 
   it('(b) each face token keeps its family stack', () => {
-    expect(unquote(valueOf('--mono') ?? '')).toContain('ibm plex mono')
-    expect(unquote(valueOf('--kmono') ?? '')).toContain('nanum gothic coding')
-    expect(unquote(valueOf('--myeong') ?? '')).toContain('nanum myeongjo')
+    expect(unquote(valueOf('--mono'))).toContain('ibm plex mono')
+    expect(unquote(valueOf('--mono'))).toContain('nanum gothic coding')
+    expect(unquote(valueOf('--myeong'))).toContain('nanum myeongjo')
   })
 
   it('(c) each face token ends in a generic fallback family', () => {
-    const bad = FACE_TOKENS.filter((n) => !/(monospace|serif|sans-serif)\s*$/.test(valueOf(n) ?? ''))
+    const bad = FACE_TOKENS.filter((name) => !/(monospace|serif|sans-serif)\s*$/.test(valueOf(name)))
     expect(bad).toEqual([])
-  })
-})
-
-describe('[u1#c2] nothing from the owned token set is dropped', () => {
-  it('(a) every owned stock/accent token is present or rename-mapped', () => {
-    const dropped = [...OWNED_TOKEN_VALUES.keys()].filter((n) => resolve(n) === null)
-    expect(dropped).toEqual([])
-  })
-
-  it('(b) every rename-map entry points at a token that actually exists', () => {
-    const dangling = [...renameMap()].filter(([, to]) => !tokens.has(to)).map(([from, to]) => `${from} -> ${to}`)
-    expect(dangling).toEqual([])
   })
 })

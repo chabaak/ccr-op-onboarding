@@ -1293,7 +1293,7 @@ export function mount(host: HTMLElement, driver: FixtureDriver): void {
    * seam's own `meta` arrives moments later and `callsignOf(run)` takes over
    * with the identical string, which is why the row does not flicker across it.
    *
-   * The row is already red — `.rd-code` is `--seal-2` on every page — so the
+   * The row is already red — `.rd-code` is `--warning-strong` on every page — so the
    * red the operator sees is the callsign's own ink arriving, not a highlight.
    */
   function typeCallsign(onDone: () => void): void {

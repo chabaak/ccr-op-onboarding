@@ -24,7 +24,7 @@
 .bp .cable2{stroke-width:.5;transform:translateY(5px);opacity:.55}
 .bp .hang path{stroke-width:.5;opacity:.75}
 .bp .dim{stroke-width:.5;stroke-dasharray:2 3;opacity:.6}
-.bp .mark{fill:none;stroke:var(--seal);stroke-width:1.2;opacity:.75;
+.bp .mark{fill:none;stroke:var(--warning);stroke-width:1.2;opacity:.75;
   animation:pulseMark 4.5s ease-in-out infinite}
 @keyframes pulseMark{0%,100%{opacity:.25;r:22}50%{opacity:.9;r:30}}
 /* x10 (민서, 08-10) — `.bplabel` and `.bplabel.warn` are GONE, not commented
@@ -35,7 +35,7 @@
    vendored design file (`docs/design/phase2-ui/desktop.css:76-77`), which is
    the port SOURCE and stays as it is. A rule that paints a surface the markup
    no longer has is a claim that the surface exists, so it does not get to
-   stay behind "just in case" — `.bplabel.warn` was also the only `--seal`
+   stay behind "just in case" — `.bplabel.warn` was also the only `--warning`
    consumer in the wallpaper, and losing it is the point: the wallpaper is
    dressing and the red is the case's. Both are recoverable from git. */
 #horizon{position:absolute;left:0;right:0;bottom:0;height:34vh;
@@ -65,7 +65,7 @@
    the tab order entirely. */
 .skip-link{position:fixed;left:var(--space-8);top:var(--space-8);z-index:960;
   padding:var(--space-8) var(--space-14);
-  background:var(--chrome-hi);border:1px solid var(--seal);color:var(--txt-hi);
+  background:var(--chrome-hi);border:1px solid var(--warning);color:var(--txt-hi);
   font-size:var(--fs-9-5);letter-spacing:.16em;text-decoration:none;
   transform:translateY(-400%)}
 .skip-link:focus{transform:none}
@@ -92,7 +92,7 @@
   animation:barDrop .8s cubic-bezier(.2,.9,.2,1) both}
 @keyframes barDrop{from{transform:translateY(-100%)}to{transform:none}}
 #topbar::after{content:'';position:absolute;left:0;right:0;bottom:-1px;height:1px;
-  background:linear-gradient(90deg,transparent,var(--seal) 12%,var(--seal) 88%,transparent);
+  background:linear-gradient(90deg,transparent,var(--warning) 12%,var(--warning) 88%,transparent);
   opacity:.55}
 
 .tb-row{display:flex;align-items:stretch}
@@ -100,14 +100,14 @@
 
 .tb-identity{display:flex;align-items:center;gap:var(--space-12);min-width:0;overflow:hidden;flex:1 1 auto}
 .seal-emblem svg{width:39px;height:39px;display:block}
-.seal-emblem circle{fill:none;stroke:var(--seal);stroke-width:1.2;opacity:.85}
-.seal-emblem text{fill:var(--seal);font-weight:700;font-size:var(--fs-13);line-height:1;
+.seal-emblem circle{fill:none;stroke:var(--warning);stroke-width:1.2;opacity:.85}
+.seal-emblem text{fill:var(--warning);font-weight:700;font-size:var(--fs-13);line-height:1;
   font-family:var(--myeong);opacity:.9}
 .tb-portal{display:flex;flex-direction:column;line-height:1.15}
 .tb-portal b{font-family:var(--myeong);font-weight:800;font-size:var(--fs-13);
   color:var(--txt-hi);letter-spacing:.02em}
 .tb-portal i{font-style:normal;font-size:var(--fs-9);letter-spacing:.22em;
-  color:var(--seal);font-weight:600}
+  color:var(--warning);font-weight:600}
 .tb-sep{width:1px;background:var(--ink-line);margin:var(--space-8) var(--space-2)}
 .tb-op,.tb-case{display:flex;flex-direction:column;line-height:1.3;gap:var(--space-1)}
 .tb-op em,.tb-case em{font-style:normal;font-size:var(--fs-8);letter-spacing:.24em;color:var(--txt-6)}
@@ -165,15 +165,15 @@
    one, and the same face every Korean surface on this desk renders in. No
    font-family declared here on purpose: naming one would be a fourth answer to a
    question `tokens.css` has already answered twice. */
-.dd-value{font-size:var(--fs-15);font-weight:700;letter-spacing:.09em;color:var(--seal);
+.dd-value{font-size:var(--fs-15);font-weight:700;letter-spacing:.09em;color:var(--warning);
   line-height:1.25;font-variant-numeric:tabular-nums}
 .dd-value.bump{animation:ddBump .6s cubic-bezier(.3,1.6,.4,1)}
 @keyframes ddBump{0%{transform:scale(1.5);color:var(--txt-max)}100%{}}
 .dd-runs{font-size:var(--fs-8-5);color:var(--txt-4);letter-spacing:.1em;line-height:1.3}
 .dd-pips{display:flex;gap:var(--space-2);justify-content:flex-end;margin-top:var(--space-2)}
 .dd-pips i{width:9px;height:5px;background:var(--ink-line);display:block}
-.dd-pips i.spent{background:var(--seal-2);opacity:.55}
-.dd-pips i.now{background:var(--seal);box-shadow:0 0 6px var(--seal)}
+.dd-pips i.spent{background:var(--warning-strong);opacity:.55}
+.dd-pips i.now{background:var(--warning);box-shadow:0 0 6px var(--warning)}
 
 /* taskbar */
 .tb-row-2{height:44px;padding:0 var(--space-10);gap:var(--space-5);align-items:center;
@@ -185,19 +185,19 @@
 .task:hover{color:var(--txt-2);border-color:var(--line-1);background:var(--chrome-raise-2)}
 .task b{font-weight:500}
 .task.open{color:var(--txt-hi);background:var(--chrome-open);border-color:var(--line-2)}
-.task.open::before{content:'';position:absolute;left:-1px;top:-1px;bottom:-1px;width:2px;background:var(--seal)}
+.task.open::before{content:'';position:absolute;left:-1px;top:-1px;bottom:-1px;width:2px;background:var(--warning)}
 .task.focused{background:var(--chrome-focus);border-color:var(--line-3)}
 .task.alert{animation:taskAlert 1s ease-in-out infinite}
-@keyframes taskAlert{0%,100%{border-color:var(--seal);color:var(--alert-txt)}
+@keyframes taskAlert{0%,100%{border-color:var(--warning);color:var(--alert-txt)}
   50%{border-color:var(--alert-line);color:var(--alert-dim)}}
 .task[disabled]{opacity:.35;cursor:not-allowed}
 .abort-mission{display:flex;align-items:center;height:32px;
   padding:0 var(--space-10);
-  border:1px solid var(--seal-2);background:var(--chrome-raise);color:var(--seal);
+  border:1px solid var(--warning-strong);background:var(--chrome-raise);color:var(--warning);
   font-size:var(--fs-9-5);font-weight:700;letter-spacing:.14em;transition:.15s}
 .abort-mission:hover,.abort-mission:focus-visible{
-  color:var(--txt-max);border-color:var(--seal);background:var(--chrome-focus)}
-.abort-mission:focus-visible{outline:1px solid var(--seal);outline-offset:2px}
+  color:var(--txt-max);border-color:var(--warning);background:var(--chrome-focus)}
+.abort-mission:focus-visible{outline:1px solid var(--warning);outline-offset:2px}
 .abort-mission[disabled]{opacity:.4;cursor:wait}
 .tb-hint{margin-left:auto;font-size:var(--fs-8-5);letter-spacing:.16em;color:var(--txt-8);
   padding-right:var(--space-4)}
@@ -214,7 +214,7 @@
   border:1px solid transparent;background:transparent;transition:.14s}
 .scenario-file:hover,.scenario-file:focus-visible{color:var(--txt-hi);
   border-color:var(--line-2);background:var(--chrome-raise)}
-.scenario-file:focus-visible{outline:1px solid var(--seal);outline-offset:2px}
+.scenario-file:focus-visible{outline:1px solid var(--warning);outline-offset:2px}
 .scenario-file[disabled]{opacity:.45;cursor:wait}
 .scenario-file-icon{width:50px;height:60px;display:flex;align-items:flex-end;justify-content:center;
   padding-bottom:var(--space-7);font-size:var(--fs-7-5);letter-spacing:.12em;color:var(--txt-7);
@@ -228,9 +228,9 @@
 body.booting .scenario-file{visibility:hidden}
 /* red string is laid ON TOP of the documents — corkboard, not wallpaper */
 #threads{position:fixed;inset:0;z-index:460;pointer-events:none}
-#threads path{fill:none;stroke:var(--thread);stroke-width:1.1;opacity:.6;
-  stroke-dasharray:3 3;filter:drop-shadow(0 0 3px var(--thread-a55))}
-#threads circle{fill:var(--thread);filter:drop-shadow(0 0 4px var(--thread-a8))}
+#threads path{fill:none;stroke:var(--evidence-thread);stroke-width:1.1;opacity:.6;
+  stroke-dasharray:3 3;filter:drop-shadow(0 0 3px var(--evidence-thread-a55))}
+#threads circle{fill:var(--evidence-thread);filter:drop-shadow(0 0 4px var(--evidence-thread-a8))}
 
 /* ═══ WINDOW SHELL ════════════════════════════════════════════════════════ */
 .win{position:fixed;left:var(--x);top:var(--y);width:var(--w);height:var(--h);
@@ -281,13 +281,13 @@ body.booting .win{visibility:hidden}
   background:linear-gradient(to bottom,var(--bar-hi),var(--chrome-hi));
   border-bottom:1px solid var(--edge);cursor:grab;flex:0 0 auto;position:relative}
 .win-bar::after{content:'';position:absolute;left:0;right:0;bottom:0;height:1px;
-  background:linear-gradient(90deg,var(--seal),transparent 60%);opacity:.5}
+  background:linear-gradient(90deg,var(--warning),transparent 60%);opacity:.5}
 .win.focused .win-bar{background:linear-gradient(to bottom,var(--bar-hi-on),var(--chrome-raise-2))}
 .win.focused .win-bar::after{opacity:1}
 .win-dot{width:9px;height:9px;background:var(--dot);flex:0 0 auto}
-.win.focused .win-dot{background:var(--seal);box-shadow:0 0 8px var(--seal)}
-.win-dot.live{background:var(--seal);animation:livePulse 1.4s ease-in-out infinite}
-@keyframes livePulse{0%,100%{opacity:.35;box-shadow:none}50%{opacity:1;box-shadow:0 0 9px var(--seal)}}
+.win.focused .win-dot{background:var(--warning);box-shadow:0 0 8px var(--warning)}
+.win-dot.live{background:var(--warning);animation:livePulse 1.4s ease-in-out infinite}
+@keyframes livePulse{0%,100%{opacity:.35;box-shadow:none}50%{opacity:1;box-shadow:0 0 9px var(--warning)}}
 /* x1 — `white-space:nowrap` on the title. At 1.5× the two right-column
    windows are 383 px wide and `AGENT FILE` broke over two lines, which doubled
    the bar's height and pushed the body down behind it.
@@ -299,7 +299,7 @@ body.booting .win{visibility:hidden}
 .win-ctl{margin-left:auto;display:flex;gap:var(--space-1)}
 .wc{width:36px;height:30px;font-size:var(--fs-11);line-height:1;color:var(--txt-5);transition:.12s}
 .wc:hover{background:var(--ctl-hover);color:var(--txt-hi)}
-.wc-close:hover{background:var(--seal-2);color:var(--txt-max)}
+.wc-close:hover{background:var(--warning-strong);color:var(--txt-max)}
 
 .win-body{flex:1;min-height:0;position:relative;overflow:hidden}
 .win-grip{position:absolute;right:0;bottom:0;width:24px;height:24px;cursor:nwse-resize;z-index:5}

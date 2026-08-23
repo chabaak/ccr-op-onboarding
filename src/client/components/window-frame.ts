@@ -73,10 +73,9 @@ export function buildWindowFrame(def: WindowDef): WindowFrame {
   ctl.append(collapse, close)
   bar.append(dot, title, ctl)
 
-  // The stock is the frame's, not the contents': u1 shipped `paper.css` for it
-  // and the reference prints it in the markup (`<div class="win-body paper
-  // kraft">`). The body stays EMPTY here — u4 · u4s · u5 · u6 · u7 fill it.
-  const body = el('div', `win-body ${def.stock}`)
+  // Every window body shares the terminal surface. The body stays EMPTY here —
+  // u4 · u4s · u5 · u6 · u7 fill it.
+  const body = el('div', 'win-body surface')
 
   // A REAL, NAMED BUTTON — not the `aria-hidden` div it used to be, which
   // assistive tech could not even discover. It stays OUT of the tab order

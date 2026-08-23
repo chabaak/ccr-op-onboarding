@@ -377,13 +377,13 @@ describe('[u7#c4] digits are score only', () => {
   // x4 — RE-POINTED, not weakened. The claim is unchanged: every selector u7
   // paints a digit into must be one inv 2 excuses BY NAME, so a digit that
   // escapes into an NPC line still fails. What changed is the vocabulary — the
-  // ledger's `.tly-table` / `.th-v` / `.tr-v` went with its sheet skin and the
+  // tally table's `.tly-table` / `.th-v` / `.tr-v` went with its sheet skin and the
   // day's numbers are painted into `.tly-line` / `#tlyBig` now. Both halves move
   // together or the cross-check goes vacuous, which is what the second loop is.
   it('(d) u7 paints digits only into selectors the inv-2 scan excludes by name', () => {
     const invariant = read(path.join(REPO, 'tests/invariants/no-digit-npc.test.ts'))
     expect(invariant.length, 'the inv-2 suite is missing — the cross-check is vacuous').toBeGreaterThan(0)
-    for (const selector of ['.ledger', '.tly-lines', '.tly-line']) {
+    for (const selector of ['.tly-lines', '.tly-line']) {
       expect(invariant, `${selector} is not on the inv-2 excluded list`).toContain(selector)
     }
     const painted = scannedSources().map((s) => s.text).join('\n')

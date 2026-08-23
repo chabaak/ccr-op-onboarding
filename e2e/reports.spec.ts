@@ -298,11 +298,11 @@ test.describe('report renders once after the last beat', () => {
     await expect(page.locator(OPTION)).toHaveCount(before.rail)
   })
 
-  test('report renders once after the last beat — two documents side by side on white bond', async ({
+  test('report renders once after the last beat — two documents side by side on the shared surface', async ({
     page,
   }) => {
     await drain(page)
-    await expect(page.locator(`${REP} .win-body.paper.bond`)).toHaveCount(1)
+    await expect(page.locator(`${REP} .win-body.surface`)).toHaveCount(1)
     await expect(page.locator(`${REP} .rep-grid > .doc.doc-facts`)).toHaveCount(1)
     await expect(page.locator(`${REP} .rep-grid > .doc.doc-body`)).toHaveCount(1)
 

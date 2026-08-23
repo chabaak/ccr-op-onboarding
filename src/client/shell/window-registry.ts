@@ -37,8 +37,6 @@ export interface WindowDef {
    * exist. `en` is now the one and only name a window carries.
    */
   en: string
-  /** The paper stock this window's body is printed on (u1's `paper.css`). */
-  stock: string
   /** Whether the window carries the live dot (LIVE FEED does). */
   live?: boolean
   /**
@@ -53,7 +51,7 @@ export interface WindowDef {
 }
 
 export const WINDOW_REGISTRY: readonly WindowDef[] = [
-  { key: 'feed', id: 'w-feed', en: 'LIVE FEED', stock: 'fanfold', live: true, mount: mountLiveFeed },
-  { key: 'file', id: 'w-file', en: 'AGENT FILE', stock: 'paper kraft', resizable: false, mount: mountAgentFile },
-  { key: 'rep', id: 'w-rep', en: 'REPORTS', stock: 'paper bond', mount: mountReports },
+  { key: 'feed', id: 'w-feed', en: 'LIVE FEED', live: true, mount: mountLiveFeed },
+  { key: 'file', id: 'w-file', en: 'AGENT FILE', resizable: false, mount: mountAgentFile },
+  { key: 'rep', id: 'w-rep', en: 'REPORTS', mount: mountReports },
 ]

@@ -237,7 +237,7 @@ test.describe('the day opens on the press', () => {
   test('the day opens on the press — the fanfold is empty until the file is committed', async ({ page }) => {
     await boot(page)
 
-    // The window is up and the head is printed — the stock is not a run line.
+    // The window is up and the head is printed — chrome is not a run line.
     await expect(page.locator(`${FEED} .feed-head`)).toHaveCount(1)
     await expect(page.locator(`${LIST} li`), 'the run printed before it was opened').toHaveCount(0)
 

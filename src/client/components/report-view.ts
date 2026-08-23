@@ -1,7 +1,7 @@
 // [u6] ReportView — spec-client §4 REPORTS row, §3 inv 5, latency rule 4.
 //
-// Two filed documents side by side on white bond: the objective log on the left
-// and the agent's own report on the right. Ported from
+// Two filed documents side by side: the objective log on the left and the
+// agent's own report on the right. Ported from
 // docs/design/phase2-ui/index.html lines 176..218 and app.js `renderReport()` /
 // `typewrite()` (lines 505, 523). (x6 — the ledger rule the reference drew down
 // the report side is gone; see `win-reports.css`.)
@@ -135,7 +135,7 @@ export interface ReportView {
 }
 
 export interface ReportViewOptions {
-  /** The window body the shell built — `.win-body.paper.bond`. */
+  /** The window body the shell built — `.win-body.surface`. */
   host: HTMLElement
   /** The archive rail, built by `report-archive.ts` and mounted above the grid. */
   rail: HTMLElement

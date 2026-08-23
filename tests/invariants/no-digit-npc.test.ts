@@ -11,7 +11,7 @@
 //   scoped   `.fl-npc .fl-c`                         ← NPC state, text only
 //   excluded `.fl-t` (the per-line clock stamp)      ← chrome, not NPC state
 //            `.clk-*` · `.tb-clock` · `.dd-*`        ← topbar clock / D-DAY
-//            `.tly-*` · `.ledger` · `.th-*` · `.tr-*` ← tally = score
+//            `.tly-*`                            ← tally = score
 //
 // Every selector on both lists is proven to exist on disk in (a) below, so a
 // rename in u5/u7 breaks this assert loudly instead of silently widening or
@@ -79,11 +79,11 @@ const NPC_SR_SELECTOR = '.fl-sr'
  * Excluded by name. Each one renders digits legitimately: the per-line and
  * topbar clocks are chrome, the tally is score.
  *
- * x4 — the ledger's table went with its sheet skin, so `.tly-table` / `.th-v` /
+ * x4 — the tally table went with its sheet skin, so `.tly-table` / `.th-v` /
  * `.tr-v` name nothing any more. The day's digits are painted into the record's
- * LINES now: `.tly-lines` (the list) and `.tly-line` (one 집계 line). The
- * exclusion is the same one it always was — score is allowed digits, an NPC
- * line is not — re-pointed at the selectors that carry them.
+ * LINES now: `.tly-lines` (the list) and `.tly-line` (one 집계 line). Issue #107
+ * then removed the final sheet selector from this list; the exclusion is still
+ * the same one it always was — score is allowed digits, an NPC line is not.
  */
 const EXCLUDED_SELECTORS = [
   '.fl-t',
@@ -91,7 +91,6 @@ const EXCLUDED_SELECTORS = [
   '.tb-clock',
   '.dd-value',
   '.dd-runs',
-  '.ledger',
   '.tly-lines',
   '.tly-line',
 ] as const
