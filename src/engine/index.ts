@@ -332,6 +332,25 @@ export function createEngine(deps: EngineDeps): EngineHandle {
     return fresh
   }
 
+  function repairEventLines(
+    authored: readonly ScriptLine[],
+    returned: readonly unknown[],
+  ): ScriptLine[] {
+    const authoredIds = new Set(authored.map((line) => line.id))
+    const renderedById = new Map<string, string>()
+
+    for (const entry of returned) {
+      if (entry === null || typeof entry !== 'object') continue
+      const line = entry as Record<string, unknown>
+      if (typeof line.id !== 'string' || !authoredIds.has(line.id)) continue
+      if (renderedById.has(line.id)) continue
+      if (typeof line.text !== 'string' || line.text.trim() === '') continue
+      renderedById.set(line.id, line.text)
+    }
+
+    return authored.map((line) => ({ id: line.id, text: renderedById.get(line.id) ?? line.text }))
+  }
+
   /** This beat's gate — the same refusal both ingest points owe their caller. */
   function gateNowOrThrow(): ScheduledGate & { roundIndex: number | null } {
     const beat = beatNow()
@@ -436,12 +455,13 @@ export function createEngine(deps: EngineDeps): EngineHandle {
         timeline_entries: [],
         npc_lines: [],
       }
+      const eventLines = repairEventLines(record.scriptLines ?? [], narration.event_lines)
       record.narration = {
-        event_lines: narration.event_lines,
+        event_lines: eventLines,
         timeline_entries: narration.timeline_entries,
         npc_lines: narration.npc_lines,
       }
-      for (const eventLine of narration.event_lines) {
+      for (const eventLine of eventLines) {
         lines.push({
           kind: 'event',
           clock: nextStamp(beat),

@@ -262,41 +262,12 @@ const narration: CallSpec = {
     const value = input as Record<string, unknown>;
     const problems: string[] = [];
 
-    // Read from the SLOTS, the same question `buildTool` asked — a beat with no
-    // authored event may legally come back with nothing. Refusing it here would
-    // undo the schema's permission in the worst possible way: a fallback, which
-    // prints `※ 회신 불량` on the paper and costs the beat its whole narration,
-    // for a model that did exactly what it was asked to do.
-    //
-    // An empty array is still refused everywhere else, because everywhere else
-    // there IS something to react to and silence is a dropped beat.
+    // `event_lines` content is repaired where the authored beat events are in
+    // hand. Here the hard boundary is shape only: an array can be reconciled,
+    // but a non-array cannot even be iterated safely.
     const quiet = quietBeat(slots);
-    const eventIds = fixedEventIds(slots);
     if (!Array.isArray(value.event_lines)) {
       problems.push("event_lines not an array");
-    } else {
-      const ids = value.event_lines.map((line) =>
-        typeof line === "object" && line !== null
-          ? (line as Record<string, unknown>).id
-          : undefined,
-      );
-      if (value.event_lines.length !== eventIds.length) {
-        problems.push("event_lines count does not match fixed events");
-      }
-      if (ids.some((id) => typeof id !== "string" || !eventIds.includes(id))) {
-        problems.push("event_lines id not in fixed events");
-      }
-      if (ids.some((id, index) => id !== eventIds[index])) {
-        problems.push("event_lines ids out of order");
-      }
-      if (
-        value.event_lines.some((line) => {
-          if (typeof line !== "object" || line === null) return true;
-          return !isFilled((line as Record<string, unknown>).text);
-        })
-      ) {
-        problems.push("event_lines has an empty entry");
-      }
     }
 
     if (!Array.isArray(value.timeline_entries)) {

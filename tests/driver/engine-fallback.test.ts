@@ -22,15 +22,32 @@ import {
   failingTransport,
   feedLines,
   makeRig,
+  rawBodyTransport,
   recordEngine,
   sentinelJudgment,
   shape,
   unusableTransport,
 } from './engine-fixtures/rig.ts'
-import { twoRounds } from './engine-fixtures/pack.ts'
+import { scriptedRound, twoRounds } from './engine-fixtures/pack.ts'
 
 function fallbacks(events: ViewEvent[]): Extract<ViewEvent, { type: 'fallback' }>[] {
   return events.flatMap((event) => (event.type === 'fallback' ? [event] : []))
+}
+
+function authoredFeed(events: ViewEvent[]): { id: string; text: string }[] {
+  return feedLines(events)
+    .filter((line) => line.kind === 'event' && line.sentence_id?.startsWith('t'))
+    .map((line) => ({ id: line.sentence_id!, text: line.text }))
+}
+
+function twoEventBeat() {
+  const pack = scriptedRound()
+  return {
+    ...pack,
+    timeline: {
+      events: pack.timeline.events.map((event) => ({ ...event, time: '09:00' })),
+    },
+  }
 }
 
 describe('[e7#A5] Call 1 fails', () => {
@@ -98,6 +115,159 @@ describe('[e7#A5] Call 2 fails', () => {
       '남측 관측소가 신호를 놓쳤다.',
       '실장이 회선을 열었다.',
     ])
+  })
+})
+
+describe('[#97] Call 2 repairs imperfect event_lines instead of dropping the beat', () => {
+  it('(a) missing event lines render the authored text under the authored id', async () => {
+    const events = await drain(
+      makeRig({
+        shaped: true,
+        responses: {
+          narration: { event_lines: [], timeline_entries: ['모델이 후속 기록을 남겼다.'], npc_lines: [] },
+        },
+      }),
+    )
+
+    expect(fallbacks(events).filter((event) => event.call === 2)).toEqual([])
+    expect(authoredFeed(events)).toEqual([
+      { id: 't1', text: '남측 관측소가 신호를 놓쳤다.' },
+      { id: 't2', text: '실장이 회선을 열었다.' },
+    ])
+  })
+
+  it('(b) an extra duplicate entry does not duplicate the rendered authored event', async () => {
+    const events = await drain(
+      makeRig({
+        shaped: true,
+        responses: {
+          narration: {
+            event_lines: [
+              { id: 't1', text: '모델이 남측 관측소 신호 이탈을 기록했다.' },
+              { id: 't1', text: '중복된 t1 기록은 버려져야 한다.' },
+            ],
+            timeline_entries: ['모델이 후속 기록을 남겼다.'],
+            npc_lines: [],
+          },
+        },
+      }),
+    )
+
+    expect(fallbacks(events).filter((event) => event.call === 2)).toEqual([])
+    expect(authoredFeed(events)).toEqual([
+      { id: 't1', text: '모델이 남측 관측소 신호 이탈을 기록했다.' },
+      { id: 't2', text: '실장이 회선을 열었다.' },
+    ])
+    expect(JSON.stringify(feedLines(events))).not.toContain('중복된 t1 기록')
+  })
+
+  it('(c) returned order is ignored; authored order is the rendered order', async () => {
+    const events = await drain(
+      makeRig({
+        shaped: true,
+        pack: twoEventBeat(),
+        responses: {
+          narration: {
+            event_lines: [
+              { id: 't2', text: '모델이 실장 회선 개방을 먼저 적었다.' },
+              { id: 't1', text: '모델이 관측소 신호 이탈을 나중에 적었다.' },
+            ],
+            timeline_entries: ['모델이 후속 기록을 남겼다.'],
+            npc_lines: [],
+          },
+        },
+      }),
+    )
+
+    expect(fallbacks(events).filter((event) => event.call === 2)).toEqual([])
+    expect(authoredFeed(events)).toEqual([
+      { id: 't1', text: '모델이 관측소 신호 이탈을 나중에 적었다.' },
+      { id: 't2', text: '모델이 실장 회선 개방을 먼저 적었다.' },
+    ])
+  })
+
+  it('(d) unknown ids are dropped and the missing authored event is filled from the script', async () => {
+    const events = await drain(
+      makeRig({
+        shaped: true,
+        pack: twoEventBeat(),
+        responses: {
+          narration: {
+            event_lines: [
+              { id: 't-unknown', text: '없는 사건이 끼어들었다.' },
+              { id: 't2', text: '모델이 실장 회선 개방을 기록했다.' },
+            ],
+            timeline_entries: ['모델이 후속 기록을 남겼다.'],
+            npc_lines: [],
+          },
+        },
+      }),
+    )
+
+    expect(fallbacks(events).filter((event) => event.call === 2)).toEqual([])
+    expect(authoredFeed(events)).toEqual([
+      { id: 't1', text: '남측 관측소가 신호를 놓쳤다.' },
+      { id: 't2', text: '모델이 실장 회선 개방을 기록했다.' },
+    ])
+    expect(JSON.stringify(feedLines(events))).not.toContain('없는 사건')
+  })
+
+  it('(e) wrong response shape still falls back before the engine repairs content', async () => {
+    const events = await drain(
+      makeRig({
+        shaped: true,
+        transport: rawBodyTransport('narration', {
+          event_lines: 'not an array',
+          timeline_entries: ['모델이 후속 기록을 남겼다.'],
+          npc_lines: [],
+        }),
+      }),
+    )
+
+    expect(fallbacks(events).filter((event) => event.call === 2)).toEqual([
+      { type: 'fallback', call: 2, code: UNUSABLE_PAYLOAD_CODE, beat: 0 },
+      { type: 'fallback', call: 2, code: UNUSABLE_PAYLOAD_CODE, beat: 1 },
+    ])
+    expect(authoredFeed(events)).toEqual([
+      { id: 't1', text: '남측 관측소가 신호를 놓쳤다.' },
+      { id: 't2', text: '실장이 회선을 열었다.' },
+    ])
+  })
+
+  it('(f) a non-object response body still falls back before the engine repairs content', async () => {
+    const events = await drain(
+      makeRig({
+        shaped: true,
+        transport: rawBodyTransport('narration', 'not an object'),
+      }),
+    )
+
+    expect(fallbacks(events).filter((event) => event.call === 2)).toEqual([
+      { type: 'fallback', call: 2, code: UNUSABLE_PAYLOAD_CODE, beat: 0 },
+      { type: 'fallback', call: 2, code: UNUSABLE_PAYLOAD_CODE, beat: 1 },
+    ])
+    expect(authoredFeed(events)).toEqual([
+      { id: 't1', text: '남측 관측소가 신호를 놓쳤다.' },
+      { id: 't2', text: '실장이 회선을 열었다.' },
+    ])
+  })
+
+  it('(g) repaired narration keeps Call 3 fed without changing reporter scope', async () => {
+    const events = await drain(
+      makeRig({
+        shaped: true,
+        responses: {
+          narration: { event_lines: [], timeline_entries: ['모델이 후속 기록을 남겼다.'], npc_lines: [] },
+        },
+      }),
+    )
+    const reports = events.flatMap((event) => (event.type === 'report' ? [event] : []))
+
+    expect(fallbacks(events).filter((event) => event.call === 3)).toEqual([])
+    expect(reports).toHaveLength(1)
+    expect(reports[0]!.facts.map((sentence) => sentence.text)).toEqual(
+      expect.arrayContaining(['남측 관측소가 신호를 놓쳤다.', '실장이 회선을 열었다.']),
+    )
   })
 })
 
