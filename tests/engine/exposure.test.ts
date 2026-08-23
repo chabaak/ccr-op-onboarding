@@ -27,11 +27,18 @@ import { buildSchedule } from '../../src/engine/beat/schedule.ts'
 import { createEngine } from '../../src/engine/index.ts'
 import type { EnginePack } from '../../src/engine/index.ts'
 import type { Beat } from '../../src/engine/beat/schedule.ts'
-import type { Characters, Gates, ScenarioIndex, Symptoms, Temperament, Timeline } from '../../src/shared/datapack.ts'
+import type { Characters, Gates, Symptoms, Temperament, Timeline } from '../../src/shared/datapack.ts'
+import { tutorialScenarioPack } from '../../src/client/shell/pack.ts'
+import type { ScenarioIndex } from '../../src/client/shell/pack.ts'
+import { holds, problems } from '../../src/shared/predicates.ts'
+import type { PredicateState } from '../../src/shared/predicates.ts'
 import { rig } from './beat/harness.ts'
 import { exposurePack, twinRosterPack } from './beat/fixtures/packs.ts'
 
 /* ══ (a) the rule ═══════════════════════════════════════════════════════════ */
+
+const FIXED_ROW = /^([A-Za-z][A-Za-z0-9_-]*):\s*(.+)$/
+const withoutFixedId = (row: string): string => row.replace(FIXED_ROW, '$2')
 
 /** Drives the whole fixture, answering the one gate with `stance`. */
 function drive(r: ReturnType<typeof rig>, stance: string): { fixed: string[]; roster: string[][] } {
@@ -42,7 +49,12 @@ function drive(r: ReturnType<typeof rig>, stance: string): { fixed: string[]; ro
     if (cur.kind === 'gate') r.driver.submitStance({ stance, utterance: 'u' })
     r.driver.applyBeatEffects()
     const view = r.driver.beatView()
-    fixed.push(view.FIXED_NPC_ACTION)
+    fixed.push(
+      view.FIXED_NPC_ACTION.split('\n')
+        .filter((row) => row !== '')
+        .map(withoutFixedId)
+        .join('\n'),
+    )
     roster.push(view.PRESENT_NPCS.map((npc) => npc.id))
     if (!r.driver.advance()) break
   }
@@ -97,7 +109,7 @@ describe('[e3#F4] a ROW reaches the prompt only where its exposure holds', () =>
 
 const REPO = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '../..')
 const MANIFEST = JSON.parse(fs.readFileSync(path.join(REPO, 'data/scenario/index.json'), 'utf8')) as ScenarioIndex
-const PACK_SLUG = MANIFEST.packs.find((pack) => pack.role === 'tutorial')!.slug
+const PACK_SLUG = tutorialScenarioPack(MANIFEST).slug
 const part = <T>(name: string): T =>
   JSON.parse(fs.readFileSync(path.join(REPO, 'data/scenario', PACK_SLUG, `${name}.json`), 'utf8')) as T
 
@@ -123,13 +135,18 @@ const MAX_BEATS = 128
  * is the run a player who does nothing gets, and it is the run the defect was
  * measured on.
  */
-function walkShipped(): { handed: string[]; printed: string[]; scenes: string[]; beats: Beat[] } {
+function exposed(condition: string | null | undefined, state: PredicateState): boolean {
+  if (condition === null || condition === undefined || condition === '') return true
+  if (problems(condition).length > 0) return true
+  return holds(condition, state)
+}
+
+function walkShipped(): { handed: string[]; exposedRows: string[]; beats: Beat[] } {
   const pack = shippedPack()
   const schedule = buildSchedule(pack.timeline, pack.gates)
   const engine = createEngine({ pack })
   const handed: string[] = []
-  const printed: string[] = []
-  const scenes: string[] = []
+  const exposedRows: string[] = []
   const beats: Beat[] = []
   for (let step = 0; step < MAX_BEATS; step += 1) {
     const cursor = engine.current()
@@ -137,32 +154,32 @@ function walkShipped(): { handed: string[]; printed: string[]; scenes: string[];
     beats.push(beat)
     if (cursor.kind === 'gate') {
       engine.submitStance(null)
-      if (beat.gate !== null) scenes.push(beat.gate.scene)
     }
     engine.applyBeatEffects()
-    // Both surfaces of the SAME beat, read in the same breath: the paper the
-    // operator gets and the fixed action the model is told already happened.
-    for (const line of engine.feed()) printed.push(line.text)
+    const state = engine.snapshot()
+    for (const event of beat.events) {
+      if (exposed(event.exposure?.extra_condition, state)) exposedRows.push(event.text)
+    }
     const fixed = engine.beatView().FIXED_NPC_ACTION
-    for (const row of fixed.split('\n')) if (row !== '') handed.push(row)
+    for (const row of fixed.split('\n')) {
+      if (!/^t\d+:\s*/.test(row)) continue
+      handed.push(withoutFixedId(row))
+    }
     if (!engine.advance()) break
   }
-  return { handed, printed, scenes, beats }
+  return { handed, exposedRows, beats }
 }
 
 describe(`[e3#F4] the shipped pack (${PACK_SLUG}) hands the model nothing its paper withheld`, () => {
-  it('(e) every row in FIXED_NPC_ACTION is a row the run actually printed', () => {
-    const { handed, printed, scenes } = walkShipped()
+  it('(e) every t* row in FIXED_NPC_ACTION is exposed on this run', () => {
+    const { handed, exposedRows } = walkShipped()
     expect(handed.length, 'the run handed the model nothing — the compare is vacuous').toBeGreaterThan(0)
 
-    // A gate beat with no exposed row falls back to the gate's own scene (D3),
-    // which is authored to be read there and is not a timeline row at all.
-    const paper = new Set(printed)
-    const scene = new Set(scenes)
-    const leaked = handed.filter((row) => !paper.has(row) && !scene.has(row))
+    const exposedText = new Set(exposedRows)
+    const leaked = handed.filter((row) => !exposedText.has(row))
     expect(
       leaked,
-      'a row the paper never printed reached FIXED_NPC_ACTION — the model is told it already happened',
+      'a row whose exposure did not hold reached FIXED_NPC_ACTION',
     ).toEqual([])
   })
 

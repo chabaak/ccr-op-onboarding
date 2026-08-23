@@ -51,11 +51,11 @@ export type KeptNpcLine = { speakerId: string; speakerName: string; text: string
 export type BeatFeedInput = {
   /** Beat time is an input, never computed here — there is no clock in the engine. */
   clock: string
-  /** Authored script events for this beat, verbatim. */
+  /** Authored script events for this beat. Fallback input; not rendered before Call 2. */
   scriptLines?: readonly ScriptLine[]
   /** Gate beat only, and only the one field the timeline may see. */
   judgment?: Pick<JudgmentResponse, 'utterance'>
-  narration?: Pick<NarrationResponse, 'timeline_entries' | 'npc_lines'>
+  narration?: Pick<NarrationResponse, 'event_lines' | 'timeline_entries' | 'npc_lines'>
   present: readonly PresentNpc[]
   /** The symptom renderer's output. Fixed authored sentences — never minted. */
   symptoms?: readonly string[]

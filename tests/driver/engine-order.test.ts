@@ -27,11 +27,11 @@ const GATE_BEAT = [
   'beat_start',
   'waiting:judgment:on',
   'waiting:judgment:off',
-  'feed:event', // the authored script line (`t*`, id inherited)
   'feed:radio', // the utterance (`u`)
   'feed:symptom', // the renderer's output — carries no id, never minable
   'waiting:narration:on',
   'waiting:narration:off',
+  'feed:event', // the authored script line (`t*`, id inherited)
   'feed:event', // `n` …
   'feed:event',
   'feed:npc', // `q`
@@ -41,10 +41,10 @@ const GATE_BEAT = [
 /** A2 — the script beat. No `waiting:judgment` anywhere in it. */
 const SCRIPT_BEAT = [
   'beat_start',
-  'feed:event',
   'feed:symptom',
   'waiting:narration:on',
   'waiting:narration:off',
+  'feed:event',
   'feed:event',
   'feed:event',
   'feed:npc',

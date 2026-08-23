@@ -71,26 +71,32 @@ describe('[e7#A5] Call 2 fails', () => {
       'beat_start',
       'waiting:judgment:on',
       'waiting:judgment:off',
-      'feed:event',
       'feed:radio',
       'feed:symptom',
       'waiting:narration:on',
       'fallback:2',
       'waiting:narration:off',
+      'feed:event',
     ])
   })
 
-  it('(b) zero `n`/`q` lines that beat; `event`/`radio`/`symptom` still arrive', async () => {
+  it('(b) zero `n`/`q` lines that beat; fallback renders authored `t*` text verbatim', async () => {
     const events = await drain(makeRig({ shaped: true, transport: failingTransport('narration') }))
     const lines = feedLines(events)
     const minted = lines.flatMap((line) => (line.sentence_id ?? '').match(/-([nq])\d+$/) ?? [])
     expect(minted).toEqual([])
     expect(lines.map((line) => line.kind)).toEqual([
-      'event',
       'radio',
       'symptom',
       'event',
       'symptom',
+      'event',
+    ])
+    const fallbackEvents = lines.filter((line) => line.kind === 'event')
+    expect(fallbackEvents.map((line) => line.sentence_id)).toEqual(['t1', 't2'])
+    expect(fallbackEvents.map((line) => line.text)).toEqual([
+      '남측 관측소가 신호를 놓쳤다.',
+      '실장이 회선을 열었다.',
     ])
   })
 })

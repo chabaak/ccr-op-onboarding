@@ -170,7 +170,7 @@ describe('[e4] §5 the objective log is not the Call 3 prompt', () => {
 
   it('(q) the utterance stays — it was already on the player’s timeline this round', () => {
     expect(assembleObjectiveLog(GOLDEN_ROUND).some((l) => l.includes(UTTERANCE))).toBe(true)
-    expect(assembleObjectiveLog(GOLDEN_ROUND)[0]).toBe(assembleExperienced(GOLDEN_ROUND)[0])
+    expect(assembleObjectiveLog(GOLDEN_ROUND)[0]).toBe(assembleExperienced(GOLDEN_ROUND)[1])
   })
 
   it('(r) with no note authored the two assemblies are identical', () => {
@@ -192,10 +192,11 @@ describe('[e4] §5 EXPERIENCED assembly', () => {
     const lines = experienced()
     expect(Array.isArray(lines)).toBe(true)
     expect(lines.every((l) => typeof l === 'string')).toBe(true)
-    // script · inner_note · utterance · 2 timeline_entries · 2 surviving npc lines
+    // inner_note · utterance · event_lines · 2 timeline_entries · 2 surviving npc lines
     expect(lines.length).toBe(7)
     const at = (needle: string) => lines.findIndex((l) => l.includes(needle))
-    expect(at(SCRIPT_LINE.text)).toBe(0)
+    expect(at(SCRIPT_LINE.text)).toBe(2)
+    expect(at(UTTERANCE)).toBeLessThan(at(SCRIPT_LINE.text))
     expect(at(TIMELINE_ENTRIES[0])).toBeLessThan(at(TIMELINE_ENTRIES[1]))
     expect(at(TIMELINE_ENTRIES[1])).toBeLessThan(at('문 좀 열어주세요.'))
     expect(at('문 좀 열어주세요.')).toBeLessThan(at('조용히 해.'))

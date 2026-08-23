@@ -104,7 +104,7 @@ describe("runtime prompt bundle — only the live contract is shipped", () => {
   it("ships the same versions the client requests", () => {
     expect(runtimeVersions).toEqual({
       judgment: "v0.5",
-      narration: "v0.4",
+      narration: "v0.5",
       reporter: "v0.4",
     });
   });
@@ -113,8 +113,8 @@ describe("runtime prompt bundle — only the live contract is shipped", () => {
     expect(Object.keys(PROMPT_BUNDLE).sort()).toEqual([
       "judgment/base-v0.5",
       "judgment/user-v0.5",
-      "narration/base-v0.4",
-      "narration/user-v0.4",
+      "narration/base-v0.5",
+      "narration/user-v0.5",
       "reporter/base-v0.4",
       "reporter/user-v0.4",
     ]);
@@ -209,7 +209,7 @@ const COVERAGE: Array<{
 }> = [
   {
     call: "judgment",
-    version: "v0.4",
+    version: "v0.5",
     slots: {
       TIMELINE_EXCERPT: ["09:40 회선 A 착신.", "09:41 발신자가 숨을 고른다."],
       BLOCKS: [
@@ -303,7 +303,7 @@ const COVERAGE: Array<{
   // pair lands with nothing rendering it — every fixture above pins an older
   // version, and a mistyped slot marker in a fresh template would first surface
   // in production. These three are the fiction-reset set (요원 ECHO, not
-  // 통제관): judgment v0.5, narration v0.4, reporter v0.4.
+  // 통제관): judgment v0.5, narration v0.5, reporter v0.4.
   {
     call: "judgment",
     version: "v0.5",
@@ -320,7 +320,7 @@ const COVERAGE: Array<{
   },
   {
     call: "narration",
-    version: "v0.4",
+    version: "v0.5",
     label: "current",
     slots: {
       TIMELINE_TAIL: ["18:40 요원: 천천히 말해."],
@@ -397,11 +397,11 @@ describe("renderer coverage — every RENDERERS entry, not just what suites use"
     const rendered = renderCall(
       {
         call_type: "narration",
-        template_version: "v0.4",
+        template_version: "v0.5",
         slots: {
           TIMELINE_TAIL: ["18:44 물이 한 방울씩 떨어진다."],
           AGENT_UTTERANCE: "",
-          FIXED_NPC_ACTION: "표기웅이 천장을 올려다본다.",
+          FIXED_NPC_ACTION: "t1: 표기웅이 천장을 올려다본다.",
           SCENE_SYMPTOMS: [],
           PRESENT_NPCS: [],
         },

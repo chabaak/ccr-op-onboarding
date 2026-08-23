@@ -74,7 +74,7 @@ function readJudgment(body: AnyBody): CallResponse['judgment'] | null {
 }
 
 function readNarration(body: AnyBody): CallResponse['narration'] | null {
-  return 'timeline_entries' in body ? body : null
+  return 'event_lines' in body && 'timeline_entries' in body && 'npc_lines' in body ? body : null
 }
 
 function readReporter(body: AnyBody): CallResponse['reporter'] | null {

@@ -38,7 +38,7 @@ const quietSlots = {
   PRESENT_NPCS: [],
 };
 
-const loudSlots = { ...quietSlots, FIXED_NPC_ACTION: "천장 가운데가 내려오고 있다." };
+const loudSlots = { ...quietSlots, FIXED_NPC_ACTION: "t1: 천장 가운데가 내려오고 있다." };
 
 const narration = CALL_SPECS.narration;
 
@@ -51,7 +51,7 @@ const descriptionOf = (slots: Record<string, unknown>): string => {
 
 const userMessage = (slots: Record<string, unknown>): string =>
   renderCall(
-    { call_type: "narration", template_version: "v0.4", slots },
+    { call_type: "narration", template_version: "v0.5", slots },
     { FLAW: "", INCIDENT: "", PRIORITY_LIST: [] },
   ).user;
 
@@ -77,12 +77,19 @@ describe("a quiet beat is sayable, and answerable with nothing", () => {
     // Refusing it would undo the schema's own permission in the worst way: a
     // fallback prints `※ 회신 불량` on the paper and costs the beat its whole
     // narration, for a model that did what it was asked.
-    expect(narration.validate({ timeline_entries: [], npc_lines: [] }, quietSlots)).toEqual([]);
+    expect(narration.validate({ event_lines: [], timeline_entries: [], npc_lines: [] }, quietSlots)).toEqual([]);
   });
 
   it("still refuses an empty timeline where something DID happen", () => {
     expect(
-      narration.validate({ timeline_entries: [], npc_lines: [] }, loudSlots),
+      narration.validate(
+        {
+          event_lines: [{ id: "t1", text: "천장 가운데가 내려오고 있다." }],
+          timeline_entries: [],
+          npc_lines: [],
+        },
+        loudSlots,
+      ),
     ).toContain("timeline_entries empty");
   });
 
@@ -101,7 +108,7 @@ describe("a quiet beat is sayable, and answerable with nothing", () => {
       const slots = { ...quietSlots, FIXED_NPC_ACTION: value };
       expect(descriptionOf(slots), `FIXED_NPC_ACTION=${String(value)}`).toContain("빈 배열이 정답이다");
       expect(
-        narration.validate({ timeline_entries: [], npc_lines: [] }, slots),
+        narration.validate({ event_lines: [], timeline_entries: [], npc_lines: [] }, slots),
         `FIXED_NPC_ACTION=${String(value)}`,
       ).toEqual([]);
     }
@@ -111,7 +118,7 @@ describe("a quiet beat is sayable, and answerable with nothing", () => {
     // The permission is to say nothing, not to say anything. An entry that is
     // present but blank is still breakage.
     expect(
-      narration.validate({ timeline_entries: ["  "], npc_lines: [] }, quietSlots),
+      narration.validate({ event_lines: [], timeline_entries: ["  "], npc_lines: [] }, quietSlots),
     ).toContain("timeline_entries has an empty entry");
   });
 });

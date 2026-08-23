@@ -140,7 +140,7 @@ describe('A3–A5 — the envelope is exactly what §11 describes', () => {
     // must be in the bundle at it, which is the check that would have caught a
     // client asking the proxy for something it cannot serve.
     expect(reqs.judgment.template_version).toBe('v0.5')
-    expect(reqs.narration.template_version).toBe('v0.4')
+    expect(reqs.narration.template_version).toBe('v0.5')
     expect(reqs.reporter.template_version).toBe('v0.4')
 
     for (const t of CALL_TYPES) {

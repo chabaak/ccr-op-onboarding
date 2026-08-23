@@ -238,7 +238,7 @@ export function createBeatDriver(deps: BeatDriverDeps): BeatDriver {
    * always caught a beat with no events at all.
    */
   function fixedAction(beat: Beat, events: readonly TimelineEvent[]): string {
-    const authored = events.map((event) => event.text).join('\n')
+    const authored = events.map((event) => `${event.id}: ${event.text}`).join('\n')
     if (authored !== '') return authored
     // A gate that is not being asked contributes no scene either: its prose
     // describes the situation the gate is about, and that situation is what

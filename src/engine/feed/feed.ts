@@ -3,14 +3,14 @@
  *
  * The emission order **is** the id order, and the id order is the D1 golden:
  *
- *   authored script events (`t*`, no mint) → the utterance (`u`) →
+ *   the utterance (`u`) → `event_lines` (`t*`, no mint) →
  *   `timeline_entries` (`n`, array order) → surviving `npc_lines` (`q`, array
  *   order, after drops) → symptoms (no mint)
  *
  * Two lines carry no `sentence_id` at all, for opposite reasons:
  *
- * - **script events** already have one — `timeline.json`'s authored `t*` id,
- *   copied verbatim. It is run-independent, so the same script line is
+ * - **event_lines** already have one — `timeline.json`'s authored `t*` id,
+ *   inherited through Call 2. It is run-independent, so the same authored id is
  *   byte-identical in run 1 and run 42.
  * - **symptoms** must never get one. They are fixed authored sentences,
  *   identical every run, so mining one carries no information; a minable
@@ -26,14 +26,14 @@ export function buildFeed(beat: BeatFeedInput, ids: IdAllocator): FeedResult {
   const clock = beat.clock
   const lines: FeedLine[] = []
 
-  for (const script of beat.scriptLines ?? []) {
-    lines.push({ kind: 'event', clock, text: script.text, sentence_id: script.id })
-  }
-
   // The only field of Call 1's response that reaches the timeline.
   const utterance = beat.judgment?.utterance ?? ''
   if (utterance !== '') {
     lines.push({ kind: 'radio', clock, text: utterance, sentence_id: ids.next('u') })
+  }
+
+  for (const eventLine of beat.narration?.event_lines ?? []) {
+    lines.push({ kind: 'event', clock, text: eventLine.text, sentence_id: eventLine.id })
   }
 
   for (const entry of beat.narration?.timeline_entries ?? []) {

@@ -6,13 +6,13 @@
     "run then silently highlights the wrong text. If a change here is genuinely required, it is a",
     "contract revision, not a test fix.",
     "Hand-derived from spec decisions 1-3: <nn> is per-(run,channel), 1-based, min width 2;",
-    "intra-beat allocation order is u -> n -> q(after drops); round end is f -> b; a dropped npc",
+    "intra-beat allocation order is u -> t -> n -> q(after drops); round end is f -> b; a dropped npc",
     "line consumes no sequence number (q02 belongs to the third raw line, not the second)."
   ],
   "run": 1,
   "feed": [
-    { "kind": "event", "clock": "09:14", "text": "무전기에서 잡음이 흘러나온다.", "sentence_id": "t3" },
     { "kind": "radio", "clock": "09:14", "text": "지금은 문을 열지 않는다.", "sentence_id": "b-r1-u01" },
+    { "kind": "event", "clock": "09:14", "text": "무전기에서 잡음이 흘러나온다.", "sentence_id": "t3" },
     { "kind": "event", "clock": "09:14", "text": "복도 끝에서 발소리가 멈춘다.", "sentence_id": "b-r1-n01" },
     { "kind": "event", "clock": "09:14", "text": "누군가 손잡이를 두 번 흔든다.", "sentence_id": "b-r1-n02" },
     { "kind": "npc", "clock": "09:14", "speaker": "박 주임", "text": "문 좀 열어주세요.", "sentence_id": "b-r1-q01" },

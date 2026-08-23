@@ -25,13 +25,15 @@
 // because_block_ids → rejected_stance → rejected_reason → utterance (deep-test
 // plan §7.1). Do not reorder without a shape re-validation.
 //
-// Every field is a SCALAR OR ARRAY OF SCALARS — no nested objects. `because` and
-// `rejected` used to be objects; in RB1 (2026-07-30) the model emitted `because`
-// as a string holding a literal `<parameter name="referent">…` with the inner
-// keys hoisted to the top level, on 7 of 17 baseline attempts, and the
-// malformation was arm-correlated — the no-block arm failed, the block arm did
-// not. That makes two arms differently-filtered samples, which voids the
-// comparison (plan §8.5 step 4). Nested objects are banned here; see run log A7.
+// Every field is a SCALAR OR ARRAY OF SCALARS, except narration.event_lines.
+// `because` and `rejected` used to be objects; in RB1 (2026-07-30) the model
+// emitted `because` as a string holding a literal `<parameter name="referent">…`
+// with the inner keys hoisted to the top level, on 7 of 17 baseline attempts,
+// and the malformation was arm-correlated — the no-block arm failed, the block
+// arm did not. That makes two arms differently-filtered samples, which voids
+// the comparison (plan §8.5 step 4). `event_lines` is the explicit exception:
+// its id/text pair is the structural contract that prevents silent loss of
+// authored `t*` events.
 
 /** Stance ids a suite presents at its gate. */
 const stanceIds = (suite) => (suite.slots.STANCE_SET ?? []).map((s) => s.id);
@@ -218,6 +220,13 @@ const NPC_LINE = /^(\S+):\s*(.+)$/;
  * cannot catch is a soft observation lost, never a wrong retry.
  */
 const normLine = (s) => String(s ?? '').replace(/[\s"'“”‘’.,!?…·:;-]/g, '');
+const fixedEventIds = (suite) =>
+  String(suite.slots?.FIXED_NPC_ACTION ?? '')
+    .split('\n')
+    .map((line) => /^([t]\d+):\s*(.+)$/.exec(line.trim()))
+    .filter(Boolean)
+    .map((match) => match[1]);
+
 function echoesUtterance(line, utterance) {
   const a = normLine(line);
   const b = normLine(utterance);
@@ -236,19 +245,40 @@ const narration = {
   ],
 
   buildTool(suite) {
-    if (npcIds(suite).length < 1) throw new Error('narration: slots.PRESENT_NPCS needs >= 1 npc');
+    const roster = npcIds(suite);
     // A QUIET beat — nothing authored happened in this minute on this run.
     // `proxy/src/calls.ts` carries the account and the measurement; mirrored
     // here because `prompt-parity.test.ts` compares the built tool as well as
     // the two messages, and a schema that drifts makes the mechanism numbers
     // stop describing the deployed system silently.
     const quiet = !String(suite.slots?.FIXED_NPC_ACTION ?? '').trim();
+    const eventIds = fixedEventIds(suite);
     return {
       name: 'narration',
       description: '이 비트의 반응을 기록한다. 정확히 한 번만 호출한다.',
       input_schema: {
         type: 'object',
         properties: {
+          event_lines: {
+            type: 'array',
+            items: {
+              type: 'object',
+              properties: {
+                id: { type: 'string', enum: eventIds },
+                text: {
+                  type: 'string',
+                  description:
+                    '해당 id의 고정 사건을 현장 기록으로 한 문장에 적는다. 입력 문장을 복사하지 말고, 같은 사실을 빠뜨리지 않는다.',
+                },
+              },
+              required: ['id', 'text'],
+            },
+            minItems: eventIds.length,
+            maxItems: eventIds.length,
+            description: eventIds.length
+              ? 'FIXED_NPC_ACTION에 있는 t* 사건마다 정확히 한 항목을 쓴다. id는 그 t* id를 그대로 넣는다.'
+              : 'FIXED_NPC_ACTION에 t* 사건이 없으므로 빈 배열을 쓴다.',
+          },
           timeline_entries: {
             type: 'array',
             items: { type: 'string' },
@@ -267,11 +297,12 @@ const narration = {
             type: 'array',
             items: { type: 'string' },
             maxItems: 1,
-            description:
-              '이 비트의 대사. 많아야 한 줄이고, 말하는 사람도 한 명뿐이다. 항목은 "인물id: 대사" 형식이며 [현장의 인물]에 있는 id만 쓴다. 되묻지 않는다 — 물음이거나 요원의 대답을 요구하는 말은 쓸 수 없다. 대사가 없는 비트가 정상이다. 없으면 빈 배열.',
+            description: roster.length
+              ? '이 비트의 대사. 많아야 한 줄이고, 말하는 사람도 한 명뿐이다. 항목은 "인물id: 대사" 형식이며 [현장의 인물]에 있는 id만 쓴다. 되묻지 않는다 — 물음이거나 요원의 대답을 요구하는 말은 쓸 수 없다. 대사가 없는 비트가 정상이다. 없으면 빈 배열.'
+              : '이 비트에는 아무도 없다. 반드시 빈 배열을 쓴다.',
           },
         },
-        required: ['timeline_entries', 'npc_lines'],
+        required: ['event_lines', 'timeline_entries', 'npc_lines'],
       },
     };
   },
@@ -285,6 +316,26 @@ const narration = {
     // validator that refuses what its own schema permits turns an obedient
     // model into a retry, and the retry count is what this file is measured on.
     const quiet = !String(suite.slots?.FIXED_NPC_ACTION ?? '').trim();
+    const eventIds = fixedEventIds(suite);
+    if (!Array.isArray(input.event_lines)) problems.push('event_lines not an array');
+    else {
+      const ids = input.event_lines.map((line) =>
+        line && typeof line === 'object' ? line.id : undefined,
+      );
+      if (input.event_lines.length !== eventIds.length)
+        problems.push('event_lines count does not match fixed events');
+      if (ids.some((id) => typeof id !== 'string' || !eventIds.includes(id)))
+        problems.push('event_lines id not in fixed events');
+      if (ids.some((id, index) => id !== eventIds[index]))
+        problems.push('event_lines ids out of order');
+      if (
+        input.event_lines.some(
+          (line) => !line || typeof line !== 'object' || !String(line.text ?? '').trim(),
+        )
+      )
+        problems.push('event_lines has an empty entry');
+    }
+
     if (!Array.isArray(input.timeline_entries)) problems.push('timeline_entries not an array');
     else if (!input.timeline_entries.length && !quiet) problems.push('timeline_entries empty');
     else if (input.timeline_entries.some((e) => !String(e ?? '').trim()))
@@ -338,6 +389,7 @@ const narration = {
   dryRunPayload(suite) {
     const ids = npcIds(suite);
     return {
+      event_lines: fixedEventIds(suite).map((id) => ({ id, text: `(dry-run) ${id} 사건 기록.` })),
       timeline_entries: ['(dry-run) 반응 서술 자리.'],
       npc_lines: ids.length ? [`${ids[0]}: (dry-run) 대사 자리.`] : [],
     };

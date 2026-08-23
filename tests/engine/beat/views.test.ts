@@ -136,7 +136,7 @@ describe('[e3#D2/D3] Call-2 slots on a gate beat', () => {
     r.driver.submitStance({ stance: 'a', utterance: 'u' })
     r.driver.applyBeatEffects()
     const view = r.driver.beatView()
-    expect(view.FIXED_NPC_ACTION).toBe('gate-beat-text')
+    expect(view.FIXED_NPC_ACTION).toBe('g1e: gate-beat-text')
     expect(view.PRESENT_NPCS).toEqual([{ id: 'c1', name: CHARACTERS.characters[0]!.name, side: 'line' }])
   })
 
