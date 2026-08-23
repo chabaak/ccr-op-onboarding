@@ -21,7 +21,7 @@ export interface ScenarioIdentity {
   end: string
 }
 
-export type ScenarioRole = 'tutorial' | 'practice'
+export type ScenarioRole = 'tutorial' | 'practice' | 'fixture'
 
 export interface ScenarioPackEntry {
   slug: string
@@ -104,7 +104,7 @@ function readPackEntry(raw: unknown, field: string): ScenarioPackEntry {
   if (typeof displayName !== 'string' || displayName.length === 0) {
     throw new Error(`scenario index: '${field}.display_name' is not a string`)
   }
-  if (role !== 'tutorial' && role !== 'practice') {
+  if (role !== 'tutorial' && role !== 'practice' && role !== 'fixture') {
     throw new Error(`scenario index: '${field}.role' is not a known role`)
   }
   if (typeof order !== 'number' || !Number.isInteger(order) || order < 0) {
@@ -125,6 +125,10 @@ function readScenarioIndex(raw: unknown): ScenarioIndex {
 
 export function sortedScenarioPacks(index: ScenarioIndex): readonly ScenarioPackEntry[] {
   return [...index.packs].sort((left, right) => left.order - right.order)
+}
+
+export function isScenarioPlayable(entry: Pick<ScenarioPackEntry, 'role'>): boolean {
+  return entry.role === 'tutorial' || entry.role === 'practice'
 }
 
 export function tutorialScenarioPack(index: ScenarioIndex): ScenarioPackEntry {

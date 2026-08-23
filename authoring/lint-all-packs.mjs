@@ -30,6 +30,7 @@ const KNOWN_KEYWORDS = new Set([
   'minItems', 'maxItems', 'items', 'required', 'properties',
   'additionalProperties', 'anyOf',
 ])
+const PLAYABLE_ROLES = new Set(['tutorial', 'practice'])
 
 function validate(schema, data, path, root) {
   for (const k of Object.keys(schema)) {
@@ -136,6 +137,13 @@ if (manifest !== null && typeof manifest === 'object' && Array.isArray(manifest.
     if (typeof pack?.order !== 'number') continue
     if (orders.has(pack.order)) errors.push(`index.packs: duplicate order ${pack.order}`)
     orders.add(pack.order)
+  }
+  for (const pack of manifest.packs) {
+    if (!PLAYABLE_ROLES.has(pack?.role)) continue
+    if (typeof pack?.slug !== 'string') continue
+    if (!existsSync(join(SCENARIO_DIR, pack.slug, 'endings.json'))) {
+      errors.push(`index.packs: playable pack "${pack.slug}" (${pack.role}) has no endings.json`)
+    }
   }
 }
 

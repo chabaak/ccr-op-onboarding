@@ -17,7 +17,11 @@
         "properties": {
           "slug": { "type": "string", "minLength": 1 },
           "display_name": { "type": "string", "minLength": 1 },
-          "role": { "type": "string", "enum": ["tutorial", "practice"] },
+          "role": {
+            "type": "string",
+            "enum": ["tutorial", "practice", "fixture"],
+            "description": "tutorial/practice packs are startable and must ship endings.json; fixture packs may remain selectable archive cases without ending data"
+          },
           "order": { "type": "integer", "minimum": 0 },
           "difficulty": { "type": "string", "minLength": 1 }
         }
