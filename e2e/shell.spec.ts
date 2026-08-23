@@ -232,6 +232,10 @@ test.describe('window ops', () => {
   })
 
   test('window ops — `×` closes the window to the taskbar', async ({ page }) => {
+    await page.evaluate(() => {
+      window.sessionStorage.setItem('ndsp:scenario:selected:v1', 'kept')
+    })
+
     for (const w of WINDOWS) {
       const node = win(page, w.id)
       const task = page.locator(`.task[data-win="${w.key}"]`)
@@ -245,6 +249,9 @@ test.describe('window ops', () => {
     // Closed to the taskbar, not destroyed.
     await expect(page.locator('.win')).toHaveCount(3)
     await expect(page.locator('.task')).toHaveCount(3)
+    await expect
+      .poll(() => page.evaluate(() => window.sessionStorage.getItem('ndsp:scenario:selected:v1')))
+      .toBe('kept')
   })
 
   test('window ops — the taskbar reopens a closed window', async ({ page }) => {
@@ -604,6 +611,59 @@ test.describe('topbar', () => {
       nodes.map((n) => (n as HTMLElement).dataset.win ?? ''),
     )
     expect(keys).toEqual(WINDOWS.map((w) => w.key))
+    await expect(taskbar.locator('#abortMission')).toHaveCount(1)
+  })
+
+  test('topbar — abort asks first and cancelling leaves the run untouched', async ({ page }) => {
+    await page.evaluate(() => {
+      window.sessionStorage.setItem('ndsp:scenario:selected:v1', 'kept')
+    })
+    const before = await frame(page)
+
+    await page.locator('#abortMission').click()
+    await expect(page.locator('#confirm')).toBeVisible()
+    await expect(page.locator('#cf-body')).toContainText('사건 선택 데스크톱')
+    await expect(page.locator('#confirm .cf-note')).toContainText('시행')
+    await expect(page.locator('#confirm .cf-note')).toContainText('블록')
+    await expect(page.locator('#confirm .cf-note')).toContainText('인수인계')
+    await expect(page.locator('#confirm .cf-note')).toContainText('멤브레인')
+
+    await page.locator('#confirmNo').click()
+    await expect(page.locator('#confirm')).toHaveCount(0)
+    await expect
+      .poll(() => page.evaluate(() => window.sessionStorage.getItem('ndsp:scenario:selected:v1')))
+      .toBe('kept')
+    expect(await frame(page)).toEqual(before)
+    for (const w of WINDOWS) await expect(win(page, w.id)).toBeVisible()
+  })
+
+  test('topbar — confirming abort resets and returns to the scenario desktop', async ({ page }) => {
+    await page.evaluate(() => {
+      window.sessionStorage.setItem('ndsp:scenario:selected:v1', '멈춘회전문')
+      window.sessionStorage.setItem('ndsp:meta:v1', 'stale')
+      window.sessionStorage.setItem('dday.meta.멈춘회전문', 'stale')
+      window.sessionStorage.setItem('dday.meta.stamp.멈춘회전문', 'stale')
+      window.localStorage.setItem('ndsp:scenario:unlocked:v1', JSON.stringify(['멈춘회전문']))
+    })
+
+    await page.locator('#abortMission').click()
+    await Promise.all([
+      page.waitForLoadState('domcontentloaded'),
+      page.locator('#confirmYes').click(),
+    ])
+    await page.waitForFunction(() => !document.body.classList.contains('booting'), undefined, { timeout: 20_000 })
+    await hideDebugPane(page)
+
+    await expect(page.locator('#abortMission')).toBeVisible()
+    await expect(page.locator('.scenario-file')).toHaveCount(1)
+    for (const w of WINDOWS) await expect(win(page, w.id)).toBeHidden()
+
+    const stored = await page.evaluate(() => Object.fromEntries(Object.entries(window.sessionStorage)))
+    expect(stored['ndsp:scenario:selected:v1']).toBeUndefined()
+    expect(stored['ndsp:scenario:return-desktop:v1']).toBeUndefined()
+    expect(stored['ndsp:meta:v1']).not.toBe('stale')
+    expect(stored['dday.meta.멈춘회전문']).not.toBe('stale')
+    expect(stored['dday.meta.stamp.멈춘회전문']).not.toBe('stale')
   })
 
   test('topbar — desktop dressing and the u8 overlay hosts are present', async ({ page }) => {

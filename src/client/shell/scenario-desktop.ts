@@ -16,7 +16,7 @@ import {
   sortedScenarioPacks,
 } from './pack.ts'
 import type { ScenarioEndings, ScenarioIncidentBrief, ScenarioIndex, ScenarioPackEntry, ScenarioScore } from './pack.ts'
-import { resetScenarioSession, switchScenarioPack } from './pack-session.ts'
+import { resetScenarioSession, returnToScenarioDesktop, switchScenarioPack } from './pack-session.ts'
 import type { ScenarioSwitchOptions } from './pack-session.ts'
 import type { ConfirmCopy } from './confirm.ts'
 
@@ -56,6 +56,7 @@ export interface ScenarioDesktopHandle {
   unlockAll(): readonly string[]
   showUnlockNotice(): Promise<void>
   restartCurrent(): void
+  returnToDesktop(): void
   render(): void
 }
 
@@ -252,6 +253,12 @@ export function installScenarioDesktop(deps: ScenarioDesktopDeps): ScenarioDeskt
     },
     restartCurrent(): void {
       restartScenario(deps.index, {
+        storage: sessionStorage,
+        reload: deps.reload,
+      })
+    },
+    returnToDesktop(): void {
+      returnToScenarioDesktop(deps.index, {
         storage: sessionStorage,
         reload: deps.reload,
       })

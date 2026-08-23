@@ -2,8 +2,11 @@ import { afterEach, describe, expect, it, vi } from 'vitest'
 
 import { META_KEY } from '../../src/client/shell/run-state.ts'
 import {
+  SCENARIO_DESKTOP_RETURN_KEY,
   SELECTED_SCENARIO_KEY,
+  consumeScenarioDesktopReturn,
   resetScenarioSession,
+  returnToScenarioDesktop,
   scenarioPackInPlay,
   switchScenarioPack,
 } from '../../src/client/shell/pack-session.ts'
@@ -118,5 +121,31 @@ describe('runtime scenario pack selection', () => {
     expect(() => switchScenarioPack(MANIFEST, fixture.slug, { storage: new FakeStorage() })).toThrow(
       /not playable/,
     )
+  })
+
+  it('(h) abort return clears the selected pack through the shared reset and marks one desktop reload', () => {
+    const storage = new FakeStorage()
+    let reloaded = false
+    const chosen = PLAYABLE_MANIFEST.packs.find((pack) => pack.role === 'practice')!
+
+    storage.setItem(SELECTED_SCENARIO_KEY, chosen.slug)
+    storage.setItem(META_KEY, JSON.stringify({ type: 'meta', run: 3 }))
+    for (const pack of PLAYABLE_MANIFEST.packs) {
+      storage.setItem(metaKey(pack.slug), JSON.stringify({ pack_slug: pack.slug, run_count: 2 }))
+      storage.setItem(stampKey(pack.slug), 'old-build')
+    }
+
+    returnToScenarioDesktop(PLAYABLE_MANIFEST, {
+      storage,
+      reload: () => {
+        reloaded = true
+      },
+    })
+
+    expect(reloaded).toBe(true)
+    expect(storage.getItem(SELECTED_SCENARIO_KEY)).toBeNull()
+    expect(storage.keys()).toEqual([SCENARIO_DESKTOP_RETURN_KEY])
+    expect(consumeScenarioDesktopReturn({ storage })).toBe(true)
+    expect(storage.keys()).toEqual([])
   })
 })

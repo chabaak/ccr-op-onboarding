@@ -14,6 +14,7 @@ import { createRunCounter } from '../components/run-counter.ts'
 import { holdDesk, revealDesk } from '../components/desktop-dressing.ts'
 import { installAudio } from '../audio/index.ts'
 import { createAnnouncer } from './announcer.ts'
+import { installAbortMissionControl } from './abort-mission.ts'
 import { bindRadioSfx, sfxHandOver } from './radio-sfx.ts'
 import { must } from './dom.ts'
 import { installEnding } from './ending.ts'
@@ -23,7 +24,7 @@ import { installTutorial } from './tutorial.ts'
 import { fetchScenarioEndings, fetchScenarioIdentity, fetchScenarioIndex, fetchScenarioScore } from './pack.ts'
 import type { ScenarioIdentity } from './pack.ts'
 import { installScenarioDesktop } from './scenario-desktop.ts'
-import { scenarioPackInPlay } from './pack-session.ts'
+import { consumeScenarioDesktopReturn, scenarioPackInPlay } from './pack-session.ts'
 import { PORTAL, TASKBAR_HINT } from './portal-identity.ts'
 import { clearRunState } from './run-state.ts'
 import { WINDOW_REGISTRY } from './window-registry.ts'
@@ -224,6 +225,7 @@ export async function bootShell(): Promise<void> {
   // 1 — the scenario pack.
   const scenarioIndex = await fetchScenarioIndex()
   const selectedPack = scenarioPackInPlay(scenarioIndex, { storage: window.sessionStorage })
+  const returnToDesktop = consumeScenarioDesktopReturn({ storage: window.sessionStorage })
   const identity = await fetchScenarioIdentity(selectedPack)
   const endingData = await Promise.all([
     fetchScenarioEndings(identity.slug),
@@ -292,6 +294,11 @@ export async function bootShell(): Promise<void> {
     index: scenarioIndex,
     localStorage: window.localStorage,
     sessionStorage: window.sessionStorage,
+  })
+  installAbortMissionControl({
+    app,
+    taskbar: must('#taskbar'),
+    returnToDesktop: () => scenarioDesktop.returnToDesktop(),
   })
   desk.arrange({ width: window.innerWidth, height: window.innerHeight })
   window.addEventListener('resize', () => {
@@ -381,7 +388,8 @@ export async function bootShell(): Promise<void> {
   }
 
   runPump(driver)
-  desk.focus('feed')
+  if (returnToDesktop) desk.closeAll()
+  else desk.focus('feed')
 
   // 6 — the hand-over. Signed in, the operator gets one thing on the desk: the
   // sheet the portal issues with the terminal. Closing it uncovers the desk
