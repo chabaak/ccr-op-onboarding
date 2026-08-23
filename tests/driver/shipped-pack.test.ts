@@ -7,17 +7,16 @@
 // expectations are derived from the same data it reads cannot catch a defect
 // that lives in the data. So they stay, aimed at that pack.
 //
-// What they cannot do is follow `PACK_SLUG`. When the desk moved to 전구간정상
+// What they cannot do is follow source. When the desk moved to 전구간정상
 // (08-08), every real-run harness in the suite — this file's sibling,
 // `acceptance/fixtures/rig.ts`, `scorer.test.ts` — stayed pointed at 우는다리,
 // and the shipped pack went out having never been played. A green suite meant
 // a pack that is not deployed is green.
 //
-// This closes that with the opposite discipline: ONE literal — the slug, read
-// from `shell/pack.ts` — and every expectation computed from the named pack's
-// own files. It cannot go stale on a slug switch, and it deliberately asserts
-// only properties that hold for ANY consumable pack, so it never has to be
-// re-authored when the scenario changes.
+// This closes that with the opposite discipline: the runtime tutorial pack is
+// read from `data/scenario/index.json`, and every expectation is computed from
+// that pack's own files. It cannot go stale on a source edit because there is
+// no source edit to make.
 import { describe, expect, it } from 'vitest'
 import fs from 'node:fs'
 import path from 'node:path'
@@ -32,11 +31,14 @@ import type { ViewEvent } from '../../src/shared/view-driver.ts'
 import type { FixtureDriver } from '../../src/client/driver/fixture-driver.ts'
 import { deathsOf, readValue } from '../../src/shared/predicates.ts'
 import { displayStamp } from '../../src/client/driver/clock.ts'
-import { PACK_SLUG } from '../../src/client/shell/pack.ts'
+import type { ScenarioIndex } from '../../src/shared/datapack.ts'
 
 const REPO = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '../..')
 
 const readJson = (rel: string): unknown => JSON.parse(fs.readFileSync(path.join(REPO, rel), 'utf8'))
+const MANIFEST = readJson('data/scenario/index.json') as ScenarioIndex
+const PACK_ENTRY = MANIFEST.packs.find((pack) => pack.role === 'tutorial')!
+const PACK_SLUG = PACK_ENTRY.slug
 const packFile = (part: string): unknown => readJson(`data/scenario/${PACK_SLUG}/${part}.json`)
 
 /** The authored shapes this file measures against — read, never restated. */
@@ -168,7 +170,7 @@ async function playOneRun(): Promise<ViewEvent[]> {
 }
 
 describe('the shipped pack is the pack under test', () => {
-  it('(a) `PACK_SLUG` names a pack on disk, and it is the one this file plays', () => {
+  it('(a) the manifest tutorial names a pack on disk, and it is the one this file plays', () => {
     const dir = path.join(REPO, 'data', 'scenario', PACK_SLUG)
     expect(fs.existsSync(dir), `PACK_SLUG names "${PACK_SLUG}", which is not a pack directory`).toBe(
       true,

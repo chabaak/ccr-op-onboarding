@@ -23,7 +23,7 @@ import { button, el, must } from '../shell/dom.ts'
 import { deployCopy, openConfirm } from '../shell/confirm.ts'
 import { announce } from '../shell/announcer.ts'
 import { feedReached } from '../shell/feed-reach.ts'
-import { fetchScenarioIdentity } from '../shell/pack.ts'
+import { fetchScenarioInPlay } from '../shell/pack-session.ts'
 import { PORTAL } from '../shell/portal-identity.ts'
 import { createRunState, hasFiledReport } from '../shell/run-state.ts'
 import type { RunPhase, RunState } from '../shell/run-state.ts'
@@ -1503,7 +1503,7 @@ export function mount(host: HTMLElement, driver: FixtureDriver): void {
   // print the shift's hours), so what the cover reads from the pack now is the
   // doc number alone. `identity.end` is no longer used here; the topbar clock
   // is where the day's terminal time is printed.
-  void fetchScenarioIdentity()
+  void fetchScenarioInPlay()
     .then((identity) => {
       slug = identity.slug
       opensAt = identity.start

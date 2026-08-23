@@ -20,8 +20,9 @@ import { installEnding } from './ending.ts'
 import { openManual } from './manual.ts'
 import { openSignIn, signInSkipped } from './sign-in.ts'
 import { installTutorial } from './tutorial.ts'
-import { PACK_DISPLAY_NAME, fetchScenarioEndings, fetchScenarioIdentity, fetchScenarioScore } from './pack.ts'
+import { fetchScenarioEndings, fetchScenarioIdentity, fetchScenarioIndex, fetchScenarioScore } from './pack.ts'
 import type { ScenarioIdentity } from './pack.ts'
+import { scenarioPackInPlay } from './pack-session.ts'
 import { PORTAL, TASKBAR_HINT } from './portal-identity.ts'
 import { clearRunState } from './run-state.ts'
 import { WINDOW_REGISTRY } from './window-registry.ts'
@@ -101,12 +102,10 @@ async function openLiveDesk(identity: ScenarioIdentity): Promise<FixtureDriver |
 }
 
 /**
- * The chrome row's left two thirds. Takes no argument: every string it paints
- * is authored (`PORTAL`, `PACK_DISPLAY_NAME`), and it stopped reading the
- * fetched identity when the case name became display text rather than the
- * slug. The identity is still fetched — the clock band below needs it.
+ * The chrome row's left two thirds. The portal text is shell identity; the case
+ * display name is manifest data for the pack this session selected.
  */
-function renderIdentity(): void {
+function renderIdentity(identity: ScenarioIdentity): void {
   must('#portalName').textContent = PORTAL.portal
   must('#portalCode').textContent = PORTAL.portalCode
   // x2 (08-08) — the id alone. `PORTAL.operator` still exists and the sign-in
@@ -116,7 +115,7 @@ function renderIdentity(): void {
   // screen. The name is not orphaned data — it is data the door consumes.
   must('#opName').textContent = PORTAL.operatorId
   must('#opClearance').textContent = `권한 ${PORTAL.clearance}`
-  must('#caseName').textContent = PACK_DISPLAY_NAME
+  must('#caseName').textContent = identity.displayName
 }
 
 /**
@@ -220,7 +219,9 @@ export async function bootShell(): Promise<void> {
   })
 
   // 1 — the scenario pack.
-  const identity = await fetchScenarioIdentity()
+  const scenarioIndex = await fetchScenarioIndex()
+  const selectedPack = scenarioPackInPlay(scenarioIndex, { storage: window.sessionStorage })
+  const identity = await fetchScenarioIdentity(selectedPack)
   const endingData = await Promise.all([
     fetchScenarioEndings(identity.slug),
     fetchScenarioScore(identity.slug),
@@ -228,7 +229,7 @@ export async function bootShell(): Promise<void> {
     console.error('scenario ending unavailable — the desk will continue without a curtain', cause)
     return null
   })
-  renderIdentity()
+  renderIdentity(identity)
 
   // 2 — the driver behind the §5.2 seam. Nothing above this line knows it.
   // The loop opens on the run the tab left off at (§7 #8): the persisted `meta`

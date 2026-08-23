@@ -305,7 +305,7 @@ export const FEED_PACE: TypePace = { msPerChar: FEED_MS_PER_CHAR, msBetween: FEE
  * be made to wait for a run that is happening whether they watch or not. The
  * pause has one job: to make the next line feel like it took time to happen.
  *
- * The cap is NOT optional, and the shipped pack is the argument. `멈춘회전문`'s
+ * The cap is NOT optional, and the shipped pack is the argument. Its authored
  * gaps run 0 to 33 sim-minutes, so raw proportionality would make the last pause
  * thirty times the first; the demo fixture (`driver/fixtures/woodari-run03.ts`,
  * which is what e2e drives) has gaps of 89. Opening above zero and adding a

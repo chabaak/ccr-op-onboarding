@@ -275,6 +275,17 @@ export type Endings = {
   };
 };
 
+/** scenario index — 런타임 팩 목록과 역할 */
+export type ScenarioIndex = {
+  packs: Array<{
+    slug: string;
+    display_name: string;
+    role: "tutorial" | "practice";
+    order: number;
+    difficulty: string;
+  }>;
+};
+
 /** One scenario's full pack — `data/scenario/<slug>/`, keyed by file. */
 export type Datapack = {
   meta: Meta;

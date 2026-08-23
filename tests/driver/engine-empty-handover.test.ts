@@ -219,14 +219,17 @@ describe('[x14#D] a gate always has a baseline line to speak', () => {
   })
 
   it('(d) the SHIPPED pack answers for every gate it authors', async () => {
-    const { PACK_SLUG } = await import('../../src/client/shell/pack.ts')
     const fs = await import('node:fs')
     const path = await import('node:path')
     const url = await import('node:url')
     const repo = path.resolve(path.dirname(url.fileURLToPath(import.meta.url)), '../..')
+    const manifest = JSON.parse(
+      fs.readFileSync(path.join(repo, 'data/scenario/index.json'), 'utf8'),
+    ) as { packs: { slug: string; role: string }[] }
+    const packSlug = manifest.packs.find((pack) => pack.role === 'tutorial')!.slug
     const read = (name: string): never =>
       JSON.parse(
-        fs.readFileSync(path.join(repo, 'data/scenario', PACK_SLUG, `${name}.json`), 'utf8'),
+        fs.readFileSync(path.join(repo, 'data/scenario', packSlug, `${name}.json`), 'utf8'),
       ) as never
     const schedule = buildSchedule(read('timeline'), read('gates'))
     const gates = schedule.flatMap((beat) => (beat.gate === null ? [] : [beat.gate]))

@@ -23,10 +23,12 @@ import fs from 'node:fs'
 import path from 'node:path'
 import { fileURLToPath } from 'node:url'
 import { DEFAULT_PROMPTS, defaultPromptFor, FALLBACK_PACK } from '../../proxy/src/default-prompt.ts'
-import { PACK_SLUG } from '../../src/client/shell/pack.ts'
+import type { ScenarioIndex } from '../../src/shared/datapack.ts'
 
 const REPO = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '../..')
 const readJson = (rel: string): unknown => JSON.parse(fs.readFileSync(path.join(REPO, rel), 'utf8'))
+const MANIFEST = readJson('data/scenario/index.json') as ScenarioIndex
+const TUTORIAL = MANIFEST.packs.find((pack) => pack.role === 'tutorial')!
 
 type Suite = { slots: { FLAW: string; INCIDENT: string; PRIORITY_LIST: string[] } }
 
@@ -41,11 +43,11 @@ const MEASURED_BY: Readonly<Record<string, string>> = {
 }
 
 describe('the proxy default prompt covers the shipped pack', () => {
-  it('(a) `PACK_SLUG` has its own entry — it never plays on the fallback', () => {
+  it('(a) the tutorial pack has its own entry — it never plays on the fallback', () => {
     expect(
       Object.keys(DEFAULT_PROMPTS),
-      `the deploy ships "${PACK_SLUG}", which has no default prompt — it would play as ${FALLBACK_PACK}`,
-    ).toContain(PACK_SLUG)
+      `the deploy ships "${TUTORIAL.slug}", which has no default prompt — it would play as ${FALLBACK_PACK}`,
+    ).toContain(TUTORIAL.slug)
   })
 
   it('(b) every entry names a pack that exists on disk', () => {

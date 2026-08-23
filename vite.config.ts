@@ -61,6 +61,7 @@ const OPTIONAL_PACK_PARTS = [
 // by the client rather than the driver — `src/client/audio/` reads it on the
 // first gesture, which is why it appears here and not in either `PACK_FILES`.
 const POLICY_FILES = ['policy/report-guidance.json', 'policy/audio-map.json'] as const
+const SCENARIO_ROOT_FILES = ['scenario/index.json'] as const
 
 /** `data/scenario/<slug>/` — every directory that is a pack, `_schema/` aside. */
 function packSlugs(scenarioDir: string): string[] {
@@ -81,7 +82,7 @@ export function publishedDataFiles(root: string = process.cwd()): string[] {
         .filter((rel) => existsSync(join(root, 'data', rel))),
     ],
   )
-  return [...scenario, ...POLICY_FILES]
+  return [...SCENARIO_ROOT_FILES, ...scenario, ...POLICY_FILES]
 }
 
 /**
