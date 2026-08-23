@@ -43,6 +43,10 @@ artifacts/runs/
 # Super-pipeline runtime state must stay out of git
 .claude/super/
 
+# Local design-tool state and imported handoff scratch
+.impeccable/
+.design-handoff/
+
 # Editor directories and files
 .vscode/*
 !.vscode/extensions.json
