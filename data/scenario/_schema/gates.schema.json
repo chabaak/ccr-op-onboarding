@@ -84,7 +84,7 @@
           "stances": {
             "type": "array",
             "minItems": 2,
-            "maxItems": 4,
+            "maxItems": 5,
             "items": {
               "type": "object",
               "required": [
