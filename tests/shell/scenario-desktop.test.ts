@@ -1,17 +1,26 @@
-import { describe, expect, it } from 'vitest'
+import { describe, expect, it, vi } from 'vitest'
 import fs from 'node:fs'
 import path from 'node:path'
 
 import { META_KEY } from '../../src/client/shell/run-state.ts'
 import {
   SCENARIO_UNLOCK_NOTICE,
+  SCENARIO_ENDING_LOAD_FAILURE_NOTICE,
+  SCENARIO_UNPLAYABLE_NOTICE,
   UNLOCKED_SCENARIOS_KEY,
   incidentBriefCopy,
   readUnlockedScenarioSlugs,
   restartScenario,
+  scenarioStartCheck,
   unlockAllScenarioFiles,
 } from '../../src/client/shell/scenario-desktop.ts'
-import type { ScenarioIncidentBrief, ScenarioIndex } from '../../src/client/shell/pack.ts'
+import type {
+  ScenarioEndings,
+  ScenarioIncidentBrief,
+  ScenarioIndex,
+  ScenarioPackEntry,
+  ScenarioScore,
+} from '../../src/client/shell/pack.ts'
 import { sortedScenarioPacks } from '../../src/client/shell/pack.ts'
 import { metaKey, stampKey } from '../../src/runloop/index.ts'
 
@@ -19,6 +28,23 @@ const REPO = path.resolve(import.meta.dirname, '../..')
 const MANIFEST = JSON.parse(
   fs.readFileSync(path.join(REPO, 'data/scenario/index.json'), 'utf8'),
 ) as ScenarioIndex
+const ENDINGS: ScenarioEndings = {
+  siteOccupants: 1,
+  scoredOutsideSite: [],
+  copy: {
+    good: [{ head: 'good', lead: 'lead', body: ['body'] }],
+    bad: [{ head: 'bad', lead: 'lead', body: ['body'] }],
+  },
+}
+const SCORE: ScenarioScore = { units: [] }
+
+const packEntry = (role: ScenarioPackEntry['role']): ScenarioPackEntry => ({
+  slug: `${role}-pack`,
+  displayName: `${role} pack`,
+  role,
+  order: 1,
+  difficulty: 'test',
+})
 
 class FakeStorage {
   readonly held = new Map<string, string>()
@@ -110,5 +136,39 @@ describe('scenario desktop replay files', () => {
 
     expect(storage.keys()).toEqual([])
     expect(reloaded).toBe(true)
+  })
+
+  it('(g) a playable pack must prove its ending sidecars before selection can continue', async () => {
+    await expect(
+      scenarioStartCheck(packEntry('practice'), {
+        fetchEndings: async () => ENDINGS,
+        fetchScore: async () => SCORE,
+      }),
+    ).resolves.toEqual({ ok: true })
+  })
+
+  it('(h) a missing ending sidecar becomes operator-facing copy before the run starts', async () => {
+    await expect(
+      scenarioStartCheck(packEntry('practice'), {
+        fetchEndings: async () => {
+          throw new Error('missing')
+        },
+        fetchScore: async () => SCORE,
+      }),
+    ).resolves.toEqual({ ok: false, says: SCENARIO_ENDING_LOAD_FAILURE_NOTICE })
+  })
+
+  it('(i) fixture packs are visible archive files, not startable runs', async () => {
+    const fetchEndings = vi.fn(async () => ENDINGS)
+    const fetchScore = vi.fn(async () => SCORE)
+
+    await expect(
+      scenarioStartCheck(packEntry('fixture'), {
+        fetchEndings,
+        fetchScore,
+      }),
+    ).resolves.toEqual({ ok: false, says: SCENARIO_UNPLAYABLE_NOTICE })
+    expect(fetchEndings).not.toHaveBeenCalled()
+    expect(fetchScore).not.toHaveBeenCalled()
   })
 })

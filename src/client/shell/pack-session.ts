@@ -11,6 +11,7 @@ import { clearRunState } from './run-state.ts'
 import {
   fetchScenarioIdentity,
   fetchScenarioIndex,
+  isScenarioPlayable,
   scenarioPackBySlug,
   tutorialScenarioPack,
 } from './pack.ts'
@@ -58,7 +59,7 @@ export function scenarioPackInPlay(
   const selected = storage?.getItem(SELECTED_SCENARIO_KEY) ?? null
   if (selected !== null) {
     const pack = scenarioPackBySlug(index, selected)
-    if (pack !== null) return pack
+    if (pack !== null && isScenarioPlayable(pack)) return pack
   }
   return tutorialScenarioPack(index)
 }
@@ -89,6 +90,7 @@ export function switchScenarioPack(
 ): ScenarioPackEntry {
   const pack = scenarioPackBySlug(index, slug)
   if (pack === null) throw new Error(`scenario index: unknown pack ${JSON.stringify(slug)}`)
+  if (!isScenarioPlayable(pack)) throw new Error(`scenario index: pack ${JSON.stringify(slug)} is not playable`)
   const storage = storageOf(options)
   resetScenarioSession(index, { storage })
   storage?.setItem(SELECTED_SCENARIO_KEY, slug)

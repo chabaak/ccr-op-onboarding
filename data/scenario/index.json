@@ -10,14 +10,14 @@
     {
       "slug": "전구간정상",
       "display_name": "전 구간 정상",
-      "role": "practice",
+      "role": "fixture",
       "order": 10,
       "difficulty": "standard"
     },
     {
       "slug": "우는다리",
       "display_name": "우는 다리",
-      "role": "practice",
+      "role": "fixture",
       "order": 20,
       "difficulty": "advanced"
     }

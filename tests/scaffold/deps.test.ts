@@ -1,9 +1,10 @@
 // [u0#c4] — dev-dependencies-only toolchain (PRD §2, inv 9, C2) + script wiring.
 import { describe, it, expect } from 'vitest'
 import fs from 'node:fs'
+import os from 'node:os'
 import path from 'node:path'
 import { createRequire } from 'node:module'
-import { execFileSync } from 'node:child_process'
+import { execFileSync, spawnSync } from 'node:child_process'
 import { fileURLToPath } from 'node:url'
 
 const REPO = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '../..')
@@ -131,6 +132,40 @@ describe('[u0#c4] script wiring', () => {
       // whole point of the test.
       expect(listed.normalize('NFC'), `pack "${slug}" was never linted`).toContain(`── ${slug}`)
     }
+  })
+
+  it('(g5) playable scenario entries cannot omit the ending sidecar', () => {
+    const root = fs.mkdtempSync(path.join(os.tmpdir(), 'scenario-index-'))
+    const scenario = path.join(root, 'data', 'scenario')
+    fs.mkdirSync(path.join(scenario, '_schema'), { recursive: true })
+    fs.mkdirSync(path.join(scenario, 'broken-pack'), { recursive: true })
+    fs.copyFileSync(
+      path.join(REPO, 'data/scenario/_schema/index.schema.json'),
+      path.join(scenario, '_schema/index.schema.json'),
+    )
+    fs.writeFileSync(
+      path.join(scenario, 'index.json'),
+      JSON.stringify({
+        packs: [
+          {
+            slug: 'broken-pack',
+            display_name: 'Broken Pack',
+            role: 'practice',
+            order: 0,
+            difficulty: 'test',
+          },
+        ],
+      }),
+    )
+
+    const result = spawnSync(process.execPath, [path.join(REPO, 'authoring/lint-all-packs.mjs')], {
+      cwd: root,
+      encoding: 'utf8',
+    })
+
+    expect(result.status).toBe(1)
+    expect(result.stderr).toContain('playable pack "broken-pack" (practice) has no endings.json')
+    fs.rmSync(root, { recursive: true, force: true })
   })
 
   it('(g2) root-moved tool configs are invoked from config/', () => {

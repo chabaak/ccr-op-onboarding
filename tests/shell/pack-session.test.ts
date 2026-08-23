@@ -17,6 +17,18 @@ const REPO = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '../..')
 const MANIFEST = JSON.parse(
   fs.readFileSync(path.join(REPO, 'data/scenario/index.json'), 'utf8'),
 ) as ScenarioIndex
+const PLAYABLE_MANIFEST: ScenarioIndex = {
+  packs: [
+    ...MANIFEST.packs,
+    {
+      slug: 'practice-live',
+      displayName: 'Practice Live',
+      role: 'practice',
+      order: 99,
+      difficulty: 'test',
+    },
+  ],
+}
 
 class FakeStorage {
   readonly held = new Map<string, string>()
@@ -50,23 +62,23 @@ describe('runtime scenario pack selection', () => {
 
   it('(b) a valid session choice selects that pack without a source edit', () => {
     const storage = new FakeStorage()
-    const chosen = MANIFEST.packs.find((pack) => pack.role !== 'tutorial')!
+    const chosen = PLAYABLE_MANIFEST.packs.find((pack) => pack.role === 'practice')!
     storage.setItem(SELECTED_SCENARIO_KEY, chosen.slug)
-    expect(scenarioPackInPlay(MANIFEST, { storage }).slug).toBe(chosen.slug)
+    expect(scenarioPackInPlay(PLAYABLE_MANIFEST, { storage }).slug).toBe(chosen.slug)
   })
 
   it('(c) switching clears shell/run-loop state and asks the host to reload', () => {
     const storage = new FakeStorage()
-    const chosen = MANIFEST.packs.find((pack) => pack.role !== 'tutorial')!
+    const chosen = PLAYABLE_MANIFEST.packs.find((pack) => pack.role === 'practice')!
     let reloaded = false
 
     storage.setItem(META_KEY, JSON.stringify({ type: 'meta', run: 3 }))
-    for (const pack of MANIFEST.packs) {
+    for (const pack of PLAYABLE_MANIFEST.packs) {
       storage.setItem(metaKey(pack.slug), JSON.stringify({ pack_slug: pack.slug, run_count: 2 }))
       storage.setItem(stampKey(pack.slug), 'old-build')
     }
 
-    const entry = switchScenarioPack(MANIFEST, chosen.slug, {
+    const entry = switchScenarioPack(PLAYABLE_MANIFEST, chosen.slug, {
       storage,
       reload: () => {
         reloaded = true
@@ -90,12 +102,30 @@ describe('runtime scenario pack selection', () => {
   })
 
   it('(e) switching reloads the page by default', () => {
-    const chosen = MANIFEST.packs.find((pack) => pack.role !== 'tutorial')!
+    const chosen = PLAYABLE_MANIFEST.packs.find((pack) => pack.role === 'practice')!
     const reload = vi.fn()
     vi.stubGlobal('location', { reload })
 
-    switchScenarioPack(MANIFEST, chosen.slug, { storage: new FakeStorage() })
+    switchScenarioPack(PLAYABLE_MANIFEST, chosen.slug, { storage: new FakeStorage() })
 
     expect(reload).toHaveBeenCalledOnce()
+  })
+
+  it('(f) a persisted fixture choice falls back to the playable tutorial pack', () => {
+    const storage = new FakeStorage()
+    const fixture = MANIFEST.packs.find((pack) => pack.role === 'fixture')!
+    const tutorial = MANIFEST.packs.find((pack) => pack.role === 'tutorial')!
+
+    storage.setItem(SELECTED_SCENARIO_KEY, fixture.slug)
+
+    expect(scenarioPackInPlay(MANIFEST, { storage }).slug).toBe(tutorial.slug)
+  })
+
+  it('(g) switching refuses fixture packs before they can boot without endings', () => {
+    const fixture = MANIFEST.packs.find((pack) => pack.role === 'fixture')!
+
+    expect(() => switchScenarioPack(MANIFEST, fixture.slug, { storage: new FakeStorage() })).toThrow(
+      /not playable/,
+    )
   })
 })

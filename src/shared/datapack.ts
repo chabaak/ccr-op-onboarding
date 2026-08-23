@@ -296,7 +296,8 @@ export type ScenarioIndex = {
   packs: Array<{
     slug: string;
     display_name: string;
-    role: "tutorial" | "practice";
+    /** tutorial/practice packs are startable and must ship endings.json; fixture packs may remain selectable archive cases without ending data */
+    role: "tutorial" | "practice" | "fixture";
     order: number;
     difficulty: string;
   }>;
