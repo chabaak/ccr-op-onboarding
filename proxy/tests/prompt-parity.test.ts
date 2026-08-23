@@ -1,5 +1,5 @@
 import { readdirSync, readFileSync, statSync } from "node:fs";
-import { dirname, join } from "node:path";
+import { basename, dirname, join } from "node:path";
 import { fileURLToPath } from "node:url";
 import { describe, expect, it } from "vitest";
 
@@ -35,10 +35,16 @@ import type { CallType } from "../src/types.js";
  */
 
 const REPO = join(dirname(fileURLToPath(import.meta.url)), "..", "..");
-const SUITES = join(REPO, "tools", "probe", "dday-mechanism", "suites");
-const TEMPERAMENT = join(REPO, "tools", "probe", "fixtures", "temperament");
+const RETAINED_SUITES = join(REPO, "tools", "probe", "dday-mechanism", "suites");
+const TEST_SUITES = join(REPO, "tests", "fixtures", "probe", "suites");
+const TEMPERAMENT = join(REPO, "tests", "fixtures", "probe", "temperament");
 const PROMPT_ROOT = join(REPO, "proxy", "prompts");
 const RUNTIME_VERSIONS = join(PROMPT_ROOT, "runtime-versions.json");
+const PARITY_SUITES = [
+  join(RETAINED_SUITES, "DOME-G1-baseline.json"),
+  join(TEST_SUITES, "SMOKE-C2-narration-J1.json"),
+  join(TEST_SUITES, "SMOKE-C3-reporter-J1.json"),
+];
 
 const probeOpts = {
   prompts: {
@@ -58,26 +64,14 @@ type Suite = {
 
 /** One composable suite per call type. */
 function suitesUnderTest(): Array<{ name: string; suite: Suite }> {
-  const picked = new Map<string, { name: string; suite: Suite }>();
-  for (const file of readdirSync(SUITES).sort()) {
-    if (!file.endsWith(".json")) continue;
-    let suite: Suite;
-    try {
-      suite = JSON.parse(readFileSync(join(SUITES, file), "utf8"));
-    } catch {
-      continue;
-    }
-    if (!(suite.call_type in CALL_TYPES) || picked.has(suite.call_type)) continue;
-    // Some archived suites target a template version whose files are gone. A
-    // load failure is not drift, so they are skipped rather than failed.
-    try {
-      composeArm(suite, Object.keys(suite.arms ?? {})[0], probeOpts);
-    } catch {
-      continue;
-    }
-    picked.set(suite.call_type, { name: file, suite });
-  }
-  return [...picked.values()];
+  return PARITY_SUITES.map((file) => {
+    const suite = JSON.parse(readFileSync(file, "utf8")) as Suite;
+    if (!(suite.call_type in CALL_TYPES)) throw new Error(`${file} has unknown call type`);
+    const firstArm = Object.keys(suite.arms ?? {})[0];
+    if (!firstArm) throw new Error(`${file} has no arms`);
+    composeArm(suite, firstArm, probeOpts);
+    return { name: basename(file), suite };
+  });
 }
 
 const cases = suitesUnderTest();

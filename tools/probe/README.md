@@ -17,7 +17,7 @@ to an experiment has moved out:
 |---|---|---|
 | `templates/*/base-*.md` | `proxy/prompts/` | the production system layer; call contracts §6 makes the proxy its supplier |
 | `templates/*/user-*.md` | `proxy/prompts/` | the proxy renders both layers (physical §3.10) |
-| `templates/*/temperament/` | `fixtures/temperament/` | probe fixtures. The production source of truth is `data/scenario/<slug>/temperament.json` |
+| `templates/*/temperament/` | `tests/fixtures/probe/temperament/` | test fixtures. The production source of truth is `data/scenario/<slug>/temperament.json` |
 | `lib/compose.mjs` | `tools/lib/compose.mjs` | prototype of `src/composer/`, shared with the driver |
 | `lib/calltypes.mjs` | `tools/lib/calls.mjs` | the three calls' contracts, shared with the driver |
 | `lib/transport.mjs` | `tools/lib/transport.mjs` | shared with the driver |
@@ -126,8 +126,11 @@ both are paper instruments with zero calls.
 
 ## Suite anatomy
 
-Suites are data, under `tools/probe/dday-mechanism/suites/`. See
-`DOME-G1-baseline.json` for a worked one.
+Suites are data, under `tools/probe/dday-mechanism/suites/`. The retained DOME
+suites are measurement evidence and stay single-source; the proxy parity gate
+reads the retained judgment suite directly. Retired SMOKE sheets used only to
+exercise narration/reporter parity live under `tests/fixtures/probe/suites/`.
+See `DOME-G1-baseline.json` for a worked retained measurement suite.
 
 ```jsonc
 {
@@ -136,7 +139,7 @@ Suites are data, under `tools/probe/dday-mechanism/suites/`. See
   "channel": "C-BLOCK",                    // decides which slots may vary
   "template_version": "v0.4",
   "model": "claude-haiku-4-5-20251001",    // pinned
-  "temperament": "k1",                     // fixtures/temperament/<id>.md
+  "temperament": "k1",                     // tests/fixtures/probe/temperament/<id>.md
   "pre_registration": {
     "hypothesis": "…gate standard form…",
     "n_per_arm": 3,

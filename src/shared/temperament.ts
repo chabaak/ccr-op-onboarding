@@ -17,7 +17,7 @@
  * shape, only the body of this function changes; the export stays the same.
  *
  * The header text below is the one exemplar the spec gives (probe fixture
- * `tools/probe/fixtures/temperament/k1.md`, design decision 6): S + D still
+ * `tests/fixtures/probe/temperament/k1.md`, design decision 6): S + D still
  * own the final call, but this is not a placeholder invented by this unit.
  *
  * D4 / spec S5: this renderer is **total** — no validation, no throw.
