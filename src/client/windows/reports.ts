@@ -48,7 +48,7 @@ import type { ReportModel } from '../components/report-view.ts'
 import { el } from '../shell/dom.ts'
 import { feedReached } from '../shell/feed-reach.ts'
 import type { FeedCue } from '../shell/feed-reach.ts'
-import { fetchScenarioIdentity } from '../shell/pack.ts'
+import { fetchScenarioInPlay } from '../shell/pack-session.ts'
 import { PORTAL } from '../shell/portal-identity.ts'
 import { pad2 } from '../components/block-card.ts'
 import { getSlotBoard, SLOT_CAP } from '../components/slot-board.ts'
@@ -447,7 +447,7 @@ export function mount(host: HTMLElement, driver: FixtureDriver): void {
   // The record's headline needs the pack's own end-of-day stamp — the ONE
   // pack file the consumer map gives the view shell (`architecture-map.md:85`),
   // read through the shell's own helper, exactly as `windows/tally.ts` once did.
-  void fetchScenarioIdentity()
+  void fetchScenarioInPlay()
     .then((identity) => {
       slug = identity.slug
       const [hour, minute] = identity.end.split(':')

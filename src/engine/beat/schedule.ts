@@ -50,9 +50,9 @@ export type ScheduledGate = {
    * Resolved once, here, and never empty. `compileGate` prefers the authored
    * `baseline_utterance` and falls back to the DEFAULT STANCE'S OWN LABEL,
    * which is not a degraded substitute: a label is already written in the
-   * agent's 해라체 as the action it takes and the reason it takes it — 멈춘회전문's
-   * G1 `a` opens `달리 볼 까닭이 없으므로`. An agent reasoning from temperament
-   * alone says exactly that, so the authored field is an escape hatch for a
+   * agent's 해라체 as the action it takes and the reason it takes it. An agent
+   * reasoning from temperament alone says exactly that, so the authored field
+   * is an escape hatch for a
    * label that reads badly aloud, not the normal path.
    *
    * Resolved at BUILD time, unlike `availability` below, because nothing about

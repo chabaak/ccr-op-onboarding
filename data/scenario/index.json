@@ -1,0 +1,25 @@
+{
+  "packs": [
+    {
+      "slug": "멈춘회전문",
+      "display_name": "멈춘 회전문",
+      "role": "tutorial",
+      "order": 0,
+      "difficulty": "tutorial"
+    },
+    {
+      "slug": "전구간정상",
+      "display_name": "전 구간 정상",
+      "role": "practice",
+      "order": 10,
+      "difficulty": "standard"
+    },
+    {
+      "slug": "우는다리",
+      "display_name": "우는 다리",
+      "role": "practice",
+      "order": 20,
+      "difficulty": "advanced"
+    }
+  ]
+}

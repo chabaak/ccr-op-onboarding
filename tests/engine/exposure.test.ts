@@ -27,8 +27,7 @@ import { buildSchedule } from '../../src/engine/beat/schedule.ts'
 import { createEngine } from '../../src/engine/index.ts'
 import type { EnginePack } from '../../src/engine/index.ts'
 import type { Beat } from '../../src/engine/beat/schedule.ts'
-import type { Characters, Gates, Symptoms, Temperament, Timeline } from '../../src/shared/datapack.ts'
-import { PACK_SLUG } from '../../src/client/shell/pack.ts'
+import type { Characters, Gates, ScenarioIndex, Symptoms, Temperament, Timeline } from '../../src/shared/datapack.ts'
 import { rig } from './beat/harness.ts'
 import { exposurePack, twinRosterPack } from './beat/fixtures/packs.ts'
 
@@ -97,6 +96,8 @@ describe('[e3#F4] a ROW reaches the prompt only where its exposure holds', () =>
 /* ══ (b) the pack that ships ════════════════════════════════════════════════ */
 
 const REPO = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '../..')
+const MANIFEST = JSON.parse(fs.readFileSync(path.join(REPO, 'data/scenario/index.json'), 'utf8')) as ScenarioIndex
+const PACK_SLUG = MANIFEST.packs.find((pack) => pack.role === 'tutorial')!.slug
 const part = <T>(name: string): T =>
   JSON.parse(fs.readFileSync(path.join(REPO, 'data/scenario', PACK_SLUG, `${name}.json`), 'utf8')) as T
 

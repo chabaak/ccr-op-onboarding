@@ -1,0 +1,105 @@
+// Runtime scenario choice and the reset that makes a choice clean.
+//
+// The tutorial/default pack is data, not source: `scenarioPackInPlay()` falls
+// back to the manifest's single tutorial entry when no session choice exists.
+// A later select screen can call `switchScenarioPack()` and get the same reset
+// #60 needs here: run counters, carry-over blocks and the shell's last meta
+// projection are cleared before the selected slug is written.
+
+import { clearWebStorageMetaStore } from '../../runloop/index.ts'
+import { clearRunState } from './run-state.ts'
+import {
+  fetchScenarioIdentity,
+  fetchScenarioIndex,
+  scenarioPackBySlug,
+  tutorialScenarioPack,
+} from './pack.ts'
+import type { ScenarioIdentity, ScenarioIndex, ScenarioPackEntry } from './pack.ts'
+
+interface StoragePort {
+  getItem(key: string): string | null
+  setItem(key: string, value: string): void
+  removeItem(key: string): void
+}
+
+export interface ScenarioSessionOptions {
+  storage?: StoragePort | null
+}
+
+export interface ScenarioSwitchOptions extends ScenarioSessionOptions {
+  reload?: () => void
+}
+
+export const SELECTED_SCENARIO_KEY = 'ndsp:scenario:selected:v1'
+
+function defaultStorage(): StoragePort | null {
+  try {
+    const holder = globalThis as { sessionStorage?: StoragePort }
+    return holder.sessionStorage ?? null
+  } catch {
+    return null
+  }
+}
+
+function storageOf(options: ScenarioSessionOptions): StoragePort | null {
+  return options.storage === undefined ? defaultStorage() : options.storage
+}
+
+function defaultReload(): void {
+  const holder = globalThis as { location?: { reload?: () => void } }
+  holder.location?.reload?.()
+}
+
+export function scenarioPackInPlay(
+  index: ScenarioIndex,
+  options: ScenarioSessionOptions = {},
+): ScenarioPackEntry {
+  const storage = storageOf(options)
+  const selected = storage?.getItem(SELECTED_SCENARIO_KEY) ?? null
+  if (selected !== null) {
+    const pack = scenarioPackBySlug(index, selected)
+    if (pack !== null) return pack
+  }
+  return tutorialScenarioPack(index)
+}
+
+/**
+ * Clears all pack-bound session state.
+ *
+ * Run-loop state is keyed by slug, so every manifest entry is cleared. The
+ * shell projection uses one fixed key and is cleared once. The in-memory block
+ * and membrane stores are intentionally not reachable here; `switchScenarioPack`
+ * reloads the page after clearing persistence, which is the only clean way to
+ * drop those live objects without teaching every window about pack selection.
+ */
+export function resetScenarioSession(
+  index: ScenarioIndex,
+  options: ScenarioSessionOptions = {},
+): void {
+  const storage = storageOf(options)
+  if (storage === null) return
+  clearRunState({ storage: storage as Storage })
+  for (const pack of index.packs) clearWebStorageMetaStore(storage, pack.slug)
+}
+
+export function switchScenarioPack(
+  index: ScenarioIndex,
+  slug: string,
+  options: ScenarioSwitchOptions = {},
+): ScenarioPackEntry {
+  const pack = scenarioPackBySlug(index, slug)
+  if (pack === null) throw new Error(`scenario index: unknown pack ${JSON.stringify(slug)}`)
+  const storage = storageOf(options)
+  resetScenarioSession(index, { storage })
+  storage?.setItem(SELECTED_SCENARIO_KEY, slug)
+  if (options.reload === undefined) defaultReload()
+  else options.reload()
+  return pack
+}
+
+export async function fetchScenarioInPlay(
+  options: ScenarioSessionOptions = {},
+): Promise<ScenarioIdentity> {
+  const index = await fetchScenarioIndex()
+  return fetchScenarioIdentity(scenarioPackInPlay(index, options))
+}

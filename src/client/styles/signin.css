@@ -32,8 +32,8 @@ body.signin #toast{display:none}
 
    x10 (민서, 08-10) — this comment used to name the drawing and call it "the
    bridge this whole simulation is about", and it was wrong twice over. The
-   shipped case is a tunnel (`PACK_SLUG`, `shell/pack.ts`), and the wallpaper
-   now carries no name at all: its four `<text>` labels named the dropped first
+   shipped case is not selected by this stylesheet, and the wallpaper now
+   carries no name at all: its four `<text>` labels named the dropped first
    concept and are gone (see the `.bp` group in index.html). This rule is
    unchanged and still earns its keep — the door is the ONE screen with nothing
    over the wallpaper, so it is the only place the drawing is worth lighting.

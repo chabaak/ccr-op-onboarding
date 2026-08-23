@@ -1,9 +1,11 @@
 // The scenario pack fetch — step 1 of the boot order (spec-client §5.1).
 //
-// The shell reads the pack surfaces it owns: `meta.json` for the chrome/clock
-// band and `endings.json` for the terminal curtain. Score predicates are read
-// only for the ending trigger and preview tally; the ledger itself still comes
-// from the driver seam.
+// The shell starts with `data/scenario/index.json`: the ordered list of packs
+// and the one tutorial designation the portal auto-opens. Then it reads the
+// selected pack surfaces it owns: `meta.json` for the chrome/clock band and
+// `endings.json` for the terminal curtain. Score predicates are read only for
+// the ending trigger and preview tally; the ledger itself still comes from the
+// driver seam.
 //
 // The pack is authored data (frozen this run), so it is parsed defensively:
 // the terminal stamp is written `21:04+` there — the trailing `+` marks an
@@ -12,10 +14,25 @@
 /** The case identity + clock band the chrome renders. */
 export interface ScenarioIdentity {
   slug: string
+  displayName: string
   /** `"HH:MM"` the scenario opens on. */
   start: string
   /** `"HH:MM"` the scenario closes on. */
   end: string
+}
+
+export type ScenarioRole = 'tutorial' | 'practice'
+
+export interface ScenarioPackEntry {
+  slug: string
+  displayName: string
+  role: ScenarioRole
+  order: number
+  difficulty: string
+}
+
+export interface ScenarioIndex {
+  packs: readonly ScenarioPackEntry[]
 }
 
 export type EndingKindName = 'good' | 'bad'
@@ -42,50 +59,6 @@ export interface ScenarioScore {
   units: readonly ScenarioScoreUnit[]
 }
 
-// The shipped scenario. Switching it is a one-line change here plus the
-// `<title>` in `index.html`, and nothing else: `packSlugs()` in
-// `vite.config.ts` publishes every pack under `data/scenario/`, the engine
-// reads whatever `meta.json` this points at, and `metaKey(packSlug)` keys the
-// saved meta-state per slug, so a switch starts a clean shelf rather than
-// resuming another scenario's counters.
-//
-// The clock band is same-day only (`driver/clock.ts` `createClock` ends the
-// run on `minute >= endMinute`), which is why `compile-datapack.mjs` refuses a
-// timeline that would cross midnight — a pack that did would boot already
-// ended. A candidate pack has to close before 23:59.
-//
-// EXPORTED so a test can ask "which pack ships?" instead of restating the
-// answer. `tests/driver/shipped-pack.test.ts` plays whatever this names and
-// derives every expectation from that pack's own files, so switching the slug
-// moves the coverage with it rather than leaving it aimed at a pack the deploy
-// no longer carries.
-export const PACK_SLUG = '멈춘회전문'
-
-/**
- * The same case, spelled for a reader instead of for a filesystem.
- *
- * x2 (08-08) — the chrome was printing `PACK_SLUG` straight into `#caseName`,
- * so the desk named its own case 전구간정상: one run-on word, which is what a
- * directory name has to be and not what a control room writes. That pack's own
- * logline already spelled it 전 구간 정상 in prose, so the display name was the
- * pack agreeing with itself rather than a new name.
- *
- * 멈춘회전문 (08-10) does not name itself in its logline, so the spacing here is
- * the only place the two words come apart. 멈춘 · 회전문 is the segmentation any
- * reader makes and none of this code could — which is the same reason the field
- * is authored rather than derived.
- *
- * DELIBERATELY not derived from `PACK_SLUG` — there is no rule that puts the
- * spaces back (전/구간/정상 is not a segmentation any code here could know), and
- * a display name is authored text either way.
- *
- * The slug stays the slug everywhere it is an IDENTIFIER: the `data/scenario/`
- * path, `metaKey()`'s storage key, and the `ERR-2/AF/…` · `ERR-2/TL/…` document
- * numbers, which are catalogue numbers a reader is meant to quote back, not
- * prose. Only the places that read as a name take this.
- */
-export const PACK_DISPLAY_NAME = '멈춘 회전문'
-
 const isRecord = (value: unknown): value is Record<string, unknown> =>
   typeof value === 'object' && value !== null
 
@@ -101,16 +74,64 @@ function stamp(value: unknown, field: string): string {
   throw new Error(`scenario pack: meta.json '${field}' is not an "HH:MM" stamp`)
 }
 
-function readIdentity(raw: unknown, fallbackSlug: string): ScenarioIdentity {
+function readIdentity(raw: unknown, entry: Pick<ScenarioPackEntry, 'slug' | 'displayName'>): ScenarioIdentity {
   if (!isRecord(raw) || !isRecord(raw.clock)) {
     throw new Error('scenario pack: meta.json has no clock band')
   }
-  const slug = typeof raw.slug === 'string' && raw.slug.length > 0 ? raw.slug : fallbackSlug
+  const slug = typeof raw.slug === 'string' && raw.slug.length > 0 ? raw.slug : entry.slug
+  if (slug !== entry.slug) {
+    throw new Error(`scenario pack: meta.json declares slug ${JSON.stringify(slug)}`)
+  }
   return {
     slug,
+    displayName: entry.displayName,
     start: stamp(raw.clock.start, 'clock.start'),
     end: stamp(raw.clock.end, 'clock.end'),
   }
+}
+
+function readPackEntry(raw: unknown, field: string): ScenarioPackEntry {
+  if (!isRecord(raw)) throw new Error(`scenario index: '${field}' is not a pack entry`)
+  const { slug, display_name: displayName, role, order, difficulty } = raw
+  if (typeof slug !== 'string' || slug.length === 0) {
+    throw new Error(`scenario index: '${field}.slug' is not a string`)
+  }
+  if (typeof displayName !== 'string' || displayName.length === 0) {
+    throw new Error(`scenario index: '${field}.display_name' is not a string`)
+  }
+  if (role !== 'tutorial' && role !== 'practice') {
+    throw new Error(`scenario index: '${field}.role' is not a known role`)
+  }
+  if (typeof order !== 'number' || !Number.isInteger(order) || order < 0) {
+    throw new Error(`scenario index: '${field}.order' is not a non-negative integer`)
+  }
+  if (typeof difficulty !== 'string' || difficulty.length === 0) {
+    throw new Error(`scenario index: '${field}.difficulty' is not a string`)
+  }
+  return { slug, displayName, role, order, difficulty }
+}
+
+function readScenarioIndex(raw: unknown): ScenarioIndex {
+  if (!isRecord(raw) || !Array.isArray(raw.packs) || raw.packs.length === 0) {
+    throw new Error('scenario index: no packs listed')
+  }
+  return { packs: raw.packs.map((pack, index) => readPackEntry(pack, `packs[${index}]`)) }
+}
+
+export function sortedScenarioPacks(index: ScenarioIndex): readonly ScenarioPackEntry[] {
+  return [...index.packs].sort((left, right) => left.order - right.order)
+}
+
+export function tutorialScenarioPack(index: ScenarioIndex): ScenarioPackEntry {
+  const tutorials = index.packs.filter((pack) => pack.role === 'tutorial')
+  if (tutorials.length !== 1) {
+    throw new Error(`scenario index: expected exactly one tutorial pack, found ${tutorials.length}`)
+  }
+  return tutorials[0]!
+}
+
+export function scenarioPackBySlug(index: ScenarioIndex, slug: string): ScenarioPackEntry | null {
+  return index.packs.find((pack) => pack.slug === slug) ?? null
 }
 
 function readPlateCopy(raw: unknown, field: string): ScenarioEndingPlateCopy {
@@ -162,8 +183,8 @@ function readScore(raw: unknown): ScenarioScore {
   }
 }
 
-async function fetchScenarioJson(part: string, slug: string): Promise<unknown> {
-  const url = new URL(`data/scenario/${slug}/${part}.json`, document.baseURI)
+async function fetchDataJson(path: string): Promise<unknown> {
+  const url = new URL(path, document.baseURI)
   const response = await fetch(url)
   if (!response.ok) {
     throw new Error(`scenario pack: ${url.pathname} answered ${response.status}`)
@@ -171,17 +192,26 @@ async function fetchScenarioJson(part: string, slug: string): Promise<unknown> {
   return response.json()
 }
 
+async function fetchScenarioJson(part: string, slug: string): Promise<unknown> {
+  return fetchDataJson(`data/scenario/${slug}/${part}.json`)
+}
+
+/** Fetches `data/scenario/index.json`, the runtime pack manifest. */
+export async function fetchScenarioIndex(): Promise<ScenarioIndex> {
+  return readScenarioIndex(await fetchDataJson('data/scenario/index.json'))
+}
+
 /** Fetches `data/scenario/<slug>/meta.json` relative to the deployed base. */
-export async function fetchScenarioIdentity(slug: string = PACK_SLUG): Promise<ScenarioIdentity> {
-  return readIdentity(await fetchScenarioJson('meta', slug), slug)
+export async function fetchScenarioIdentity(entry: Pick<ScenarioPackEntry, 'slug' | 'displayName'>): Promise<ScenarioIdentity> {
+  return readIdentity(await fetchScenarioJson('meta', entry.slug), entry)
 }
 
 /** Fetches the optional pack-owned ending text and display arithmetic. */
-export async function fetchScenarioEndings(slug: string = PACK_SLUG): Promise<ScenarioEndings> {
+export async function fetchScenarioEndings(slug: string): Promise<ScenarioEndings> {
   return readEndings(await fetchScenarioJson('endings', slug))
 }
 
 /** Fetches the score predicates the ending uses for trigger and preview totals. */
-export async function fetchScenarioScore(slug: string = PACK_SLUG): Promise<ScenarioScore> {
+export async function fetchScenarioScore(slug: string): Promise<ScenarioScore> {
   return readScore(await fetchScenarioJson('score', slug))
 }

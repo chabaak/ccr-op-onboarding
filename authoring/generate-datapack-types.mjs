@@ -29,6 +29,7 @@ const OUT = join(ROOT, 'src', 'shared', 'datapack.ts');
 const REQUIRED_FILES = ['meta', 'timeline', 'characters', 'places', 'temperament', 'gates', 'truths', 'score', 'symptoms'];
 const OPTIONAL_FILES = ['endings'];
 const FILES = [...REQUIRED_FILES, ...OPTIONAL_FILES];
+const ROOT_FILES = ['index'];
 const typeName = (f) => f[0].toUpperCase() + f.slice(1);
 
 const indent = (s) => s.replace(/^/gm, '  ');
@@ -93,6 +94,12 @@ for (const name of FILES) {
   const schema = JSON.parse(readFileSync(join(SCHEMA_DIR, `${name}.schema.json`), 'utf8'));
   out += doc({ description: schema.title }, '');
   out += `export type ${typeName(name)} = ${ts(schema, schema)};\n\n`;
+}
+
+for (const name of ROOT_FILES) {
+  const schema = JSON.parse(readFileSync(join(SCHEMA_DIR, `${name}.schema.json`), 'utf8'));
+  out += doc({ description: schema.title }, '');
+  out += `export type Scenario${typeName(name)} = ${ts(schema, schema)};\n\n`;
 }
 
 out += `/** One scenario's full pack — \`data/scenario/<slug>/\`, keyed by file. */
