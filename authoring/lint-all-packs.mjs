@@ -21,6 +21,8 @@ const SCENARIO_DIR = join(process.cwd(), 'data', 'scenario')
 const LINTER = join('authoring', 'lint-datapack.mjs')
 const MANIFEST = join(SCENARIO_DIR, 'index.json')
 const MANIFEST_SCHEMA = join(SCENARIO_DIR, '_schema', 'index.schema.json')
+const DEFAULT_PROMPTS = join(SCENARIO_DIR, 'default-prompts.json')
+const DEFAULT_PROMPTS_SCHEMA = join(SCENARIO_DIR, '_schema', 'default-prompts.schema.json')
 
 const errors = []
 
@@ -108,6 +110,15 @@ try {
   errors.push(`index.json: cannot read/parse — ${cause.message}`)
 }
 
+let defaultPrompts = null
+try {
+  defaultPrompts = JSON.parse(readFileSync(DEFAULT_PROMPTS, 'utf8'))
+  const schema = JSON.parse(readFileSync(DEFAULT_PROMPTS_SCHEMA, 'utf8'))
+  validate(schema, defaultPrompts, 'default-prompts', schema)
+} catch (cause) {
+  errors.push(`default-prompts.json: cannot read/parse — ${cause.message}`)
+}
+
 // An empty `data/scenario/` means the enumeration silently linted nothing,
 // which is the failure this script was written to prevent — so it is an error.
 if (!slugs.length) {
@@ -139,8 +150,25 @@ if (manifest !== null && typeof manifest === 'object' && Array.isArray(manifest.
   }
 }
 
+if (defaultPrompts !== null && typeof defaultPrompts === 'object' && Array.isArray(defaultPrompts.prompts)) {
+  const listedSet = new Set(
+    manifest !== null && typeof manifest === 'object' && Array.isArray(manifest.packs)
+      ? manifest.packs.map((pack) => pack?.slug).filter((slug) => typeof slug === 'string')
+      : [],
+  )
+  const seen = new Set()
+  for (const prompt of defaultPrompts.prompts) {
+    if (typeof prompt?.slug !== 'string') continue
+    if (seen.has(prompt.slug)) errors.push(`default-prompts.prompts: duplicate slug "${prompt.slug}"`)
+    seen.add(prompt.slug)
+    if (listedSet.size && !listedSet.has(prompt.slug)) {
+      errors.push(`default-prompts.prompts: slug "${prompt.slug}" is not listed in index.packs`)
+    }
+  }
+}
+
 if (errors.length) {
-  console.error('\n── scenario index ───────────────────────────────────────────────')
+  console.error('\n── scenario manifests ───────────────────────────────────────────')
   for (const error of errors) console.error(`✗ ${error}`)
   process.exit(1)
 }

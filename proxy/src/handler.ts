@@ -148,8 +148,8 @@ function parseCallRequest(value: unknown): CallRequest {
   }
   // A wrong TYPE is a malformed envelope and is rejected. An unknown NAME is
   // not checked here: which packs exist is `default-prompt.ts`'s knowledge, and
-  // it answers an unknown one with the incumbent rather than a 400. See
-  // `FALLBACK_PACK` for why that direction.
+  // it answers an unknown one with the generated tutorial fallback rather than
+  // a 400.
   if (body.pack !== undefined && typeof body.pack !== "string") {
     throw new PublicError(400, "invalid_request", "pack must be a string.");
   }
