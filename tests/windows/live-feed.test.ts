@@ -533,13 +533,26 @@ describe('x11 the reveal pump charges time for lines, never for events', () => {
     const timeline = readJson<{ events: { time: string }[] }>(`data/scenario/${tutorial!.slug}/timeline.json`)
     const policy = liveFeedGapPolicyFromClocks(timeline.events.map((event) => event.time))
 
-    expect(policy).toEqual(LIVE_FEED_DEFAULT_GAP_POLICY)
+    expect(policy).toEqual({ gapMaxMs: 900 })
+    expect(FEED_PACE).toEqual({ msPerChar: 48, msBetween: 700 })
+
     const open = mm('08:00')
-    for (let gap = 0; gap <= 120; gap += 1) {
+    const expectedGaps = new Map([
+      [0, 0],
+      [1, 284],
+      [5, 380],
+      [10, 500],
+      [26, 884],
+      [27, 900],
+      [33, 900],
+      [60, 900],
+      [120, 900],
+    ])
+    for (const [gap, expected] of expectedGaps) {
       const to = hhmm(open + gap)
-      expect(feedGapMs('08:00', to, policy)).toBe(feedGapMs('08:00', to, LIVE_FEED_DEFAULT_GAP_POLICY))
+      expect(feedGapMs('08:00', to, policy), `${gap} minute gap`).toBe(expected)
     }
-    expect(paperCost(EVENTS, policy)).toBe(paperCost(EVENTS, LIVE_FEED_DEFAULT_GAP_POLICY))
+    expect(paperCost(EVENTS, policy)).toBe(130088)
   })
 
   it('(e) the whole demo day of paper stays inside the human-readable presentation band', () => {
