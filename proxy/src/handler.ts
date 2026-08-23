@@ -11,7 +11,7 @@ import { BedrockCallProvider, createBedrockClient } from "./provider.js";
 import { isCallType, type CallRequest } from "./types.js";
 
 /**
- * HTTP skeleton, copied from `apothecary-llm-layer/src/handler.ts`: the origin
+ * HTTP skeleton, copied from the earlier LLM service handler: the origin
  * check, content-type gate, body-size limit, error envelope, and the
  * `x-llm-fallback` header that engine spec §5 rides on.
  *

@@ -2,7 +2,7 @@
   "_what": "Call 2 분량 축소 3단계 — v6(\"3~5개\")에서 모델이 5콜 전부 범위의 하한값 3에 붙었다(분산 0). 범위 표기는 밀도 차이를 만들지 못하고 하한이 곧 결과값이다. 축소폭이 의도보다 커서(항목 6.2→3.0, −52%) 하한만 4로 올려 되돌린다.",
   "_authoring_provenance": {
     "derived_from": "SMOKE-C2v6-count-J1.json — description의 개수 범위 \"3~5개\" → \"4~5개\", 그 외 전부 동일",
-    "control": "SMOKE-C2v6-count-J1-calls (하한 3) · SMOKE-C2v5-onesentence-J1-calls (개수 무제한) · SMOKE-C2-roleboundary-J1-calls (원본)",
+    "control": "SMOKE-C2v6-count-J1 suite lineage (하한 3) · SMOKE-C2v5-onesentence-J1 suite lineage (개수 무제한) · SMOKE-C2-roleboundary-J1 suite lineage (원본)",
     "schema_diff": "description: \"3~5개.\" → \"4~5개.\""
   },
   "experiment": "SMOKE-C2v7-count4-J1",

@@ -3,7 +3,7 @@ import { PublicError } from "./errors.js";
 /**
  * Runtime configuration, validated at cold start and never after.
  *
- * Copied from `apothecary-llm-layer/src/config.ts` and narrowed: DDAY binds
+ * Copied from the earlier LLM service config and narrowed: DDAY binds
  * haiku (game spec §4), so the two-model allowlist and the `structuredOutputMode`
  * branch that went with it are gone. The allowlist *machinery* stays, because
  * the property it enforces is still worth having — `MODEL_ID` must be a member

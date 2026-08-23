@@ -1,4 +1,4 @@
-// [u0#c5] — playwright.config.ts shape: chromium only, 1280×800, a real build behind the runner (C5/C9).
+// [u0#c5] — config/playwright.config.ts shape: chromium only, 1280×800, a real build behind the runner (C5/C9).
 //
 // C12/C17 note (08-04, [u11]): four cases here were written against a SINGLE
 // project and a SINGLE webServer object. The C5 split made that shape
@@ -12,7 +12,7 @@ import path from 'node:path'
 import { fileURLToPath, pathToFileURL } from 'node:url'
 
 const REPO = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '../..')
-const CONFIG_PATH = path.join(REPO, 'playwright.config.ts')
+const CONFIG_PATH = path.join(REPO, 'config/playwright.config.ts')
 
 const EXPECTED_BASE_URL = 'http://localhost:5174/ccr-op-onboarding/'
 
@@ -51,8 +51,8 @@ function baseURLs(cfg: PwConfig): string[] {
   return perProject.filter((u): u is string => typeof u === 'string')
 }
 
-describe('[u0#c5] playwright.config.ts source', () => {
-  it('exists at the repo root', () => {
+describe('[u0#c5] config/playwright.config.ts source', () => {
+  it('exists under config/', () => {
     expect(fs.existsSync(CONFIG_PATH)).toBe(true)
   })
 
@@ -66,9 +66,9 @@ describe('[u0#c5] playwright.config.ts source', () => {
   })
 })
 
-describe('[u0#c5] playwright.config.ts resolved value', () => {
-  it('(f) testDir is ./e2e', async () => {
-    expect((await loadConfig()).testDir).toBe('./e2e')
+describe('[u0#c5] config/playwright.config.ts resolved value', () => {
+  it('(f) testDir is ../e2e from config/', async () => {
+    expect((await loadConfig()).testDir).toBe('../e2e')
   })
 
   // C17 / [u11#c12] — RE-AIMED (08-04), never deleted. The C5 split gave the run three HOSTS

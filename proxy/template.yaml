@@ -2,7 +2,7 @@ AWSTemplateFormatVersion: "2010-09-09"
 Transform: AWS::Serverless-2016-10-31
 Description: Stateless DDAY LLM proxy backed by Amazon Bedrock Converse (haiku).
 
-# Copied from apothecary-llm-layer/template.yaml. What changed and why:
+# Based on the earlier LLM service template. What changed and why:
 #   - ModelId is fixed to the haiku global profile (game spec §4), so the
 #     AllowedProfileMode parameter, its Rules block, and the four Nova IAM
 #     statements are all gone. One model, one policy, no conditions.

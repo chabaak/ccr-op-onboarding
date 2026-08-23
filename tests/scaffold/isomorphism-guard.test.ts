@@ -15,31 +15,33 @@
 //       actually for survives and is re-aimed below: the copy stays **by name**,
 //       build-only, with no hand-rolled dev file server.
 //
-// The inspected files — `tsconfig.core.json`, `vite.config.ts` — are frozen
-// inputs (PRD §9). e0 moves these expectations, never the files.
+// The inspected files — `config/tsconfig.core.json`, `vite.config.ts` — are
+// frozen inputs (PRD §9). e0 moves these expectations, never the files.
 import { describe, it, expect } from 'vitest'
 import fs from 'node:fs'
 import path from 'node:path'
 import crypto from 'node:crypto'
-import { execFileSync } from 'node:child_process'
 import { fileURLToPath } from 'node:url'
 
 const REPO = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '../..')
+const CORE_TSCONFIG = 'config/tsconfig.core.json'
+const TEST_TSCONFIG = 'config/tsconfig.test.json'
 
-// D7 — SHA-256 of tsconfig.core.json as it stands on `main` after #114. This
-// file is 윤석's standing condition: it must come out of this run byte-identical.
-const CORE_TSCONFIG_SHA256 = '876a7313e70e221c2619de88fbf91507c92483301c91688b65afd8453b736fcd'
+// D7 — SHA-256 of config/tsconfig.core.json after the issue #53 root cleanup.
+// This file is 윤석's standing condition: it must come out of future runs
+// byte-identical unless the isomorphic boundary is deliberately changed.
+const CORE_TSCONFIG_SHA256 = 'ba959daf6b97524d98e1f8ea25f1553d98e8789e424fc9623dea7610c20981dd'
 
 // physical §3.1 / spec-physical-architecture §2 table — the six isomorphic
 // folders, in declaration order. `tsconfig.core.json` is the mechanical
 // isomorphism guard; a folder missing here compiles with the DOM lib.
 const ISOMORPHIC_FOLDERS = [
-  'src/shared',
-  'src/engine',
-  'src/composer',
-  'src/transport',
-  'src/driver',
-  'src/runloop',
+  '../src/shared',
+  '../src/engine',
+  '../src/composer',
+  '../src/transport',
+  '../src/driver',
+  '../src/runloop',
 ] as const
 
 function read(rel: string): string {
@@ -54,34 +56,31 @@ function parseJsonc(source: string): unknown {
   return JSON.parse(noTrailingComma)
 }
 
-function git(args: string[]): string {
-  return execFileSync('git', args, { cwd: REPO, encoding: 'utf8' })
-}
-
-describe('[u0#c3] tsconfig.core.json is untouched (C6 standing condition)', () => {
+describe('[u0#c3] config/tsconfig.core.json is untouched (C6 standing condition)', () => {
   it('(a) SHA-256 matches the pinned constant', () => {
-    const hash = crypto.createHash('sha256').update(fs.readFileSync(path.join(REPO, 'tsconfig.core.json'))).digest('hex')
+    const hash = crypto.createHash('sha256').update(fs.readFileSync(path.join(REPO, CORE_TSCONFIG))).digest('hex')
     expect(hash).toBe(CORE_TSCONFIG_SHA256)
   })
 
-  it('(b) git reports no modification to tsconfig.core.json', () => {
-    expect(git(['status', '--porcelain', '--', 'tsconfig.core.json']).trim()).toBe('')
+  it('(b) the core config lives under config/', () => {
+    expect(fs.existsSync(path.join(REPO, CORE_TSCONFIG))).toBe(true)
+    expect(path.dirname(CORE_TSCONFIG)).toBe('config')
   })
 
   it('(c) its include is exactly the six isomorphic folders', () => {
-    const cfg = parseJsonc(read('tsconfig.core.json')) as { include?: unknown }
+    const cfg = parseJsonc(read(CORE_TSCONFIG)) as { include?: unknown }
     expect(cfg.include).toEqual([...ISOMORPHIC_FOLDERS])
   })
 
   it('(c1) no isomorphic folder is ever dropped from include (standing condition)', () => {
-    const cfg = parseJsonc(read('tsconfig.core.json')) as { include?: string[] }
+    const cfg = parseJsonc(read(CORE_TSCONFIG)) as { include?: string[] }
     for (const folder of ISOMORPHIC_FOLDERS) {
       expect(cfg.include, `${folder} left the isomorphic core`).toContain(folder)
     }
   })
 
   it('(c2) it still omits DOM lib and all ambient types', () => {
-    const cfg = parseJsonc(read('tsconfig.core.json')) as {
+    const cfg = parseJsonc(read(CORE_TSCONFIG)) as {
       compilerOptions?: { lib?: unknown; types?: unknown }
     }
     expect(cfg.compilerOptions?.lib).toEqual(['ES2023'])
@@ -90,13 +89,9 @@ describe('[u0#c3] tsconfig.core.json is untouched (C6 standing condition)', () =
 })
 
 describe('[u0#c3] no path alias anywhere (C6)', () => {
-  const tsconfigs = () =>
-    fs
-      .readdirSync(REPO)
-      .filter((f) => /^tsconfig.*\.json$/.test(f))
-      .sort()
+  const tsconfigs = () => ['tsconfig.json', CORE_TSCONFIG, TEST_TSCONFIG]
 
-  it('(d) no repo-root tsconfig*.json declares compilerOptions.paths', () => {
+  it('(d) no TypeScript config declares compilerOptions.paths', () => {
     const offenders = tsconfigs().filter((f) => {
       const cfg = parseJsonc(read(f)) as { compilerOptions?: Record<string, unknown> }
       return cfg.compilerOptions != null && 'paths' in cfg.compilerOptions
@@ -104,20 +99,20 @@ describe('[u0#c3] no path alias anywhere (C6)', () => {
     expect(offenders).toEqual([])
   })
 
-  it('(d2) tsconfig.test.json exists, extends tsconfig.json, and adds no paths', () => {
-    expect(tsconfigs()).toContain('tsconfig.test.json')
-    const cfg = parseJsonc(read('tsconfig.test.json')) as {
+  it('(d2) config/tsconfig.test.json exists, extends tsconfig.json, and adds no paths', () => {
+    expect(tsconfigs()).toContain(TEST_TSCONFIG)
+    const cfg = parseJsonc(read(TEST_TSCONFIG)) as {
       extends?: unknown
       include?: unknown
       compilerOptions?: Record<string, unknown>
     }
-    expect(cfg.extends).toBe('./tsconfig.json')
+    expect(cfg.extends).toBe('../tsconfig.json')
     expect(cfg.compilerOptions ?? {}).not.toHaveProperty('paths')
     expect(Array.isArray(cfg.include) && (cfg.include as string[]).some((i) => i.includes('tests'))).toBe(true)
   })
 
   it('(e) no build/test config declares a resolve alias', () => {
-    for (const f of ['vite.config.ts', 'vitest.config.ts', 'playwright.config.ts']) {
+    for (const f of ['vite.config.ts', 'config/vitest.config.ts', 'config/playwright.config.ts']) {
       expect(fs.existsSync(path.join(REPO, f)), `${f} is missing`).toBe(true)
       const source = read(f)
       expect(source, `${f} declares an alias`).not.toMatch(/resolve\s*:\s*\{[\s\S]*alias/)

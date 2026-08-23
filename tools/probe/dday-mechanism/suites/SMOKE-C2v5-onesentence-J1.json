@@ -2,7 +2,7 @@
   "_what": "Call 2 분량 계약의 실측 — \"항목당 정확히 한 문장\"이 지켜지지 않아(v0.3 기준 22/31 = 71% 위반, 항목당 1.74문장) 한 항목에 두 주장이 실리고, 그 항목이 id 하나로 민팅되어 채굴 단위가 깨진다. 스키마 description을 검사 가능한 형태로 바꾼 뒤 같은 슬롯으로 다시 잰다. 항목 수 상한은 이 런에서 건드리지 않는다 — 분량 감소가 개수 축소 없이 얼마나 나오는지가 이 런의 질문이다.",
   "_authoring_provenance": {
     "derived_from": "SMOKE-C2-roleboundary-J1.json — 슬롯·템플릿·모델 동일, timeline_entries의 스키마 description만 변경",
-    "control": "SMOKE-C2-roleboundary-J1-calls/calls-baseline.md (동일 슬롯, 동일 템플릿 v0.3, 동일 모델, N=5) — 이 런의 과거 대조군",
+    "control": "SMOKE-C2-roleboundary-J1 suite lineage (동일 슬롯, 동일 템플릿 v0.3, 동일 모델, N=5) — 이 런의 과거 대조군",
     "schema_diff": "description: \"항목당 정확히 한 문장.\" → \"한 항목은 한 문장이다 — 마침표는 항목의 맨 끝에 하나뿐이고, 항목 안에서 두 문장을 잇지 않는다.\""
   },
   "experiment": "SMOKE-C2v5-onesentence-J1",

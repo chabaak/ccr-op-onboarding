@@ -2,7 +2,7 @@
   "_what": "Call 2 분량 축소 2단계 — v5(한 문장 규칙)만으로는 피드 부피가 −14%에 그쳤다(비트당 10.0→8.6줄). 항목 개수 상한을 범위로 얹어 부피를 더 깎는다. 균일 상한이 아니라 범위(3~5)인 이유는 비트별 밀도 차이를 남기기 위해서다 — 한 콜 안 항목 중복이 0%로 측정된 이상, 개수 축소는 실제 내용 손실이므로 최소한으로 간다.",
   "_authoring_provenance": {
     "derived_from": "SMOKE-C2v5-onesentence-J1.json — 슬롯·템플릿·모델 동일, timeline_entries description에 개수 범위만 추가",
-    "control": "SMOKE-C2v5-onesentence-J1-calls (직전 단계) 및 SMOKE-C2-roleboundary-J1-calls (원 대조군)",
+    "control": "SMOKE-C2v5-onesentence-J1 suite lineage (직전 단계) 및 SMOKE-C2-roleboundary-J1 suite lineage (원 대조군)",
     "schema_diff": "description에 \"3~5개.\" 추가. 한 문장 규칙은 v5 그대로 유지."
   },
   "experiment": "SMOKE-C2v6-count-J1",

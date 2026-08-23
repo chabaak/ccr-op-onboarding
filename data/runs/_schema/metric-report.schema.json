@@ -2,7 +2,7 @@
   "$schema": "https://json-schema.org/draft/2020-12/schema",
   "$id": "metric-report.schema.json",
   "title": "metric-report — 게임성 측정 리포트 (pipeline §5의 리포트 포맷)",
-  "description": "정책 봇 N런 × 정책들의 집계. §5가 요구한 '첫 실행 전 포맷 확정'의 이행. 측정 불가한 지표는 null — 0과 null을 구분한다(측정 불가 ≠ 효과 없음, RUNLOG A20).",
+  "description": "정책 봇 N런 × 정책들의 집계. §5가 요구한 '첫 실행 전 포맷 확정'의 이행. 측정 불가한 지표는 null — 0과 null을 구분한다(측정 불가 ≠ 효과 없음, 폐기된 운영 메모 A20).",
   "type": "object",
   "required": ["pack_slug", "run_ids", "policies", "metrics"],
   "additionalProperties": false,

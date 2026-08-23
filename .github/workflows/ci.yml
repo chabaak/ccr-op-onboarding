@@ -83,7 +83,7 @@ jobs:
       # lanes: it starts every entry in the array regardless of `--project`,
       # so without the gate this job pays for a dev-mode build, a dev server
       # and the real build — the config filters the array on this variable.
-      - run: npx playwright test --project=preview
+      - run: npx playwright test --config config/playwright.config.ts --project=preview
         env:
           CI: '1'
           PW_LANE: preview
@@ -128,7 +128,7 @@ jobs:
           cache: npm
       - run: npm ci
       - run: npx playwright install --with-deps chromium
-      - run: npx playwright test --project=chromium
+      - run: npx playwright test --config config/playwright.config.ts --project=chromium
         env:
           CI: '1'
           PW_LANE: unit

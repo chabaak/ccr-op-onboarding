@@ -680,8 +680,8 @@ describe('[u6#c10] run-wide hard constraints hold in this unit', () => {
   })
 
   it('(g) C5/C6 — u6 edits neither runner config nor vitest.config.ts', () => {
-    expect(read(path.join(CLIENT, '../../playwright.config.ts'))).not.toMatch(/reports\.spec|u6/)
-    expect(read(path.join(CLIENT, '../../vitest.config.ts'))).not.toMatch(/jsdom|happy-dom/)
+    expect(read(path.join(CLIENT, '../../config/playwright.config.ts'))).not.toMatch(/reports\.spec|u6/)
+    expect(read(path.join(CLIENT, '../../config/vitest.config.ts'))).not.toMatch(/jsdom|happy-dom/)
   })
 })
 

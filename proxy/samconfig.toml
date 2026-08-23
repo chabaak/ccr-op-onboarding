@@ -1,6 +1,6 @@
 version = 0.1
 
-# Copied from apothecary-llm-layer's shape. Differences: new stack name and new
+# Based on the earlier LLM service deployment shape. Differences: new stack name and new
 # physical resources (§3.6), and no [elevated] profile — that existed only to
 # rewrite the execution role when AllowedProfileMode changed, and DDAY has no
 # such parameter (haiku is bound by the game spec, so the IAM policy is fixed).

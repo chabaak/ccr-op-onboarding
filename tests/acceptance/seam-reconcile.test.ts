@@ -105,7 +105,7 @@ describe('[u11#c14] a REAL row routes to its owner, never to u11 ([u11#c8])', ()
 
 describe('[u11#c14] the whole suite stays a real suite', () => {
   it('(l) no vitest/playwright config excludes a test path to make the run green (C17)', () => {
-    const vitestConfig = fs.readFileSync(path.join(REPO, 'vitest.config.ts'), 'utf8')
+    const vitestConfig = fs.readFileSync(path.join(REPO, 'config/vitest.config.ts'), 'utf8')
     const exclude = vitestConfig.match(/exclude:\s*\[([^\]]*)\]/)?.[1] ?? ''
     const allowed = ['node_modules/**', 'dist/**', 'demos/**', 'e2e/**']
     const listed = [...exclude.matchAll(/'([^']+)'/g)].map((m) => m[1]!)

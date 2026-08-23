@@ -169,9 +169,9 @@ describe('[u2#c2] the seam module is types-only and core-clean', () => {
     expect(outside, 'the seam module reaches outside src/shared').toEqual([])
   })
 
-  it('(l) `tsc -p tsconfig.core.json --noEmit` is green with the file in scope', () => {
+  it('(l) `tsc -p config/tsconfig.core.json --noEmit` is green with the file in scope', () => {
     expect(() =>
-      execFileSync('npx', ['tsc', '-p', 'tsconfig.core.json', '--noEmit'], {
+      execFileSync('npx', ['tsc', '-p', 'config/tsconfig.core.json', '--noEmit'], {
         cwd: REPO,
         encoding: 'utf8',
         stdio: 'pipe',

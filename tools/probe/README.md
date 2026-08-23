@@ -3,7 +3,7 @@
 Probe runner for DDAY test programs. Zero dependencies, plain Node ≥24.
 
 First consumer is the mechanism deep-test material under
-`tools/probe/dday-mechanism/`. The runner is built to outlive that program:
+`tools/probe/dday-mechanism/`. The runner is built to outlive any one program:
 [**EXTENDING.md**](./EXTENDING.md) covers pointing it at other tests, with
 worked recipes and what each planned test still needs.
 
@@ -45,9 +45,8 @@ output schema) and has no filesystem, no repo, and no session context, so
 isolation is a property of the transport rather than a frontmatter field. Latency
 is wall-clocked; the model id is pinned in the suite and echoed back by the API.
 
-The old definitions are archived, not deleted, next to the runs they produced:
-`planning/dday-poc/poc/agents/` (v1, sonnet) and
-`planning/dday-poc/poc-terror/agents/` (v2, haiku).
+The old subagent definitions were part of the retired proof-of-concept record;
+new probes use the direct runner and prompt fixtures in this tree.
 
 ## Quickstart
 
@@ -128,11 +127,11 @@ both are paper instruments with zero calls.
 ## Suite anatomy
 
 Suites are data, under `tools/probe/dday-mechanism/suites/`. See
-`E0-shape-revalidation.json` for a worked one.
+`DOME-G1-baseline.json` for a worked one.
 
 ```jsonc
 {
-  "experiment": "E0-shape-revalidation",   // artifact directory name
+  "experiment": "DOME-G1-baseline",         // artifact directory name
   "call_type": "judgment",                 // key in tools/lib/calls.mjs
   "channel": "C-BLOCK",                    // decides which slots may vary
   "template_version": "v0.4",
@@ -179,9 +178,8 @@ const myCall = {
 `narration` and `reporter` call types are wired this way (templates at
 `prompts/narration/` and `prompts/reporter/`, both v0.1) — their contracts
 and the decisions behind their field lists are encoded in `tools/lib/calls.mjs`
-and the prompt bundles. First smoke suites:
-`tools/probe/dday-mechanism/suites/SMOKE-C2*-narration-J1.json` and
-`SMOKE-C3-reporter-J1.json`.
+and the prompt bundles. The live DOME suites are the current worked examples
+for gate measurement.
 
 Two things to keep in mind when adding one:
 

@@ -10,9 +10,16 @@ works at a gate** — not to pass or fail a mechanism. So a read is a diagnosis:
 what did the block actually change, what stayed the same, and which of the three
 levers should move next.
 
-Before writing anything, read `tools/probe/dday-mechanism/RUNLOG.md`. Its `A#`
-amendments override the deep-test plan and several of them change how a result
-must be read (A5 fabricated ids, A7 malformation, A8/A9/A10 saturation).
+Before writing anything, identify the retained run artifacts:
+
+- the matching suite JSON under `tools/probe/dday-mechanism/suites/`
+- its run directory under `tools/probe/dday-mechanism/runs/<experiment>-calls/`
+- every `calls-<arm>.md` and `metrics-<arm>.json` file in that run directory
+
+The closed-programme amendment log is retired. Read only what remains in the
+retained DOME suites and run artifacts; if the run cannot be interpreted from
+those files, stop and say which missing artifact blocks the read rather than
+reconstructing it from memory.
 
 ## 1. Gather
 
@@ -109,5 +116,6 @@ player as designed — a B3b legibility problem, and an argument for lever 1.
 ## 4. Where it goes
 
 The write-up is for reading. If the run changes how future probes must be built,
-that belongs in `RUNLOG.md` as a dated run entry plus any new `A#` amendment —
-append, never rewrite, and never edit the plan or the spec instead.
+record that as a new note beside the retained run artifacts and cite the exact
+suite plus run directory; never recreate the retired amendment log, and never
+edit the plan or the spec instead.
