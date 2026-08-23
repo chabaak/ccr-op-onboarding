@@ -56,6 +56,37 @@ Write the world under these constraints:
 - A key is a condition class: axis x referent x species. Write several example
   sentences for each condition; a one-sentence key is a lottery.
 
+The channel has its own physics. Breaking these rules produces a scenario shape
+the engine cannot make fair, even if the JSON compiles:
+
+- Handover changes interpretation; it is not an order sheet. A sentence can make
+  the agent understand a fact differently and therefore choose another gate
+  stance, but it cannot command an action by position, priority, or phrasing.
+- A handed-over belief is not retracted by doubt. Once the agent accepts a
+  sentence, the game has no "take it back" lever; only another sentence can
+  counterweight it. Do not write beats where the agent realizes the handover was
+  false and simply returns to the old state.
+- Handover order and priority are not levers. If a route only works because one
+  sentence appears before another, it is not playable through this interface.
+- Agent speech is narrow outside gates. Third-party facts affect judgment, not
+  free dialogue; when the agent's goal must change, the spoken surface should
+  redefine the conversation itself, e.g. turning a call from "threat" into
+  "ignored report." If a scene needs a new agent answer, make it a gate.
+- NPC dialogue alone cannot change world state. State changes come from scripted
+  events, gate choices, buckets, and authored effects; an improvised line cannot
+  move a meter, set a flag, or save a person by itself.
+- A missed gate is not a dead end. Failure routes should become harder branches,
+  later losses, or worse scores, not a stopped scenario; repeated runs need more
+  truth to mine after a mistake.
+- Fixed scenes cannot require an agent response. Between gates, the fixed
+  timeline cannot ask a question the model has no legal output slot to answer;
+  otherwise another speaker will appear to fill the hole. Turn that moment into
+  a gate.
+- Reconstructed people cannot perceive the trainee, the portal, or the replay.
+  The lower layer is the past day; only the agent crosses layers. Anyone inside
+  the reconstruction who notices the outside frame breaks the premise and cannot
+  ship.
+
 Player-facing text must stay inside the reconstruction. Do not expose `G1`,
 `G3`, `gate`, `stance`, `block`, `injection`, `run`, `player`, `agent`, or
 workshop labels on shipped surfaces. When timeline exposure depends on a gate
