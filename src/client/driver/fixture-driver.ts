@@ -34,6 +34,8 @@ export type ViewListener = (event: ViewEvent) => void
 
 export interface FixtureDriver {
   readonly clock: Clock
+  /** Optional feed schedule, supplied by the active pack or fixture run. */
+  readonly feedGapClocks?: () => readonly string[]
   subscribe(listener: ViewListener): () => void
   start(): void
   /** Pumps real elapsed milliseconds through clock, animations and stream. */
@@ -55,6 +57,10 @@ function stampOf(event: ViewEvent): string | null {
 export function createFixtureDriver(run: FixtureRun): FixtureDriver {
   const clock = createClock({ start: run.start, end: run.end })
   const startMinute = mm(run.start)
+  const feedGapClocks = run.events.flatMap((event) => {
+    const stamp = stampOf(event)
+    return stamp === null ? [] : [stamp]
+  })
 
   // Due minute per event, resolved once: an unstamped event rides the stamp of
   // the last stamped event before it, so stream order is never reordered.
@@ -116,6 +122,7 @@ export function createFixtureDriver(run: FixtureRun): FixtureDriver {
 
   return {
     clock,
+    feedGapClocks: () => feedGapClocks,
 
     subscribe(listener: ViewListener) {
       listeners.add(listener)
