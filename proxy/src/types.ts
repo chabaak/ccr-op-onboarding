@@ -53,6 +53,7 @@ export type CallTelemetry = {
   templateVersion: string;
   modelId: string;
   latencyMs: number;
+  attempts: number;
   fallback: boolean;
   usage: TokenUsage;
 };

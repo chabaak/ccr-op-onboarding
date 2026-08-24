@@ -235,6 +235,8 @@ export function createHandler({
           path === CALL_ROUTE ? "call" : path === HEALTH_ROUTE ? "health" : "unknown",
         status: publicError.status,
         code: publicError.code,
+        ...(isFallback && error.attempts !== undefined ? { attempts: error.attempts } : {}),
+        ...(isFallback && error.latencyMs !== undefined ? { latencyMs: error.latencyMs } : {}),
       });
       return jsonResponse(
         publicError.status,

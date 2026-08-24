@@ -4,7 +4,7 @@ import { defaultPromptFor } from "./default-prompt.js";
 import { errorCode, ProviderOutputError, PublicError } from "./errors.js";
 import { renderCall } from "./prompt.js";
 import type { CallProvider } from "./provider.js";
-import type { CallRequest, CallTelemetry } from "./types.js";
+import type { CallRequest, CallTelemetry, TokenUsage } from "./types.js";
 
 /**
  * One call, end to end: render → Bedrock → validate.
@@ -32,15 +32,21 @@ export type CallResult = {
   telemetry: CallTelemetry;
 };
 
+const ROUTE_TIMEOUT_MS = 18_000;
+const MAX_ATTEMPTS = 3;
+
+type Clock = () => number;
+
 export class CallService {
   constructor(
     private readonly config: RuntimeConfig,
     private readonly provider: CallProvider,
+    private readonly now: Clock = () => performance.now(),
   ) {}
 
   async handle(request: CallRequest): Promise<CallResult> {
     const spec = CALL_SPECS[request.call_type];
-    const startedAt = performance.now();
+    const startedAt = this.now();
 
     // Render AND build the tool schema before calling. Both can fail on a bad
     // payload — an unfilled slot, a STANCE_SET with one entry — and finding that
@@ -53,34 +59,55 @@ export class CallService {
     );
     const tool = spec.buildTool(request.slots);
 
-    let result;
-    try {
-      result = await this.provider.generate(request, rendered, tool);
-    } catch (error) {
-      throw asFallback(error);
-    }
+    let attempts = 0;
+    let usage = emptyUsage();
 
-    const problems = spec.validate(result.payload, request.slots);
-    if (problems.length) {
-      throw asFallback(
-        new ProviderOutputError(
-          `Model output failed validation: ${problems.join("; ")}`,
-          result.usage,
-        ),
+    while (attempts < MAX_ATTEMPTS) {
+      attempts += 1;
+      let result;
+      try {
+        result = await this.provider.generate(request, rendered, tool);
+      } catch (error) {
+        throw asFallback(error, {
+          attempts,
+          latencyMs: Math.round(this.now() - startedAt),
+        });
+      }
+
+      usage = addUsage(usage, result.usage);
+      const problems = spec.validate(result.payload, request.slots);
+      if (!problems.length) {
+        return {
+          response: result.payload,
+          telemetry: {
+            callType: request.call_type,
+            templateVersion: request.template_version,
+            modelId: this.config.modelId,
+            latencyMs: Math.round(this.now() - startedAt),
+            attempts,
+            fallback: false,
+            usage,
+          },
+        };
+      }
+
+      const error = new ProviderOutputError(
+        `Model output failed validation: ${problems.join("; ")}`,
+        usage,
       );
+      if (attempts >= MAX_ATTEMPTS || !this.canStartAnotherAttempt(startedAt)) {
+        throw asFallback(error, {
+          attempts,
+          latencyMs: Math.round(this.now() - startedAt),
+        });
+      }
     }
 
-    return {
-      response: result.payload,
-      telemetry: {
-        callType: request.call_type,
-        templateVersion: request.template_version,
-        modelId: this.config.modelId,
-        latencyMs: Math.round(performance.now() - startedAt),
-        fallback: false,
-        usage: result.usage,
-      },
-    };
+    throw new Error("unreachable call retry loop state");
+  }
+
+  private canStartAnotherAttempt(startedAt: number): boolean {
+    return this.now() - startedAt + this.config.modelTimeoutMs <= ROUTE_TIMEOUT_MS;
   }
 }
 
@@ -90,26 +117,52 @@ export class CallService {
  * apply your authored fallback" apart from "your request was malformed".
  */
 export class FallbackError extends PublicError {
-  constructor(status: number, code: string, message: string) {
+  readonly attempts: number | undefined;
+  readonly latencyMs: number | undefined;
+
+  constructor(
+    status: number,
+    code: string,
+    message: string,
+    telemetry: { attempts?: number; latencyMs?: number } = {},
+  ) {
     super(status, code, message);
     this.name = "FallbackError";
+    this.attempts = telemetry.attempts;
+    this.latencyMs = telemetry.latencyMs;
   }
 }
 
-function asFallback(error: unknown): FallbackError {
+function asFallback(
+  error: unknown,
+  telemetry: { attempts?: number; latencyMs?: number } = {},
+): FallbackError {
   if (error instanceof FallbackError) return error;
   if (error instanceof ProviderOutputError) {
-    return new FallbackError(502, "invalid_model_output", error.message);
+    return new FallbackError(502, "invalid_model_output", error.message, telemetry);
   }
   if (error instanceof PublicError) {
     // A 4xx here is the client's fault, not the model's — pass it through so it
     // does not masquerade as a fallback the engine should absorb.
     if (error.status < 500) throw error;
-    return new FallbackError(error.status, error.code, error.message);
+    return new FallbackError(error.status, error.code, error.message, telemetry);
   }
   return new FallbackError(
     502,
     errorCode(error),
     "The model call did not produce a usable response.",
+    telemetry,
   );
+}
+
+function emptyUsage(): TokenUsage {
+  return { inputTokens: 0, outputTokens: 0, totalTokens: 0 };
+}
+
+function addUsage(left: TokenUsage, right: TokenUsage): TokenUsage {
+  return {
+    inputTokens: left.inputTokens + right.inputTokens,
+    outputTokens: left.outputTokens + right.outputTokens,
+    totalTokens: left.totalTokens + right.totalTokens,
+  };
 }
