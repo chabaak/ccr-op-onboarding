@@ -8,6 +8,7 @@
 import { button, el } from './dom.ts'
 import { createCoach } from './coach.ts'
 import { openConfirm } from './confirm.ts'
+import { PORTAL } from './portal-identity.ts'
 import {
   fetchScenarioEndings,
   fetchScenarioIncidentBrief,
@@ -19,11 +20,15 @@ import type { ScenarioEndings, ScenarioIncidentBrief, ScenarioIndex, ScenarioPac
 import { resetScenarioSession, returnToScenarioDesktop, switchScenarioPack } from './pack-session.ts'
 import type { ScenarioSwitchOptions } from './pack-session.ts'
 import type { ConfirmCopy } from './confirm.ts'
+import { DEFAULT_TOTAL_RUNS } from '../../runloop/run-loop.ts'
 
 export const UNLOCKED_SCENARIOS_KEY = 'ndsp:scenario:unlocked:v1'
 export const SCENARIO_UNLOCK_NOTICE = '다른 사건도 해결해보십시오.'
 export const SCENARIO_UNPLAYABLE_NOTICE = '이 사건은 아직 종료 자료가 없어 시작할 수 없습니다.'
 export const SCENARIO_ENDING_LOAD_FAILURE_NOTICE = '종료 자료를 확인할 수 없어 이 사건을 시작할 수 없습니다.'
+export const SCENARIO_PICKER_NOTE =
+  '사건 개요는 배치 후 회선에서만 열람할 수 있습니다. 아래 표시되는 것은 난이도와 시행 횟수뿐입니다. 배치된 사건은 시행을 모두 소진할 때까지 교체할 수 없습니다.'
+export const SCENARIO_PICKER_FOOT = '시행을 모두 소진하면 동일 사건으로 재평가가 편성됩니다.'
 
 interface StoragePort {
   getItem(key: string): string | null
@@ -42,6 +47,14 @@ interface ScenarioStartCheckDeps {
 export type ScenarioStartCheck =
   | { ok: true }
   | { ok: false; says: string }
+
+export interface ScenarioCardModel {
+  readonly code: string
+  readonly difficulty: string
+  readonly runs: string
+  readonly status: string
+  readonly enabled: boolean
+}
 
 export interface ScenarioDesktopDeps {
   app: HTMLElement
@@ -72,6 +85,32 @@ function storageOf(port: StoragePort | null | undefined): StoragePort | null {
 
 function knownSlugs(index: ScenarioIndex): Set<string> {
   return new Set(index.packs.map((pack) => pack.slug))
+}
+
+function scenarioFileCode(index: number): string {
+  return `${PORTAL.portalCode}/SC-${String(index + 1).padStart(2, '0')}`
+}
+
+function difficultyGrade(entry: ScenarioPackEntry): string {
+  const raw = entry.difficulty.trim()
+  if (/^등급\s*\S+/.test(raw)) return raw
+  if (/^\d+$/.test(raw)) return `등급 ${raw}`
+  return `등급 ${raw.toUpperCase()}`
+}
+
+export function scenarioCardModel(
+  entry: ScenarioPackEntry,
+  index: number,
+  unlocked: boolean,
+): ScenarioCardModel {
+  const enabled = unlocked && isScenarioPlayable(entry)
+  return {
+    code: scenarioFileCode(index),
+    difficulty: difficultyGrade(entry),
+    runs: `RUN 01 / ${String(DEFAULT_TOTAL_RUNS).padStart(2, '0')}`,
+    status: enabled ? '배치 가능' : unlocked ? '열람 전용' : '미개방',
+    enabled,
+  }
 }
 
 export function readUnlockedScenarioSlugs(
@@ -157,12 +196,41 @@ export function installScenarioDesktop(deps: ScenarioDesktopDeps): ScenarioDeskt
   const packs = sortedScenarioPacks(deps.index)
   const bySlug = new Map(packs.map((pack) => [pack.slug, pack]))
   const files = new Map<string, HTMLButtonElement>()
+  let picker: HTMLElement | null = null
+  let grid: HTMLElement | null = null
 
-  function place(node: HTMLElement, index: number): void {
-    const column = index % 2
-    const row = Math.floor(index / 2)
-    node.style.setProperty('--file-x', `${32 + column * 150}px`)
-    node.style.setProperty('--file-y', `${156 + row * 122}px`)
+  function pickerShell(): HTMLElement {
+    if (picker) return picker
+    picker = el('section', 'scenario-picker')
+    picker.setAttribute('aria-labelledby', 'scenario-picker-title')
+
+    const head = el('div', 'scenario-picker-head')
+    const title = el('span', undefined, '모의 과정 · 배치 가능 사건')
+    title.id = 'scenario-picker-title'
+    head.append(
+      title,
+      el('span', undefined, `${PORTAL.operatorId} ${PORTAL.operator} · 보안 등급 ${PORTAL.clearance}`),
+    )
+
+    grid = el('div', 'scenario-grid')
+    picker.append(
+      head,
+      el('p', 'scenario-picker-note', SCENARIO_PICKER_NOTE),
+      grid,
+      el('div', 'scenario-picker-foot', SCENARIO_PICKER_FOOT),
+    )
+    deps.desktop.append(picker)
+    return picker
+  }
+
+  function renderPips(node: HTMLElement, model: ScenarioCardModel): void {
+    const pips = el('span', 'scenario-file-pips')
+    for (let index = 0; index < DEFAULT_TOTAL_RUNS; index += 1) {
+      const pip = el('span')
+      if (model.enabled && index === 0) pip.className = 'is-current'
+      pips.append(pip)
+    }
+    node.append(pips)
   }
 
   function openFile(entry: ScenarioPackEntry, node: HTMLButtonElement): void {
@@ -200,28 +268,31 @@ export function installScenarioDesktop(deps: ScenarioDesktopDeps): ScenarioDeskt
 
   function render(): void {
     const unlocked = new Set(readUnlockedScenarioSlugs(deps.index, localStorage))
-    let visible = 0
-    for (const pack of packs) {
+    pickerShell()
+    for (const [index, pack] of packs.entries()) {
       let node = files.get(pack.slug)
       if (!node) {
-        node = button('scenario-file', `${pack.displayName} 사건 개요 열기`, '')
+        node = button('scenario-file', '', '')
         node.dataset.scenarioSlug = pack.slug
-        node.setAttribute('aria-label', `${pack.displayName} 사건 개요 열기`)
-        node.append(
-          el('span', 'scenario-file-icon', 'FILE'),
-          el('b', undefined, pack.displayName),
-          el('i', undefined, pack.difficulty),
-        )
         node.addEventListener('click', () => openFile(pack, node!))
         files.set(pack.slug, node)
       }
-      if (unlocked.has(pack.slug)) {
-        place(node, visible)
-        if (!node.isConnected) deps.desktop.append(node)
-        visible += 1
-      } else {
-        node.remove()
-      }
+      const model = scenarioCardModel(pack, index, unlocked.has(pack.slug))
+      node.title = `${model.code} ${model.status}`
+      node.setAttribute('aria-label', `${model.code} ${model.status}`)
+      node.disabled = !model.enabled
+      node.classList.toggle('is-locked', !model.enabled)
+      node.classList.toggle('is-open', model.enabled)
+      node.replaceChildren(
+        el('span', 'scenario-file-top', model.code),
+        el('span', 'scenario-file-status', model.status),
+        el('span', 'scenario-file-field', '난이도'),
+        el('b', undefined, model.difficulty),
+        el('span', 'scenario-file-field', '시행'),
+        el('i', undefined, model.runs),
+      )
+      renderPips(node, model)
+      if (!node.isConnected) grid?.append(node)
     }
     for (const [slug, node] of files) {
       if (!bySlug.has(slug)) {

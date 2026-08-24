@@ -14,7 +14,7 @@ import { expect, test, type Page } from 'playwright/test'
 // browser can answer, and it is the half a player actually experiences:
 //
 //  · the door really is LOCKED on the first frame, in the DOM sense and the
-//    visual one (a red slab with a sweep crossing it is not a locked control);
+//    visual one (a filled call to action is not a locked control);
 //  · a press really does land one character, and a TAP does too — which is the
 //    difference between a door that opens on a phone and a dead end;
 //  · Tab and Enter really are still the button's, not the wells';
@@ -65,16 +65,18 @@ test.describe('[x9] the door opens locked', () => {
     await expect(page.locator('#signin .si-field.is-armed')).toHaveCount(1)
   })
 
-  test('(d) the locked slab LOOKS dead — greyed, and no invitation sweeping across it', async ({ page }) => {
+  test('(d) the locked control LOOKS dead — transparent, not a filled call to action', async ({ page }) => {
     await openDoor(page)
     const skin = await login(page).evaluate((el) => ({
-      filter: getComputedStyle(el).filter,
-      sheen: getComputedStyle(el, '::after').display,
+      background: getComputedStyle(el).backgroundColor,
+      border: getComputedStyle(el).borderColor,
+      foreground: getComputedStyle(el).color,
     }))
     // `pointer-events:none` used to be the whole of the locked state, which left
-    // the most inviting object on the screen inert.
-    expect(skin.filter, 'a disabled LOGIN is still in full seal red').toContain('grayscale')
-    expect(skin.sheen, 'the highlight sweep is still running on a dead button').toBe('none')
+    // the most inviting object on the screen inert. The prototype makes it a
+    // dead outline until the card is fully printed.
+    expect(skin.background, 'a disabled LOGIN is still filled').toBe('rgba(0, 0, 0, 0)')
+    expect(skin.border, 'a disabled LOGIN border vanished into its label').not.toBe(skin.foreground)
   })
 
   test('(e) the membrane holds at the door — no field to type into', async ({ page }) => {
@@ -132,7 +134,7 @@ test.describe('[x9] one press, one character', () => {
     await expect(maskCaret(page)).toBeHidden()
   })
 
-  test('(e) the flash settles onto the resting red rather than pinning a filter', async ({ page }) => {
+  test('(e) the flash settles onto the resting control rather than pinning a filter', async ({ page }) => {
     await openDoor(page)
     await press(page, 15)
     // `siArm` carries no fill mode on purpose: filled, it would hold
