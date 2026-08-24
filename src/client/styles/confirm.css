@@ -15,7 +15,7 @@
   display:flex;align-items:center;justify-content:center;
   /* Dimmed, not blacked out. The question is about the file the operator just
      wrote, and a veil that hides the file hides what the question is about. */
-  background:radial-gradient(70% 60% at 50% 50%,var(--sh-4),var(--sh-8));
+  background:var(--sh-8);
   backdrop-filter:blur(2px);
   animation:cfVeil .18s ease-out both}
 @keyframes cfVeil{from{opacity:0}to{opacity:1}}
@@ -192,3 +192,50 @@
   box-shadow:inset 0 1px 0 var(--sheen-25), 0 6px 18px -10px var(--sh-9)}
 .cf-yes:hover{filter:brightness(1.12);
   box-shadow:inset 0 1px 0 var(--sheen-35), 0 12px 26px -12px var(--warning-a5)}
+
+/* ─── notice object (issue 133) ─────────────────────────────────────────────
+   The applied class family for the reusable notice plate. `cf-*` remains on the
+   existing DOM as a compatibility hook for older tests and for the ending sheet
+   that has not been re-cut yet; `notice-*` is the object #135 and #136 should
+   apply. */
+.notice-plate{width:520px;max-width:calc(100% - var(--space-32));
+  display:flex;flex-direction:column;position:relative;
+  background:var(--surface);border:1px solid var(--ink-line);
+  box-shadow:none;border-radius:0}
+.notice-plate.notice-fullscreen{width:640px}
+.notice-plate::before{content:none}
+.notice-accent{border-color:var(--blueprint)}
+
+.notice-head{height:auto;padding:var(--space-11) var(--space-20) var(--space-10);
+  display:flex;align-items:baseline;justify-content:space-between;gap:var(--space-12);
+  background:transparent;border-bottom:1px solid var(--ink-line)}
+.notice-head::after{content:none}
+.notice-kind{margin-right:auto;font-family:var(--mono);font-size:var(--fs-10);
+  font-weight:400;letter-spacing:.24em;color:var(--signal)}
+.notice-meta{margin-left:auto;font-family:var(--mono);font-style:normal;font-size:var(--fs-10);
+  letter-spacing:.16em;color:var(--surface-muted-2);opacity:1;font-variant-numeric:tabular-nums}
+.notice-accent .notice-kind,
+.notice-accent .notice-meta{color:var(--warning)}
+
+.notice-body{padding:var(--space-20) var(--space-20) var(--space-18);
+  display:flex;flex-direction:column;gap:var(--space-12)}
+.notice-lead{font-size:var(--fs-17);font-weight:600;
+  line-height:1.5;letter-spacing:0;color:var(--surface-text);word-break:keep-all;
+  text-wrap:pretty}
+.notice-fullscreen .notice-lead{font-size:var(--fs-21)}
+.notice-line{margin-top:0;font-size:var(--fs-13);
+  line-height:1.85;letter-spacing:0;color:var(--surface-muted);word-break:keep-all;
+  text-wrap:pretty}
+
+.notice-foot{padding:var(--space-7) var(--space-20);border-top:1px solid var(--ink-line);
+  display:flex;align-items:center;justify-content:space-between;gap:var(--space-10)}
+.notice-actions{display:flex;align-items:center;justify-content:flex-end;gap:var(--space-10);
+  margin-left:auto}
+.notice-footnote{margin-top:0;font-family:var(--mono);font-size:var(--fs-10);
+  letter-spacing:.16em;line-height:1.5;color:var(--surface-muted);word-break:keep-all}
+.notice-btn{min-width:0;height:auto;padding:var(--space-6) var(--space-13);
+  font-family:var(--mono);font-size:var(--fs-10);font-weight:400;letter-spacing:.2em;
+  text-indent:.2em;border:1px solid var(--signal);background:var(--signal);
+  color:var(--ink-1);box-shadow:none;transition:filter .18s, transform .12s}
+.notice-btn:hover{filter:brightness(1.08);box-shadow:none}
+.notice-secondary{border-color:var(--blueprint);background:transparent;color:var(--surface-muted)}
