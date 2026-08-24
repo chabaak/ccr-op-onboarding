@@ -85,29 +85,28 @@ const COL_LEFT_RATIO = 0.5
 /**
  * REPORTS' share of the right column's height; AGENT FILE takes the rest.
  *
- * Sized from what the FILE needs, not from taste. C1 made it a paged document
- * and its two pages measure 413px (cover) and 487px (the agent's own page,
- * whose four slots alone are 216) against a body that is the window less its
- * title bar. At .42 the file got 392 and clipped both — 교신 지침 off the cover
- * and the page control off the window entirely, which is C9 ("nothing
- * off-screen in the default layout") and would have left no way to turn the
- * page at all. At .25 the file gets 507 and both pages fit whole.
+ * Sized from what the two right-column documents can honestly show, not from a
+ * no-scroll ideal. C1 made AGENT FILE a paged document; at the current type
+ * scale its page needs about 628px against about 325px of sheet in the old
+ * .3 split, so it scrolls regardless, and `win-agent-file.css` pins the page
+ * control outside that scroll. Starving REPORTS further would not make FILE
+ * whole; it would only hide the record the operator mines after the run.
  *
- * x1 (08-08) — .2 → .3, and the paragraph above stops being the whole reason.
- * At 1.5× type the agent's page needs 628 px and the file's sheet has 325 of
- * them at ANY ratio this file can offer: the document scrolls now, and
- * `win-agent-file.css` pins the page control outside the scroll so that is
- * survivable. Once the file scrolls either way, the top pane can keep enough
- * height to announce the record without pretending the file can be made whole
- * by starving it. .3 is tight for REPORTS, but that is the accepted starting
- * geometry for this pass rather than a ratio retune.
+ * x2 (08-25) — .3 -> .48. The tagged-column rebuild collapsed REPORTS from two
+ * documents into one column and measured the current record at 20 single-line rows:
+ * roughly 49px each, or about 970px of rows before the rail, signature, footer,
+ * breaks, and terminal-record chrome. That cannot fit in any right-column split
+ * this desk can offer, so the real decision is the visible row budget before
+ * scrolling. At the 1280x800 floor, .48 gives REPORTS a 306px outer window and
+ * about 206px of `.rep-grid`, which is four rows at the shipped row height.
+ * AGENT FILE remains the taller right-column pane at 331px, and LIVE FEED keeps
+ * the full left column because it is the desk's primary reading surface.
  *
- * WHAT IT COSTS, said plainly: the DEPLOY zone sits below the fold on first
- * paint. It is the foot of the agent's page and the page is taller than its
- * window. `windows/agent-file.ts` opens a turned page at its head so the
- * scroll is always in the same direction, and nothing else on the desk hides.
+ * WHAT IT COSTS, said plainly: REPORTS still scrolls, and AGENT FILE still
+ * scrolls. The split buys the record enough first-glance substance without
+ * pretending either document can be shown whole or taking height from LIVE FEED.
  */
-const ROW_TOP_RATIO = 0.3
+const ROW_TOP_RATIO = 0.48
 const MIN_W = 240
 const MIN_H = 120
 
