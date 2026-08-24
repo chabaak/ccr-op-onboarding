@@ -64,9 +64,9 @@ import { must } from './dom.ts'
 const DEPLOY = '#btnDeploy'
 const FEED_WIN = '#w-feed'
 const REP_WIN = '#w-rep'
-/** The former document titles, now row tags. */
-const FACTS_HEAD = '#w-rep #factsList .rep-row:first-child .rep-stamp'
-const BODY_HEAD = '#w-rep #bodyList .rep-row:first-child .rep-stamp'
+/** The former document titles, now row groups inside the single REPORTS surface. */
+const FACTS_GROUP = '#w-rep #factsList'
+const BODY_GROUP = '#w-rep #bodyList'
 /** The first sentence in each tagged row group. */
 const FIRST_FACT = '#w-rep #factsList [data-sentence-id]'
 const FIRST_BODY = '#w-rep #bodyList [data-sentence-id]'
@@ -102,6 +102,28 @@ const SEAT = '#w-file .slot.filled'
 const HANDOVER = '#w-file [data-sect="handover"]'
 /** The control that takes a seated sentence back out. */
 const UNSET = '#w-file .slot-unset'
+
+export interface TutorialAnchor {
+  readonly name: string
+  readonly selector: string
+  readonly unique?: boolean
+}
+
+export const TUTORIAL_ANCHORS = [
+  { name: 'deploy', selector: DEPLOY, unique: true },
+  { name: 'live feed window', selector: FEED_WIN, unique: true },
+  { name: 'reports window', selector: REP_WIN, unique: true },
+  { name: 'facts row group', selector: FACTS_GROUP, unique: true },
+  { name: 'radio row group', selector: BODY_GROUP, unique: true },
+  { name: 'first fact sentence', selector: FIRST_FACT },
+  { name: 'first radio sentence', selector: FIRST_BODY },
+  { name: 'handover section', selector: HANDOVER, unique: true },
+  { name: 'unset control', selector: UNSET },
+] as const satisfies readonly TutorialAnchor[]
+
+const TUTORIAL_ANCHOR_BY_SELECTOR = new Map<string, TutorialAnchor>(
+  TUTORIAL_ANCHORS.map((anchor) => [anchor.selector, anchor]),
+)
 
 /* ── who gets the walk ───────────────────────────────────────────────────── */
 
@@ -151,6 +173,18 @@ function appears(selector: string): Promise<void> {
     })
     observer.observe(document.body, { childList: true, subtree: true })
   })
+}
+
+export interface TutorialAnchorRoot {
+  querySelectorAll(selector: string): { readonly length: number }
+}
+
+export function requireTutorialAnchor(root: TutorialAnchorRoot, selector: string, anchor?: TutorialAnchor): void {
+  const count = root.querySelectorAll(selector).length
+  if (count === 0) throw new Error(`tutorial anchor missing: ${selector}`)
+  if (anchor?.unique === true && count !== 1) {
+    throw new Error(`tutorial anchor not unique: ${selector} (${count} matches)`)
+  }
 }
 
 /** Resolves on the first stream event the predicate accepts. */
@@ -235,13 +269,13 @@ export async function runTutorial(ports: TutorialPorts): Promise<void> {
   const seated = appears(SEAT)
 
   /**
-   * The day is over AND both documents have something in them.
+   * The day is over AND both REPORTS row groups have something in them.
    *
-   * One gate for plates 5 through 8, because all four of them are about a record
-   * that has to exist before they can name it — the window, its two columns, and
-   * the first sentence of the second one. `appears()` resolves the instant its
-   * selector matches, so the conjunction settles at whichever of the three is
-   * last, and after that every later plate is guaranteed its target.
+   * One gate for plates 5 through 8, because all four of them are about record
+   * rows that have to exist before they can name them — the window, the two tag
+   * groups, and the first sentence of the second one. `appears()` resolves the
+   * instant its selector matches, so the conjunction settles at whichever of
+   * the three is last, and after that every later plate is guaranteed its target.
    *
    * There is deliberately no `report` gate any more. See the note on plate 5.
    */
@@ -329,7 +363,7 @@ export async function runTutorial(ports: TutorialPorts): Promise<void> {
     // somewhere else.
     //
     // So the whole tail of the walk hangs off `dayFiled`, and the run of plates
-    // 2 → 5 is the debrief: the window, the two documents in it, and the gesture
+    // 2 → 5 is the debrief: the window, the two row groups in it, and the gesture
     // that moves a sentence out of them. `report` is no longer subscribed to at
     // all — the record's own DOM is what says the day produced something, which
     // is also the only thing these four plates actually need to be true.
@@ -341,15 +375,15 @@ export async function runTutorial(ports: TutorialPorts): Promise<void> {
       mark: { target: REP_WIN, says: '요원의 보고를 확인하세요', side: 'right' },
     },
 
-    // 3 — the first of its two documents. `dayFiled` already guarantees the
-    // column has something in it, so a plate saying 객관적 사실이 기록됩니다
-    // cannot be raised over an empty one and say the opposite of what it means.
+    // 3 — the first row group. `dayFiled` already guarantees the group has
+    // something in it, so a plate explaining the tag cannot be raised over an
+    // empty group and say the opposite of what it means.
     {
-      mark: { target: FACTS_HEAD, says: '객관적 사실이 기록됩니다', side: 'right' },
+      mark: { target: FACTS_GROUP, says: '현장 기록 태그는 확인된 사실입니다', side: 'right' },
     },
 
-    // 4 — the other document, and the difference between them is the lesson.
-    { mark: { target: BODY_HEAD, says: '요원의 생각과 판단이 기록됩니다', side: 'right' } },
+    // 4 — the other row group, and the difference between the tags is the lesson.
+    { mark: { target: BODY_GROUP, says: '무전 기록 태그는 요원의 판단입니다', side: 'right' } },
 
     // 5 — the gesture, pointed at a SENTENCE rather than at the column, because
     // a sentence is the unit that moves. It points at the first line of 무전
@@ -399,6 +433,7 @@ export async function runTutorial(ports: TutorialPorts): Promise<void> {
   try {
     for (const beat of walk) {
       if (beat.after !== undefined) await beat.after
+      requireTutorialAnchor(document, beat.mark.target, TUTORIAL_ANCHOR_BY_SELECTOR.get(beat.mark.target))
       // The skip is checked on every plate and nowhere else: 튜토리얼 건너뛰기
       // ends the WALK, so the loop returns out of the middle of the table and
       // the `finally` below takes the layer with it. `'closed'` and

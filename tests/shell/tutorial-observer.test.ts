@@ -39,12 +39,19 @@
 import { describe, it, expect } from 'vitest'
 import path from 'node:path'
 import { CLIENT, SHELL_DIR, exists, read, rel, tsFiles, walk } from './shell-utils.ts'
+import { TUTORIAL_ANCHORS, requireTutorialAnchor } from '../../src/client/shell/tutorial.ts'
 
 const TUTORIAL_TS = path.join(SHELL_DIR, 'tutorial.ts')
 const COACH_TS = path.join(SHELL_DIR, 'coach.ts')
 const COACH_CSS = path.join(CLIENT, 'styles/coach.css')
 const INDEX_CSS = path.join(CLIENT, 'styles/index.css')
 const BOOT_TS = path.join(SHELL_DIR, 'boot.ts')
+const DEPLOY_BUTTON_TS = path.join(CLIENT, 'components/deploy-button.ts')
+const DOSSIER_TS = path.join(CLIENT, 'components/dossier.ts')
+const MINABLE_SENTENCE_TS = path.join(CLIENT, 'components/minable-sentence.ts')
+const REPORT_VIEW_TS = path.join(CLIENT, 'components/report-view.ts')
+const SLOT_BOARD_TS = path.join(CLIENT, 'components/slot-board.ts')
+const WINDOW_REGISTRY_TS = path.join(SHELL_DIR, 'window-registry.ts')
 
 /** The walk is TWO modules now — the script and the layer it drives. */
 const WALK = [TUTORIAL_TS, COACH_TS] as const
@@ -88,6 +95,44 @@ function zIndexOf(sheet: string, selector: string): number {
   const rule = new RegExp(`${escaped}\\s*\\{[^}]*?z-index\\s*:\\s*(\\d+)`).exec(css(sheet))
   expect(rule, `${selector} declares no z-index in ${rel(sheet)}`).not.toBeNull()
   return Number(rule![1])
+}
+
+function sourceBackedTutorialAnchors(): Map<string, number> {
+  const deployButton = code(DEPLOY_BUTTON_TS)
+  const dossier = code(DOSSIER_TS)
+  const minableSentence = code(MINABLE_SENTENCE_TS)
+  const reportView = code(REPORT_VIEW_TS)
+  const slotBoard = code(SLOT_BOARD_TS)
+  const windowRegistry = code(WINDOW_REGISTRY_TS)
+
+  const hasWindow = (id: string): boolean => new RegExp(`id\\s*:\\s*'${id}'`).test(windowRegistry)
+  const hasReportGroup = (name: string): boolean => new RegExp(`\\.id\\s*=\\s*'${name}'`).test(reportView)
+  const hasReportStamp = /el\s*\(\s*'span'\s*,\s*'rep-stamp'/.test(reportView)
+  const hasSentenceId = /'data-sentence-id'\s*:/.test(minableSentence)
+  const hasHandoverSection =
+    /slug\s*:\s*'handover'/.test(dossier) && /node\.dataset\.sect\s*=\s*section\.slug/.test(dossier)
+
+  const backed = new Map<string, number>()
+  if (/\.id\s*=\s*'btnDeploy'/.test(deployButton)) backed.set('#btnDeploy', 1)
+  if (hasWindow('w-feed')) backed.set('#w-feed', 1)
+  if (hasWindow('w-rep')) backed.set('#w-rep', 1)
+  if (hasWindow('w-file') && hasHandoverSection) backed.set('#w-file [data-sect="handover"]', 1)
+  if (hasWindow('w-file') && /button\s*\(\s*'slot-unset'/.test(slotBoard)) backed.set('#w-file .slot-unset', 2)
+  if (hasWindow('w-rep') && hasReportGroup('factsList')) backed.set('#w-rep #factsList', 1)
+  if (hasWindow('w-rep') && hasReportGroup('bodyList')) backed.set('#w-rep #bodyList', 1)
+  if (hasWindow('w-rep') && hasReportGroup('factsList') && hasReportStamp) {
+    backed.set('#w-rep #factsList .rep-stamp', 2)
+  }
+  if (hasWindow('w-rep') && hasReportGroup('bodyList') && hasReportStamp) {
+    backed.set('#w-rep #bodyList .rep-stamp', 2)
+  }
+  if (hasWindow('w-rep') && hasReportGroup('factsList') && hasSentenceId) {
+    backed.set('#w-rep #factsList [data-sentence-id]', 2)
+  }
+  if (hasWindow('w-rep') && hasReportGroup('bodyList') && hasSentenceId) {
+    backed.set('#w-rep #bodyList [data-sentence-id]', 2)
+  }
+  return backed
 }
 
 describe('[x3] the walk exists and is wired exactly once', () => {
@@ -192,6 +237,63 @@ describe('[x3] the walk can only watch — the clause the rewrite did not spend'
       const src = code(file)
       expect(src, `${rel(file)} paces a plate with a timer`).not.toMatch(/setTimeout\s*\(/)
     }
+  })
+})
+
+describe('[issue #137] missing tutorial anchors fail where they break', () => {
+  it('(a) the walk target list is explicit and uses current row-group handles', () => {
+    expect(TUTORIAL_ANCHORS).toEqual([
+      { name: 'deploy', selector: '#btnDeploy', unique: true },
+      { name: 'live feed window', selector: '#w-feed', unique: true },
+      { name: 'reports window', selector: '#w-rep', unique: true },
+      { name: 'facts row group', selector: '#w-rep #factsList', unique: true },
+      { name: 'radio row group', selector: '#w-rep #bodyList', unique: true },
+      { name: 'first fact sentence', selector: '#w-rep #factsList [data-sentence-id]' },
+      { name: 'first radio sentence', selector: '#w-rep #bodyList [data-sentence-id]' },
+      { name: 'handover section', selector: '#w-file [data-sect="handover"]', unique: true },
+      { name: 'unset control', selector: '#w-file .slot-unset' },
+    ])
+  })
+
+  it('(b) current desk sources back every walk anchor under npm test', () => {
+    const backed = sourceBackedTutorialAnchors()
+    const root = {
+      querySelectorAll: (selector: string): { readonly length: number } => ({ length: backed.get(selector) ?? 0 }),
+    }
+
+    for (const anchor of TUTORIAL_ANCHORS) {
+      expect(() => requireTutorialAnchor(root, anchor.selector, anchor), anchor.selector).not.toThrow()
+    }
+  })
+
+  it('(c) a missing anchor throws with the selector named', () => {
+    const root = { querySelectorAll: (): { readonly length: number } => ({ length: 0 }) }
+    expect(() => requireTutorialAnchor(root, '#w-rep #factsList')).toThrow(
+      'tutorial anchor missing: #w-rep #factsList',
+    )
+  })
+
+  it('(d) a repeated unique anchor throws with the selector and match count', () => {
+    const root = { querySelectorAll: (): { readonly length: number } => ({ length: 2 }) }
+    expect(() =>
+      requireTutorialAnchor(root, '#w-rep #factsList .rep-stamp', {
+        name: 'broken',
+        selector: '#w-rep #factsList .rep-stamp',
+        unique: true,
+      }),
+    ).toThrow('tutorial anchor not unique: #w-rep #factsList .rep-stamp (2 matches)')
+  })
+
+  it('(e) a present non-unique anchor returns without shortening the walk', () => {
+    const root = { querySelectorAll: (): { readonly length: number } => ({ length: 2 }) }
+    expect(() => requireTutorialAnchor(root, '#w-rep #factsList [data-sentence-id]')).not.toThrow()
+  })
+
+  it('(f) every plate checks its target before it is shown', () => {
+    const src = code(TUTORIAL_TS)
+    expect(src, 'the walk no longer checks the target before showing the plate').toMatch(
+      /requireTutorialAnchor\s*\(\s*document\s*,\s*beat\.mark\.target\s*,\s*TUTORIAL_ANCHOR_BY_SELECTOR\.get\s*\(\s*beat\.mark\.target\s*\)\s*\)[\s\S]*?coach\.show\s*\(\s*beat\.mark/,
+    )
   })
 })
 
