@@ -20,35 +20,35 @@
 /* ─── vendored :root block — desktop.css lines 8..44, verbatim ─────────── */
 :root{
   /* ink */
-  --ink-0:#08090c;
-  --ink-1:#0d1015;
-  --ink-2:#141920;
-  --ink-3:#1e242c;
-  --ink-line:#2b333d;
-  --blueprint:#4a6072;
+  --ink-0:#05070c;
+  --ink-1:#080b12;
+  --ink-2:#0c1119;
+  --ink-3:#131b27;
+  --ink-line:#1b2534;
+  --blueprint:#2c3d57;
 
   /* shared document surface — old light neutral values, kept until the palette pivot */
-  --surface:#f2efe6;
-  --surface-inset:#e6e2d5;
-  --surface-border:#3f4a56;
-  --surface-rule:#2b333d;
+  --surface:#080b12;
+  --surface-inset:#05070c;
+  --surface-border:#1b2534;
+  --surface-rule:#131b27;
 
   /* surface text tiers */
-  --surface-text:#242a30;
-  --surface-text-strong:#3c444d;
-  --surface-muted:#7d7565;
-  --surface-muted-2:#9b9382;
+  --surface-text:#dfe9ff;
+  --surface-text-strong:#dfe9ff;
+  --surface-muted:#93a6c6;
+  --surface-muted-2:#6b7c99;
 
   /* accents — one signal, one warning, one evidence-thread ink */
-  --signal:#8fb8d8;
-  --warning:#b2242c;
-  --warning-strong:#8d1a20;
-  --warning-wash:rgba(178,36,44,.10);
-  --evidence-thread:#a8272f;
-  --highlight:#e8d24a;
+  --signal:#8fd0ff;
+  --warning:#e88a6a;
+  --warning-strong:#e88a6a;
+  --warning-wash:rgba(232,138,106,.10);
+  --evidence-thread:#e88a6a;
+  --highlight:#8fd0ff;
 
-  --shadow-win:0 2px 0 rgba(0,0,0,.5), 0 28px 64px -20px rgba(0,0,0,.9),
-               0 0 0 1px rgba(0,0,0,.7);
+  --shadow-win:0 2px 0 rgba(5,7,12,.5), 0 28px 64px -20px rgba(5,7,12,.9),
+               0 0 0 1px rgba(5,7,12,.7);
 
   /* TWO faces, and the split is what a thing IS, not which window it is in (x5).
      `--mono` is every FIXED value the desk prints — window names, section
@@ -77,157 +77,157 @@
 
 /* ─── machine-room chrome: surfaces ───────────────────────────────────── */
 :root{
-  --edge:#000;
-  --sky:#182029;
-  --chrome-hi:#12171d;
-  --chrome-lo:#0b0e12;
-  --chrome-deep:#090c10;
-  --chrome-raise:#11161c;
-  --chrome-raise-2:#161d25;
-  --chrome-open:#1a222b;
-  --chrome-focus:#233040;
-  --bar-hi:#1b222a;
-  --bar-hi-on:#26313c;
-  --tab-hi:#252d36;
-  --tab-lo:#1a2027;
-  --ctl-hover:#2b3540;
-  --track:#1c232b;
-  --dot:#3c4650;
-  --gauge-1:#3d5b74;
-  --gauge-2:#8fb8d8;
+  --edge:#1b2534;
+  --sky:#080b12;
+  --chrome-hi:#0c1119;
+  --chrome-lo:#080b12;
+  --chrome-deep:#05070c;
+  --chrome-raise:#0c1119;
+  --chrome-raise-2:#131b27;
+  --chrome-open:#131b27;
+  --chrome-focus:#18222f;
+  --bar-hi:#131b27;
+  --bar-hi-on:#1b2534;
+  --tab-hi:#131b27;
+  --tab-lo:#080b12;
+  --ctl-hover:#18222f;
+  --track:#0c1119;
+  --dot:#33415c;
+  --gauge-1:#2c3d57;
+  --gauge-2:#8fd0ff;
 }
 
 /* ─── machine-room chrome: type + rules ───────────────────────────────── */
 :root{
-  --txt-max:#fff;
-  --txt-hi:#e8eef3;
-  --txt:#cfd4da;
-  --txt-2:#b7c0c9;
-  --txt-3:#8d99a5;
-  --txt-4:#78838f;
-  --txt-5:#6a7683;
-  --txt-6:#5c6773;
-  --txt-7:#54606c;
-  --txt-8:#3e4854;
-  --line-1:#3f4a56;
-  --line-2:#4a5764;
-  --line-3:#6a7d90;
-  --alert-txt:#f0d7d8;
-  --alert-line:#4a2226;
-  --alert-dim:#8d7c7d;
+  --txt-max:#dfe9ff;
+  --txt-hi:#dfe9ff;
+  --txt:#dfe9ff;
+  --txt-2:#93a6c6;
+  --txt-3:#93a6c6;
+  --txt-4:#6b7c99;
+  --txt-5:#6b7c99;
+  --txt-6:#6b7c99;
+  --txt-7:#6b7c99;
+  --txt-8:#33415c;
+  --line-1:#1b2534;
+  --line-2:#2c3d57;
+  --line-3:#2c3d57;
+  --alert-txt:#dfe9ff;
+  --alert-line:#e88a6a;
+  --alert-dim:#93a6c6;
 }
 
 /* ─── text on document surfaces ───────────────────────────────────────── */
 :root{
-  --surface-text-max:#12171c;
-  --surface-text-heading:#1a1f24;
-  --surface-text-1:#22282e;
-  --surface-text-2:#1e242a;
-  --surface-text-3:#3b434b;
-  --surface-text-4:#5b6068;
-  --surface-text-5:#6f7781;
-  --surface-text-6:#a89f8b;
-  --surface-text-7:#948b78;
-  --redact:#15191d;
-  --good:#2f6b3e;
-  --slotted-ink:#7a6512;
+  --surface-text-max:#dfe9ff;
+  --surface-text-heading:#dfe9ff;
+  --surface-text-1:#dfe9ff;
+  --surface-text-2:#dfe9ff;
+  --surface-text-3:#93a6c6;
+  --surface-text-4:#93a6c6;
+  --surface-text-5:#6b7c99;
+  --surface-text-6:#6b7c99;
+  --surface-text-7:#33415c;
+  --redact:#05070c;
+  --good:#8fd0ff;
+  --slotted-ink:#8fd0ff;
 }
 
 /* ─── LIVE FEED inks ──────────────────────────────────────────────────── */
 :root{
-  --feed-1:#252b23;
-  --feed-2:#20261e;
-  --feed-3:#1d2419;
-  --feed-mark:#7d8577;
-  --feed-t:#6c7468;
-  --feed-hd:#5f665a;
-  --feed-rule:#5c6355;
-  --radio:#1a2f42;
-  --npc:#4a3524;
+  --feed-1:#dfe9ff;
+  --feed-2:#93a6c6;
+  --feed-3:#dfe9ff;
+  --feed-mark:#6b7c99;
+  --feed-t:#6b7c99;
+  --feed-hd:#93a6c6;
+  --feed-rule:#131b27;
+  --radio:#8fd0ff;
+  --npc:#93a6c6;
   /* x8 — `--symptom` / `--symptom-mark` are gone, the way `--feed-wait` went in
      x7: the symptom line no longer reaches the DOM, so nothing consumed them.
      See `win-live-feed.css`'s header for the removal. */
-  --band-1:rgba(150,180,145,.30);
-  --band-2:rgba(150,180,145,.22);
+  --band-1:#0a0e16;
+  --band-2:#0a0e16;
 }
 
 /* ─── block card face + sprocket hardware ─────────────────────────────── */
 :root{
-  --card-face:#f6f2e6;
-  --punch-1:#8d846f;
-  --punch-2:#c9c0a8;
-  --kind-fact:#2f4054;
-  --kind-self:#4d3f6b;
-  --kind-quote:#3f5340;
-  --pin-hi:#e0666c;
-  --sprocket-hole:#0e1116;
-  --sprocket-1:#cdd1c6;
-  --sprocket-2:#d8dbd1;
+  --card-face:#080b12;
+  --punch-1:#2b3750;
+  --punch-2:#33415c;
+  --kind-fact:#2c3d57;
+  --kind-self:#33415c;
+  --kind-quote:#1b2534;
+  --pin-hi:#e88a6a;
+  --sprocket-hole:#05070c;
+  --sprocket-1:#0c1119;
+  --sprocket-2:#131b27;
 }
 
 /* ─── shade: the graphite-ink accent at low alpha (rules, wells, shadow) ─ */
 :root{
-  --sh-025:rgba(0,0,0,.025);
-  --sh-04:rgba(0,0,0,.04);
-  --sh-055:rgba(0,0,0,.055);
-  --sh-06:rgba(0,0,0,.06);
-  --sh-07:rgba(0,0,0,.07);
-  --sh-13:rgba(0,0,0,.13);
-  --sh-14:rgba(0,0,0,.14);
-  --sh-15:rgba(0,0,0,.15);
-  --sh-18:rgba(0,0,0,.18);
-  --sh-2:rgba(0,0,0,.2);
-  --sh-22:rgba(0,0,0,.22);
-  --sh-24:rgba(0,0,0,.24);
-  --sh-25:rgba(0,0,0,.25);
-  --sh-28:rgba(0,0,0,.28);
-  --sh-3:rgba(0,0,0,.3);
-  --sh-34:rgba(0,0,0,.34);
-  --sh-35:rgba(0,0,0,.35);
-  --sh-4:rgba(0,0,0,.4);
-  --sh-5:rgba(0,0,0,.5);
-  --sh-7:rgba(0,0,0,.7);
-  --sh-72:rgba(0,0,0,.72);
-  --sh-8:rgba(0,0,0,.8);
-  --sh-9:rgba(0,0,0,.9);
+  --sh-025:rgba(5,7,12,.025);
+  --sh-04:rgba(5,7,12,.04);
+  --sh-055:rgba(5,7,12,.055);
+  --sh-06:rgba(5,7,12,.06);
+  --sh-07:rgba(5,7,12,.07);
+  --sh-13:rgba(5,7,12,.13);
+  --sh-14:rgba(5,7,12,.14);
+  --sh-15:rgba(5,7,12,.15);
+  --sh-18:rgba(5,7,12,.18);
+  --sh-2:rgba(5,7,12,.2);
+  --sh-22:rgba(5,7,12,.22);
+  --sh-24:rgba(5,7,12,.24);
+  --sh-25:rgba(5,7,12,.25);
+  --sh-28:rgba(5,7,12,.28);
+  --sh-3:rgba(5,7,12,.3);
+  --sh-34:rgba(5,7,12,.34);
+  --sh-35:rgba(5,7,12,.35);
+  --sh-4:rgba(5,7,12,.4);
+  --sh-5:rgba(5,7,12,.5);
+  --sh-7:rgba(5,7,12,.7);
+  --sh-72:rgba(5,7,12,.72);
+  --sh-8:rgba(5,7,12,.8);
+  --sh-9:rgba(5,7,12,.9);
 }
 
 /* ─── sheen: paper highlight at low alpha ─────────────────────────────── */
 :root{
-  --sheen-05:rgba(255,255,255,.05);
-  --sheen-25:rgba(255,255,255,.25);
-  --sheen-28:rgba(255,255,255,.28);
-  --sheen-3:rgba(255,255,255,.3);
-  --sheen-35:rgba(255,255,255,.35);
-  --sheen-4:rgba(255,255,255,.4);
-  --sheen-5:rgba(255,255,255,.5);
-  --sheen-55:rgba(255,255,255,.55);
-  --sheen-6:rgba(255,255,255,.6);
-  --sheen-warm:rgba(255,250,235,.5);
+  --sheen-05:rgba(223,233,255,.05);
+  --sheen-25:rgba(223,233,255,.25);
+  --sheen-28:rgba(223,233,255,.28);
+  --sheen-3:rgba(223,233,255,.3);
+  --sheen-35:rgba(223,233,255,.35);
+  --sheen-4:rgba(223,233,255,.4);
+  --sheen-5:rgba(223,233,255,.5);
+  --sheen-55:rgba(223,233,255,.55);
+  --sheen-6:rgba(223,233,255,.6);
+  --sheen-warm:rgba(223,233,255,.5);
 }
 
 /* ─── warning at low alpha + the evidence thread ──────────────────────── */
 :root{
-  --warning-a08:rgba(178,36,44,.08);
-  --warning-a09:rgba(178,36,44,.09);
-  --warning-a12:rgba(178,36,44,.12);
-  --warning-a13:rgba(178,36,44,.13);
-  --warning-a25:rgba(178,36,44,.25);
-  --warning-a4:rgba(178,36,44,.4);
-  --warning-a5:rgba(178,36,44,.5);
-  --warning-a55:rgba(178,36,44,.55);
-  --evidence-thread-a55:rgba(168,39,47,.55);
-  --evidence-thread-a8:rgba(168,39,47,.8);
-  --horizon:rgba(120,24,28,.16);
-  --highlight-a62:rgba(232,210,74,.62);
+  --warning-a08:rgba(232,138,106,.08);
+  --warning-a09:rgba(232,138,106,.09);
+  --warning-a12:rgba(232,138,106,.12);
+  --warning-a13:rgba(232,138,106,.13);
+  --warning-a25:rgba(232,138,106,.25);
+  --warning-a4:rgba(232,138,106,.4);
+  --warning-a5:rgba(232,138,106,.5);
+  --warning-a55:rgba(232,138,106,.55);
+  --evidence-thread-a55:rgba(232,138,106,.55);
+  --evidence-thread-a8:rgba(232,138,106,.8);
+  --horizon:rgba(232,138,106,.16);
+  --highlight-a62:rgba(143,208,255,.62);
 }
 
 /* ─── boot scanline + instrument glow ─────────────────────────────────── */
 :root{
-  --scan-a05:rgba(150,200,255,.05);
-  --scan-a1:rgba(150,200,255,.10);
-  --glow-clk:rgba(200,225,255,.28);
-  --glow-tick:rgba(220,240,255,.6);
+  --scan-a05:rgba(143,208,255,.05);
+  --scan-a1:rgba(143,208,255,.10);
+  --glow-clk:rgba(143,208,255,.28);
+  --glow-tick:rgba(143,208,255,.6);
 }
 
 /* ─── type scale ──────────────────────────────────────────────────────────
