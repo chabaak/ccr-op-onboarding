@@ -134,79 +134,57 @@
    `tests/styles/token-lint.test.ts` only checks used→declared, so it will not
    fail either way. Left for a token pass to decide. */
 
-/* 인수인계 사항 — a paragraph, not four boxes (x4).
+/* 인수인계 사항 — four prototype slot rows, one document section. */
+.slots{margin-top:var(--space-8);display:flex;flex-direction:column;gap:var(--space-8);
+  font-family:var(--prose);font-size:var(--fs-12);line-height:1.45;color:var(--surface-text);
+  text-align:left;word-break:keep-all}
 
-   T1 had already taken the card FACE off a seated sentence ("what a slot holds
-   is a line of the file, not an object off a deck"), but the BOX stayed: four
-   dashed rectangles with a numbered rail down the left, standing there empty
-   whether or not the operator had anything to hand over. The file is a handover
-   the operator WRITES, so it reads as writing now — one justified flow, with
-   each sentence's slot number and its 해제 sitting in the margin of the line
-   they belong to.
-
-   The four permanent boxes are down to one blank, and only while the file is
-   empty; `#slotCount` in the deploy zone below is where the remaining seats are
-   read. `components/slot-board.ts` decides all of that — nothing here counts. */
-/* Ragged right, deliberately — the 무전 기록 pane justifies because it is one
-   long piece of prose, and this is a handful of short discrete sentences with a
-   button on the end of each. Justified, the last line of every seat stretched
-   its inter-word spaces into rivers wide enough to read as a table. */
-.slots{margin-top:var(--space-8);font-family:var(--prose);font-size:var(--fs-11-5);
-  line-height:2.05;color:var(--surface-text-1);text-align:left;word-break:keep-all}
-
-/* one seated sentence: an inline run, so the paragraph can break inside it */
-.slot{display:inline}
-.slot::before{content:attr(data-no);font-family:var(--mono);font-size:var(--fs-8);font-weight:700;
-  letter-spacing:.1em;color:var(--warning-strong);vertical-align:.15em;margin-right:var(--space-4);
-  padding:0 var(--space-3);border:1px solid var(--warning-a25);border-radius:1px;
+.slot{position:relative;display:flex;align-items:flex-start;gap:var(--space-9);
+  min-height:42px;padding:var(--space-8) var(--space-12);
+  border:1px solid var(--line-2);background:var(--ink-2);transition:background .18s,border-color .18s}
+.slot::before{content:attr(data-label);flex:0 0 46px;font-family:var(--mono);
+  font-size:var(--fs-10);line-height:1.55;letter-spacing:.16em;color:var(--surface-muted-2);
   white-space:nowrap}
-.slot .bcard{display:inline;padding:0;background:transparent;border:0}
-.slot .bc-text{display:inline;font-family:inherit;font-size:inherit;line-height:inherit;
+.slot .bcard{display:block;flex:1 1 auto;min-width:0;padding:0;background:transparent;border:0}
+.slot .bc-text{display:block;font-family:inherit;font-size:inherit;line-height:inherit;
   color:inherit;text-align:inherit}
-/* the thread's landing dot rides the line rather than a box corner, and it
-   CLOSES the run — see the note in `slot-board.ts` on why it is last */
-.slot-pin{display:inline-block;width:7px;height:7px;border-radius:50%;vertical-align:.28em;
-  margin-left:var(--space-4);
+.slot-pin{flex:0 0 auto;align-self:center;width:7px;height:7px;border-radius:50%;
   background:radial-gradient(circle at 35% 30%,var(--pin-hi),var(--warning-strong));
   box-shadow:0 0 6px var(--warning-a55)}
-.slot-unset{font-size:var(--fs-8);letter-spacing:.14em;color:var(--surface-muted);
-  margin-left:var(--space-5);padding:0 var(--space-5);vertical-align:.15em;
-  border:1px solid var(--sh-25);border-radius:1px;background:var(--sheen-28);
+.slot-unset{flex:0 0 auto;align-self:flex-start;font-family:var(--mono);font-size:var(--fs-8);
+  letter-spacing:.14em;color:var(--surface-muted);padding:0 var(--space-5);
+  border:1px solid var(--surface-rule);border-radius:0;background:var(--surface);
   transition:.14s;white-space:nowrap}
 .slot-unset:hover{border-color:var(--warning);color:var(--warning-strong);background:var(--warning-wash)}
-.slot.locked::before{color:var(--surface-muted);border-color:var(--sh-25)}
+.slots[data-state="locked"] .slot{opacity:.6;pointer-events:none}
+.slots[data-state="locked"] .slot::before{color:var(--surface-muted)}
 .slot.locked .slot-unset{display:none}
 
-/* the blank — one panel, the line centred in it both ways */
-.slot-blank{display:flex;align-items:center;justify-content:center;min-height:96px;
-  padding:var(--space-10) var(--space-14);border:1px dashed var(--sh-34);
-  background:var(--sheen-28);text-align:center;
-  transition:background .18s,border-color .18s,box-shadow .18s}
-.slot-blank::before{content:none}
-.slot-blank .slot-empty{font-family:var(--prose);font-size:var(--fs-11);line-height:1.7;
-  color:var(--surface-muted-2);background:transparent;border:0;word-break:keep-all}
+.slot-blank{border-color:var(--chrome-focus);background:var(--surface)}
+.slot-blank::before{color:var(--surface-muted-2)}
+.slot-blank .slot-empty{flex:1 1 auto;min-width:0;padding:0;background:transparent;border:0;
+  font-family:var(--mono);font-size:var(--fs-10-5);line-height:1.55;letter-spacing:.08em;
+  color:var(--surface-muted-2);text-align:left;word-break:keep-all}
 .slot-blank .slot-target{cursor:pointer}
-.slot-blank.droppable{border-color:var(--warning);background:var(--warning-wash);
-  box-shadow:0 0 0 3px var(--warning-a12)}
-.slot-blank.locked{opacity:.92}
-.slot-blank.locked .slot-empty{opacity:.5}
+.slot-blank.droppable{border-color:var(--signal);background:var(--ink-3)}
 
-/* x5 — the zone is a COLUMN: the counter-and-button row, then the note across
-   the full page width. See the note in `deploy-button.ts` on why they split. */
-.deploy-zone{margin-top:var(--space-18);margin-bottom:var(--space-10);
-  padding-top:var(--space-12);border-top:2px solid var(--surface-text);
-  display:flex;flex-direction:column;gap:var(--space-8)}
-.dz-row{display:flex;align-items:center;justify-content:space-between;gap:var(--space-12)}
-.dz-meta{min-width:0;font-size:var(--fs-9);letter-spacing:.08em;color:var(--surface-muted);line-height:1.6}
-.dz-meta span{color:var(--surface-text);font-weight:600}
-#deployState{font-size:var(--fs-9);letter-spacing:.06em;line-height:1.6;
-  color:var(--surface-text);font-weight:600;word-break:keep-all}
-.btn-deploy{flex:0 0 auto;display:flex;flex-direction:column;align-items:center;gap:var(--space-1);
-  padding:var(--space-9) var(--space-20);background:var(--surface-text);color:var(--surface);
-  border:1px solid var(--edge);box-shadow:2px 2px 0 var(--sh-35);transition:.14s}
-.btn-deploy:hover:not(:disabled){background:var(--warning-strong);box-shadow:2px 2px 0 var(--sh-5);transform:translate(-1px,-1px)}
-.btn-deploy:active:not(:disabled){transform:translate(1px,1px);box-shadow:none}
-.btn-deploy:disabled{opacity:.3;cursor:not-allowed;box-shadow:none}
+.deploy-zone{margin-top:var(--space-10);margin-bottom:var(--space-10);
+  padding-top:var(--space-8);border-top:1px solid var(--surface-rule);
+  display:flex;flex-direction:column;gap:var(--space-7)}
+.dz-row{display:flex;align-items:stretch;justify-content:space-between;gap:var(--space-8)}
+.dz-meta{flex:0 0 118px;display:flex;align-items:center;font-family:var(--mono);
+  font-size:var(--fs-10);letter-spacing:.16em;color:var(--surface-muted-2);line-height:1.35}
+.dz-meta span{color:inherit;font-weight:600}
+#deployState{font-family:var(--mono);font-size:var(--fs-10);letter-spacing:.12em;line-height:1.5;
+  color:var(--surface-muted-2);word-break:keep-all}
+.btn-deploy{flex:1 1 auto;display:flex;flex-direction:column;align-items:center;justify-content:center;
+  min-width:0;padding:var(--space-11);background:var(--signal);color:var(--ink-1);
+  border:1px solid var(--signal);border-radius:0;box-shadow:none;transition:.14s}
+.btn-deploy:hover:not(:disabled){background:var(--warning-strong);border-color:var(--warning-strong);transform:none}
+.btn-deploy:active:not(:disabled){transform:translateY(1px);box-shadow:none}
+.btn-deploy:disabled{opacity:.6;cursor:not-allowed;box-shadow:none}
+.btn-deploy[data-state="deployed"]{background:transparent;color:var(--surface-muted);
+  border-color:var(--surface-rule);opacity:1}
 
 /* ═══ x10 — THE FIRST DEPLOY BLINKS, AND ONLY THE FIRST (민서, 08-10) ════════
    The control switches between its activated look and its deactivated one until
@@ -310,12 +288,15 @@
 .btn-deploy.is-cued{animation:dzCue 1s linear infinite both}
 @keyframes dzCue{
   /* the deactivated look — the background `.btn-deploy` itself declares */
-  0%,49.9%{background:var(--surface-text)}
+  0%,49.9%{background:var(--signal)}
   /* …and the ACTIVATED look, which is also where the animation ENDS */
   50%,100%{background:var(--warning-strong)}}
 
-.bd-main{font-size:var(--fs-13);font-weight:700;letter-spacing:.28em;text-indent:.28em}
-.bd-sub{font-family:var(--mono);font-size:var(--fs-9);opacity:.72;letter-spacing:.06em}
+.bd-main{font-family:var(--mono);font-size:var(--fs-11);font-weight:700;line-height:1;
+  letter-spacing:.24em;text-indent:.24em;white-space:nowrap}
+.bd-sub{font-family:var(--mono);font-size:var(--fs-9);line-height:1;margin-top:var(--space-3);
+  opacity:.72;letter-spacing:.12em;white-space:nowrap}
+.bd-sub:empty{display:none}
 
 /* deploy stamp */
 .stamp{position:absolute;right:39px;top:132px;z-index:4;pointer-events:none;

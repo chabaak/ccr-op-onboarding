@@ -27,6 +27,7 @@ const NOTE_PARTIAL = '편성 중 — 배치를 기다립니다'
 const NOTE_LOCKED = '배치됨 — 이번 시행에서 잠김'
 
 const DEPLOY_MAIN = 'DEPLOY'
+const DEPLOY_DONE = '파 견 완 료'
 // x6 — 요원 파견, not 배치 · 파일 잠금 (민서, 08-09). The sub line was describing
 // the BOOKKEEPING the press performs — a file committed, a file locked — which is
 // the desk narrating its own state change to the one person who already knows
@@ -118,8 +119,8 @@ export function deployView(state: DeployState): DeployView {
     // 배치, and the sub line is the only thing that says which day it commits
     // for. `mode` still drives `data-op`, because the op the press actually
     // sends does change — and the membrane census reads it (see the builder).
-    mainLabel: DEPLOY_MAIN,
-    subLine: mode === 'deploy' ? DEPLOY_SUB : `${NEW_RUN_SUB}${nextAt}${NEW_RUN_SUB_TAIL}`,
+    mainLabel: mode === 'deploy' && state.deployed ? DEPLOY_DONE : DEPLOY_MAIN,
+    subLine: mode === 'deploy' ? (state.deployed ? '' : DEPLOY_SUB) : `${NEW_RUN_SUB}${nextAt}${NEW_RUN_SUB_TAIL}`,
   }
 }
 
@@ -176,6 +177,12 @@ export function buildDeployZone(onDeploy: () => void): DeployPart {
       // census — one physical control, never both ops at once.
       deploy.dataset.op = view.mode === 'next' || view.mode === 'spent' ? 'new_run' : 'deploy'
       deploy.dataset.state = view.buttonState
+      deploy.setAttribute(
+        'aria-label',
+        view.buttonState === 'deployed'
+          ? '파견 완료 — 이번 시행에서 잠김'
+          : '요원 파견 — 요원 파일을 이번 시행 동안 잠급니다',
+      )
       deploy.disabled = view.mode === 'next' ? false : view.mode === 'deploy' ? view.stampOn : true
     },
   }
