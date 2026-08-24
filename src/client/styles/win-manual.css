@@ -37,7 +37,7 @@ body:has(#manual) #toast{display:none}
      file show through, because the question is ABOUT the file; this one is
      shown over a desk the operator has not been handed yet, and there is
      nothing behind it they are meant to be reading. */
-  background:radial-gradient(70% 60% at 50% 50%,var(--sh-5),var(--sh-9));
+  background:var(--sh-8);
   backdrop-filter:blur(3px);
   animation:manVeil .5s ease-out both}
 @keyframes manVeil{from{opacity:0}to{opacity:1}}
@@ -205,3 +205,12 @@ body:has(#manual) #toast{display:none}
    height or a font-size declared here would silently fork the one-button foot
    away from the template it is supposed to be following. */
 .man-plate .cf-btn{padding:0 var(--space-12)}
+
+/* issue 133 — the onboarding briefing now applies the shared notice object.
+   These overrides neutralise the older x10 measurements above without changing
+   the compatibility `.cf-*` hooks that the ending sheet still uses. */
+.man-plate.notice-plate .notice-body{min-height:0}
+.man-plate.notice-plate .notice-line{font-size:var(--fs-13);letter-spacing:0;
+  line-height:1.85;color:var(--surface-muted)}
+.man-plate.notice-plate .notice-line + .notice-line{margin-top:0}
+.man-plate.notice-plate .notice-btn{padding:var(--space-6) var(--space-13)}

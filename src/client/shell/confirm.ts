@@ -80,6 +80,10 @@ export function deployCopy(): ConfirmCopy {
   }
 }
 
+function accentClass(copy: ConfirmCopy): string {
+  return copy.head === '배치 확인' || copy.head === '시행 중단' ? ' notice-accent' : ''
+}
+
 /** The elements the shell must hold still while a question is on the screen. */
 const HELD = ['#topbar', '#desktop']
 
@@ -119,28 +123,28 @@ export function openConfirm(app: HTMLElement, copy: ConfirmCopy): Promise<boolea
   layer.setAttribute('aria-labelledby', 'cf-head')
   layer.setAttribute('aria-describedby', 'cf-body')
 
-  const plate = el('section', 'cf-plate')
+  const plate = el('section', `cf-plate notice-plate${accentClass(copy)}`)
 
-  const led = el('span', 'cf-led')
-  led.setAttribute('aria-hidden', 'true')
-  const headLabel = el('b', undefined, copy.head)
+  const headLabel = el('b', 'notice-kind', copy.head)
   headLabel.id = 'cf-head'
-  const head = el('div', 'cf-plate-hd')
-  head.append(led, headLabel, el('i', undefined, copy.meta))
+  const head = el('div', 'cf-plate-hd notice-head')
+  head.append(headLabel, el('i', 'notice-meta', copy.meta))
 
-  const bodyText = el('p', 'cf-ask', copy.body)
+  const bodyText = el('p', 'cf-ask notice-lead', copy.body)
   bodyText.id = 'cf-body'
-  const body = el('div', 'cf-body')
-  body.append(bodyText, el('p', 'cf-note', copy.note))
+  const body = el('div', 'cf-body notice-body')
+  body.append(bodyText)
 
   // 취소 is built first and focused first: the opening keystroke on an
   // irreversible act should not be able to confirm it by reflex.
-  const no = button('cf-btn cf-no', copy.no, copy.no)
+  const no = button('cf-btn cf-no notice-btn notice-secondary', copy.no, copy.no)
   no.id = 'confirmNo'
-  const yes = button('cf-btn cf-yes', copy.yes, copy.yes)
+  const yes = button('cf-btn cf-yes notice-btn notice-primary', copy.yes, copy.yes)
   yes.id = 'confirmYes'
-  const foot = el('div', 'cf-foot')
-  foot.append(no, yes)
+  const actions = el('span', 'notice-actions')
+  actions.append(no, yes)
+  const foot = el('div', 'cf-foot notice-foot')
+  foot.append(el('span', 'cf-note notice-footnote', copy.note), actions)
 
   plate.append(head, body, foot)
   layer.append(plate)

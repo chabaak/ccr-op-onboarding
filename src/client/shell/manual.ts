@@ -167,17 +167,15 @@ export function openManual(app: HTMLElement): Promise<void> {
   root.setAttribute('aria-labelledby', 'man-head')
   root.setAttribute('aria-describedby', 'man-body')
 
-  const plate = el('section', 'cf-plate man-plate')
+  const plate = el('section', 'cf-plate notice-plate man-plate')
 
-  const led = el('span', 'cf-led')
-  led.setAttribute('aria-hidden', 'true')
-  const headLabel = el('b')
+  const headLabel = el('b', 'notice-kind')
   headLabel.id = 'man-head'
-  const counter = el('i')
-  const head = el('div', 'cf-plate-hd')
-  head.append(led, headLabel, counter)
+  const counter = el('i', 'notice-meta')
+  const head = el('div', 'cf-plate-hd notice-head')
+  head.append(headLabel, counter)
 
-  const body = el('div', 'cf-body')
+  const body = el('div', 'cf-body notice-body')
   body.id = 'man-body'
   // The step changes under a reader who is not looking at the head, so the
   // region announces itself. `aria-describedby` above points at this same
@@ -185,9 +183,9 @@ export function openManual(app: HTMLElement): Promise<void> {
   // follows the walk instead of going stale on step 1's lead.
   body.setAttribute('aria-live', 'polite')
 
-  const go = button('cf-btn cf-yes man-go', MANUAL_NEXT, MANUAL_NEXT)
+  const go = button('cf-btn cf-yes notice-btn notice-primary man-go', MANUAL_NEXT, MANUAL_NEXT)
   go.id = 'manualGo'
-  const foot = el('div', 'cf-foot')
+  const foot = el('div', 'cf-foot notice-foot')
   foot.append(go)
 
   plate.append(head, body, foot)
@@ -204,8 +202,8 @@ export function openManual(app: HTMLElement): Promise<void> {
     headLabel.textContent = step.head
     counter.textContent = counterOf(at)
     body.replaceChildren(
-      el('p', 'cf-ask', step.lead),
-      ...step.body.map((line) => el('p', 'cf-note', line)),
+      el('p', 'cf-ask notice-lead', step.lead),
+      ...step.body.map((line) => el('p', 'cf-note notice-line', line)),
     )
 
     go.textContent = last ? MANUAL_START : MANUAL_NEXT
