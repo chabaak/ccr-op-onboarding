@@ -622,6 +622,10 @@ test.describe('topbar', () => {
 
     await page.locator('#abortMission').click()
     await expect(page.locator('#confirm')).toBeVisible()
+    await expect(page.locator('#confirm .notice-plate.notice-accent')).toHaveCount(1)
+    await expect(page.locator('#confirm .notice-head')).toHaveCount(1)
+    await expect(page.locator('#confirm .notice-body')).toHaveCount(1)
+    await expect(page.locator('#confirm .notice-foot')).toHaveCount(1)
     await expect(page.locator('#cf-body')).toContainText('사건 선택 데스크톱')
     await expect(page.locator('#confirm .cf-note')).toContainText('시행')
     await expect(page.locator('#confirm .cf-note')).toContainText('블록')

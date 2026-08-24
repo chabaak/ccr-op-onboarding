@@ -5,9 +5,11 @@ import {
   ABORT_MISSION_COPY,
   confirmAbortMission,
 } from '../../src/client/shell/abort-mission.ts'
-import { SHELL_DIR, read, stripComments } from './shell-utils.ts'
+import { CLIENT, SHELL_DIR, read, stripComments } from './shell-utils.ts'
 
 const WINDOW_MANAGER_TS = path.join(SHELL_DIR, 'window-manager.ts')
+const CONFIRM_TS = path.join(SHELL_DIR, 'confirm.ts')
+const CONFIRM_CSS = path.join(CLIENT, 'styles/confirm.css')
 
 describe('abort mission control', () => {
   it('(a) asks in plain language what the abort discards', () => {
@@ -59,6 +61,15 @@ describe('abort mission control', () => {
     expect(handler, 'window close stopped updating the taskbar').toMatch(/syncTaskbar\s*\(\s*\)/)
     expect(handler, 'window close must not reset a scenario').not.toMatch(
       /resetScenarioSession|returnToScenarioDesktop|abort|reload/,
+    )
+  })
+
+  it('(e) 시행 중단 uses the shared irreversible notice accent', () => {
+    expect(read(CONFIRM_TS)).toMatch(
+      /copy\.head === '배치 확인' \|\| copy\.head === '시행 중단' \? ' notice-accent'/,
+    )
+    expect(stripComments(read(CONFIRM_CSS))).toMatch(
+      /\.notice-accent\s+\.notice-kind,\s*\.notice-accent\s+\.notice-meta\s*\{[^}]*color\s*:\s*var\(--warning\)/,
     )
   })
 })
