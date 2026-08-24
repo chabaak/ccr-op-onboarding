@@ -83,8 +83,16 @@ const SAID = [
 
 /** How long any one plate may take to arrive. Generous: a gate may wait on a day. */
 const PLATE_MS = 30_000
-/** …and the gates that wait for the simulation to produce something. */
-const DAY_MS = 60_000
+/**
+ * …and the gates that wait for the simulation to produce something.
+ *
+ * Measured after the issue 130 live-feed rows landed: `origin/main` produced
+ * the first report 53.3s after tally, while the fixed branch takes 64.4s
+ * because symptom support rows are visible again. The repeat-each lane runs two
+ * tutorial workers together, so keep headroom above the measured report gate
+ * without letting a missing report inherit a broad test default.
+ */
+const DAY_MS = 90_000
 
 test.use({ viewport: { width: 1280, height: 800 } })
 

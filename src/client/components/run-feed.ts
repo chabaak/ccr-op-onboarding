@@ -344,8 +344,12 @@ export function feedGapMs(
  * arriving-now animation as a real one. It is the desk reporting on itself, in
  * the same breath as the `※` and the hatched band it prints on, and it should
  * read as stamped rather than as spoken.
+ *
+ * `symptom` is a quiet supporting row, not a foreground dispatch. Printing it
+ * whole keeps the beat state visible without making REPORTS wait for every
+ * muted sentence to type at full live-feed pace.
  */
-export const typesOut = (kind: FeedKind): boolean => kind !== 'mark' && kind !== 'fallback'
+export const typesOut = (kind: FeedKind): boolean => kind !== 'mark' && kind !== 'fallback' && kind !== 'symptom'
 
 /**
  * The kind the fanfold DROPS — one owner, and two readers of it.

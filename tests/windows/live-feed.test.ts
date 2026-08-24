@@ -534,7 +534,13 @@ describe('x11 the reveal pump charges time for lines, never for events', () => {
       const to = hhmm(open + gap)
       expect(feedGapMs('08:00', to, policy), `${gap} minute gap`).toBe(expected)
     }
-    expect(paperCost(EVENTS, policy)).toBe(158052)
+    expect(paperCost(EVENTS, policy)).toBe(140772)
+  })
+
+  it('(d4) symptom rows land whole so supporting state does not slow the report gate', () => {
+    expect(typesOut('symptom')).toBe(false)
+    expect(typesOut('npc')).toBe(true)
+    expect(typesOut('radio')).toBe(true)
   })
 
   it('(e) the whole demo day of paper stays inside the human-readable presentation band', () => {
