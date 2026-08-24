@@ -236,6 +236,36 @@ describe('[x3] the mark cannot come between the operator and the desk', () => {
     expect(sheet).not.toMatch(/animation-iteration-count\s*:\s*infinite/)
   })
 
+  it('(b2) the Interrupts plate is flat signal chrome, not a warning modal', () => {
+    const sheet = css(COACH_CSS)
+    expect(sheet, 'the scrim does not use the approved nearest shade token').toMatch(
+      /\.coach-scrim\s*\{[^}]*fill\s*:\s*var\(--sh-72\)/,
+    )
+    expect(sheet, 'the target edge is not signal').toMatch(
+      /\.coach-edge\s*\{[^}]*stroke\s*:\s*var\(--signal\)/,
+    )
+    expect(sheet, 'the leader is not signal').toMatch(
+      /\.coach-lead\s*\{[^}]*stroke\s*:\s*var\(--signal\)/,
+    )
+    expect(sheet, 'the coach plate kept a gradient').not.toMatch(/\.coach-plate\s*\{[^}]*gradient/)
+    expect(sheet, 'the coach plate is not on the notice surface').toMatch(
+      /\.coach-plate\s*\{[^}]*background\s*:\s*var\(--surface\)/,
+    )
+    expect(sheet, 'the coach plate is not on the blueprint line').toMatch(
+      /\.coach-plate\s*\{[^}]*border\s*:\s*1px solid var\(--blueprint\)/,
+    )
+    expect(sheet, 'the coach sentence is not prose type').toMatch(
+      /\.coach-says\s*\{[^}]*font-family\s*:\s*var\(--prose\)/,
+    )
+    expect(sheet, 'the coach sentence is not on the reference type step').toMatch(
+      /\.coach-says\s*\{[^}]*font-size\s*:\s*var\(--fs-13\)/,
+    )
+    expect(sheet, 'the check button is not signal').toMatch(
+      /\.coach-ok\s*\{[^}]*background\s*:\s*var\(--signal\)/,
+    )
+    expect(sheet, 'the coach skin must not spend warning').not.toMatch(/var\(--warning/)
+  })
+
   it('(c) the mark is never the thing on top of an irreversible question', () => {
     // `coach.css`'s header claims a place on the desk's z-ladder. That claim is
     // about OTHER sheets, so it is the kind of comment that goes stale silently
@@ -275,6 +305,19 @@ describe('[x3] the mark cannot come between the operator and the desk', () => {
     // A window rides `--z`, which the manager assigns from a base far below all
     // of these, so it is asserted by shape rather than by number.
     expect(css(shell)).toMatch(/\.win\s*\{[^}]*z-index\s*:\s*var\(--z\)/)
+  })
+})
+
+describe('[x3] the plate answers are ordered like the prototype', () => {
+  it('(a) skip is DOM-first and gets initial focus', () => {
+    const src = code(COACH_TS)
+    expect(src, 'the visual/tab order stopped being sentence, skip, check').toMatch(
+      /root\.append\(line,\s*skip,\s*ok\)/,
+    )
+    expect(src, 'the plate no longer focuses the quiet exit first').toMatch(
+      /plate\.skip\.focus\(\{\s*preventScroll:\s*true\s*\}\)/,
+    )
+    expect(src, 'the non-modal coach plate became aria-modal').not.toMatch(/aria-modal/)
   })
 })
 

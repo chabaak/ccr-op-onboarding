@@ -215,6 +215,7 @@ test.describe('[x3] the walk is opt-in for every lane but its own', () => {
     await commit(page)
     await expect(page.locator(PLATE)).toBeVisible({ timeout: DAY_MS })
     await expect(says(page)).toHaveText(SAID[0]!)
+    await expect(page.locator(SKIP)).toBeFocused()
   })
 })
 

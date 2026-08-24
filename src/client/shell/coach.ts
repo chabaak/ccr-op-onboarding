@@ -561,7 +561,7 @@ export function createCoach(app: HTMLElement): CoachHandle {
       // `preventScroll`, because the plate is `position:fixed` and has nothing
       // to be scrolled into view — and because a focus that scrolled a window
       // body would move the very target this mark has just measured.
-      requestAnimationFrame(() => plate.ok.focus({ preventScroll: true }))
+      requestAnimationFrame(() => plate.skip.focus({ preventScroll: true }))
     })
   }
 
