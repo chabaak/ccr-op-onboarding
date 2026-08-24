@@ -42,11 +42,22 @@ const failingProvider = (error: unknown): CallProvider => ({
   },
 });
 
-function build(provider: CallProvider = okProvider()) {
+const sequenceProvider = (payloads: unknown[]): CallProvider => {
+  let attempts = 0;
+  return {
+    generate: async () => ({
+      payload: payloads[attempts++] ?? payloads.at(-1),
+      latencyMs: 12,
+      usage: { inputTokens: 100, outputTokens: 50, totalTokens: 150 },
+    }),
+  };
+};
+
+function build(provider: CallProvider = okProvider(), logger = silentLogger) {
   return createHandler({
     config: validConfig,
     callService: new CallService(validConfig, provider),
-    logger: silentLogger,
+    logger,
   });
 }
 
@@ -183,6 +194,24 @@ describe("DDAY proxy HTTP skeleton", () => {
     expect(res.headers?.["x-llm-fallback"]).toBe("false");
   });
 
+  it("logs the attempt count for a rescued retry", async () => {
+    const logger = { info: vi.fn(), warn: vi.fn(), error: vi.fn() };
+    const res = result(
+      await build(
+        sequenceProvider([{ ...JUDGMENT_OK, stance: "not-offered" }, JUDGMENT_OK]),
+        logger,
+      )(event(validCallBody), context),
+    );
+
+    expect(res.statusCode).toBe(200);
+    expect(logger.info).toHaveBeenCalledWith(
+      expect.objectContaining({
+        event: "dday_call",
+        attempts: 2,
+      }),
+    );
+  });
+
   it("rejects an archived prompt version that is still on disk for probe evidence", async () => {
     const res = result(
       await build()(
@@ -222,6 +251,25 @@ describe("DDAY proxy HTTP skeleton", () => {
     );
     expect(res.statusCode).toBe(502);
     expect(res.headers?.["x-fallback-code"]).toBe("invalid_model_output");
+  });
+
+  it("logs the attempt count for a fallback", async () => {
+    const logger = { info: vi.fn(), warn: vi.fn(), error: vi.fn() };
+    const res = result(
+      await build(
+        failingProvider(new PublicError(504, "bedrock_timeout", "too slow")),
+        logger,
+      )(event(validCallBody), context),
+    );
+
+    expect(res.statusCode).toBe(504);
+    expect(logger.warn).toHaveBeenCalledWith(
+      expect.objectContaining({
+        event: "dday_call_fallback",
+        code: "bedrock_timeout",
+        attempts: 1,
+      }),
+    );
   });
 
   // A malformed request must not look like a model failure: the engine would
