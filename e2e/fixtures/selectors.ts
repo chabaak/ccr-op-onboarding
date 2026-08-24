@@ -69,18 +69,14 @@ export const FEED = {
    * The clock stamp `.fl-t` is a SIBLING of both and is deliberately outside
    * this scope — it is chrome, and inv 2 is about NPC state.
    */
-  npcColumns: '#w-feed #feedList .fl-npc :is(.fl-c, .fl-sr)',
+  npcColumns: '#w-feed #feedList :is(.fl-npc, .fl-symptom) :is(.fl-c, .fl-sr)',
   /** The behind-indicator (U2) — shown only while the feed is NOT following. */
   behind: '#w-feed #feedBehind',
 } as const
 
 /* x8 — `EMPTY_SYMPTOM` is gone (민서, 08-10). It named `(변화 없음)`, the copy a
-   beat printed when it closed without moving anything, and there is no symptom
-   line on the paper to be empty: `run-feed.ts` drops the kind before the DOM,
-   the way it already dropped `wait`. The symptoms still exist — they are the
-   engine's delta journal and they still reach Call 2 as `SCENE_SYMPTOMS` — so a
-   suite that wants to observe one reads it off the stream, as the wait note
-   below says, and never off the DOM. `.fl-symptom` selects nothing now. */
+   beat printed when it closed without moving anything. #130 brings symptom
+   lines back as ordinary 요원 rows, but the empty-state copy stays gone. */
 
 /* x6 — `WAIT_PHRASE` and the wait selector are gone (민서, 08-09). There is no
    wait phrasing left to name and no `.fl-wait` node to select: the waiting

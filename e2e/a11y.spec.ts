@@ -37,13 +37,10 @@ const MEMBRANE_OPS = ['slot', 'unslot', 'mine', 'deploy', 'new_run'] as const
 const MEMBRANE_SELECTOR = MEMBRANE_OPS.map((op) => `[data-op="${op}"]`).join(', ')
 
 /**
- * The NPC channel (spec §3 inv 2). The clock stamp `.fl-t` is chrome, excluded.
+ * The NPC state channels (spec §3 inv 2). The clock stamp `.fl-t` is chrome, excluded.
  *
- * x8 — ONE channel, not two. `.fl-symptom .fl-c` was the second, and the
- * symptom line no longer reaches the DOM at all (민서, 08-10), so leaving it
- * here would have quietly turned half the scope into a selector that matches
- * nothing — the exact silent-emptying this assert's scoping rule exists to
- * prevent. Kept in step with `tests/invariants/no-digit-npc.test.ts`.
+ * #130 reopens `.fl-symptom` as a quiet 요원 row, so it is back in scope beside
+ * `.fl-npc`.
  *
  * x11 — TWO COLUMNS OF THE ONE CHANNEL (민서, 08-10). The reveal became a
  * typewriter, so a line is printed twice: `.fl-c` fills character by character
@@ -55,7 +52,7 @@ const MEMBRANE_SELECTOR = MEMBRANE_OPS.map((op) => `[data-op="${op}"]`).join(', 
  * assistive-tech user actually receives, was never scanned at all. Both columns
  * are in scope and neither is `.fl-t`, so the exclusion below is unaffected.
  */
-const NPC_TEXT_SELECTOR = '.fl-npc .fl-c, .fl-npc .fl-sr'
+const NPC_TEXT_SELECTOR = '.fl-npc .fl-c, .fl-npc .fl-sr, .fl-symptom .fl-c, .fl-symptom .fl-sr'
 /** Digit-bearing surfaces that are score or chrome, never NPC state. */
 /* x4 — the ledger's table became record lines; the exclusion follows the
    selectors that actually carry score digits. Kept in step with

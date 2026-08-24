@@ -1,16 +1,9 @@
 /* ===========================================================================
    win-live-feed.css — WINDOW 2 · LIVE FEED (desktop.css lines 414..470).
 
-   Green-bar fanfold printing as you watch: one grid row per line, kind-coded
-   (event · radio · npc · fallback · mark).
-
-   FIVE skins, not seven — x8 took `.fl-symptom` the same way x6 took `.fl-wait`
-   (민서, 08-10). The symptoms were the engine's delta journal in italic under
-   every beat, and `run-feed.ts` now drops a `symptom` line before it reaches the
-   DOM, so nothing carries the class. The rules that went were `.fl-symptom
-   .fl-c` and its `::before`; `--symptom` / `--symptom-mark` went with them from
-   `tokens.css`, having no consumer left. The kind itself is untouched on the
-   seam and still reaches Call 2 as `SCENE_SYMPTOMS`.
+   Fanfold printing as you watch: one grid row per line, with stamp, speaker tag
+   and sentence columns. `symptom` rows print again as quiet 요원 state; `wait`
+   still stays silent.
 
    And the older removal, kept because it is the precedent: `wait` is a kind on the frozen seam
    (`shared/view-driver.ts`) and has no skin here because x6 removed the waiting
@@ -50,18 +43,18 @@
    lines, the fallback notice and the behind-indicator — so the feed printed
    three faces and the radio, which is the one thing in this window an actual
    person says, was the least legible of them. See `styles/tokens.css`. */
-.fl{display:grid;grid-template-columns:66px 1fr;gap:0 var(--space-10);
-  padding:var(--space-3) var(--space-8) var(--space-3) var(--space-4);
+.fl{display:grid;grid-template-columns:46px 52px minmax(0,1fr);gap:var(--space-12);
+  padding:var(--space-9) 0;border-bottom:1px solid var(--surface-rule);align-items:baseline;
   font-family:var(--mono);font-size:var(--fs-11);line-height:1.65;
   position:relative;animation:lineIn .34s cubic-bezier(.25,.9,.3,1) both}
 @keyframes lineIn{from{opacity:0;transform:translateY(4px);clip-path:inset(0 100% 0 0)}
   to{opacity:1;transform:none;clip-path:inset(0 0 0 0)}}
 .fl.band{background:linear-gradient(90deg,var(--band-1),var(--band-2))}
-.fl-t{font-size:var(--fs-9-5);color:var(--feed-t);letter-spacing:.02em;padding-top:var(--space-2);
+.fl-t{font-size:var(--fs-11);color:var(--surface-muted-2);letter-spacing:0;padding-top:var(--space-2);
   font-variant-numeric:tabular-nums;text-align:right}
-.fl-c{font-family:var(--prose);color:var(--feed-1);min-width:0;padding-left:var(--space-14)}
-.fl-c::before{content:attr(data-mark);display:inline-block;width:21px;margin-left:var(--space-n21);
-  color:var(--feed-mark);font-size:var(--fs-10)}
+.fl-k{font-family:var(--mono);font-size:var(--fs-10);letter-spacing:.14em;color:var(--surface-muted-2);
+  white-space:nowrap;overflow:hidden;text-overflow:clip}
+.fl-c{font-family:var(--prose);font-size:var(--fs-13);line-height:1.65;color:var(--feed-1);min-width:0}
 
 /* x11 — THE ROW HAS A TWIN (민서, 08-10). `.fl-c` is typed out character by
    character now (`components/run-feed.ts`), and `#feedList` is a `role="log"`
@@ -76,32 +69,15 @@
    declared for it here on purpose: a second rule for the same node in a second
    sheet is how one of them ends up half-true.
 
-   The mark keeps printing from `data-mark` above, so an empty `.fl-c` is a
-   gutter mark with nothing after it yet — the print head, before the line. */
+   An empty `.fl-c` is the print head before the line. */
 
-/* Each kind below sets its SIZE and its COLOUR; the face comes from `.fl-c` and
-   is not restated. There used to be one exception — the radio's own channel
-   label, a fixed `ECHO-n · 무전` caption in `--mono` block-set above the
-   utterance — and x10 (민서, 08-10) deleted it, along with the radio's `◈`.
-
-   The caption said, on every radio line, the name the fanfold's header already
-   prints once per run; the mark sat beside a line that was already the only
-   thing on the paper in `--radio` at 700. So the channel is named by the ink and
-   the weight below and by nothing else, and two rules went with the caption:
-   `.fl-radio .fl-c b` (nothing constructs a radio `<b>` any more — `.fl-npc
-   .fl-c b` on the NPC speaker is a different rule and stays) and
-   `.fl-radio .fl-c::before{color:var(--radio)}`, which coloured a mark that is
-   now the empty string. `--radio-2`, the caption's ink, went from `tokens.css`
-   with them — it had no other consumer.
-
-   What did NOT change is the indentation. `run-feed.ts` gives radio the empty
-   mark rather than skipping the mark, so `.fl-c::before` still reserves its
-   21px and the agent's text keeps the left edge every other kind's body text
-   sits on. Losing the mark was not allowed to move the column. */
-.fl-event .fl-c{font-size:var(--fs-11-5);color:var(--feed-2)}
-.fl-radio{margin:var(--space-2) 0}
-.fl-radio .fl-c{font-weight:700;color:var(--radio);letter-spacing:-.01em;font-size:var(--fs-11)}
-.fl-npc .fl-c{font-size:var(--fs-12);color:var(--feed-3)}
+/* Each kind below sets its typographic treatment. The tag column says who; the
+   sentence treatment says what kind of event the operator is reading. */
+.fl-event .fl-c{font-weight:400;color:var(--feed-1)}
+.fl-radio .fl-c{font-weight:600;color:var(--feed-1)}
+.fl-symptom .fl-c{font-size:var(--fs-12);color:var(--surface-muted-2)}
+.fl-npc .fl-k{color:var(--warning)}
+.fl-npc .fl-c{font-size:var(--fs-13);color:var(--feed-3)}
 /* x8 — the speaker sits INSIDE a sentence now (`표기웅 “…”라고 말한다`), so it is
    set as a name in running text and not as a screenplay slug. The old rule was
    700 weight, a smaller size and .04em tracking — the three things that made it
@@ -109,14 +85,13 @@
    weight are kept: the name is still the informative half of the line. */
 .fl-npc .fl-c b{font-weight:600;color:var(--npc)}
 .fl-npc .fl-c q{quotes:'“' '”';font-style:normal}
-.fl-fallback{background:repeating-linear-gradient(135deg,var(--warning-a09) 0 6px,transparent 6px 12px);
-  border-top:1px solid var(--warning-a4);border-bottom:1px solid var(--warning-a4);margin:var(--space-3) 0}
-.fl-fallback .fl-c{color:var(--warning-strong);font-size:var(--fs-10-5)}
-.fl-fallback .fl-c::before{color:var(--warning)}
+.fl-fallback{grid-template-columns:46px var(--space-20) minmax(0,1fr);gap:var(--space-10);
+  background:transparent}
+.fl-fallback .fl-k{font-size:var(--fs-11);letter-spacing:0;color:var(--warning)}
+.fl-fallback .fl-c{font-size:var(--fs-12-5);line-height:1.7;color:var(--surface-text)}
 .fl-mark{grid-template-columns:1fr;padding:var(--space-11) 0 var(--space-12);margin:var(--space-6) 0}
 .fl-mark .fl-c{padding:0;text-align:center;font-size:var(--fs-9-5);
   letter-spacing:.34em;color:var(--feed-rule);position:relative}
-.fl-mark .fl-c::before{display:none}
 .fl-mark .fl-c span{background:var(--surface);padding:0 var(--space-12);position:relative;z-index:1}
 .fl-mark .fl-c::after{content:'';position:absolute;left:0;right:0;top:50%;
   border-top:1px dashed var(--sh-35)}

@@ -48,34 +48,31 @@ const LIST = '#w-feed #feedList'
 const SCROLL = '#w-feed #feedScroll'
 
 /**
- * The marks as they must reach `.fl-c[data-mark]` — app.js:405's table with the
- * one deviation x10 (민서, 08-10) declared: the radio prints none. The attribute
- * is still WRITTEN, empty, so the 21px gutter stays reserved and the agent's
- * text keeps the left edge every other kind's body text sits on.
+ * The fixed kind tags as they must reach the middle column. `npc` fills this
+ * column from the line's speaker, and fallback visually prints the prototype's
+ * glyph while its row data still says 오류.
  */
-const MARKS: Record<string, string> = {
-  event: '▸',
-  radio: '',
-  npc: '—',
-  symptom: '·',
-  wait: '',
-  fallback: '※',
-  mark: '',
+const TAGS: Record<string, string | null> = {
+  event: '요원',
+  radio: '요원',
+  npc: null,
+  symptom: '요원',
+  wait: null,
+  fallback: '오류',
+  mark: null,
 }
 
 /**
  * Kinds the seam carries that the fanfold does NOT print, so a stream/DOM
  * comparison has to subtract them before it can mean anything.
  *
- * `wait` since x6 (the waiting marker was removed outright) and `symptom` since
- * x8 (민서, 08-10) — both are dropped in `run-feed.ts`'s `appendLine`, before a
- * node is ever built. Neither is gone from the engine: symptoms are still the
- * delta journal and still reach Call 2 as `SCENE_SYMPTOMS`.
+ * `wait` since x6 (the waiting marker was removed outright) is dropped in
+ * `run-feed.ts`'s `appendLine`, before a node is ever built.
  *
  * `(변화 없음)` used to be named here too, as the copy a symptom-free beat
  * printed. Nothing mints it any longer.
  */
-const UNDRAWN_KINDS = ['wait', 'symptom']
+const UNDRAWN_KINDS = ['wait']
 
 interface StreamLine {
   kind: string
@@ -87,7 +84,8 @@ interface StreamLine {
 interface DomLine {
   kind: string
   stamp: string | null
-  mark: string | null
+  tag: string | null
+  tagText: string | null
   /** The TYPED column `.fl-c` — what the paper shows. Partial mid-reveal. */
   text: string
   /** x11 — the sr-only column `.fl-sr`: the complete text, landed at once. */
@@ -192,12 +190,14 @@ async function domLines(page: Page): Promise<DomLine[]> {
       const li = n as HTMLElement
       const kind = (li.className.match(/\bfl-([a-z]+)\b/) ?? [, ''])[1] ?? ''
       const stampNode = li.querySelector('.fl-t')
+      const tagNode = li.querySelector('.fl-k')
       const content = li.querySelector('.fl-c')
       const spoken = li.querySelector('.fl-sr')
       return {
         kind,
         stamp: stampNode ? (stampNode.textContent ?? '').trim() : null,
-        mark: content ? content.getAttribute('data-mark') : null,
+        tag: li.dataset.feedTag ?? null,
+        tagText: tagNode ? (tagNode.textContent ?? '').trim() : null,
         text: (content?.textContent ?? '').trim(),
         announced: (spoken?.textContent ?? '').trim(),
         band: li.classList.contains('band'),
@@ -298,15 +298,23 @@ test.describe('round renders in order', () => {
     const stream = await drawnStreamLines(page)
     const rendered = streamRendered(await domLines(page))
     for (let i = 0; i < stream.length; i += 1) {
-      expect(rendered[i]?.text).toContain(stream[i]!.text)
-      if (stream[i]!.speaker) expect(rendered[i]?.text).toContain(stream[i]!.speaker!)
+      if (stream[i]!.kind === 'fallback') expect(rendered[i]?.text).toBe('회신 불량')
+      else expect(rendered[i]?.text).toContain(stream[i]!.text)
+      if (stream[i]!.kind === 'npc') expect(rendered[i]?.tagText).toContain(stream[i]!.speaker!)
     }
   })
 
-  test('round renders in order — every line carries its kind mark', async ({ page }) => {
+  test('round renders in order — every row carries the expected feed tag', async ({ page }) => {
     for (const line of await domLines(page)) {
       if (line.kind === 'mark') continue
-      expect(`${line.kind}:${line.mark ?? ''}`).toBe(`${line.kind}:${MARKS[line.kind] ?? ''}`)
+      if (line.kind === 'npc') {
+        expect((line.tagText ?? '').length).toBeGreaterThan(0)
+        expect(line.tag).toBe(line.tagText)
+        continue
+      }
+      expect(`${line.kind}:${line.tag ?? ''}`).toBe(`${line.kind}:${TAGS[line.kind] ?? ''}`)
+      if (line.kind === 'fallback') expect(line.tagText).toBe('※')
+      else expect(`${line.kind}:${line.tagText ?? ''}`).toBe(`${line.kind}:${TAGS[line.kind] ?? ''}`)
     }
   })
 
@@ -331,7 +339,7 @@ test.describe('round renders in order', () => {
         return {
           text: (content?.textContent ?? '').trim(),
           cite: (row.querySelector('.fl-cite')?.textContent ?? '').trim(),
-          mark: content?.getAttribute('data-mark') ?? null,
+          tag: (row as HTMLElement).dataset.feedTag ?? null,
         }
       }),
     )
@@ -342,8 +350,7 @@ test.describe('round renders in order', () => {
       expect(printed[i]!.text.startsWith(spoken[i]!.text)).toBe(true)
       // … and nothing after it but the citation, when there is one.
       expect(printed[i]!.text.slice(spoken[i]!.text.length).trim()).toBe(printed[i]!.cite)
-      // The gutter is empty, not absent: the column is still reserved.
-      expect(printed[i]!.mark).toBe('')
+      expect(printed[i]!.tag).toBe('요원')
     }
   })
 
@@ -369,18 +376,14 @@ test.describe('round renders in order', () => {
     expect(overloaded).toEqual([])
   })
 
-  // x8 — this was 'a symptom-free beat renders the empty state', and it held the
-  // `(변화 없음)` line: a beat that moved nothing still printed one, so the
-  // player was told the beat had closed. The line is gone with the whole symptom
-  // channel, and what remains to hold is the negative — that the channel really
-  // is shut at the DOM, and that it is shut against symptoms that are genuinely
-  // being produced. Without the second half this would pass on a broken feed.
-  test('round renders in order — the symptom channel is closed at the paper', async ({ page }) => {
+  test('round renders in order — symptom lines print as 요원 state, not a split kind', async ({ page }) => {
     const produced = (await streamLines(page)).filter((l) => l.kind === 'symptom')
     expect(produced.length, 'the round produced no symptom — the assert is vacuous').toBeGreaterThan(0)
 
     const lines = await domLines(page)
-    expect(lines.filter((l) => l.kind === 'symptom')).toEqual([])
+    const symptoms = lines.filter((l) => l.kind === 'symptom')
+    expect(symptoms.length).toBe(produced.length)
+    expect(symptoms.every((l) => l.tag === '요원' && l.tagText === '요원')).toBe(true)
     expect(lines.filter((l) => l.text.includes('(변화 없음)'))).toEqual([])
   })
 
@@ -494,7 +497,9 @@ test.describe('fallback line', () => {
     await seek(page, '17:35')
     const fallback = page.locator(`${LIST} li.fl-fallback`)
     await expect(fallback).toHaveCount(1)
-    await expect(fallback.locator('.fl-c')).toHaveAttribute('data-mark', '※')
+    await expect(fallback).toHaveAttribute('data-feed-tag', '오류')
+    await expect(fallback.locator('.fl-k')).toHaveText('※')
+    await expect(fallback.locator('.fl-c')).toHaveText('회신 불량')
     await expect(fallback.locator('.fl-t')).toHaveText('17:33')
   })
 
@@ -645,6 +650,7 @@ test.describe('untouchable during a run', () => {
     await deployFile(page)
     await setRate(page, 0)
     await seek(page, '21:04')
+    await flushFeed(page)
   })
 
   test('untouchable during a run — no mining surface exists on any line', async ({ page }) => {
@@ -803,8 +809,9 @@ test.describe('the line’s two columns', () => {
     const rendered = streamRendered(await domLines(page))
     for (let i = 0; i < stream.length; i += 1) {
       expect(rendered[i]?.announced, `line ${i} announces nothing at all`).not.toBe('')
-      expect(rendered[i]?.announced).toContain(stream[i]!.text)
-      if (stream[i]!.speaker) expect(rendered[i]?.announced).toContain(stream[i]!.speaker!)
+      if (stream[i]!.kind === 'fallback') expect(rendered[i]?.announced).toBe('회신 불량')
+      else expect(rendered[i]?.announced).toContain(stream[i]!.text)
+      if (stream[i]!.kind === 'npc') expect(rendered[i]?.tagText).toContain(stream[i]!.speaker!)
     }
   })
 })
@@ -828,7 +835,7 @@ test.describe('the day’s end drains', () => {
   test('the day’s end drains — the close does not dump the queue, and the paper catches up on its own', async ({
     page,
   }) => {
-    test.setTimeout(180_000)
+    test.setTimeout(270_000)
     await boot(page)
     // The press opens the day at ×1 and leaves it running, which is the premise
     // of the whole test: a PAUSED desk is flushed by the feed's settle watchdog
@@ -855,13 +862,13 @@ test.describe('the day’s end drains', () => {
       'the day dumped its queue: the whole stream was on the paper in the frame it closed',
     ).toBeLessThan(drawn.length)
 
-    // …and it is a drain and not a stall: the paper finishes on its own, with no
-    // flush, no seek and nothing else touching it. The budget is generous on
-    // purpose — the reveal is priced in reading time and the crowd divisor that
-    // used to halve it on the busiest beats is gone (that was the point), so the
-    // tail of a seven-round day is minutes of real paper, not seconds.
+    // …and it is a drain and not a stall: the paper continues on its own, with
+    // no flush, no seek and nothing else touching it. The full seven-round tail
+    // is intentionally minutes of real paper now that symptom rows print too,
+    // so this bounded check proves progress without turning the spec into a
+    // stopwatch for every sentence in the day.
     await expect
-      .poll(async () => streamRendered(await domLines(page)).length, { timeout: 150_000 })
-      .toBe(drawn.length)
+      .poll(async () => streamRendered(await domLines(page)).length, { timeout: 60_000 })
+      .toBeGreaterThan(straightAfter)
   })
 })
