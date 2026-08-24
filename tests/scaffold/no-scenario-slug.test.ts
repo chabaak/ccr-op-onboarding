@@ -18,6 +18,8 @@ const SCANNED_ROOTS = ['src', 'proxy/src', 'tools']
  *   fixture or generated helper that names a current pack leaks that default to
  *   the next pack. A measurement artifact that names the scenario it measured
  *   is different: it is evidence, and rewriting it would falsify the record.
+ *   That includes a generated report when its whole job is to measure the
+ *   current scenario by name and stay byte-regenerable from source.
  *
  * Therefore the exemption is a path allowlist, not a file-type rule. File type
  * cannot distinguish executable JSON config from pre-registration evidence, and
@@ -28,6 +30,7 @@ const SCANNED_ROOTS = ['src', 'proxy/src', 'tools']
 const TOOL_EVIDENCE_ALLOWLIST = [
   'tools/probe/dday-mechanism/suites/',
   'tools/probe/dday-mechanism/runs/',
+  'tools/text-inventory-report.md',
 ]
 
 type Finding = { file: string; line: number; slug: string }
@@ -48,7 +51,7 @@ function currentScenarioSlugs(): string[] {
 }
 
 function isAllowlistedEvidence(file: string): boolean {
-  return TOOL_EVIDENCE_ALLOWLIST.some((prefix) => file.startsWith(prefix))
+  return TOOL_EVIDENCE_ALLOWLIST.some((entry) => entry.endsWith('/') ? file.startsWith(entry) : file === entry)
 }
 
 function lineFindings(file: string, slugs: string[]): Finding[] {
