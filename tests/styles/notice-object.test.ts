@@ -9,8 +9,10 @@ import { REPO, STYLES_DIR, read, ruleBodies, scannable } from './css-utils.ts'
 
 const CONFIRM_CSS = path.join(STYLES_DIR, 'confirm.css')
 const WIN_MANUAL_CSS = path.join(STYLES_DIR, 'win-manual.css')
+const WIN_ENDING_CSS = path.join(STYLES_DIR, 'win-ending.css')
 const CONFIRM_TS = path.join(REPO, 'src/client/shell/confirm.ts')
 const MANUAL_TS = path.join(REPO, 'src/client/shell/manual.ts')
+const ENDING_TS = path.join(REPO, 'src/client/shell/ending.ts')
 
 function decl(cssPath: string, selector: string, prop: string): string {
   const escaped = selector.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')
@@ -28,7 +30,7 @@ function noticeWarningSelectors(): string[] {
 }
 
 describe('[issue 133] the notice object has one reusable class family', () => {
-  it('(a) confirm and manual apply the notice classes while keeping compatibility hooks', () => {
+  it('(a) confirm, manual, and ending apply the notice classes while keeping compatibility hooks', () => {
     expect(read(CONFIRM_TS)).toMatch(/cf-plate notice-plate/)
     expect(read(CONFIRM_TS)).toMatch(/cf-plate-hd notice-head/)
     expect(read(CONFIRM_TS)).toMatch(/cf-body notice-body/)
@@ -41,6 +43,13 @@ describe('[issue 133] the notice object has one reusable class family', () => {
     expect(read(MANUAL_TS)).toMatch(/cf-body notice-body/)
     expect(read(MANUAL_TS)).toMatch(/cf-ask notice-lead/)
     expect(read(MANUAL_TS)).toMatch(/cf-note notice-line/)
+
+    expect(read(ENDING_TS)).toMatch(/cf-plate notice-plate notice-fullscreen end-plate/)
+    expect(read(ENDING_TS)).toMatch(/cf-plate-hd notice-head/)
+    expect(read(ENDING_TS)).toMatch(/cf-body notice-body/)
+    expect(read(ENDING_TS)).toMatch(/cf-ask notice-lead/)
+    expect(read(ENDING_TS)).toMatch(/cf-note notice-line/)
+    expect(read(ENDING_TS)).toMatch(/cf-btn cf-yes notice-btn notice-primary end-go/)
   })
 
   it('(b) the plate and its three bands match the Notices prototype geometry', () => {
@@ -81,5 +90,9 @@ describe('[issue 133] the notice object has one reusable class family', () => {
     expect(read(CONFIRM_TS)).toMatch(/배치 확인/)
     expect(read(CONFIRM_TS)).toMatch(/시행 중단/)
     expect(read(MANUAL_TS)).not.toMatch(/notice-accent/)
+    expect(read(ENDING_TS)).not.toMatch(/notice-accent/)
+    expect(decl(WIN_ENDING_CSS, '.end-plate .notice-kind', 'color')).toBe('var(--signal)')
+    expect(decl(WIN_ENDING_CSS, '.end-plate .notice-meta', 'color')).toBe('var(--surface-muted-2)')
+    expect(scannable(read(WIN_ENDING_CSS))).not.toMatch(/var\(--warning|var\(--alert|var\(--good/)
   })
 })
