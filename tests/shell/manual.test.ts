@@ -168,9 +168,9 @@ describe('[x10] the plate x10 cut stays cut (민서, 08-10)', () => {
 })
 
 describe('[x10] the foot is shorter than the head (민서, 08-10)', () => {
-  // One change to the shared template, so this holds for the 파견 confirmation,
-  // the briefing and both endings at once. Computed from the tokens rather than
-  // restated, so a padding step or a button height that drifts fails here.
+  // One change to the shared compatibility template, so this holds for the
+  // 파견 confirmation and the briefing. The ending has moved onto the notice
+  // object and is pinned by the notice-object suite.
   const headHeight = px(decl(CONFIRM_CSS, '.cf-plate-hd', 'height'))
   const [padTop, , padBottom] = box(decl(CONFIRM_CSS, '.cf-foot', 'padding'))
   const btnHeight = px(decl(CONFIRM_CSS, '.cf-btn', 'height'))
@@ -198,18 +198,14 @@ describe('[x10] the foot is shorter than the head (민서, 08-10)', () => {
     expect(ring).toBeLessThan(padBottom)
   })
 
-  it('(c) the two one-button feet inherit the height — they set inline padding only', () => {
-    for (const [sheet, selector] of [
-      [WIN_MANUAL_CSS, '.man-plate .cf-btn'],
-      [WIN_ENDING_CSS, '.end-plate .cf-btn'],
-    ] as const) {
-      const body = ruleBodies(read(sheet), new RegExp(`^${selector.replace(/\./g, '\\.')}$`)).join(';')
-      expect(body, `${path.basename(sheet)} has no rule for '${selector}'`).not.toBe('')
-      const props = [...body.matchAll(/([a-z-]+)\s*:/g)].map((m) => m[1])
-      expect(props).toEqual(['padding'])
-      const [top, , bottom] = box(decl(sheet, selector, 'padding'))
-      expect([top, bottom]).toEqual([0, 0])
-    }
+  it('(c) the briefing one-button foot inherits the height — it sets inline padding only', () => {
+    const selector = '.man-plate .cf-btn'
+    const body = ruleBodies(read(WIN_MANUAL_CSS), new RegExp(`^${selector.replace(/\./g, '\\.')}$`)).join(';')
+    expect(body, `${path.basename(WIN_MANUAL_CSS)} has no rule for '${selector}'`).not.toBe('')
+    const props = [...body.matchAll(/([a-z-]+)\s*:/g)].map((m) => m[1])
+    expect(props).toEqual(['padding'])
+    const [top, , bottom] = box(decl(WIN_MANUAL_CSS, selector, 'padding'))
+    expect([top, bottom]).toEqual([0, 0])
   })
 })
 

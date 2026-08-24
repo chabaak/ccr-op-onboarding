@@ -315,17 +315,15 @@ export function openEnding(
   root.setAttribute('aria-labelledby', 'end-head')
   root.setAttribute('aria-describedby', 'end-body')
 
-  const plate = el('section', 'cf-plate end-plate')
+  const plate = el('section', 'cf-plate notice-plate notice-fullscreen end-plate')
 
-  const led = el('span', 'cf-led')
-  led.setAttribute('aria-hidden', 'true')
-  const headLabel = el('b')
+  const headLabel = el('b', 'notice-kind')
   headLabel.id = 'end-head'
-  const counter = el('i')
-  const head = el('div', 'cf-plate-hd')
-  head.append(led, headLabel, counter)
+  const counter = el('i', 'notice-meta')
+  const head = el('div', 'cf-plate-hd notice-head')
+  head.append(headLabel, counter)
 
-  const body = el('div', 'cf-body end-body end-step')
+  const body = el('div', 'cf-body notice-body end-body end-step')
   body.id = 'end-body'
   // The step changes under a reader who is not looking at the head, so the
   // region announces itself. `aria-describedby` above names this container
@@ -333,13 +331,21 @@ export function openEnding(
   // instead of going stale on the first lead.
   body.setAttribute('aria-live', 'polite')
 
-  const go = button('cf-btn cf-yes end-go', ENDING_NEXT, ENDING_NEXT)
+  const go = button('cf-btn cf-yes notice-btn notice-primary end-go', ENDING_NEXT, ENDING_NEXT)
   go.id = 'endingGo'
-  const foot = el('div', 'cf-foot')
-  foot.append(go)
+  const footnote = el('span', 'notice-footnote')
+  const actions = el('span', 'notice-actions')
+  actions.append(go)
+  const foot = el('div', 'cf-foot notice-foot')
+  foot.append(footnote, actions)
+
+  const pips = el('div', 'end-pips')
+  pips.setAttribute('aria-hidden', 'true')
+  for (let index = 0; index < plates.length; index += 1) pips.append(el('span'))
 
   plate.append(head, body, foot)
   root.append(plate)
+  root.append(pips)
   app.append(root)
 
   let at = 0
@@ -351,10 +357,14 @@ export function openEnding(
 
     headLabel.textContent = step.head
     counter.textContent = step.corner
+    footnote.textContent = step.corner
     body.replaceChildren(
-      el('p', 'cf-ask', step.lead),
-      ...step.body.map((line) => el('p', 'cf-note', line)),
+      el('p', 'cf-ask notice-lead', step.lead),
+      ...step.body.map((line) => el('p', 'cf-note notice-line', line)),
     )
+    for (const [index, pip] of [...pips.children].entries()) {
+      pip.classList.toggle('is-current', index === at)
+    }
 
     go.textContent = last ? ENDING_CLOSE : ENDING_NEXT
     go.title = last ? ENDING_CLOSE : ENDING_NEXT

@@ -370,6 +370,14 @@ describe('[x6] the plates', () => {
     expect(ENDING_CLOSE).toBe('확인')
     expect(ENDING_WINDOW_CLOSE).toBe(ENDING_CLOSE)
   })
+
+  it('(i) 배정 소진 is authored inside the three-plate bad path, not as a fourth plate', () => {
+    const plates = endingPlates('bad', numbers, ENDINGS)
+    expect(plates).toHaveLength(3)
+    expect(plates.flatMap((plate) => [plate.lead, ...plate.body]).join('\n')).toContain(
+      '시행 횟수가 모두 소진되었습니다.',
+    )
+  })
 })
 
 /* ══ 4 — the ending can only watch ════════════════════════════════════════ */
@@ -473,5 +481,24 @@ describe('[x6] the ending is an observer', () => {
     expect(src, 'BAD no longer restarts through the desktop/session helper').toMatch(
       /onBadEnding[\s\S]*?restartCurrent\s*\(/,
     )
+  })
+
+  it('(k) the ending applies the fullscreen notice object without the accent hook', () => {
+    const src = code(ENDING_TS)
+    expect(src).toMatch(/cf-plate notice-plate notice-fullscreen end-plate/)
+    expect(src).toMatch(/cf-plate-hd notice-head/)
+    expect(src).toMatch(/cf-body notice-body/)
+    expect(src).toMatch(/cf-ask notice-lead/)
+    expect(src).toMatch(/cf-note notice-line/)
+    expect(src).toMatch(/notice-footnote/)
+    expect(src).toMatch(/notice-actions/)
+    expect(src).toMatch(/notice-btn notice-primary/)
+    expect(src).not.toMatch(/notice-accent/)
+  })
+
+  it('(l) the footer pips mirror the three authored plates', () => {
+    const src = code(ENDING_TS)
+    expect(src).toMatch(/for\s*\(let index = 0; index < plates\.length; index \+= 1\)/)
+    expect(src).toMatch(/pip\.classList\.toggle\(\s*['"]is-current['"],\s*index === at\s*\)/)
   })
 })
