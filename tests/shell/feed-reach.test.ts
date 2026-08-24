@@ -263,9 +263,9 @@ describe('[x12] the reach is a slot, not a surface', () => {
     expect(code(REACH_TS)).not.toMatch(/\bfrom\s*['"]/)
   })
 
-  it('(c) inside the shell, nothing waits on it — the ends are a component and two windows', () => {
-    // The publisher is the LIVE FEED's fanfold and the waiters are the windows
-    // whose documents describe what it prints; neither reaches the other (C8),
+  it('(c) inside the shell, nothing waits on it — the ends are a component and REPORTS', () => {
+    // The publisher is the LIVE FEED's fanfold and the waiter is the window
+    // whose arriving documents describe what it prints; neither reaches the other (C8),
     // which is the whole reason this module exists. A SHELL module waiting on
     // the paper would be a new claim about who the feed is pacing for and should
     // not arrive silently — the ending already has its own slot for the tail.
@@ -280,10 +280,10 @@ describe('[x12] the reach is a slot, not a surface', () => {
       .filter((f) => /from\s+'\.\.\/shell\/feed-reach\.ts'/.test(code(f)))
       .map((f) => rel(f))
       .sort()
-    expect(readers).toEqual([rel(RUN_FEED_TS), rel(AGENT_FILE_TS), rel(REPORTS_TS)].sort())
+    expect(readers).toEqual([rel(RUN_FEED_TS), rel(REPORTS_TS)].sort())
   })
 
-  it('(d) the waiters only READ — neither window publishes a cue or resets the slot', () => {
+  it('(d) the readers only READ — neither window publishes a cue or resets the slot', () => {
     // Same contract the ending keeps with the count it waits on
     // (`feed-drain.test.ts` (d)): a window that wrote to this slot would be
     // deciding where the paper had got to instead of being told.
@@ -384,15 +384,17 @@ describe('[x12] the arriving document waits for the paper', () => {
     }
   })
 
-  it('(b) the terminal record mounts on the event and COUNTS on the paper', () => {
-    // The record is on the desk the moment the day closes — `open()` leaves it
-    // `pending`, which is the waiting state — and the count-up runs when the
-    // fanfold reaches the same `score` it mints the 집계 line from. The two are
-    // one count, printed twice.
+  it('(b) the terminal record opens on the event and COUNTS on the paper', () => {
+    // The record identity is reconciled through REPORTS the moment the day
+    // closes, while the visible tally host lives under AGENT FILE's DEPLOY row.
+    // `open()` leaves it `pending`, and the count-up runs when the fanfold
+    // reaches the same `score` it mints the 집계 line from. The two are one
+    // count, printed twice.
     const src = code(REPORTS_TS)
     const scored = /if \(event\.type === 'score'\) \{[\s\S]*?\n {6}return\n {4}\}/.exec(src)
     expect(scored, 'the score branch is gone — re-aim this guard').not.toBeNull()
-    expect(scored![0], 'the record no longer mounts when the day closes').toMatch(/tally\.open\(\)/)
+    expect(scored![0], 'the tally is no longer read from the shared file host').toMatch(/getScoreTally\(\)/)
+    expect(scored![0], 'the record no longer opens when the day closes').toMatch(/tally\.open\(\)/)
     expect(scored![0], 'the count-up no longer waits for the paper').toMatch(
       /afterPaper\(\{ at: 'score'[\s\S]*?tally\.run\(/,
     )
@@ -418,17 +420,15 @@ describe('[x12] the arriving document waits for the paper', () => {
     expect(select, 'selecting a past day now waits on the paper').not.toMatch(/afterPaper|feedReached/)
   })
 
-  it('(d) the AGENT FILE’s settle timer starts on the count-up, not on the event', () => {
-    // It derives `counted` from wall-clock time since the record began counting
-    // (design #4 — no cross-window callback). The count-up now starts when the
-    // paper reaches the `score`, so a timer still started off the EVENT would
-    // release the settle — turning the page and unlocking NEW RUN — with the
-    // record still blank beside it.
+  it('(d) AGENT FILE releases from the visible count-up, not a second timer', () => {
+    // REPORTS already holds `tally.run(record)` until the paper reaches the
+    // score. AGENT FILE owns the visible host now, so deriving `counted` from
+    // another `feedReached` + timeout here would be a second clock that could
+    // drift from the count-up it is meant to describe.
     const src = code(AGENT_FILE_TS)
-    const armed = /if \(state\.score !== null && !scoreSeen\) \{[\s\S]*?\n {4}\}/.exec(src)
-    expect(armed, 'the count timer is gone — re-aim this guard').not.toBeNull()
-    expect(armed![0], 'the settle timer no longer waits for the paper').toMatch(
-      /feedReached\(\{ at: 'score'[\s\S]*?setTimeout\(/,
-    )
+    expect(src, 'AGENT FILE no longer mounts the score tally').toMatch(/createScoreTally\(\{[\s\S]*?onFinal:/)
+    expect(src, 'the visible tally no longer marks counted on final').toMatch(/onFinal:[\s\S]*?counted = true/)
+    expect(src, 'the duplicate score waiter is back').not.toMatch(/feedReached\(\{ at: 'score'/)
+    expect(src, 'the duplicate count timer is back').not.toMatch(/scoreSeen|countTimer/)
   })
 })

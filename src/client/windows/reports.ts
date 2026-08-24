@@ -11,12 +11,11 @@
 // window (mining emits an op at the seam; where the card lands is the store's
 // business), or touch engine/composer (C8 / inv 12).
 //
-// U3 (playtest g3-1) — TALLY dissolves: the day's results now land here, as a
-// fourth collaborator. `components/score-tally.ts` survives whole; this window
-// only hands it a host and a model. The record renders from the `score` event
-// alone (inv 6 / inv 12) — no pack read, and `report-view.ts` is not edited:
-// its own render cycle only ever replaces `#factsList`'s and the body's
-// children, so the record survives every repaint as a sibling article.
+// U3 (playtest g3-1) — TALLY dissolves: the day's results became a fourth
+// collaborator. x13 moves the visible tally under AGENT FILE's DEPLOY row, but
+// this window still owns the `score` event: it gives the rail a record identity,
+// builds the model from the event, and gates the count-up on the paper. The
+// record renders from the `score` event alone (inv 6 / inv 12) — no pack read.
 //
 // x12 (민서, 08-10) — WHAT ARRIVES IS NOT WHAT IS SHOWN, and that is the one
 // structural change since. This window took the §5.2 stream literally: a
@@ -52,7 +51,7 @@ import { fetchScenarioInPlay } from '../shell/pack-session.ts'
 import { PORTAL } from '../shell/portal-identity.ts'
 import { pad2 } from '../components/block-card.ts'
 import { getSlotBoard, SLOT_CAP } from '../components/slot-board.ts'
-import { createScoreTally } from '../components/score-tally.ts'
+import { getScoreTally } from '../components/score-tally.ts'
 import type { TallyModel } from '../components/score-tally.ts'
 
 /** What the record is called, and what it grades against — relocated verbatim
@@ -359,7 +358,7 @@ export function mount(host: HTMLElement, driver: FixtureDriver): void {
     }
     if (event.type === 'score') {
       // Unmineable by construction: no `.min` node, no `sentence_id` — this
-      // is a terminal, autopsy-window record, not a source document.
+      // is a terminal, autopsy-window record identity, not a source document.
       //
       // W2 — the record belongs to its SITTING and is stored with it. It used
       // to be one element the next `score` replaced whole, so a past day's
@@ -383,7 +382,8 @@ export function mount(host: HTMLElement, driver: FixtureDriver): void {
       // a day that filed no report still takes its identity.
       sync(false)
       mountRecord()
-      const tally = createScoreTally({ host: node })
+      const tally = getScoreTally()
+      if (tally === null) return
       tally.open()
       // x12 — THE RECORD IS ON THE DESK NOW; THE NUMBER IS NOT. `open()` leaves
       // it `pending` — the article mounted, blank, waiting — and the count-up
