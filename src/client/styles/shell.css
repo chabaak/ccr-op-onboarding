@@ -102,9 +102,9 @@
 .seal-emblem svg{width:39px;height:39px;display:block}
 .seal-emblem circle{fill:none;stroke:var(--warning);stroke-width:1.2;opacity:.85}
 .seal-emblem text{fill:var(--warning);font-weight:700;font-size:var(--fs-13);line-height:1;
-  font-family:var(--myeong);opacity:.9}
+  font-family:var(--prose);opacity:.9}
 .tb-portal{display:flex;flex-direction:column;line-height:1.15}
-.tb-portal b{font-family:var(--myeong);font-weight:800;font-size:var(--fs-13);
+.tb-portal b{font-family:var(--prose);font-weight:800;font-size:var(--fs-13);
   color:var(--txt-hi);letter-spacing:.02em}
 .tb-portal i{font-style:normal;font-size:var(--fs-9);letter-spacing:.22em;
   color:var(--warning);font-weight:600}
@@ -113,7 +113,7 @@
 .tb-op em,.tb-case em{font-style:normal;font-size:var(--fs-8);letter-spacing:.24em;color:var(--txt-6)}
 .tb-op b,.tb-case b{font-size:var(--fs-11);font-weight:500;color:var(--txt-2)}
 .tb-op i{font-style:normal;font-size:var(--fs-8-5);color:var(--txt-6);letter-spacing:.1em}
-.tb-case b{font-family:var(--myeong);font-weight:700;font-size:var(--fs-12);color:var(--txt)}
+.tb-case b{font-family:var(--prose);font-weight:700;font-size:var(--fs-12);color:var(--txt)}
 
 /* clock */
 /* x6 — ONE ROW, not a stack of three. The unit was face / bar / rate stacked in
@@ -221,7 +221,7 @@
   background:linear-gradient(135deg,var(--chrome-raise-2) 0 78%,transparent 78%),
     linear-gradient(to bottom,var(--chrome-focus),var(--chrome-raise));
   border:1px solid var(--line-1);box-shadow:0 10px 22px -14px var(--sh-8)}
-.scenario-file b{font-family:var(--myeong);font-size:var(--fs-11);font-weight:700;line-height:1.25;
+.scenario-file b{font-family:var(--prose);font-size:var(--fs-11);font-weight:700;line-height:1.25;
   color:inherit;word-break:keep-all}
 .scenario-file i{font-style:normal;font-size:var(--fs-8);line-height:1.2;color:var(--txt-7);
   letter-spacing:.14em}

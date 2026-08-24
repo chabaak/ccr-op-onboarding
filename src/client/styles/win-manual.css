@@ -123,7 +123,7 @@ body:has(#manual) #toast{display:none}
    `confirm.css` rather than being kept and matched by two sibling sheets.
 
    The reasoning, kept because it is now the whole template's: `tokens.css` reserves
-   `--myeong` for "everything a person said or wrote" and `--mono` for "every FIXED
+   `--prose` for "everything a person said or wrote" and `--mono` for "every FIXED
    value the desk prints". A briefing set in the serif is a PERSON addressing the
    operator; set in mono it is the terminal issuing a notice, which is what it is —
    nothing behind this plate is a person yet. The people arrive with the first 교신,

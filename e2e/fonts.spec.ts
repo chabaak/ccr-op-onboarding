@@ -32,7 +32,7 @@ const LATIN_SAMPLE = 'NDSP-2 OPERATOR TERMINAL 0123456789 // report'
 const KOREAN_SHORT = '멈춘회전문'
 const KOREAN_SAMPLE = '멈춘회전문 운영자 단말 — 막구조 결함 보고서 전송 대기 중, 대설주의보 확인.'
 
-const FAMILIES = ['IBM Plex Mono', 'Nanum Gothic Coding', 'Nanum Myeongjo'] as const
+const FAMILIES = ['IBM Plex Mono', 'Nanum Gothic Coding', 'IBM Plex Sans KR'] as const
 
 interface Face {
   family: string
@@ -235,7 +235,7 @@ test('the running page makes zero third-party requests', async ({ page, baseURL 
       return {
         'IBM Plex Mono': await load('IBM Plex Mono', latin),
         'Nanum Gothic Coding': await load('Nanum Gothic Coding', korean),
-        'Nanum Myeongjo': await load('Nanum Myeongjo', korean),
+        'IBM Plex Sans KR': await load('IBM Plex Sans KR', korean),
       }
     },
     [LATIN_SAMPLE, KOREAN_SAMPLE],
@@ -352,7 +352,7 @@ test('the self-hosted fonts stay inside the ~1 s load budget', async ({ page, co
     async ([latin, korean]) => {
       await document.fonts.load(`400 16px "IBM Plex Mono"`, latin)
       await document.fonts.load(`400 16px "Nanum Gothic Coding"`, korean)
-      await document.fonts.load(`400 16px "Nanum Myeongjo"`, korean)
+      await document.fonts.load(`400 16px "IBM Plex Sans KR"`, korean)
       await document.fonts.ready
     },
     [LATIN_SAMPLE, KOREAN_SAMPLE],
@@ -395,7 +395,7 @@ test('unicode-range slicing keeps a short Korean string to a handful of slices',
   await page.addStyleTag({ content: probeCss(baseURL!, faces, PROBE) })
   await page.evaluate(
     async ([korean, suffix]) => {
-      await document.fonts.load(`400 16px "Nanum Myeongjo ${suffix}"`, korean)
+      await document.fonts.load(`400 16px "IBM Plex Sans KR ${suffix}"`, korean)
       await document.fonts.ready
     },
     [KOREAN_SHORT, PROBE.suffix],

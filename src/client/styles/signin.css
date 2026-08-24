@@ -139,11 +139,11 @@ body.signin #blueprint{filter:brightness(1.7) contrast(1.05)}
   stroke-dasharray:3 7;transform-origin:50% 50%;animation:siSpin 34s linear infinite}
 .si-crest .si-seal circle{fill:none;stroke:var(--warning);stroke-width:1.1;opacity:.9}
 .si-crest .si-seal text{fill:var(--warning);font-weight:700;font-size:var(--fs-26);
-  font-family:var(--myeong);opacity:.95}
+  font-family:var(--prose);opacity:.95}
 @keyframes siSpin{to{transform:rotate(360deg)}}
 
 /* ─── the portal's name ────────────────────────────────────────────────── */
-.si-title{font-family:var(--myeong);font-size:var(--fs-34);font-weight:800;
+.si-title{font-family:var(--prose);font-size:var(--fs-34);font-weight:800;
   color:var(--txt-hi);letter-spacing:.14em;line-height:1.2;text-indent:.14em;
   margin-top:var(--space-18);text-shadow:0 0 26px var(--sh-9);
   animation:siRise .8s cubic-bezier(.2,.8,.2,1) .18s both}

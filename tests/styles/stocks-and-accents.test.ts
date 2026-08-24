@@ -52,7 +52,7 @@ const OLD_STOCK_TOKENS = [
 ]
 
 const OLD_STOCK_CLASSES = ['kraft', 'fanfold', 'bond', 'ledger', 'card-stock']
-const FACE_TOKENS = ['--mono', '--myeong']
+const FACE_TOKENS = ['--mono', '--prose']
 
 function valueOf(name: string): string {
   return tokens.get(name) ?? ''
@@ -122,7 +122,7 @@ describe('[u1#c2] the two-face type system survives', () => {
   it('(b) each face token keeps its family stack', () => {
     expect(unquote(valueOf('--mono'))).toContain('ibm plex mono')
     expect(unquote(valueOf('--mono'))).toContain('nanum gothic coding')
-    expect(unquote(valueOf('--myeong'))).toContain('nanum myeongjo')
+    expect(unquote(valueOf('--prose'))).toContain('ibm plex sans kr')
   })
 
   it('(c) each face token ends in a generic fallback family', () => {

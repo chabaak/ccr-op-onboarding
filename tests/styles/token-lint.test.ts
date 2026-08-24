@@ -137,8 +137,8 @@ describe('[u1#c1] no color literal outside tokens.css', () => {
  * Blank out `@font-face` blocks, keeping line numbers.
  *
  * C17 / [u11#c12] — RE-AIMED (08-04), never deleted, and this is the defect
- * [u9#c8] reported and deliberately did not fix: `@font-face{font-family:'Nanum
- * Myeongjo'}` is where a face is DECLARED — the definition `--myeong` points at
+ * [u9#c8] reported and deliberately did not fix: `@font-face{font-family:'IBM
+ * Plex Sans KR'}` is where a face is DECLARED — the definition `--prose` points at
  * — not a consumption-site literal. u1's lint was written before u10's
  * `fonts.css` existed, so it scanned the declaration site too and would leave
  * inv 8 with no legal place to name a font at all. u9's repo-wide assert

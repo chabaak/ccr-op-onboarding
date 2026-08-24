@@ -46,7 +46,7 @@
    are both flush at the section's own left edge, and 2px of inset was enough to
    make the prose between them look indented against them. Measured before and
    after — heading, body and note now share one left edge. */
-.sect-body{font-family:var(--myeong);font-size:var(--fs-11-5);line-height:1.72;color:var(--surface-text-3);
+.sect-body{font-family:var(--prose);font-size:var(--fs-11-5);line-height:1.72;color:var(--surface-text-3);
   text-align:justify;white-space:pre-line}
 .sect.fixed .sect-body{color:var(--surface-text-4)}
 /* x7 — the cover's red note: the one line in a section that is not the order
@@ -151,7 +151,7 @@
    long piece of prose, and this is a handful of short discrete sentences with a
    button on the end of each. Justified, the last line of every seat stretched
    its inter-word spaces into rivers wide enough to read as a table. */
-.slots{margin-top:var(--space-8);font-family:var(--myeong);font-size:var(--fs-11-5);
+.slots{margin-top:var(--space-8);font-family:var(--prose);font-size:var(--fs-11-5);
   line-height:2.05;color:var(--surface-text-1);text-align:left;word-break:keep-all}
 
 /* one seated sentence: an inline run, so the paragraph can break inside it */
@@ -183,7 +183,7 @@
   background:var(--sheen-28);text-align:center;
   transition:background .18s,border-color .18s,box-shadow .18s}
 .slot-blank::before{content:none}
-.slot-blank .slot-empty{font-family:var(--myeong);font-size:var(--fs-11);line-height:1.7;
+.slot-blank .slot-empty{font-family:var(--prose);font-size:var(--fs-11);line-height:1.7;
   color:var(--surface-muted-2);background:transparent;border:0;word-break:keep-all}
 .slot-blank .slot-target{cursor:pointer}
 .slot-blank.droppable{border-color:var(--warning);background:var(--warning-wash);
@@ -491,7 +491,7 @@
    `.slots` type at the same measure, gone to pencil: this is a record of what
    was said, not a place anything can be put. */
 .filed-file{padding-top:var(--space-2)}
-.filed-para{font-family:var(--myeong);font-size:var(--fs-11-5);line-height:2.05;
+.filed-para{font-family:var(--prose);font-size:var(--fs-11-5);line-height:2.05;
   color:var(--surface-text-3);text-align:left;word-break:keep-all}
 .filed-s{display:inline}
 .filed-empty{font-size:var(--fs-8-5);color:var(--surface-muted)}

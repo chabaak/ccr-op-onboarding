@@ -61,11 +61,11 @@
    A `.min` used as the grid cell itself would be blockified, and its marks are
    painted per box: one block box for the whole wrapped sentence paints one mark,
    sliding out of step with the lines. See `factRow()` in report-view.ts. */
-.facts .f-s{font-family:var(--myeong);font-size:var(--fs-11);line-height:1.62;color:var(--surface-text-1);
+.facts .f-s{font-family:var(--prose);font-size:var(--fs-11);line-height:1.62;color:var(--surface-text-1);
   word-break:keep-all}
 .facts .min{display:inline}
 
-.rbody{font-family:var(--myeong);font-size:var(--fs-11-5);line-height:1.92;color:var(--surface-text-2);
+.rbody{font-family:var(--prose);font-size:var(--fs-11-5);line-height:1.92;color:var(--surface-text-2);
   text-align:justify;word-break:keep-all}
 .rbody .sent{display:inline}
 /* R1 — the break between two rounds of one sitting. An empty block in the
@@ -89,7 +89,7 @@
 /* The 채굴 rule is a DECORATION, not a background. Drawn as a gradient it was
    pinned to a fixed offset inside the painted box, so it only landed under the
    text while the font's own metrics kept it there — at 1.35em it sat under a
-   11px Nanum Myeongjo line with 0.9px to spare, and any fallback face
+   11px IBM Plex Sans KR line with 0.9px to spare, and any fallback face
    (AppleMyungjo, Batang) clipped it to a sliver. `text-underline-offset` is
    measured from the BASELINE, per line, whichever face renders. */
 .min.mined{color:var(--surface-text-5);cursor:pointer;
@@ -157,7 +157,7 @@
 .terminal-record .tly-line{display:grid;grid-template-columns:26px 51px 1fr;gap:0 var(--space-5);
   padding:var(--space-5) var(--space-2) var(--space-5) 0;
   border-bottom:1px dotted var(--sh-2);align-items:baseline}
-.terminal-record .tl-s{grid-column:3;font-family:var(--myeong);font-size:var(--fs-11);line-height:1.62;
+.terminal-record .tl-s{grid-column:3;font-family:var(--prose);font-size:var(--fs-11);line-height:1.62;
   font-weight:700;color:var(--warning-strong);word-break:keep-all}
 /* the opening line (`23시 12분 시점 집계`) and the closing one (`총 사망자 수
    60명`) are the record's own head and foot — a shade heavier, and the close
@@ -165,7 +165,7 @@
 .terminal-record .tl-open .tl-s{letter-spacing:.04em}
 .terminal-record .tl-close{border-bottom:2px solid var(--warning-a4)}
 .terminal-record .tl-close .tl-s{font-weight:800}
-.terminal-record .tl-close .tl-unit{font-family:var(--myeong)}
+.terminal-record .tl-close .tl-unit{font-family:var(--prose)}
 /* tabular figures so the closing number does not jitter while it counts */
 .terminal-record #tlyBig{font-variant-numeric:tabular-nums}
 
