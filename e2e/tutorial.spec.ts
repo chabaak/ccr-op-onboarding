@@ -56,8 +56,8 @@ const DEPLOY = '#btnDeploy'
 const PAGE_NEXT = '#w-file .pg-nav .pg-next'
 const FEED_WIN = '#w-feed'
 const REP_WIN = '#w-rep'
-const FACTS_HEAD = '#w-rep #factsList .rep-row:first-child .rep-stamp'
-const BODY_HEAD = '#w-rep #bodyList .rep-row:first-child .rep-stamp'
+const FACTS_TAG = '#w-rep #factsList .rep-stamp'
+const BODY_TAG = '#w-rep #bodyList .rep-stamp'
 const FIRST_FACT = '#w-rep #factsList [data-sentence-id]'
 const FIRST_BODY = '#w-rep #bodyList [data-sentence-id]'
 const HANDOVER = '#w-file [data-sect="handover"]'
@@ -74,8 +74,8 @@ const UNSET = '#w-file .slot-unset'
 const SAID = [
   '라이브 피드에서 현장 상황을 확인하세요',
   '요원의 보고를 확인하세요',
-  '객관적 사실이 기록됩니다',
-  '요원의 생각과 판단이 기록됩니다',
+  '현장 기록 태그는 확인된 사실입니다',
+  '무전 기록 태그는 요원의 판단입니다',
   '기록에서 주요 정보를 추출하세요',
   '주요 정보가 다음 요원 인수인계 사항으로 넘겨집니다',
   '인수인계를 해제할 수 있습니다',
@@ -162,7 +162,7 @@ async function walkTo(page: Page, line: string): Promise<void> {
 
   for (let at = 0; at < stop; at += 1) {
     if (at === 0) {
-      // 1 → 2: the day has to be over with both documents filed, and the FIXTURE
+      // 1 → 2: the day has to be over with both row groups filed, and the FIXTURE
       // day files its one report at ~78 s — measured, not guessed: the demo run
       // reports once, near the close, where a live day files seven across the
       // shift. So the rest of the day is RELEASED here rather than waited out.
@@ -318,9 +318,9 @@ test.describe('[x3] the walk says what the operator needs next', () => {
   test('[x3] (h) 1 → 4 — the gates hold shut until the day has produced something', async ({ page }) => {
     // THE gate test. Every other test drains past these two gates; this one
     // proves they were shut, which is the claim that matters: a plate saying
-    // 객관적 사실이 기록됩니다 over an empty 현장 기록 column says the opposite of
-    // what it means, and a plate about REPORTS before any report exists points
-    // at a blank window.
+    // a 현장 기록 tag over an empty tagged group says the opposite of what it
+    // means, and a plate about REPORTS before any report exists points at a
+    // blank window.
     await atTheDesk(page)
     await walkTo(page, SAID[0]!)
     await expect(page.locator(FEED_WIN)).toBeVisible()
@@ -329,10 +329,9 @@ test.describe('[x3] the walk says what the operator needs next', () => {
     // therefore leave NO plate on the desk — plates 2 and 3 are both waiting.
     // Asserted as a COUNT and not as "not that text": the layer rebuilds the
     // plate per mark, so in the gap there is no `#coachSays` to have text at all.
-    // The 현장 기록 HEADING is built at boot and is always on the page — it is
-    // the document's furniture, and plate 3 points at it precisely because it is
-    // stable. What is empty this early is the column UNDER it, which is the thing
-    // the gate is protecting the copy from.
+    // The 현장 기록 TAG is created with the first row, not boot furniture. What
+    // is empty this early is the tagged group, which is the thing the gate is
+    // protecting the copy from.
     await expect(page.locator(FIRST_FACT)).toHaveCount(0)
     await page.locator(OK).click()
     await expect(page.locator(PLATE)).toHaveCount(0)
@@ -347,13 +346,13 @@ test.describe('[x3] the walk says what the operator needs next', () => {
     await plate(page, SAID[1]!, DAY_MS)
     await expect(page.locator(REP_WIN)).toBeVisible()
 
-    // 3 — the record is on the page by the time its plate names it.
+    // 3 — the record tag is on the page by the time its plate names it.
     await acknowledge(page, SAID[2]!, DAY_MS)
-    await expect(page.locator(FACTS_HEAD)).toBeVisible({ timeout: DAY_MS })
+    await expect(page.locator(FACTS_TAG).first()).toBeVisible({ timeout: DAY_MS })
 
-    // 4 — the other document. The difference between the two is the lesson.
+    // 4 — the other row tag. The difference between the two is the lesson.
     await acknowledge(page, SAID[3]!)
-    await expect(page.locator(BODY_HEAD)).toBeVisible({ timeout: DAY_MS })
+    await expect(page.locator(BODY_TAG).first()).toBeVisible({ timeout: DAY_MS })
 
     // NOT asserted, and deliberately: that plate 3 waits specifically for
     // `run_end` as distinct from the report. The fixture day files its one
