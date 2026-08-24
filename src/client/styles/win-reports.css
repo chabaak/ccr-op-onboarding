@@ -1,105 +1,54 @@
 /* ===========================================================================
    win-reports.css — WINDOW 3 · REPORTS (desktop.css lines 471..548).
 
-   Two filed documents side by side: the fact column and the 보고서 body. Every
-   `.min` sentence is mineable — the red thread is anchored to
-   it once it has been slotted.
-
-   x6 — the 보고서 body no longer carries a red margin rule. The reference drew a
-   ledger rule 33px in and indented the prose past it, which is how a ruled pad
-   is printed and not how this pane is read: the operator reads the two panes as
-   one spread, and the rule put the right one 20px off the left one's axis for
-   the sake of a decoration nothing was written against. Both panes now hang
-   from `.doc`'s own padding.
+   A single tagged record column. 현장 기록 and 무전 기록 are row labels now,
+   not document headings, and every `.min` sentence is mineable once the run
+   closes.
    =========================================================================== */
 
 .win-rep{--delay:.36s}
 
 .win-rep .win-body{display:flex;flex-direction:column;overflow:hidden}
 
-.arch-rail{display:flex;gap:0;flex:0 0 auto;background:var(--surface-inset);
-  border-bottom:1px solid var(--sh-35);overflow-x:auto;padding-left:var(--space-2)}
-/* x5 — one line, not two. The tab was a stacked pair (callsign over the run
-   id); with the subtitle gone it is a single label, so the column flow and its
-   gap go with it and the type takes the step the subtitle used to occupy. */
-.arch{padding:var(--space-7) var(--space-14) var(--space-6);font-size:var(--fs-9-5);
-  letter-spacing:.14em;color:var(--surface-muted);
-  border-right:1px solid var(--sh-18);white-space:nowrap;transition:.14s;position:relative;
-  display:flex;align-items:center}
-.arch:hover{background:var(--sheen-6);color:var(--surface-text)}
-.arch.on{background:var(--surface);color:var(--surface-text-heading);box-shadow:inset 0 -2px 0 var(--warning)}
-.arch-note{margin-left:auto;align-self:center;padding:0 var(--space-12);font-size:var(--fs-8);
-  letter-spacing:.13em;color:var(--surface-muted-2);white-space:nowrap}
+.arch-rail{display:flex;align-items:center;gap:var(--space-4);flex:0 0 auto;
+  background:var(--surface-inset);border-bottom:1px solid var(--ink-line);
+  overflow-x:auto;padding:var(--space-8) var(--space-16) var(--space-7)}
+.arch{flex:0 0 auto;display:flex;align-items:center;padding:var(--space-3) var(--space-8);
+  font-size:var(--fs-10);letter-spacing:.24em;color:var(--surface-muted-2);
+  border:1px solid transparent;background:transparent;white-space:nowrap;transition:.14s}
+.arch:hover{background:var(--scan-a05);color:var(--surface-text)}
+.arch.on{background:var(--surface);border-color:var(--ink-line);color:var(--signal);box-shadow:none}
+.arch-note{margin-left:auto;flex:0 0 auto;padding-left:var(--space-12);
+  font-size:var(--fs-10);letter-spacing:.24em;color:var(--surface-muted-2);white-space:nowrap}
 
-.rep-grid{flex:1;min-height:0;display:grid;grid-template-columns:.92fr 1.08fr}
-.doc{padding:var(--space-13) var(--space-14) var(--space-18);overflow-y:auto;position:relative}
-.doc::-webkit-scrollbar{width:8px}
-.doc::-webkit-scrollbar-thumb{background:var(--sh-22)}
-.doc-facts{border-right:1px solid var(--sh-2);
-  background:linear-gradient(90deg,transparent 96%,var(--sh-04))}
-/* x6 — flat surface, and NO left padding of its own. The 34px indent was sized to
-   clear the ledger rule that used to be painted at x=33–34px; with the rule gone
-   it was 20px of unexplained dead space that pushed 무전 기록 off 현장 기록's
-   axis. `.doc` above sets the padding for both panes and is the only place it is
-   set. The `--surface` fill stays under the prose. */
-.doc-body{background:var(--surface)}
-/* x5 — the head is the title and the rule under it. The boxed `가` / `나` file
-   letter and the italic subtitle both left `report-view.ts`; what is left is one
-   element, so the flex row survives only to hang the rule off. */
-.doc-hd{display:flex;align-items:baseline;padding-bottom:var(--space-6);
-  margin-bottom:var(--space-10);border-bottom:1.5px solid var(--surface-text)}
-.doc-hd h3{font-family:var(--mono);font-size:var(--fs-13);font-weight:700;color:var(--surface-text-heading);
-  letter-spacing:.1em}
-
-.facts{list-style:none;counter-reset:f}
-.facts li{counter-increment:f;display:grid;grid-template-columns:26px 51px 1fr;gap:0 var(--space-5);
-  padding:var(--space-5) var(--space-2) var(--space-5) 0;
-  border-bottom:1px dotted var(--sh-2);align-items:baseline}
-.facts li::before{content:counter(f,decimal-leading-zero);font-size:var(--fs-8);color:var(--surface-muted-2)}
-.facts .f-t{font-size:var(--fs-8-5);color:var(--surface-muted);font-variant-numeric:tabular-nums}
-/* the sentence cell — the typography lives HERE, and `.min` is inline inside it.
-   A `.min` used as the grid cell itself would be blockified, and its marks are
-   painted per box: one block box for the whole wrapped sentence paints one mark,
-   sliding out of step with the lines. See `factRow()` in report-view.ts. */
-.facts .f-s{font-family:var(--prose);font-size:var(--fs-11);line-height:1.62;color:var(--surface-text-1);
-  word-break:keep-all}
-.facts .min{display:inline}
-
-.rbody{font-family:var(--prose);font-size:var(--fs-11-5);line-height:1.92;color:var(--surface-text-2);
-  text-align:justify;word-break:keep-all}
-.rbody .sent{display:inline}
-/* R1 — the break between two rounds of one sitting. An empty block in the
-   justified flow: it ends the line and leaves one step of air, so a seven-round
-   day reads as seven transmissions instead of one paragraph. */
-.rbody .r-brk{display:block;height:var(--space-6)}
-.sig{margin-top:var(--space-20);display:flex;align-items:center;justify-content:flex-end;gap:var(--space-14)}
-.sig-line{font-family:var(--mono);font-size:var(--fs-11);color:var(--surface-text-3);letter-spacing:.14em;
-  border-bottom:1px solid var(--surface-text);padding:0 var(--space-22) var(--space-2)}
-/* x13 — `.sig-stamp` and `@keyframes chopIn` are gone with the 검인 chop
-   (민서, 08-10). The rules were the seal box, its two lines and the swing that
-   put it on the paper; `report-view.ts` has the account of why the chop was
-   removed rather than re-timed. `--warning` keeps its other consumers (the fallback
-   band, the minable hover), so it stays in `tokens.css`. `.sig-line` above is
-   untouched — the signature names who was on duty, which nothing else says. */
+.rep-grid{flex:1;min-height:0;overflow-y:auto;background:var(--surface);position:relative}
+.rep-grid::-webkit-scrollbar{width:8px}
+.rep-grid::-webkit-scrollbar-thumb{background:var(--sh-22)}
+.rep-group{display:flex;flex-direction:column}
+.rep-row{display:grid;grid-template-columns:98px minmax(0,1fr);gap:var(--space-12);
+  padding:var(--space-10) var(--space-12);box-sizing:border-box;align-items:start;
+  border:1px solid transparent;border-bottom-color:var(--ink-line);cursor:pointer;
+  transition:background .15s,border-color .15s}
+.rep-row:hover{background:var(--scan-a1)}
+.rep-row.is-mined{background:var(--band-1);border-color:var(--blueprint)}
+.rep-row.is-mined:hover{background:var(--band-1)}
+.rep-row:has(.min.mined){background:var(--band-1);border-color:var(--blueprint)}
+.rep-row:has(.min.mined):hover{background:var(--band-1)}
+.rep-stamp{font-family:var(--mono);font-size:var(--fs-9-5);line-height:1.7;
+  letter-spacing:.1em;color:var(--signal);white-space:nowrap;font-variant-numeric:tabular-nums}
+.rep-s{min-width:0;font-family:var(--prose);font-size:var(--fs-13);line-height:1.7;
+  color:var(--surface-text);word-break:keep-all}
+.rep-s .min{display:inline}
+.rep-break{height:var(--space-8);border-bottom:1px solid var(--surface-rule)}
+.sig{display:flex;align-items:center;justify-content:flex-end;padding:var(--space-10) var(--space-12);
+  border-top:1px solid var(--ink-line)}
+.sig-line{font-family:var(--mono);font-size:var(--fs-10);color:var(--surface-muted);
+  letter-spacing:.24em;white-space:nowrap}
 
 /* minable sentence */
-.min{cursor:pointer;transition:background .15s,box-shadow .15s;position:relative;
-  padding:var(--space-1) var(--space-2);margin:0 var(--space-n1);border-radius:1px}
-.min:hover{background:var(--warning-a13);box-shadow:0 1px 0 var(--warning)}
-/* The 채굴 rule is a DECORATION, not a background. Drawn as a gradient it was
-   pinned to a fixed offset inside the painted box, so it only landed under the
-   text while the font's own metrics kept it there — at 1.35em it sat under a
-   11px IBM Plex Sans KR line with 0.9px to spare, and any fallback face
-   (AppleMyungjo, Batang) clipped it to a sliver. `text-underline-offset` is
-   measured from the BASELINE, per line, whichever face renders. */
-.min.mined{color:var(--surface-text-5);cursor:pointer;
-  text-decoration:underline;text-decoration-color:var(--warning-a5);
-  text-decoration-thickness:1px;text-underline-offset:.3em;text-decoration-skip-ink:none}
-.min.mined::after{content:'채굴';font-family:var(--mono);font-size:var(--fs-7);letter-spacing:.1em;
-  color:var(--warning);vertical-align:super;margin-left:var(--space-4);white-space:nowrap;
-  /* inline-block so the rule above stops at the sentence and does not run under
-     the label — the gradient never reached it either */
-  display:inline-block;text-decoration:none}
+.min{cursor:pointer;position:relative;text-decoration:none}
+.min.mined{color:var(--surface-muted-2);cursor:pointer;text-decoration:none}
+.min.mined::after{content:none}
 .min.slotted{background:linear-gradient(transparent 55%,var(--highlight-a62) 55%);cursor:default}
 .min.slotted::after{content:'배치';font-family:var(--mono);font-size:var(--fs-7);letter-spacing:.1em;
   color:var(--slotted-ink);vertical-align:super;margin-left:var(--space-4);white-space:nowrap}
@@ -114,8 +63,6 @@
   100%{background:transparent;box-shadow:none}}
 .min.refused{animation:refusedNudge .3s ease}
 @keyframes refusedNudge{25%{transform:translateX(-2px)}75%{transform:translateX(2px)}}
-.facts li.min-row{cursor:pointer}
-.facts li.min-row:hover{background:var(--warning-a08)}
 
 .rep-foot{flex:0 0 auto;padding:var(--space-6) var(--space-14);background:var(--surface-inset);
   border-top:1px solid var(--sh-28);font-size:var(--fs-8-5);letter-spacing:.11em;color:var(--surface-muted)}
@@ -127,37 +74,35 @@
 @keyframes blink{0%,49%{opacity:1}50%,100%{opacity:0}}
 
 /* ===========================================================================
-   the terminal record (U3, re-skinned x4) — the day's 집계, in the 현장 기록
-   column's own format.
+   the terminal record (U3, re-skinned x4) — the day's 집계, in the same tagged
+   row geometry as the report above it.
 
    U3 filed score-tally's ledger at the foot of this column and kept the TALLY
    sheet's skin whole: a centred head, a 66px headline in a boxed row, a
    zebra-striped table with a 기준 column. Two documents on one sheet, and the
-   second one shouted over the first. What replaces it is LINES — the `.facts`
-   grid to the pixel, the same dotted rule, the sentence starting on the same x,
-   so the day's outcome reads as the last few entries of the record rather than
-   as a report card stapled underneath it.
+   second one shouted over the first. What replaces it is LINES: the same 98px
+   label column, the same divider, and the sentence starting on the same x, so
+   the day's outcome reads as the last few entries of the record rather than as
+   a report card stapled underneath it.
 
    The one thing that separates them is INK: seal red and bold, because these
    are the only lines in the column that are not something a person observed.
    Nothing here is mineable and nothing carries a `sentence_id` — the mark is
    read, never pressed.
    =========================================================================== */
-.terminal-record{margin-top:var(--space-20);padding-top:var(--space-4);
-  border-top:2px solid var(--surface-text)}
+.terminal-record{margin-top:var(--space-8);padding-top:var(--space-4);
+  border-top:1px solid var(--ink-line)}
 .terminal-record .tly-doc{font-size:var(--fs-8);letter-spacing:.2em;color:var(--surface-muted);
-  padding:0 var(--space-2) var(--space-5) 0}
+  padding:var(--space-8) var(--space-12) var(--space-5)}
 
 .terminal-record .tly-lines{list-style:none}
-/* The `.facts li` geometry verbatim (see the block above): 26px number column,
-   51px clock column, the sentence in the third. Both leading columns are left
-   EMPTY — a 집계 line has no 시각 and is not the nth thing that happened — and
-   what they buy is that every red line starts on the same x as every black one
-   above it. Change `.facts li` and this must move with it. */
-.terminal-record .tly-line{display:grid;grid-template-columns:26px 51px 1fr;gap:0 var(--space-5);
-  padding:var(--space-5) var(--space-2) var(--space-5) 0;
-  border-bottom:1px dotted var(--sh-2);align-items:baseline}
-.terminal-record .tl-s{grid-column:3;font-family:var(--prose);font-size:var(--fs-11);line-height:1.62;
+/* The `.rep-row` geometry verbatim: 98px label column and the sentence in the
+   second. The label column is left empty so the red line starts where every
+   report sentence starts. Change `.rep-row` and this must move with it. */
+.terminal-record .tly-line{display:grid;grid-template-columns:98px minmax(0,1fr);gap:var(--space-12);
+  padding:var(--space-10) var(--space-12);box-sizing:border-box;
+  border:1px solid transparent;border-bottom-color:var(--ink-line);align-items:start}
+.terminal-record .tl-s{grid-column:2;font-family:var(--prose);font-size:var(--fs-13);line-height:1.7;
   font-weight:700;color:var(--warning-strong);word-break:keep-all}
 /* the opening line (`23시 12분 시점 집계`) and the closing one (`총 사망자 수
    60명`) are the record's own head and foot — a shade heavier, and the close

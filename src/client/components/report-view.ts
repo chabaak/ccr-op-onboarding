@@ -1,7 +1,8 @@
 // [u6] ReportView — spec-client §4 REPORTS row, §3 inv 5, latency rule 4.
 //
-// Two filed documents side by side: the objective log on the left and the
-// agent's own report on the right. Ported from
+// One tagged record column: objective facts and the agent's own report share
+// one scroll surface, with their former document titles rendered as row tags.
+// Ported from
 // docs/design/phase2-ui/index.html lines 176..218 and app.js `renderReport()` /
 // `typewrite()` (lines 505, 523). (x6 — the ledger rule the reference drew down
 // the report side is gone; see `win-reports.css`.)
@@ -117,7 +118,7 @@ export interface ReportView {
    * which becomes the model the mined tally counts.
    */
   append(slice: ReportModel, whole: ReportModel, marks: MarkSets): void
-  /** Draws a sitting's two documents from scratch, replaying on first arrival. */
+  /** Draws a sitting's tagged record rows from scratch, replaying on first arrival. */
   render(model: ReportModel, marks: MarkSets, options?: RenderOptions): void
   /** Repaints every anchor's state and the mined tally, in place. */
   refresh(marks: MarkSets): void
@@ -127,10 +128,7 @@ export interface ReportView {
   flash(id: string): void
   /** The round currently on the page, or `null` before the first report. */
   round(): number | null
-  /**
-   * Re-brands the callsign surface — the signature under 무전 기록, and since x5
-   * the only one this window has (the pane's subtitle went with `documentHead`).
-   */
+  /** Re-brands the callsign surface under the tagged record rows. */
   brand(callsign: string): void
 }
 
@@ -146,21 +144,10 @@ export interface ReportViewOptions {
 interface Anchor {
   sentence: Sentence
   node: HTMLElement
+  row: HTMLElement
 }
 
-/**
- * The two documents' names — and, since x5, the whole of their heads.
- *
- * What left with them: the `가` / `나` file letters the reference boxed in front
- * of each title (`app.js`), and the italic subtitles behind them (`일어난 것 ·
- * 관측된 것`, `ECHO-1 송신 · 1인칭`). The letters index a filing system this game
- * has exactly two entries in — 현장 기록 and 무전 기록 are already told apart by
- * being the left column and the right one — and the subtitles restated the
- * titles in longer words.
- *
- * The callsign therefore has ONE surface left in this window: the signature
- * under the 무전 기록 body, which `brand()` writes (M1).
- */
+/** The former document titles, now rendered as row tags. */
 const FACTS_TITLE = '현장 기록'
 const BODY_TITLE = '무전 기록'
 
@@ -176,20 +163,14 @@ const BODY_TITLE = '무전 기록'
 const FOOT_LEAD = '기록 중 주요 사항을 선정하여 다음 요원에게 인수인계 하십시오 · '
 const FOOT_TAIL = '건 채굴됨'
 
-function documentHead(title: string): HTMLElement {
-  const header = el('header', 'doc-hd')
-  header.append(el('h3', undefined, title))
-  return header
-}
-
 export function createReportView(options: ReportViewOptions): ReportView {
-  const facts = el('ol', 'facts')
+  const facts = el('section', 'rep-group rep-facts')
   facts.id = 'factsList'
-  const body = el('div', 'rbody')
+  const body = el('section', 'rep-group rep-body')
   body.id = 'bodyList'
-
-  const docFacts = el('article', 'doc doc-facts')
-  docFacts.append(documentHead(FACTS_TITLE), facts)
+  // Legacy mount target for the terminal record. Sentence rows live in
+  // #factsList/#bodyList, so tutorial's old document anchors stop matching.
+  const recordMount = el('article', 'doc-facts')
 
   const sig = el('div', 'sig')
   sig.setAttribute('aria-hidden', 'true')
@@ -211,11 +192,8 @@ export function createReportView(options: ReportViewOptions): ReportView {
   const sigLine = el('span', 'sig-line', callsignOf(1))
   sig.append(sigLine)
 
-  const docBody = el('article', 'doc doc-body')
-  docBody.append(documentHead(BODY_TITLE), body, sig)
-
   const grid = el('div', 'rep-grid')
-  grid.append(docFacts, docBody)
+  grid.append(facts, body, recordMount, sig)
 
   const count = el('b', undefined, '0')
   count.id = 'minedCount'
@@ -244,28 +222,24 @@ export function createReportView(options: ReportViewOptions): ReportView {
       event.preventDefault()
       options.onMine(sentence.id)
     })
-    anchors.push({ sentence, node })
     return node
   }
 
-  /**
-   * One 현장 기록 row: [번호] [시각] [문장].
-   *
-   * The sentence sits inside its own cell instead of BEING the third grid cell.
-   * A grid item is blockified, and `.min`'s marks are painted as backgrounds —
-   * on one block box, a `채굴` rule drawn every 1.35em drifts against a 1.62
-   * line box (≈2px per line, so line 3 is struck through) and a `배치`
-   * highlight lands on the last line alone. Wrapped in a cell, `.min` stays a
-   * real inline box and every line fragment is painted alike, exactly as the
-   * 무전 기록 pane's `.sent` already is. The wrap is load-bearing: the pane only
-   * looked right on a window wide enough to keep each sentence to one line.
-   */
-  function factRow(node: HTMLElement): HTMLLIElement {
-    const row = el('li', 'min-row')
-    const cell = el('div', 'f-s')
+  /** One tagged report row: [source tag] [sentence]. */
+  function reportRow(sentence: Sentence, tag: string, marks: MarkSets): { row: HTMLElement; node: HTMLElement } {
+    const node = bind(sentence, marks)
+    const row = el('div', 'rep-row')
+    row.addEventListener('click', (event: MouseEvent) => {
+      const target = event.target
+      if (target instanceof Node && node.contains(target)) return
+      options.onMine(sentence.id)
+    })
+    const cell = el('span', 'rep-s')
     cell.append(node)
-    row.append(el('span', 'f-t'), cell)
-    return row
+    row.append(el('span', 'rep-stamp', tag), cell)
+    row.classList.toggle('is-mined', sentenceState(sentence.id, marks) === 'mined')
+    anchors.push({ sentence, node, row })
+    return { row, node }
   }
 
   /**
@@ -345,18 +319,18 @@ export function createReportView(options: ReportViewOptions): ReportView {
       current = whole
 
       for (const sentence of slice.facts) {
-        const node = bind(sentence, marks)
+        const { row, node } = reportRow(sentence, FACTS_TITLE, marks)
         node.textContent = sentence.text
-        facts.append(factRow(node))
+        facts.append(row)
       }
 
       // R1 — this round opens below the last one, not beside it. `append()` is
       // only ever reached for a round that is NOT the sitting's first (the
       // window draws whole for that one), so the break is unconditional here.
-      body.append(el('span', 'r-brk'))
+      body.append(el('div', 'rep-break'))
       const grown = slice.report_body.map((sentence) => {
-        const node = bind(sentence, marks)
-        body.append(node, document.createTextNode(' '))
+        const { row, node } = reportRow(sentence, BODY_TITLE, marks)
+        body.append(row)
         return node
       })
 
@@ -375,9 +349,9 @@ export function createReportView(options: ReportViewOptions): ReportView {
       // agent's own report writes itself out (reference: `renderReport()`).
       facts.replaceChildren()
       for (const sentence of model.facts) {
-        const node = bind(sentence, marks)
+        const { row, node } = reportRow(sentence, FACTS_TITLE, marks)
         node.textContent = sentence.text
-        facts.append(factRow(node))
+        facts.append(row)
       }
 
       body.replaceChildren()
@@ -387,9 +361,9 @@ export function createReportView(options: ReportViewOptions): ReportView {
         // round boundary has to come from the model. Appending the break only
         // in `append()` below would lose it the first time the operator left
         // this rail tab and came back.
-        if (opens.has(sentence.id)) body.append(el('span', 'r-brk'))
-        const node = bind(sentence, marks)
-        body.append(node, document.createTextNode(' '))
+        if (opens.has(sentence.id)) body.append(el('div', 'rep-break'))
+        const { row, node } = reportRow(sentence, BODY_TITLE, marks)
+        body.append(row)
         return node
       })
 
@@ -398,7 +372,11 @@ export function createReportView(options: ReportViewOptions): ReportView {
     },
 
     refresh(marks: MarkSets): void {
-      for (const anchor of anchors) applyState(anchor.node, sentenceState(anchor.sentence.id, marks))
+      for (const anchor of anchors) {
+        const state = sentenceState(anchor.sentence.id, marks)
+        applyState(anchor.node, state)
+        anchor.row.classList.toggle('is-mined', state === 'mined')
+      }
       tally(marks)
     },
 

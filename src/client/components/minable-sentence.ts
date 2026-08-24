@@ -145,7 +145,7 @@ export function sentenceNode(sentence: Sentence, state: MinableState): HTMLEleme
 }
 
 /**
- * Repaints one anchor's state — class list plus the mined announcement.
+ * Repaints one anchor's state.
  *
  * `held` is the DESK's answer rather than the sentence's: the tear is
  * unavailable to every sentence at once, for as long as the previous ECHO's

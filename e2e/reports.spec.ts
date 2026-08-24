@@ -245,7 +245,7 @@ test.describe('report renders once after the last beat', () => {
     await expect(page.locator(`${REP} .rep-grid`)).toHaveCount(1)
     expect(reportsOf(await frame(page)), 'a report was already released at the opening minute').toEqual([])
     await expect(page.locator(`${BODY} .sent`)).toHaveCount(0)
-    await expect(page.locator(`${FACTS} li`)).toHaveCount(0)
+    await expect(page.locator(`${FACTS} .rep-row`)).toHaveCount(0)
   })
 
   /* x13 — 'the 검인 chop waits for the day to close' was here (민서, 08-10).
@@ -260,16 +260,18 @@ test.describe('report renders once after the last beat', () => {
      in `components/report-view.ts`; what it certified is now said by the
      transmission being on the page and by the terminal record under it. */
 
-  test('report renders once after the last beat — both panes render the event, in event order', async ({
+  test('report renders once after the last beat — both row groups render the event, in event order', async ({
     page,
   }) => {
     await drain(page)
     const report = await reportForActiveRun(page)
 
-    await expect(page.locator(`${FACTS} li`)).toHaveCount(report.facts.length)
+    await expect(page.locator(`${FACTS} .rep-row`)).toHaveCount(report.facts.length)
     await expect(page.locator(`${BODY} .sent`)).toHaveCount(report.report_body.length)
     expect(await anchorIds(page.locator(`${FACTS} .min`))).toEqual(report.facts.map((s) => s.id))
     expect(await anchorIds(page.locator(`${BODY} .sent`))).toEqual(report.report_body.map((s) => s.id))
+    expect(new Set(await page.locator(`${FACTS} .rep-stamp`).allTextContents())).toEqual(new Set(['현장 기록']))
+    expect(new Set(await page.locator(`${BODY} .rep-stamp`).allTextContents())).toEqual(new Set(['무전 기록']))
   })
 
   test('report renders once after the last beat — no data-sentence-id appears twice', async ({ page }) => {
@@ -285,7 +287,7 @@ test.describe('report renders once after the last beat', () => {
   }) => {
     await drain(page)
     const before = {
-      facts: await page.locator(`${FACTS} li`).count(),
+      facts: await page.locator(`${FACTS} .rep-row`).count(),
       body: await page.locator(`${BODY} .sent`).count(),
       rail: await page.locator(OPTION).count(),
     }
@@ -293,58 +295,49 @@ test.describe('report renders once after the last beat', () => {
 
     await drain(page)
     await drain(page)
-    await expect(page.locator(`${FACTS} li`)).toHaveCount(before.facts)
+    await expect(page.locator(`${FACTS} .rep-row`)).toHaveCount(before.facts)
     await expect(page.locator(`${BODY} .sent`)).toHaveCount(before.body)
     await expect(page.locator(OPTION)).toHaveCount(before.rail)
   })
 
-  test('report renders once after the last beat — two documents side by side on the shared surface', async ({
+  test('report renders once after the last beat — one tagged column replaces the two documents', async ({
     page,
   }) => {
     await drain(page)
     await expect(page.locator(`${REP} .win-body.surface`)).toHaveCount(1)
-    await expect(page.locator(`${REP} .rep-grid > .doc.doc-facts`)).toHaveCount(1)
-    await expect(page.locator(`${REP} .rep-grid > .doc.doc-body`)).toHaveCount(1)
+    await expect(page.locator(`${REP} .doc-hd, ${REP} .doc-body`)).toHaveCount(0)
 
-    const facts = await page.locator(`${REP} .doc-facts`).boundingBox()
-    const body = await page.locator(`${REP} .doc-body`).boundingBox()
-    expect(facts && body).toBeTruthy()
-    expect(facts!.x).toBeLessThan(body!.x)
-    expect(facts!.x + facts!.width).toBeLessThanOrEqual(body!.x + 1)
+    const rows = page.locator(`${REP} .rep-row`)
+    await expect(rows, 'no report rows rendered — the layout check is vacuous').not.toHaveCount(0)
+    const columns = await rows.first().evaluate((node) => getComputedStyle(node as HTMLElement).gridTemplateColumns)
+    expect(columns.split(' ')[0]).toBe('98px')
+
+    const firstFact = await page.locator(`${FACTS} .rep-row`).first().boundingBox()
+    const firstBody = await page.locator(`${BODY} .rep-row`).first().boundingBox()
+    expect(firstFact && firstBody).toBeTruthy()
+    expect(Math.abs(firstFact!.x - firstBody!.x), 'fact and body rows do not share one column').toBeLessThan(1)
   })
 
-  // x6 — INVERTED. This case used to require a red ledger rule down the report
-  // side, painted as a gradient band at x=33–34px with the prose indented 34px
-  // to clear it. The rule is gone: it was a decoration nothing was written
-  // against, and the indent it needed put 무전 기록 20px off 현장 기록's axis, so
-  // the pane the operator reads as one spread was visibly two.
-  //
-  // What is asserted instead is the thing the rule cost — the two panes hang
-  // from the same left edge — plus the rule's absence, so it cannot come back
-  // without this reading again.
-  test('report renders once after the last beat — the two panes hang from one left edge, with no ledger rule', async ({
+  test('report renders once after the last beat — row labels and sentence cells align across sources', async ({
     page,
   }) => {
     await drain(page)
-    const pane = async (sel: string): Promise<{ paint: string; padding: string }> =>
-      page.locator(`${REP} ${sel}`).evaluate((n) => {
+    const row = async (sel: string): Promise<{ columns: string; label: number; sentence: number }> =>
+      page.locator(sel).first().evaluate((n) => {
+        const root = n as HTMLElement
         const style = getComputedStyle(n as HTMLElement)
-        return { paint: style.backgroundImage, padding: style.paddingLeft }
+        return {
+          columns: style.gridTemplateColumns,
+          label: root.querySelector('.rep-stamp')!.getBoundingClientRect().left,
+          sentence: root.querySelector('.rep-s')!.getBoundingClientRect().left,
+        }
       })
 
-    const facts = await pane('.doc-facts')
-    const body = await pane('.doc-body')
-    expect(body.padding, `무전 기록 is indented off 현장 기록's axis`).toBe(facts.padding)
-
-    // No red band anywhere in the body pane's paint. `.doc-facts` keeps its own
-    // gradient (a grey edge shade at 96%), which is why the assert is on colour
-    // and not on the mere presence of a gradient.
-    const reds = [...body.paint.matchAll(/rgba?\(\s*(\d+)[,\s]+(\d+)[,\s]+(\d+)/g)].map((m) => ({
-      r: Number(m[1]),
-      g: Number(m[2]),
-      b: Number(m[3]),
-    }))
-    expect(reds.some((c) => c.r > c.g + 20 && c.r > c.b + 20), `a red rule is back: ${body.paint}`).toBe(false)
+    const facts = await row(`${FACTS} .rep-row`)
+    const body = await row(`${BODY} .rep-row`)
+    expect(facts.columns).toBe(body.columns)
+    expect(Math.abs(facts.label - body.label), 'source labels are not in one column').toBeLessThan(1)
+    expect(Math.abs(facts.sentence - body.sentence), 'sentences are not in one column').toBeLessThan(1)
   })
 })
 
@@ -868,6 +861,26 @@ test.describe('slotting from the report (T1)', () => {
     await page.keyboard.press('Enter')
     await expect.poll(async () => (await frame(page)).store.slots[0]).toBeUndefined()
     await expect(page.locator(`${REP} [data-sentence-id="${id}"]`).first()).toHaveClass(/\bmined\b/)
+    await expect
+      .poll(async () =>
+        page.locator(`${REP} [data-sentence-id="${id}"]`).first().evaluate((node) => {
+          const row = node.closest('.rep-row') as HTMLElement | null
+          const rowStyle = row === null ? null : getComputedStyle(row)
+          const textStyle = getComputedStyle(node as HTMLElement)
+          return {
+            hasTransferredLabel: row?.textContent?.includes('이관됨') ?? true,
+            hasBoxBackground: (rowStyle?.backgroundColor ?? '') !== 'rgba(0, 0, 0, 0)',
+            hasBoxBorder: (rowStyle?.borderTopColor ?? '') !== 'rgba(0, 0, 0, 0)',
+            textDecoration: textStyle.textDecorationLine,
+          }
+        }),
+      )
+      .toEqual({
+        hasTransferredLabel: false,
+        hasBoxBackground: true,
+        hasBoxBorder: true,
+        textDecoration: 'none',
+      })
     expect(
       await page.evaluate(() => (window as unknown as { __pointerEvents?: number }).__pointerEvents),
       'the keyboard path fired a pointer event',
