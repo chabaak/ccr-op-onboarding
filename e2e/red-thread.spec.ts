@@ -162,12 +162,31 @@ async function boot(page: Page): Promise<void> {
  * reaches the next 21:04. Nothing is skipped and no thread rule is relaxed.
  */
 
-/** The sentence ids the booted run actually rendered, in document order (C3). */
+/**
+ * The visible sentence ids the booted run actually rendered, in document order
+ * (C3).
+ *
+ * RE-AIMED (08-25). REPORTS now starts as a short top-right pane above AGENT
+ * FILE. The first two rendered facts still exist, but the second one sits
+ * below `.win-body` on first paint, and [u8#c3] correctly clips its thread.
+ * Thread-count tests need threadable source anchors, not merely rendered
+ * source anchors, so this mirrors the layer's window-body visibility gate.
+ */
 async function sourceIds(page: Page): Promise<string[]> {
   const ids = await page
     .locator(`${REP} [data-sentence-id]`)
-    .evaluateAll((nodes) => nodes.map((n) => (n as HTMLElement).dataset.sentenceId ?? ''))
-  expect(ids.length, 'the booted report renders no sentence anchor — nothing to thread').toBeGreaterThan(1)
+    .evaluateAll((nodes) => {
+      const body = document.querySelector('#w-rep .win-body')
+      if (body === null) return []
+      const b = body.getBoundingClientRect()
+      return nodes
+        .filter((n) => {
+          const r = n.getBoundingClientRect()
+          return !(r.bottom < b.top + 2 || r.top > b.bottom - 2 || r.right < b.left || r.left > b.right)
+        })
+        .map((n) => (n as HTMLElement).dataset.sentenceId ?? '')
+    })
+  expect(ids.length, 'the booted report renders fewer than two visible sentence anchors — nothing to thread').toBeGreaterThan(1)
   return ids
 }
 
@@ -191,13 +210,15 @@ async function clear(page: Page, slot: number): Promise<void> {
 }
 
 /**
- * Fill `n` slots with the first `n` rendered sentence ids; returns those ids.
+ * Fill `n` slots with the first `n` visible rendered sentence ids; returns
+ * those ids.
  *
- * The AGENT FILE body scrolls — its dossier stands above the board, so at the
- * default arrangement the slots sit below the fold. An anchor scrolled out of
- * its window body has no visible rect and therefore no thread, by the very rule
- * [u8#c3] pins (reference `app.js:567`), so the suite brings the board into
- * view exactly as the operator would before asserting anything about a string.
+ * The AGENT FILE body scrolls, and under the feed-left desk REPORTS scrolls
+ * sooner too. An anchor scrolled out of its window body has no visible rect and
+ * therefore no thread, by the very rule [u8#c3] pins (reference `app.js:567`),
+ * so the suite uses source anchors the layer can actually thread and brings the
+ * board into view exactly as the operator would before asserting anything about
+ * a string.
  */
 async function thread(page: Page, n: number): Promise<string[]> {
   const ids = (await sourceIds(page)).slice(0, n)
@@ -701,13 +722,12 @@ test.describe('clipped to visible rect', () => {
   test('clipped to visible rect — a source scrolled out of its body drops exactly that thread', async ({
     page,
   }) => {
-    // RE-AIMED (08-08, T3) — the PRECONDITION, never the criterion. T3 gave
-    // REPORTS the whole left column (640px wide at 1280x800, up from 505), and a
-    // wider column wraps less: the facts document stopped overflowing far enough
-    // for a sentence to be lifted clear of the body's top edge (measured 83px of
-    // travel against the 134px needed). The oracle below is untouched; it is
-    // handed a desk narrow enough to still overflow, which is what it always
-    // assumed and no longer got for free.
+    // RE-AIMED (08-25) — the PRECONDITION, never the criterion. The feed-left
+    // desk makes REPORTS a short top-right pane, so the first two rendered
+    // facts are no longer both visible before any scroll. `thread()` therefore
+    // chooses visible source anchors first; the oracle below still makes one of
+    // those sources leave the REPORTS body and then checks that exactly that
+    // thread disappears.
     await page.setViewportSize({ width: 1000, height: 720 })
     const ids = await thread(page, 2)
     await expect(page.locator(PATH)).toHaveCount(2)
@@ -727,10 +747,11 @@ test.describe('clipped to visible rect', () => {
     // scroller, and move it exactly far enough to lift that sentence clear of
     // the body's top edge — `clipRect` drops an anchor whose bottom is above
     // `body.top + THREAD_CLIP_PAD` (2). Scrolling by the minimum needed, rather
-    // than to the end, is what keeps this a ONE-thread test: the second sentence
-    // sits BELOW the first in the same column, so it rides up by the same amount
-    // and stays inside. Every branch that cannot reach the precondition returns
-    // a reason and fails the assert below — nothing is skipped.
+    // than to the end, is what keeps this a ONE-thread test: the survivor was
+    // selected because it was already visible, and it does not ride this
+    // scroller out with the source being hidden. Every branch that cannot reach
+    // the precondition returns a reason and fails the assert below — nothing is
+    // skipped.
     const CLEAR = 8
     const setup = await page.evaluate(
       ([id, clear]) => {
