@@ -409,6 +409,27 @@ describe("renderer coverage — every RENDERERS entry, not just what suites use"
     expect(rendered.system).toContain("요원이 말하지 않은 비트");
   });
 
+  it("states that feed lines are the agent's own record, not lines about the agent", () => {
+    const rendered = renderCall(
+      {
+        call_type: "narration",
+        template_version: "v0.5",
+        slots: {
+          TIMELINE_TAIL: ["18:44 물이 한 방울씩 떨어진다."],
+          AGENT_UTTERANCE: "",
+          FIXED_NPC_ACTION: "t1: 표기웅이 천장을 올려다본다.",
+          SCENE_SYMPTOMS: ["천장 철골이 낮게 운다."],
+          PRESENT_NPCS: [],
+        },
+      },
+      DEFAULT_PROMPT as unknown as Record<string, unknown>,
+    );
+
+    expect(rendered.system).toContain("요원 자신의 기록");
+    expect(rendered.system).toContain("요원은 작성자이지 관찰 대상이 아니다");
+    expect(rendered.system).toContain("요원을 주어·대상으로 세우지 않는다");
+  });
+
   it("derives narration staging from the side labels in the current beat", () => {
     const rendered = renderCall(
       {
