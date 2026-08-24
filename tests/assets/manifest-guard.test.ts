@@ -151,7 +151,7 @@ describe('[issue #10] every shipped font binary is covered', () => {
       .filter((file) => file.startsWith('public/assets/fonts/') && file.endsWith('/'))
     expect(targets).toEqual([
       'public/assets/fonts/ibm-plex-mono/',
-      'public/assets/fonts/nanum-myeongjo/',
+      'public/assets/fonts/ibm-plex-sans-kr/',
       'public/assets/fonts/nanum-gothic-coding/',
     ])
   })

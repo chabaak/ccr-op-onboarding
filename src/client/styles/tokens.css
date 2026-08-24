@@ -53,7 +53,7 @@
   /* TWO faces, and the split is what a thing IS, not which window it is in (x5).
      `--mono` is every FIXED value the desk prints — window names, section
      titles, clock digits, document numbers, slot numbers, flags, stamps and
-     marks. `--myeong` is everything a person said or wrote — the two REPORTS
+     marks. `--prose` is everything a person said or wrote — the two REPORTS
      panes, the live feed's content column, a mined sentence wherever it has been
      carried to, the handover paragraph.
 
@@ -72,7 +72,7 @@
      Mono carries no Hangul. Nothing about how those lines LOOK changed; what
      changed is that the sheet no longer has two names for the same answer. */
   --mono:'IBM Plex Mono','Nanum Gothic Coding',ui-monospace,Menlo,monospace;
-  --myeong:'Nanum Myeongjo','AppleMyungjo','Batang',ui-serif,serif;
+  --prose:'IBM Plex Sans KR',ui-sans-serif,system-ui,sans-serif;
 }
 
 /* ─── machine-room chrome: surfaces ───────────────────────────────────── */

@@ -217,12 +217,12 @@ describe('[x10] the briefing\'s type — one face, ×1.2, and no leak', () => {
   it('(a) no alert plate is set in the serif, and the face is declared exactly once', () => {
     // RE-AIMED (C17, x10 08-10), never weakened — and it is STRONGER than what it
     // replaced. This asserted `.man-plate .cf-ask` was `--mono` while
-    // `confirm.css`'s stayed `--myeong`: the briefing had one face and the
+    // `confirm.css`'s stayed `--prose`: the briefing had one face and the
     // confirmation and endings kept the serif, on the reading that a question and a
     // verdict are somebody speaking. 민서 overruled the scope the same day — 명조
     // leaves the alert plates entirely — so pinning the briefing's own override
     // would now pin a rule that must NOT exist, and pinning the confirmation's
-    // `--myeong` would pin the exact thing that was removed.
+    // `--prose` would pin the exact thing that was removed.
     //
     // So the claim moves up to what the ruling actually is, which is also the form
     // that cannot rot: no alert sheet may name the serif at all, and the face is
@@ -238,11 +238,11 @@ describe('[x10] the briefing\'s type — one face, ×1.2, and no leak', () => {
     expect(decl(CONFIRM_CSS, '.cf-ask', 'font-family')).toBe('var(--mono)')
 
     // …and nowhere else. Comments are stripped first: all three sheets discuss
-    // `--myeong` at length (the argument it replaced is on the record), and a guard
+    // `--prose` at length (the argument it replaced is on the record), and a guard
     // that read prose would fire on the reasoning instead of on a declaration.
     for (const [name, sheet] of SHEETS) {
       const css = stripComments(read(sheet))
-      expect(css, `${name} still sets a plate in the serif`).not.toMatch(/--myeong/)
+      expect(css, `${name} still sets a plate in prose`).not.toMatch(/--prose/)
     }
 
     // The briefing's own override is GONE, not merely equal to the template — a

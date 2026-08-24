@@ -28,7 +28,7 @@ const PACK_CSS = path.join(FONTS_DIR, 'fonts.css')
 const CSS2_QUERY =
   'family=IBM+Plex+Mono:ital,wght@0,300;0,400;0,500;0,600;0,700;1,400' +
   '&family=Nanum+Gothic+Coding:wght@400;700' +
-  '&family=Nanum+Myeongjo:wght@400;700;800' +
+  '&family=IBM+Plex+Sans+KR:wght@400;600' +
   '&display=swap'
 
 /** A desktop Chrome UA is what makes the API answer with WOFF2 + `unicode-range` slices. */

@@ -110,8 +110,8 @@ function decl(file: string, d: Declaration): Hit {
 /**
  * Blank out `@font-face` blocks, keeping line numbers.
  *
- * `@font-face { font-family: 'Nanum Myeongjo' }` is where a face is *declared*
- * — it is the definition inv 8 points `--myeong` at, not a consumption-site
+ * `@font-face { font-family: 'IBM Plex Sans KR' }` is where a face is *declared*
+ * — it is the definition inv 8 points `--prose` at, not a consumption-site
  * literal. Scanning it would make the invariant self-contradictory: there
  * would be no legal place to name a font at all.
  *
@@ -260,7 +260,7 @@ describe('[u9#c3] the lint has teeth', () => {
 
   it('(c) the @font-face exemption removes face declarations and nothing else', () => {
     const sample = [
-      "@font-face{font-family:'Nanum Myeongjo';src:url(x.woff2)}",
+      "@font-face{font-family:'IBM Plex Sans KR';src:url(x.woff2)}",
       '.x{font-size:12px}',
     ].join('\n')
     const kept = declarationsWithLines(withoutFontFace(sample))

@@ -59,7 +59,7 @@
 .fl.band{background:linear-gradient(90deg,var(--band-1),var(--band-2))}
 .fl-t{font-size:var(--fs-9-5);color:var(--feed-t);letter-spacing:.02em;padding-top:var(--space-2);
   font-variant-numeric:tabular-nums;text-align:right}
-.fl-c{font-family:var(--myeong);color:var(--feed-1);min-width:0;padding-left:var(--space-14)}
+.fl-c{font-family:var(--prose);color:var(--feed-1);min-width:0;padding-left:var(--space-14)}
 .fl-c::before{content:attr(data-mark);display:inline-block;width:21px;margin-left:var(--space-n21);
   color:var(--feed-mark);font-size:var(--fs-10)}
 

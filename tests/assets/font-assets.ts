@@ -22,17 +22,17 @@ export const SCENARIO_DIR = TUTORIAL_DIR
 
 export const IBM_PLEX_MONO = 'IBM Plex Mono'
 export const NANUM_GOTHIC_CODING = 'Nanum Gothic Coding'
-export const NANUM_MYEONGJO = 'Nanum Myeongjo'
+export const IBM_PLEX_SANS_KR = 'IBM Plex Sans KR'
 
 /** Korean faces — the ones spec-client §9 wants sliced per `unicode-range`. */
-export const KOREAN_FAMILIES = [NANUM_GOTHIC_CODING, NANUM_MYEONGJO] as const
-export const ALL_FAMILIES = [IBM_PLEX_MONO, NANUM_GOTHIC_CODING, NANUM_MYEONGJO] as const
+export const KOREAN_FAMILIES = [NANUM_GOTHIC_CODING, IBM_PLEX_SANS_KR] as const
+export const ALL_FAMILIES = [IBM_PLEX_MONO, NANUM_GOTHIC_CODING, IBM_PLEX_SANS_KR] as const
 
 /**
  * Exact family/weight/style set vendored for the client chrome:
  * `IBM+Plex+Mono:ital,wght@0,300;0,400;0,500;0,600;0,700;1,400
  *  &Nanum+Gothic+Coding:wght@400;700
- *  &Nanum+Myeongjo:wght@400;700;800`
+ *  &IBM+Plex+Sans+KR:wght@400;600`
  */
 export const EXPECTED_FACES: ReadonlyArray<{ family: string; weight: number; style: 'normal' | 'italic' }> = [
   { family: IBM_PLEX_MONO, weight: 300, style: 'normal' },
@@ -43,9 +43,8 @@ export const EXPECTED_FACES: ReadonlyArray<{ family: string; weight: number; sty
   { family: IBM_PLEX_MONO, weight: 400, style: 'italic' },
   { family: NANUM_GOTHIC_CODING, weight: 400, style: 'normal' },
   { family: NANUM_GOTHIC_CODING, weight: 700, style: 'normal' },
-  { family: NANUM_MYEONGJO, weight: 400, style: 'normal' },
-  { family: NANUM_MYEONGJO, weight: 700, style: 'normal' },
-  { family: NANUM_MYEONGJO, weight: 800, style: 'normal' },
+  { family: IBM_PLEX_SANS_KR, weight: 400, style: 'normal' },
+  { family: IBM_PLEX_SANS_KR, weight: 600, style: 'normal' },
 ]
 
 /** Hosts a self-hosted build may never talk to (spec-client §3 inv 10). */

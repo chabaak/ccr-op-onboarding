@@ -62,6 +62,6 @@ describe('[u1#c7] fonts belong to u10 (re-aimed to u1\'s own range — C17)', ()
   it('(d) tokens.css still carries the font-family stacks (the part u1 does own)', () => {
     const tokens = read(path.join(STYLES_DIR, 'tokens.css')).toLowerCase()
     expect(tokens).toContain('ibm plex mono')
-    expect(tokens).toContain('nanum myeongjo')
+    expect(tokens).toContain('ibm plex sans kr')
   })
 })

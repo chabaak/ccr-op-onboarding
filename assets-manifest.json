@@ -24,11 +24,11 @@
       "license_source": "https://github.com/google/fonts/blob/main/ofl/ibmplexmono/OFL.txt — 'Copyright © 2017 IBM Corp. with Reserved Font Name \"Plex\"', 'SIL Open Font License, Version 1.1' (checked 2026-08-08)"
     },
     {
-      "file": "public/assets/fonts/nanum-myeongjo/",
+      "file": "public/assets/fonts/ibm-plex-sans-kr/",
       "source": "Google Fonts webfont API (css2) — WOFF2 per-unicode-range slices, vendored into the repo by tools/fonts/vendor-google-webfonts.mjs",
       "license": "SIL Open Font License 1.1",
-      "note": "Self-hosted 'Nanum Myeongjo' — Korean document bodies (dossier, reports, block cards, tally). 3 weights (400/700/800), each sliced per unicode-range as upstream slices it, so a page pulls only the syllable blocks it renders (spec-client §9).",
-      "license_source": "https://github.com/google/fonts/blob/main/ofl/nanummyeongjo/OFL.txt — 'Copyright (c) 2010, NHN Corporation (http://www.nhncorp.com), with Reserved Font Name Nanum …', 'SIL Open Font License, Version 1.1' (2007-02-26) (checked 2026-08-08)"
+      "note": "Self-hosted 'IBM Plex Sans KR' — Korean prose face for document bodies, reports, block cards, and tally text. 2 weights (400/600), sliced per unicode-range as upstream slices it, so a page pulls only the syllable blocks it renders (spec-client §9).",
+      "license_source": "https://github.com/google/fonts/blob/main/ofl/ibmplexsanskr/OFL.txt — 'Copyright © 2017 IBM Corp. with Reserved Font Name \"Plex\"', 'SIL Open Font License, Version 1.1' (2007-02-26) (checked 2026-08-24)"
     },
     {
       "file": "public/assets/fonts/nanum-gothic-coding/",

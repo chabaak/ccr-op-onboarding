@@ -44,9 +44,9 @@
 
 /* ─── the question ───────────────────────────────────────────────────────────
    x10 (08-10) — NO PLATE ON THIS DESK IS SET IN 명조. 민서: alert 화면의 어떤
-   텍스트도 --myeong이면 안 된다.
+   텍스트도 --prose이면 안 된다.
 
-   This declaration was `var(--myeong)` and it was the LAST one. The ruling arrived
+   This declaration was `var(--prose)` and it was the LAST one. The ruling arrived
    in two steps and the second overturned the first: x10 began by putting only the
    briefing's lead into `--mono` so it would match the prose under it
    (`win-manual.css`), on the reading that the confirmation's question and the two
@@ -56,7 +56,7 @@
    declaration on the shared template, inherited by `#confirm`, `.man-plate` and
    `.end-plate` alike, rather than three sheets each holding an opinion.
 
-   WHAT THE READING BECOMES, because this is not only a font swap. `--myeong` on a
+   WHAT THE READING BECOMES, because this is not only a font swap. `--prose` on a
    plate said a person was addressing the operator. `--mono` says the TERMINAL is:
    every one of these plates is the portal issuing something — a briefing, a
    confirmation it needs, a verdict it has computed — and none of them is a voice
@@ -71,7 +71,7 @@
    and this line makes it a no-op. A redundant override is a claim that the plate
    needs a face of its own, and it would go stale silently the day this one moved.
    `tests/shell/manual.test.ts [x10] (a)` is re-aimed onto the durable form of the
-   rule: no alert sheet may name `--myeong` at all.
+   rule: no alert sheet may name `--prose` at all.
    ─────────────────────────────────────────────────────────────────────────── */
 .cf-body{padding:var(--space-26) var(--space-26) var(--space-20)}
 .cf-ask{font-family:var(--mono);font-size:var(--fs-15);line-height:1.7;
