@@ -21,16 +21,8 @@ import { blockCardModel, buildBlockCard, pad2, pickedBlockId, setPickedBlockId }
 /** spec-client §9 dev value, not a guess. */
 export const SLOT_CAP = 4
 
-/**
- * The blank's own copy.
- *
- * x4 — was '부검 창에서 문장을 누르면 이 칸에 앉습니다', ported from the design
- * target (`app.js` 262) back when it was printed four times, once per empty box.
- * There is one blank now (below), so the line can say what the file is FOR
- * rather than what a box does: the operator is writing a handover, and the
- * sentences come out of the record.
- */
-const EMPTY_HINT = '다음 요원에게 인수인계할 사항을 기록에서 가져오세요'
+/** The blank's own copy, printed once in each empty slot row. */
+const EMPTY_HINT = '— 비어 있음'
 /** …and what the blank says once the file is committed and nothing went in. */
 const LOCKED_HINT = '인수인계 사항 없음 — 잠김'
 
@@ -307,31 +299,21 @@ export function createSlotBoard(options: SlotBoardOptions): SlotBoard {
     options.onChange([...slots], deployed)
   }
 
-  /** Where the next sentence would sit, or `null` when the file is full. */
-  function firstFree(): number | null {
-    const seat = slotCells(slots).find((cell) => cell.blockId === null)
-    return seat === undefined ? null : seat.slot
-  }
-
   /**
-   * One seated sentence, as a RUN OF TEXT rather than a card in a box.
+   * One seated sentence in one of the four handover slots.
    *
-   * x4 — the four boxes are gone. What the operator is assembling is a handover
-   * paragraph, and it now reads as one: 01 · the sentence · 해제 · 02 · the
-   * sentence · 해제 · … in a single justified flow. The boxes made four
-   * sentences look like four objects off a deck — the same reading T1 already
-   * took the card FACE away for. What is left is the file's own prose, with the
-   * slot number and its release sitting in the margin of the line they belong
-   * to. Every attribute a filled slot carried is carried still (`data-slot`,
-   * `data-no`, `data-block-id`, the `.slot-pin` anchor, the `[data-op=unslot]`
-   * control), because the thread layer, the membrane census and the tutorial
-   * all reach for them by name.
+   * Every attribute the thread layer, membrane census and tutorial reach for
+   * survives (`data-slot`, `data-no`, `data-block-id`, `.slot-pin`,
+   * `[data-op=unslot]`). The visible number comes from the skin via
+   * `data-label`, so the semantic slot number remains stable for callers that
+   * already read `data-no`.
    */
   function buildSeat(cell: SlotCell, blockId: string, chars?: number): HTMLElement {
-    const node = el('span', 'slot filled')
+    const node = el('div', 'slot filled')
     const no = pad2(cell.slot + 1)
     node.dataset.slot = String(cell.slot)
     node.dataset.no = no
+    node.dataset.label = `칸 ${cell.slot + 1}`
     // I1 (spec-client §3 inv 3): the slot holds an authored ID, and the pin
     // anchor carries the same one — u8's RedThread pins to it.
     node.dataset.blockId = blockId
@@ -379,28 +361,17 @@ export function createSlotBoard(options: SlotBoardOptions): SlotBoard {
     return node
   }
 
-  /**
-   * The blank — ONE of them, and only while the file is empty (민서, 08-08).
-   *
-   * Four permanent boxes were four promises the file kept whether or not the
-   * operator had anything to put in them. The cap is not lost with them: the
-   * deploy zone's `#slotCount` has always printed `0 / 4` a few lines below, and
-   * that is where the remaining seats are read now.
-   *
-   * It stays a real `<button>` so the `slot` op is reachable by keyboard alone
-   * (inv 1 + PRD §4 a11y) — Enter and Space both fire its click — and it seats
-   * into `firstFree()`, which on an empty board is seat 0.
-   */
-  function buildBlank(): HTMLElement {
+  /** One empty slot row. Unlocked blanks are buttons so keyboard slotting remains complete. */
+  function buildBlank(cell: SlotCell, inert = false): HTMLElement {
     const node = el('div', 'slot slot-blank')
-    const seat = firstFree() ?? 0
-    const no = pad2(seat + 1)
-    node.dataset.slot = String(seat)
+    const no = pad2(cell.slot + 1)
+    node.dataset.slot = String(cell.slot)
     node.dataset.no = no
+    node.dataset.label = `칸 ${cell.slot + 1}`
 
-    if (deployed) {
+    if (deployed || inert) {
       node.classList.add('locked')
-      node.append(el('div', 'slot-empty', LOCKED_HINT))
+      node.append(el('div', 'slot-empty', deployed ? LOCKED_HINT : EMPTY_HINT))
       return node
     }
 
@@ -413,7 +384,7 @@ export function createSlotBoard(options: SlotBoardOptions): SlotBoard {
       const armed = pickedBlockId()
       if (armed === null) return
       setPickedBlockId(null)
-      apply({ kind: 'place', blockId: armed, slot: seat })
+      apply({ kind: 'place', blockId: armed, slot: cell.slot })
     })
     node.addEventListener('dragover', (event) => {
       event.preventDefault()
@@ -424,7 +395,7 @@ export function createSlotBoard(options: SlotBoardOptions): SlotBoard {
       event.preventDefault()
       node.classList.remove('droppable')
       const dropped = event.dataTransfer?.getData('text/plain') ?? ''
-      if (dropped.length > 0) apply({ kind: 'place', blockId: dropped, slot: seat })
+      if (dropped.length > 0) apply({ kind: 'place', blockId: dropped, slot: cell.slot })
     })
 
     return node
@@ -432,27 +403,27 @@ export function createSlotBoard(options: SlotBoardOptions): SlotBoard {
 
   function render(): void {
     root.dataset.state = boardState(slots, deployed)
-    const filled = slotCells(slots).flatMap((cell) =>
-      cell.blockId === null ? [] : [{ cell, blockId: cell.blockId }],
-    )
+    const cells = slotCells(slots)
+    const filled = cells.flatMap((cell) => (cell.blockId === null ? [] : [{ cell, blockId: cell.blockId }]))
     // H3 — mid-reveal, the page carries the rows that have landed and the one
-    // being typed, and nothing past it. `reveal.row` indexes the FILLED rows in
-    // page order, not the slot numbers: a handover of two sentences seated in
-    // slots 1 and 3 types as row 0 then row 1, and each keeps its own `01`/`03`.
-    const seated = (
-      reveal === null ? filled : filled.slice(0, reveal.row + 1)
-    ).map(({ cell, blockId }, index) =>
-      reveal !== null && index === reveal.row
-        ? buildSeat(cell, blockId, reveal.chars)
-        : buildSeat(cell, blockId),
+    // being typed; future handed-over rows keep their slot row but not their
+    // sentence yet. `reveal.row` indexes FILLED rows in page order, not slot
+    // numbers: two sentences seated in slots 1 and 3 type as row 0 then row 1.
+    const visibleFilled = reveal === null ? filled : filled.slice(0, reveal.row + 1)
+    const visibleBySlot = new Map(visibleFilled.map(({ cell, blockId }, index) => [cell.slot, { blockId, index }]))
+
+    root.replaceChildren(
+      ...cells.map((cell) => {
+        if (reveal !== null) {
+          const visible = visibleBySlot.get(cell.slot)
+          if (visible === undefined) return buildBlank(cell, true)
+          return visible.index === reveal.row
+            ? buildSeat(cell, visible.blockId, reveal.chars)
+            : buildSeat(cell, visible.blockId)
+        }
+        return cell.blockId === null ? buildBlank(cell) : buildSeat(cell, cell.blockId)
+      }),
     )
-    // Built element by element, the runs would abut with no separator and the
-    // paragraph would read `…앉힙니다해제02…`. The same whitespace-text-node
-    // trick `components/dossier.ts` uses, and for the same reason.
-    const flow: Node[] = seated.flatMap((node, index) =>
-      index === 0 ? [node] : [document.createTextNode(' '), node],
-    )
-    root.replaceChildren(...(seated.length === 0 ? [buildBlank()] : flow))
   }
 
   /**
