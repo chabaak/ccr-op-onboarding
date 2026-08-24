@@ -64,9 +64,9 @@ import { must } from './dom.ts'
 const DEPLOY = '#btnDeploy'
 const FEED_WIN = '#w-feed'
 const REP_WIN = '#w-rep'
-/** The former document titles, now row tags inside the single REPORTS surface. */
-const FACTS_TAG = '#w-rep #factsList .rep-stamp'
-const BODY_TAG = '#w-rep #bodyList .rep-stamp'
+/** The former document titles, now row groups inside the single REPORTS surface. */
+const FACTS_GROUP = '#w-rep #factsList'
+const BODY_GROUP = '#w-rep #bodyList'
 /** The first sentence in each tagged row group. */
 const FIRST_FACT = '#w-rep #factsList [data-sentence-id]'
 const FIRST_BODY = '#w-rep #bodyList [data-sentence-id]'
@@ -103,17 +103,27 @@ const HANDOVER = '#w-file [data-sect="handover"]'
 /** The control that takes a seated sentence back out. */
 const UNSET = '#w-file .slot-unset'
 
+export interface TutorialAnchor {
+  readonly name: string
+  readonly selector: string
+  readonly unique?: boolean
+}
+
 export const TUTORIAL_ANCHORS = [
-  { name: 'deploy', selector: DEPLOY },
-  { name: 'live feed window', selector: FEED_WIN },
-  { name: 'reports window', selector: REP_WIN },
-  { name: 'facts row tag', selector: FACTS_TAG },
-  { name: 'radio row tag', selector: BODY_TAG },
+  { name: 'deploy', selector: DEPLOY, unique: true },
+  { name: 'live feed window', selector: FEED_WIN, unique: true },
+  { name: 'reports window', selector: REP_WIN, unique: true },
+  { name: 'facts row group', selector: FACTS_GROUP, unique: true },
+  { name: 'radio row group', selector: BODY_GROUP, unique: true },
   { name: 'first fact sentence', selector: FIRST_FACT },
   { name: 'first radio sentence', selector: FIRST_BODY },
-  { name: 'handover section', selector: HANDOVER },
+  { name: 'handover section', selector: HANDOVER, unique: true },
   { name: 'unset control', selector: UNSET },
-] as const
+] as const satisfies readonly TutorialAnchor[]
+
+const TUTORIAL_ANCHOR_BY_SELECTOR = new Map<string, TutorialAnchor>(
+  TUTORIAL_ANCHORS.map((anchor) => [anchor.selector, anchor]),
+)
 
 /* ── who gets the walk ───────────────────────────────────────────────────── */
 
@@ -166,12 +176,15 @@ function appears(selector: string): Promise<void> {
 }
 
 export interface TutorialAnchorRoot {
-  querySelector(selector: string): Element | null
+  querySelectorAll(selector: string): { readonly length: number }
 }
 
-export function requireTutorialAnchor(root: TutorialAnchorRoot, selector: string): void {
-  if (root.querySelector(selector) !== null) return
-  throw new Error(`tutorial anchor missing: ${selector}`)
+export function requireTutorialAnchor(root: TutorialAnchorRoot, selector: string, anchor?: TutorialAnchor): void {
+  const count = root.querySelectorAll(selector).length
+  if (count === 0) throw new Error(`tutorial anchor missing: ${selector}`)
+  if (anchor?.unique === true && count !== 1) {
+    throw new Error(`tutorial anchor not unique: ${selector} (${count} matches)`)
+  }
 }
 
 /** Resolves on the first stream event the predicate accepts. */
@@ -350,7 +363,7 @@ export async function runTutorial(ports: TutorialPorts): Promise<void> {
     // somewhere else.
     //
     // So the whole tail of the walk hangs off `dayFiled`, and the run of plates
-    // 2 → 5 is the debrief: the window, the two row tags in it, and the gesture
+    // 2 → 5 is the debrief: the window, the two row groups in it, and the gesture
     // that moves a sentence out of them. `report` is no longer subscribed to at
     // all — the record's own DOM is what says the day produced something, which
     // is also the only thing these four plates actually need to be true.
@@ -362,15 +375,15 @@ export async function runTutorial(ports: TutorialPorts): Promise<void> {
       mark: { target: REP_WIN, says: '요원의 보고를 확인하세요', side: 'right' },
     },
 
-    // 3 — the first row tag. `dayFiled` already guarantees the group has
+    // 3 — the first row group. `dayFiled` already guarantees the group has
     // something in it, so a plate explaining the tag cannot be raised over an
     // empty group and say the opposite of what it means.
     {
-      mark: { target: FACTS_TAG, says: '현장 기록 태그는 확인된 사실입니다', side: 'right' },
+      mark: { target: FACTS_GROUP, says: '현장 기록 태그는 확인된 사실입니다', side: 'right' },
     },
 
-    // 4 — the other row tag, and the difference between the tags is the lesson.
-    { mark: { target: BODY_TAG, says: '무전 기록 태그는 요원의 판단입니다', side: 'right' } },
+    // 4 — the other row group, and the difference between the tags is the lesson.
+    { mark: { target: BODY_GROUP, says: '무전 기록 태그는 요원의 판단입니다', side: 'right' } },
 
     // 5 — the gesture, pointed at a SENTENCE rather than at the column, because
     // a sentence is the unit that moves. It points at the first line of 무전
@@ -420,7 +433,7 @@ export async function runTutorial(ports: TutorialPorts): Promise<void> {
   try {
     for (const beat of walk) {
       if (beat.after !== undefined) await beat.after
-      requireTutorialAnchor(document, beat.mark.target)
+      requireTutorialAnchor(document, beat.mark.target, TUTORIAL_ANCHOR_BY_SELECTOR.get(beat.mark.target))
       // The skip is checked on every plate and nowhere else: 튜토리얼 건너뛰기
       // ends the WALK, so the loop returns out of the middle of the table and
       // the `finally` below takes the layer with it. `'closed'` and

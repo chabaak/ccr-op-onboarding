@@ -56,8 +56,8 @@ const DEPLOY = '#btnDeploy'
 const PAGE_NEXT = '#w-file .pg-nav .pg-next'
 const FEED_WIN = '#w-feed'
 const REP_WIN = '#w-rep'
-const FACTS_TAG = '#w-rep #factsList .rep-stamp'
-const BODY_TAG = '#w-rep #bodyList .rep-stamp'
+const FACTS_GROUP = '#w-rep #factsList'
+const BODY_GROUP = '#w-rep #bodyList'
 const FIRST_FACT = '#w-rep #factsList [data-sentence-id]'
 const FIRST_BODY = '#w-rep #bodyList [data-sentence-id]'
 const HANDOVER = '#w-file [data-sect="handover"]'
@@ -329,7 +329,7 @@ test.describe('[x3] the walk says what the operator needs next', () => {
     // therefore leave NO plate on the desk — plates 2 and 3 are both waiting.
     // Asserted as a COUNT and not as "not that text": the layer rebuilds the
     // plate per mark, so in the gap there is no `#coachSays` to have text at all.
-    // The 현장 기록 TAG is created with the first row, not boot furniture. What
+    // The 현장 기록 GROUP receives the first row, not boot furniture. What
     // is empty this early is the tagged group, which is the thing the gate is
     // protecting the copy from.
     await expect(page.locator(FIRST_FACT)).toHaveCount(0)
@@ -346,13 +346,13 @@ test.describe('[x3] the walk says what the operator needs next', () => {
     await plate(page, SAID[1]!, DAY_MS)
     await expect(page.locator(REP_WIN)).toBeVisible()
 
-    // 3 — the record tag is on the page by the time its plate names it.
+    // 3 — the record group is on the page by the time its plate names it.
     await acknowledge(page, SAID[2]!, DAY_MS)
-    await expect(page.locator(FACTS_TAG).first()).toBeVisible({ timeout: DAY_MS })
+    await expect(page.locator(FACTS_GROUP)).toBeVisible({ timeout: DAY_MS })
 
-    // 4 — the other row tag. The difference between the two is the lesson.
+    // 4 — the other row group. The difference between the two is the lesson.
     await acknowledge(page, SAID[3]!)
-    await expect(page.locator(BODY_TAG).first()).toBeVisible({ timeout: DAY_MS })
+    await expect(page.locator(BODY_GROUP)).toBeVisible({ timeout: DAY_MS })
 
     // NOT asserted, and deliberately: that plate 3 waits specifically for
     // `run_end` as distinct from the report. The fixture day files its one

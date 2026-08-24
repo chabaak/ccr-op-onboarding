@@ -97,7 +97,7 @@ function zIndexOf(sheet: string, selector: string): number {
   return Number(rule![1])
 }
 
-function sourceBackedTutorialAnchors(): Set<string> {
+function sourceBackedTutorialAnchors(): Map<string, number> {
   const deployButton = code(DEPLOY_BUTTON_TS)
   const dossier = code(DOSSIER_TS)
   const minableSentence = code(MINABLE_SENTENCE_TS)
@@ -112,23 +112,25 @@ function sourceBackedTutorialAnchors(): Set<string> {
   const hasHandoverSection =
     /slug\s*:\s*'handover'/.test(dossier) && /node\.dataset\.sect\s*=\s*section\.slug/.test(dossier)
 
-  const backed = new Set<string>()
-  if (/\.id\s*=\s*'btnDeploy'/.test(deployButton)) backed.add('#btnDeploy')
-  if (hasWindow('w-feed')) backed.add('#w-feed')
-  if (hasWindow('w-rep')) backed.add('#w-rep')
-  if (hasWindow('w-file') && hasHandoverSection) backed.add('#w-file [data-sect="handover"]')
-  if (hasWindow('w-file') && /button\s*\(\s*'slot-unset'/.test(slotBoard)) backed.add('#w-file .slot-unset')
+  const backed = new Map<string, number>()
+  if (/\.id\s*=\s*'btnDeploy'/.test(deployButton)) backed.set('#btnDeploy', 1)
+  if (hasWindow('w-feed')) backed.set('#w-feed', 1)
+  if (hasWindow('w-rep')) backed.set('#w-rep', 1)
+  if (hasWindow('w-file') && hasHandoverSection) backed.set('#w-file [data-sect="handover"]', 1)
+  if (hasWindow('w-file') && /button\s*\(\s*'slot-unset'/.test(slotBoard)) backed.set('#w-file .slot-unset', 2)
+  if (hasWindow('w-rep') && hasReportGroup('factsList')) backed.set('#w-rep #factsList', 1)
+  if (hasWindow('w-rep') && hasReportGroup('bodyList')) backed.set('#w-rep #bodyList', 1)
   if (hasWindow('w-rep') && hasReportGroup('factsList') && hasReportStamp) {
-    backed.add('#w-rep #factsList .rep-stamp')
+    backed.set('#w-rep #factsList .rep-stamp', 2)
   }
   if (hasWindow('w-rep') && hasReportGroup('bodyList') && hasReportStamp) {
-    backed.add('#w-rep #bodyList .rep-stamp')
+    backed.set('#w-rep #bodyList .rep-stamp', 2)
   }
   if (hasWindow('w-rep') && hasReportGroup('factsList') && hasSentenceId) {
-    backed.add('#w-rep #factsList [data-sentence-id]')
+    backed.set('#w-rep #factsList [data-sentence-id]', 2)
   }
   if (hasWindow('w-rep') && hasReportGroup('bodyList') && hasSentenceId) {
-    backed.add('#w-rep #bodyList [data-sentence-id]')
+    backed.set('#w-rep #bodyList [data-sentence-id]', 2)
   }
   return backed
 }
@@ -239,16 +241,16 @@ describe('[x3] the walk can only watch — the clause the rewrite did not spend'
 })
 
 describe('[issue #137] missing tutorial anchors fail where they break', () => {
-  it('(a) the walk target list is explicit and uses current row-tag handles', () => {
+  it('(a) the walk target list is explicit and uses current row-group handles', () => {
     expect(TUTORIAL_ANCHORS).toEqual([
-      { name: 'deploy', selector: '#btnDeploy' },
-      { name: 'live feed window', selector: '#w-feed' },
-      { name: 'reports window', selector: '#w-rep' },
-      { name: 'facts row tag', selector: '#w-rep #factsList .rep-stamp' },
-      { name: 'radio row tag', selector: '#w-rep #bodyList .rep-stamp' },
+      { name: 'deploy', selector: '#btnDeploy', unique: true },
+      { name: 'live feed window', selector: '#w-feed', unique: true },
+      { name: 'reports window', selector: '#w-rep', unique: true },
+      { name: 'facts row group', selector: '#w-rep #factsList', unique: true },
+      { name: 'radio row group', selector: '#w-rep #bodyList', unique: true },
       { name: 'first fact sentence', selector: '#w-rep #factsList [data-sentence-id]' },
       { name: 'first radio sentence', selector: '#w-rep #bodyList [data-sentence-id]' },
-      { name: 'handover section', selector: '#w-file [data-sect="handover"]' },
+      { name: 'handover section', selector: '#w-file [data-sect="handover"]', unique: true },
       { name: 'unset control', selector: '#w-file .slot-unset' },
     ])
   })
@@ -256,33 +258,41 @@ describe('[issue #137] missing tutorial anchors fail where they break', () => {
   it('(b) current desk sources back every walk anchor under npm test', () => {
     const backed = sourceBackedTutorialAnchors()
     const root = {
-      querySelector: (selector: string): Element | null => (backed.has(selector) ? ({} as Element) : null),
+      querySelectorAll: (selector: string): { readonly length: number } => ({ length: backed.get(selector) ?? 0 }),
     }
 
-    for (const { selector } of TUTORIAL_ANCHORS) {
-      expect(() => requireTutorialAnchor(root, selector), selector).not.toThrow()
+    for (const anchor of TUTORIAL_ANCHORS) {
+      expect(() => requireTutorialAnchor(root, anchor.selector, anchor), anchor.selector).not.toThrow()
     }
   })
 
   it('(c) a missing anchor throws with the selector named', () => {
-    const root = { querySelector: (): Element | null => null }
-    expect(() => requireTutorialAnchor(root, '#w-rep #factsList .rep-stamp')).toThrow(
-      'tutorial anchor missing: #w-rep #factsList .rep-stamp',
+    const root = { querySelectorAll: (): { readonly length: number } => ({ length: 0 }) }
+    expect(() => requireTutorialAnchor(root, '#w-rep #factsList')).toThrow(
+      'tutorial anchor missing: #w-rep #factsList',
     )
   })
 
-  it('(d) a present anchor returns without shortening the walk', () => {
-    const root = {
-      querySelector: (selector: string): Element | null =>
-        selector === '#w-rep #factsList .rep-stamp' ? ({} as Element) : null,
-    }
-    expect(() => requireTutorialAnchor(root, '#w-rep #factsList .rep-stamp')).not.toThrow()
+  it('(d) a repeated unique anchor throws with the selector and match count', () => {
+    const root = { querySelectorAll: (): { readonly length: number } => ({ length: 2 }) }
+    expect(() =>
+      requireTutorialAnchor(root, '#w-rep #factsList .rep-stamp', {
+        name: 'broken',
+        selector: '#w-rep #factsList .rep-stamp',
+        unique: true,
+      }),
+    ).toThrow('tutorial anchor not unique: #w-rep #factsList .rep-stamp (2 matches)')
   })
 
-  it('(e) every plate checks its target before it is shown', () => {
+  it('(e) a present non-unique anchor returns without shortening the walk', () => {
+    const root = { querySelectorAll: (): { readonly length: number } => ({ length: 2 }) }
+    expect(() => requireTutorialAnchor(root, '#w-rep #factsList [data-sentence-id]')).not.toThrow()
+  })
+
+  it('(f) every plate checks its target before it is shown', () => {
     const src = code(TUTORIAL_TS)
     expect(src, 'the walk no longer checks the target before showing the plate').toMatch(
-      /requireTutorialAnchor\s*\(\s*document\s*,\s*beat\.mark\.target\s*\)[\s\S]*?coach\.show\s*\(\s*beat\.mark/,
+      /requireTutorialAnchor\s*\(\s*document\s*,\s*beat\.mark\.target\s*,\s*TUTORIAL_ANCHOR_BY_SELECTOR\.get\s*\(\s*beat\.mark\.target\s*\)\s*\)[\s\S]*?coach\.show\s*\(\s*beat\.mark/,
     )
   })
 })
