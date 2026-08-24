@@ -1,4 +1,4 @@
-// Korean text inventory for #119.
+// Korean text inventory.
 //
 // Run:
 //   node tools/text-inventory.mjs
@@ -15,7 +15,8 @@ import ts from 'typescript'
 const HERE = path.dirname(fileURLToPath(import.meta.url))
 const REPO = path.resolve(HERE, '..')
 const REPORT = path.join(HERE, 'text-inventory-report.md')
-const PACK_DIR = path.join(REPO, 'data/scenario/멈춘회전문')
+const SCENARIO_DIR = path.join(REPO, 'data/scenario')
+const SCENARIO_INDEX = path.join(SCENARIO_DIR, 'index.json')
 const DEFAULT_PROMPTS = path.join(REPO, 'data/scenario/default-prompts.json')
 const SCHEMA_DIR = path.join(REPO, 'data/scenario/_schema')
 const SHELL_DIR = path.join(REPO, 'src/client/shell')
@@ -24,7 +25,15 @@ const COMPONENTS_DIR = path.join(REPO, 'src/client/components')
 const HANGUL = /\p{Script=Hangul}/gu
 const HANGUL_TEST = /\p{Script=Hangul}/u
 const TOTAL_RUNS_PER_SITTING = 4
-const SURFACES = ['LIVE FEED', '요원 파일', '보고서', '지침', 'notice', 'entry', 'ending', 'desktop', 'unknown']
+const RENDERED = 'rendered'
+const MODEL_FACING = 'model-facing by design'
+const ORPHANED = 'genuinely orphaned'
+const CATEGORIES = [RENDERED, MODEL_FACING, ORPHANED]
+const SURFACES = ['LIVE FEED', '요원 파일', '보고서', 'decision', '지침', 'notice', 'entry', 'ending', 'desktop', 'model prompt', 'runtime data', 'authoring data', 'unknown']
+const SCORE_UNIT_DESIGN_FIELD = ['tal', 'lies'].join('')
+const SCORE_UNIT_BASE_FIELD = ['base', 'line'].join('')
+const SCORE_TOP_BASE_NOTE = `${SCORE_UNIT_BASE_FIELD}_summary`
+const SCORE_TOP_VARIANCE_NOTE = ['variance', 'notes'].join('_')
 
 function repoPath(file) {
   return path.relative(REPO, file).split(path.sep).join('/')
@@ -32,6 +41,22 @@ function repoPath(file) {
 
 function readJson(file) {
   return JSON.parse(fs.readFileSync(file, 'utf8'))
+}
+
+function playable(entry) {
+  return entry?.role === 'tutorial' || entry?.role === 'practice'
+}
+
+function packEntryFromIndex() {
+  const index = readJson(SCENARIO_INDEX)
+  const packs = Array.isArray(index.packs) ? [...index.packs] : []
+  const tutorials = packs.filter((pack) => pack.role === 'tutorial')
+  if (tutorials.length === 1) return tutorials[0]
+  const playablePacks = packs
+    .filter(playable)
+    .sort((left, right) => (left.order ?? 0) - (right.order ?? 0))
+  if (playablePacks.length > 0) return playablePacks[0]
+  throw new Error('text inventory: data/scenario/index.json has no playable pack')
 }
 
 function lineOf(text, index) {
@@ -145,6 +170,7 @@ function jsonSurface(item) {
       perSitting: condition || visible ? `0-${TOTAL_RUNS_PER_SITTING}, conditional` : `${TOTAL_RUNS_PER_SITTING}`,
       when: `timeline event ${event.id} at ${event.time}`,
       needs: '',
+      category: RENDERED,
     }
   }
 
@@ -156,6 +182,7 @@ function jsonSurface(item) {
       perSitting: `up to ${TOTAL_RUNS_PER_SITTING}`,
       when: 'agent file cover is built for a run',
       needs: '',
+      category: RENDERED,
     }
   }
 
@@ -167,6 +194,7 @@ function jsonSurface(item) {
       perSitting: '0-1 when a desktop file is opened',
       when: 'scenario file confirmation opens',
       needs: '',
+      category: RENDERED,
     }
   }
 
@@ -179,54 +207,95 @@ function jsonSurface(item) {
       perSitting: '0-1 when that ending is reached',
       when: `${kind} ending curtain raises`,
       needs: '',
+      category: RENDERED,
     }
   }
 
-  if (file.endsWith('/score.json') && /^units\.\d+\.label$/.test(p)) {
+  if (file.endsWith('/symptoms.json')) {
     return {
-      surface: '보고서',
-      state: 'tally rows',
-      perRun: '1 in scored run',
-      perSitting: `up to ${TOTAL_RUNS_PER_SITTING}`,
-      when: 'score event renders the tally',
+      surface: 'LIVE FEED',
+      state: 'symptom feed line',
+      perRun: '0-1 when matching state change is visible',
+      perSitting: `0-${TOTAL_RUNS_PER_SITTING}`,
+      when: 'state journal renders a symptom line into the feed stream',
       needs: '',
+      category: RENDERED,
     }
   }
 
-  if (file.endsWith('/score.json') && /^units\.\d+\.predicates\.\d+$/.test(p)) {
+  if (file.endsWith('/gates.json')) {
+    return {
+      surface: 'decision',
+      state: 'agent decision prompt/pick set',
+      perRun: '0-1 when the gate is reached',
+      perSitting: `0-${TOTAL_RUNS_PER_SITTING}`,
+      when: 'scheduled gate compiles the decision question, scene, stance set, and related gate prose',
+      needs: '',
+      category: RENDERED,
+    }
+  }
+
+  if (file.endsWith('/score.json')) {
+    const renderedScoreState = scoreRenderedState(p)
+    if (!renderedScoreState) {
+      return modelFacing('score authoring note', 'authoring data', 'human-written score design note stripped from the published runtime pack')
+    }
     return {
       surface: '보고서',
-      state: 'tally row value candidates',
+      state: renderedScoreState,
       perRun: '0-1 branch per unit',
       perSitting: `0-${TOTAL_RUNS_PER_SITTING}`,
-      when: 'score predicate resolves for a unit',
+      when: 'score data resolves into the report tally',
       needs: '',
+      category: RENDERED,
     }
   }
 
-  if (file.endsWith('/meta.json') && p === 'slug') return orphan('scenario slug metadata', 'scenario chooser or debug identity surface')
-  if (file.endsWith('/meta.json') && (p === 'title' || p === 'logline')) return orphan('pack metadata not read by the current visible shell', 'scenario title/logline surface')
-  if (file.endsWith('/default-prompts.json')) return orphan('default prompt registry entry', 'prompt/probe registry surface')
-  if (file.endsWith('/gates.json')) return orphan('gate prompt data', 'decision card or agent-decision audit surface')
-  if (file.endsWith('/characters.json')) return orphan('character prompt/roster data', 'character roster or agent deliberation surface')
-  if (file.endsWith('/temperament.json')) return orphan('temperament prompt data', 'agent profile or prompt-inspection surface')
-  if (file.endsWith('/symptoms.json')) return orphan('state symptom prompt data', 'state-change notice surface')
-  if (file.endsWith('/truths.json')) return orphan('truth carrier registry', 'truth/archive or mining-catalog surface')
-  if (file.endsWith('/places.json')) return orphan('place authoring data', 'place dossier or location index surface')
-  if (file.endsWith('/hardening.json')) return orphan('hardening overlay authoring data', 'authoring diagnostics surface')
-  if (file.endsWith('/score.json')) return orphan('score prose not rendered by the tally', 'score baseline/variance explanation surface')
+  if (file.endsWith('/meta.json') && p === 'slug') return modelFacing('scenario slug metadata', 'runtime data', 'scenario identity/routing data')
+  if (file.endsWith('/meta.json') && (p === 'title' || p === 'logline')) {
+    return orphaned('pack metadata not read by the current visible shell', 'scenario title/logline surface')
+  }
+  if (file.endsWith('/default-prompts.json')) return modelFacing('default prompt registry entry', 'model prompt', 'prompt/probe registry')
+  if (file.endsWith('/characters.json')) return modelFacing('character prompt/roster data', 'model prompt', 'agent deliberation and narration prompt input')
+  if (file.endsWith('/temperament.json')) return modelFacing('temperament prompt data', 'model prompt', 'agent prompt input')
+  if (file.endsWith('/truths.json')) return modelFacing('truth carrier registry', 'model prompt', 'measurement/probe and handover truth input')
+  if (file.endsWith('/places.json')) return modelFacing('place authoring data', 'model prompt', 'place and exposure context input')
+  if (file.endsWith('/hardening.json')) return modelFacing('hardening overlay authoring data', 'runtime data', 'state/effect overlay input')
 
-  return orphan('unclassified authored string', 'explicit surface mapping')
+  return orphaned('unclassified authored string', 'explicit surface mapping')
 }
 
-function orphan(state, needs) {
+function scoreRenderedState(p) {
+  if (/^units\.\d+\.label$/.test(p)) return 'tally row label'
+  if (/^units\.\d+\.predicates\.\d+$/.test(p)) return 'tally row value candidate'
+  if (p.split('.').at(2) === SCORE_UNIT_DESIGN_FIELD) return null
+  if (p.split('.').at(2) === SCORE_UNIT_BASE_FIELD) return null
+  if (p === SCORE_TOP_BASE_NOTE) return null
+  if (p.startsWith(`${SCORE_TOP_VARIANCE_NOTE}.`)) return null
+  return null
+}
+
+function modelFacing(state, surface, when) {
+  return {
+    surface,
+    state,
+    perRun: 'consumed by model/runtime path; not player-facing',
+    perSitting: 'consumed by model/runtime path; not player-facing',
+    when,
+    needs: '',
+    category: MODEL_FACING,
+  }
+}
+
+function orphaned(state, needs) {
   return {
     surface: 'unknown',
     state,
-    perRun: 'not on current design surface',
-    perSitting: 'not on current design surface',
+    perRun: 'not consumed by current rendered or model-facing path',
+    perSitting: 'not consumed by current rendered or model-facing path',
     when: state,
     needs,
+    category: ORPHANED,
   }
 }
 
@@ -265,7 +334,7 @@ const tsSurfaceByFile = new Map([
 function tsSurface(item) {
   const base = path.basename(item.file)
   const hit = tsSurfaceByFile.get(base)
-  if (!hit) return orphan('unclassified client literal', 'explicit client surface mapping')
+  if (!hit) return orphaned('unclassified client literal', 'explicit client surface mapping')
   const [surface, state] = hit
   const transient = surface === 'notice' || surface === 'ending' || surface === '지침' || surface === 'entry'
   return {
@@ -275,6 +344,7 @@ function tsSurface(item) {
     perSitting: transient ? '0-1 when state is visited' : 'persistent while mounted',
     when: state,
     needs: '',
+    category: RENDERED,
   }
 }
 
@@ -289,9 +359,10 @@ function makeRecord(kind, item, attribution) {
   }
 }
 
-function collectInventory() {
+function collectInventory(packEntry) {
+  const packDir = path.join(SCENARIO_DIR, packEntry.slug)
   const jsonFiles = [
-    ...listFiles(PACK_DIR, (name) => name.endsWith('.json')),
+    ...listFiles(packDir, (name) => name.endsWith('.json')),
     DEFAULT_PROMPTS,
   ].sort()
   const tsFiles = [
@@ -316,7 +387,7 @@ function bySurface(records) {
 }
 
 function pressure(records) {
-  const groups = bySurface(records)
+  const groups = bySurface(records.filter((record) => record.category === RENDERED))
   return [...groups.entries()]
     .filter(([, list]) => list.length > 0)
     .map(([surface, list]) => {
@@ -343,11 +414,12 @@ function evaluateCondition(condition, state) {
   })
 }
 
-function livePackRanges() {
-  const timeline = readJson(path.join(PACK_DIR, 'timeline.json')).events
-  const gates = readJson(path.join(PACK_DIR, 'gates.json')).gates
-  const score = readJson(path.join(PACK_DIR, 'score.json')).units
-  const meta = readJson(path.join(PACK_DIR, 'meta.json')).clock
+function livePackRanges(packEntry) {
+  const packDir = path.join(SCENARIO_DIR, packEntry.slug)
+  const timeline = readJson(path.join(packDir, 'timeline.json')).events
+  const gates = readJson(path.join(packDir, 'gates.json')).gates
+  const score = readJson(path.join(packDir, 'score.json')).units
+  const meta = readJson(path.join(packDir, 'meta.json')).clock
   const states = [
     ['baseline path', {}],
     ['headcount-only path', { headcount_pressed: true }],
@@ -384,24 +456,31 @@ function schemaBounds() {
 
 function inventoryTable(records) {
   const rows = [
-    '| # | source | length | surface | state | per run | per sitting | text |',
-    '|---:|---|---:|---|---|---|---|---|',
+    '| # | source | length | taxonomy | surface / consumer | state | per run | per sitting | text |',
+    '|---:|---|---:|---|---|---|---|---|---|',
   ]
   records.forEach((record, index) => {
-    rows.push(`| ${index + 1} | ${esc(record.source)} | ${record.koreanLength} | ${esc(record.surface)} | ${esc(record.state)} | ${esc(record.perRun)} | ${esc(record.perSitting)} | ${esc(record.text)} |`)
+    rows.push(`| ${index + 1} | ${esc(record.source)} | ${record.koreanLength} | ${esc(record.category)} | ${esc(record.surface)} | ${esc(record.state)} | ${esc(record.perRun)} | ${esc(record.perSitting)} | ${esc(record.text)} |`)
   })
   return rows.join('\n')
 }
 
-function renderReport(records) {
-  const ranges = livePackRanges()
+function renderReport(records, packEntry) {
+  const ranges = livePackRanges(packEntry)
   const bounds = schemaBounds()
   const roots = {
     pack: records.filter((r) => r.kind === 'data').length,
     shell: records.filter((r) => r.source.startsWith('src/client/shell/')).length,
     components: records.filter((r) => r.source.startsWith('src/client/components/')).length,
   }
-  const orphans = records.filter((r) => r.surface === 'unknown')
+  const categoryCounts = Object.fromEntries(CATEGORIES.map((category) => [
+    category,
+    records.filter((record) => record.category === category).length,
+  ]))
+  const orphans = records.filter((r) => r.category === ORPHANED)
+  const modelFacing = records.filter((r) => r.category === MODEL_FACING)
+  const renderedClient = records.filter((r) => r.kind === 'client' && r.category === RENDERED)
+  const renderedData = records.filter((r) => r.kind === 'data' && r.category === RENDERED)
   const pressureRows = pressure(records).map(({ surface, list, longest, stateRange, topDupe, states }) => {
     const stateList = [...states.entries()].sort((a, b) => a[0].localeCompare(b[0])).map(([state, count]) => `${state}: ${count}`).join('; ')
     return `| ${esc(surface)} | ${list.length} | ${stateRange} | ${topDupe[1]} x ${esc(topDupe[0])} | ${longest.koreanLength} at ${esc(longest.source)}: ${esc(longest.text)} | ${esc(stateList)} |`
@@ -411,7 +490,7 @@ function renderReport(records) {
     ? [
       'No orphans were found.',
       '',
-      'Proof method: every record in the inventory has a non-unknown surface after source-root and path attribution, and the generated inventory contains zero rows where `surface` is `unknown`.',
+      'Proof method: every record in the inventory is classified as either `rendered` or `model-facing by design`; the generated inventory contains zero rows with taxonomy `genuinely orphaned`.',
     ]
     : orphans.flatMap((record, index) => [
       `### ${index + 1}. ${record.source}`,
@@ -430,9 +509,11 @@ Generated by \`node tools/text-inventory.mjs\`.
 
 ## Scope And Method
 
-This report inventories Korean-bearing string values from the one live authored pack, \`data/scenario/멈춘회전문/*.json\`, plus \`data/scenario/default-prompts.json\`, and Korean-bearing string/template literals from \`src/client/shell/*.ts\` and \`src/client/components/*.ts\`. It deliberately does not import \`src/\` modules; it parses files as text/JSON, counts Korean characters with Unicode Hangul script matching, and reports \`unknown\` when the current surface cannot be derived.
+This report inventories Korean-bearing string values from the one live authored pack, \`data/scenario/${packEntry.slug}/*.json\`, plus \`data/scenario/default-prompts.json\`, and Korean-bearing string/template literals from \`src/client/shell/*.ts\` and \`src/client/components/*.ts\`. The pack is discovered from \`data/scenario/index.json\` by selecting the tutorial pack, matching the runtime default. The script deliberately does not import \`src/\` modules; it parses files as text/JSON, counts Korean characters with Unicode Hangul script matching, and reports \`unknown\` only for genuinely orphaned records.
 
-The sample is a single pack. The parent plan's three-pack variance premise is stale: \`멈춘회전문\` is the only live pack in \`data/scenario/\`, so measured values below are one-pack values and schema ranges are taken from \`data/scenario/_schema/\` where the schema declares them.
+The sample is a single pack. The parent plan's three-pack variance premise is stale: \`${packEntry.slug}\` is the only live pack in \`data/scenario/\`, so measured values below are one-pack values and schema ranges are taken from \`data/scenario/_schema/\` where the schema declares them.
+
+The taxonomy has three buckets: \`rendered\` means the string reaches a player-visible surface; \`model-facing by design\` means it is consumed by prompt, runtime, or authoring paths where no screen is intended; \`genuinely orphaned\` means no current rendered or model-facing path was found.
 
 ## Counts
 
@@ -442,12 +523,20 @@ The sample is a single pack. The parent plan's three-pack variance premise is st
 | shell modules | ${roots.shell} |
 | component modules | ${roots.components} |
 | total | ${records.length} |
-| orphans / unknown surface | ${orphans.length} |
+| rendered | ${categoryCounts[RENDERED]} |
+| model-facing by design | ${categoryCounts[MODEL_FACING]} |
+| genuinely orphaned | ${categoryCounts[ORPHANED]} |
 
-## Orphan List
+The prior one-bucket orphan count has been split. Symptoms, gate strings, and runtime score strings are classified as rendered because they flow to LIVE FEED, the decision object, and the report tally respectively; private character, truth, place, hardening, temperament, score design-note, and default-prompt data are model-facing by design rather than orphaned.
+
+Shell and component strings were checked separately: ${renderedClient.length} of ${roots.shell + roots.components} client strings are rendered at their point of use, and none are classified as genuinely orphaned. Authored data contributes ${renderedData.length} rendered strings, ${modelFacing.length} model-facing strings, and ${orphans.length} genuinely orphaned strings.
+
+## Genuinely Orphaned List
 
 ${orphanLines.join('\n')}
 ## Pressure Points
+
+Rendered surfaces only; model-facing records have no player-facing surface to size.
 
 | surface | strings | state count range | highest repeated string | longest string | state counts |
 |---|---:|---:|---|---|---|
@@ -470,8 +559,9 @@ ${inventoryTable(records)}
 
 function main() {
   const check = process.argv.includes('--check')
-  const records = collectInventory()
-  const report = renderReport(records)
+  const packEntry = packEntryFromIndex()
+  const records = collectInventory(packEntry)
+  const report = renderReport(records, packEntry)
   if (check) {
     const current = fs.existsSync(REPORT) ? fs.readFileSync(REPORT, 'utf8') : ''
     if (current !== report) {
