@@ -33,6 +33,11 @@
 // The count-up survives, moved onto the closing line's number and given only
 // the time that line actually has (`countMs`) — see the cadence note below.
 //
+// x13 moves the host again: the visible record sits under AGENT FILE's DEPLOY
+// row, while REPORTS still opens and runs it from the `score` event so the
+// paper gate and event-local model stay there. The component remains the same
+// record printer; only the mount owner changed.
+//
 // Two things are deliberately NOT the reference's:
 //
 // - **The settle is derived, not the literal 1400 ms.** The reference's own
@@ -240,7 +245,14 @@ export interface ScoreTally {
 export interface ScoreTallyOptions {
   host: HTMLElement
   scheduler?: Scheduler
+  onOpen?: () => void
   onFinal?: () => void
+}
+
+let mounted: ScoreTally | null = null
+
+export function getScoreTally(): ScoreTally | null {
+  return mounted
 }
 
 export function createScoreTally(options: ScoreTallyOptions): ScoreTally {
@@ -356,14 +368,19 @@ export function createScoreTally(options: ScoreTallyOptions): ScoreTally {
 
   paint('pending')
 
-  return {
+  const api: ScoreTally = {
     root,
     state: () => state,
-    open: () => reset(),
+    open: () => {
+      reset()
+      options.onOpen?.()
+    },
     run,
     reset,
     // The open and the close are not axes: a caller asking "how many rows did
     // the day score" must not be handed two more than the seam sent.
     rows: () => lines.querySelectorAll('.tly-line:not(.tl-open):not(.tl-close)').length,
   }
+  mounted = api
+  return api
 }

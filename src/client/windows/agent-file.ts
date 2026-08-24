@@ -8,11 +8,11 @@
 //
 // U3 (playtest g3-1) — TALLY dissolves: this window also drives the day's
 // turn. `shell/run-state.ts`'s `'tally'` phase now means "the day is closed,
-// awaiting the turn", and its two surfaces are the terminal record (REPORTS)
-// and this window's merged deploy control. The hold/settle logic below is
-// ported from `windows/tally.ts` (deleted this unit) with its DOM targets
-// retargeted from the old wait line and its own new-run button onto the one
-// control `components/deploy-button.ts` now builds.
+// awaiting the turn", and its two surfaces are the tally under DEPLOY and this
+// window's merged deploy control. The hold/settle logic below is ported from
+// `windows/tally.ts` (deleted this unit) with its DOM targets retargeted from
+// the old wait line and its own new-run button onto the one control
+// `components/deploy-button.ts` now builds.
 //
 // Import-safe by contract (u3): no DOM at module scope, no stylesheet import,
 // no sibling window import, nothing from engine or composer (C8 / inv 12), and
@@ -22,7 +22,6 @@ import { animationsFrozen } from '../driver/index.ts'
 import { button, el, must } from '../shell/dom.ts'
 import { deployCopy, openConfirm } from '../shell/confirm.ts'
 import { announce } from '../shell/announcer.ts'
-import { feedReached } from '../shell/feed-reach.ts'
 import { fetchScenarioInPlay } from '../shell/pack-session.ts'
 import { PORTAL } from '../shell/portal-identity.ts'
 import { createRunState, hasFiledReport } from '../shell/run-state.ts'
@@ -40,7 +39,7 @@ import {
 import { SLOT_CAP, createSlotBoard, usedIds } from '../components/slot-board.ts'
 import { buildDeployStamp, buildDeployZone, deployView } from '../components/deploy-button.ts'
 import type { DeployMode } from '../components/deploy-button.ts'
-import { PACE, settleRelease } from '../components/score-tally.ts'
+import { PACE, createScoreTally, settleRelease } from '../components/score-tally.ts'
 
 // x6b — THE LAST PRINTED WAIT LINE (민서, 08-09, playtest).
 //
@@ -234,9 +233,7 @@ export function mount(host: HTMLElement, driver: FixtureDriver): void {
   let counted = false
   let lapsed = false
   let spent = false
-  let scoreSeen = false
   let hold: ReturnType<typeof setTimeout> | null = null
-  let countTimer: ReturnType<typeof setTimeout> | null = null
   /**
    * The control's note while the day is closed — blank across the hold since
    * x6b, then FILED_NOTE/LAPSED_TAIL/SPENT on the release. `deployView` cannot
@@ -527,6 +524,35 @@ export function mount(host: HTMLElement, driver: FixtureDriver): void {
   // `deployView` (design #5: the note is the one thing it cannot derive purely).
   const noteEl = zone.root.querySelector<HTMLElement>('#deployState')!
   const deployBtn = zone.root.querySelector<HTMLButtonElement>('#btnDeploy')!
+  const tallyRoot = el('article', 'terminal-record')
+  tallyRoot.setAttribute('aria-label', '시행 결과')
+  let tallyOpened = false
+  let tallyVisible = false
+
+  function showTally(): void {
+    tallyVisible = true
+    const page = zone.root.parentElement
+    if (page !== null && tally.root.parentElement !== page) page.append(tally.root)
+  }
+
+  function hideTally(): void {
+    tallyOpened = false
+    tallyVisible = false
+    tally.reset()
+    tally.root.remove()
+  }
+
+  const tally = createScoreTally({
+    host: tallyRoot,
+    onOpen: () => {
+      tallyOpened = true
+      if (closed) showTally()
+    },
+    onFinal: () => {
+      counted = true
+      settle()
+    },
+  })
   // C1 — the file is a document with pages, and exactly one page is mounted.
   // Page 0 is the cover: the document's own number and title, then everything
   // true of every agent. Page 1 is the agent on the desk, and it is the last
@@ -1140,6 +1166,7 @@ export function mount(host: HTMLElement, driver: FixtureDriver): void {
     agent.append(buildHead())
     agent.append(buildDossier(agentModel({ slotCap: SLOT_CAP, callsign: onDesk() }), board.root))
     agent.append(zone.root)
+    if (tallyVisible) agent.append(tally.root)
 
     return [cover, ...past, agent]
   }
@@ -1395,10 +1422,10 @@ export function mount(host: HTMLElement, driver: FixtureDriver): void {
       counted = false
       lapsed = false
       spent = false
-      scoreSeen = false
       armHold()
       // x6b — blank, not a wait line. See the note at the head of this file.
       settleNote = ''
+      if (tallyOpened) showTally()
       // H3 — …and the desk turns to it. The document grew a page a moment ago
       // and the DEPLOY control went with it, so a file left on the page it was
       // on would leave the operator holding a read-only record with nothing to
@@ -1421,56 +1448,18 @@ export function mount(host: HTMLElement, driver: FixtureDriver): void {
       counted = false
       lapsed = false
       spent = false
-      scoreSeen = false
       settleNote = ''
       dropHold()
-      if (countTimer !== null) {
-        clearTimeout(countTimer)
-        countTimer = null
-      }
+      hideTally()
       sync()
       return
     }
     if (state.phase !== 'tally') return
-    // `counted` is derived from wall-clock time since the count-up STARTED, not
-    // from a cross-window callback (C8) — design #4. `components/
-    // score-tally.ts`'s own cadence sums to `PACE.TOTAL_MS − PACE.OPEN_DELAY`
-    // from that tick (the 900 ms `OPEN_DELAY` is already inside `settleMs`'s
-    // budget, just with nothing left here to spend it waiting), and this timer
-    // matches that sum.
-    //
-    // x12 (민서, 08-10) — AND THE START IS NO LONGER THE `score` EVENT. This
-    // read "REPORTS calls `tally.run()` the instant it sees `score`", which was
-    // true and is not any more: the record's count-up now waits for the LIVE
-    // FEED to have printed its way to that same `score`, because the ledger's
-    // headline and the fanfold's 집계 line are two printings of one count
-    // (`windows/reports.ts`, `shell/feed-reach.ts`). A timer still started off
-    // the event would have released the settle — turning the page and unlocking
-    // NEW RUN — with the record still blank beside it, which is the failure this
-    // whole change is about, moved one window over.
-    //
-    // Read off the SHELL SLOT, exactly as REPORTS reads it. Neither window
-    // reaches the other and neither is told anything by the other; both ask the
-    // paper where it has got to. The lapse ceiling above it is unchanged and is
-    // still the backstop: a day whose paper never arrives releases on
-    // `HOLD_CEIL` the same way a day whose report never arrives does.
-    if (state.score !== null && !scoreSeen) {
-      scoreSeen = true
-      const sitting = run
-      void feedReached({ at: 'score', run: sitting }).then(() => {
-        // The day may have been left behind while the paper caught up — a reset
-        // clears `scoreSeen` (the `!== 'tally'` branch above), and a timer armed
-        // after that would count for a sitting nobody is watching.
-        if (!scoreSeen || !closed || settled) return
-        countTimer = setTimeout(() => {
-          countTimer = null
-          counted = true
-          settle()
-        }, PACE.TOTAL_MS - PACE.OPEN_DELAY)
-      })
-    }
-    // …and a report that lands after the count-up releases the settle it was
-    // holding.
+    // `counted` is the visible tally's own final state now. REPORTS still owns
+    // the event model and paper gate, then calls `tally.run(record)`; this
+    // window owns the host under DEPLOY and releases only when that cadence
+    // reaches `final`. No sibling window calls back here, and no second timer
+    // can drift from the count-up it is meant to describe.
     settle()
   })
 
