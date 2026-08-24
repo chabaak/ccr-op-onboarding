@@ -38,7 +38,7 @@
   letter-spacing:.1em;color:var(--signal);white-space:nowrap;font-variant-numeric:tabular-nums}
 .rep-s{min-width:0;font-family:var(--prose);font-size:var(--fs-13);line-height:1.7;
   color:var(--surface-text);word-break:keep-all}
-.rep-s .min{display:inline}
+.rep-s .min{display:block}
 .rep-break{height:var(--space-8);border-bottom:1px solid var(--surface-rule)}
 .sig{display:flex;align-items:center;justify-content:flex-end;padding:var(--space-10) var(--space-12);
   border-top:1px solid var(--ink-line)}

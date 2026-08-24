@@ -168,15 +168,15 @@ async function boot(page: Page): Promise<void> {
  *
  * RE-AIMED (08-25). REPORTS now starts as a short top-right pane above AGENT
  * FILE. The first two rendered facts still exist, but the second one sits
- * below `.win-body` on first paint, and [u8#c3] correctly clips its thread.
+ * below `.rep-grid` on first paint, and [u8#c3] correctly clips its thread.
  * Thread-count tests need threadable source anchors, not merely rendered
- * source anchors, so this mirrors the layer's window-body visibility gate.
+ * source anchors, so this mirrors the REPORTS scroll-body visibility gate.
  */
 async function sourceIds(page: Page): Promise<string[]> {
   const ids = await page
     .locator(`${REP} [data-sentence-id]`)
     .evaluateAll((nodes) => {
-      const body = document.querySelector('#w-rep .win-body')
+      const body = document.querySelector('#w-rep .rep-grid')
       if (body === null) return []
       const b = body.getBoundingClientRect()
       return nodes
@@ -213,8 +213,9 @@ async function clear(page: Page, slot: number): Promise<void> {
  * Fill `n` slots with the first `n` visible rendered sentence ids; returns
  * those ids.
  *
- * The AGENT FILE body scrolls, and under the feed-left desk REPORTS scrolls
- * sooner too. An anchor scrolled out of its window body has no visible rect and
+ * The AGENT FILE body scrolls, and under the feed-left desk REPORTS' tagged
+ * row column scrolls sooner too. An anchor scrolled out of its scroll body has
+ * no visible rect and
  * therefore no thread, by the very rule [u8#c3] pins (reference `app.js:567`),
  * so the suite uses source anchors the layer can actually thread and brings the
  * board into view exactly as the operator would before asserting anything about
@@ -724,11 +725,19 @@ test.describe('clipped to visible rect', () => {
   }) => {
     // RE-AIMED (08-25) — the PRECONDITION, never the criterion. The feed-left
     // desk makes REPORTS a short top-right pane, so the first two rendered
-    // facts are no longer both visible before any scroll. `thread()` therefore
+    // rows are no longer both visible before any scroll. `thread()` therefore
     // chooses visible source anchors first; the oracle below still makes one of
     // those sources leave the REPORTS body and then checks that exactly that
     // thread disappears.
-    await page.setViewportSize({ width: 1000, height: 720 })
+    await expect
+      .poll(async () => {
+        return page.evaluate(() => {
+          const grid = document.querySelector('#w-rep .rep-grid') as HTMLElement | null
+          if (grid === null) return false
+          return grid.scrollHeight > grid.clientHeight + 1
+        })
+      })
+      .toBe(true)
     const ids = await thread(page, 2)
     await expect(page.locator(PATH)).toHaveCount(2)
 
@@ -736,16 +745,16 @@ test.describe('clipped to visible rect', () => {
     // `test.skip(!scrolled, …)` "the REPORTS body does not overflow in this run",
     // which meant [u8#c3]'s ONE scroll-out oracle never ran in the full suite.
     // The stated reason was not the real one, and measuring it says so: REPORTS
-    // DOES overflow at the finished arrangement (`article.doc.doc-facts`,
-    // scrollHeight 491 over clientHeight 298 — 193 px of travel). What the old
+    // DOES overflow at the finished arrangement (`.rep-grid`,
+    // with the tagged row column taller than its viewport). What the old
     // setup scrolled was `.win-body`, and `.win-body` is `overflow-y: hidden` —
     // `scrollTop` on it is a no-op, so `scrolled` was false EVERY run and the
-    // skip fired unconditionally. REPORTS puts its two documents in `article.doc`
-    // columns and those are the scrollers.
+    // skip fired unconditionally. REPORTS now puts every row in `.rep-grid`,
+    // and that is the scroller.
     //
-    // So the precondition is MADE, not hoped for: find the sentence's own
-    // scroller, and move it exactly far enough to lift that sentence clear of
-    // the body's top edge — `clipRect` drops an anchor whose bottom is above
+    // So the precondition is MADE, not hoped for: scroll `.rep-grid`, and move
+    // it exactly far enough to lift that sentence clear of the clip edge the
+    // layer actually uses. `clipRect` drops an anchor whose bottom is above
     // `body.top + THREAD_CLIP_PAD` (2). Scrolling by the minimum needed, rather
     // than to the end, is what keeps this a ONE-thread test: the survivor was
     // selected because it was already visible, and it does not ride this
@@ -756,15 +765,17 @@ test.describe('clipped to visible rect', () => {
     const setup = await page.evaluate(
       ([id, clear]) => {
         const node = document.querySelector(`#w-rep [data-sentence-id="${id}"]`) as HTMLElement | null
+        const scroller = document.querySelector('#w-rep .rep-grid') as HTMLElement | null
         const body = document.querySelector('#w-rep .win-body') as HTMLElement | null
-        if (!node || !body) return { ok: false, why: 'REPORTS renders no anchor for the first threaded sentence' }
+        if (!node || !scroller || !body) return { ok: false, why: 'REPORTS renders no anchor for the first threaded sentence' }
 
         const scrolls = (el: HTMLElement): boolean =>
           /auto|scroll/.test(getComputedStyle(el).overflowY) && el.scrollHeight > el.clientHeight + 1
-        let scroller = node.parentElement
-        while (scroller && scroller !== body && !scrolls(scroller)) scroller = scroller.parentElement
-        if (!scroller || scroller === body) {
-          return { ok: false, why: 'no scrollable ancestor between the sentence and .win-body — nothing can scroll out' }
+        if (!scroller.contains(node)) {
+          return { ok: false, why: 'the threaded sentence is not inside .rep-grid — the REPORTS scroller cannot move it' }
+        }
+        if (!scrolls(scroller)) {
+          return { ok: false, why: '.rep-grid is not scrollable — nothing can scroll out' }
         }
 
         const need = node.getBoundingClientRect().bottom - body.getBoundingClientRect().top + (clear as number)

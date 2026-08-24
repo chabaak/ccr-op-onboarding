@@ -64,12 +64,12 @@ import { must } from './dom.ts'
 const DEPLOY = '#btnDeploy'
 const FEED_WIN = '#w-feed'
 const REP_WIN = '#w-rep'
-/** The two documents' headings. 현장 기록 is `.doc-facts`, 무전 기록 is `.doc-body`. */
-const FACTS_HEAD = '#w-rep .doc-facts .doc-hd h3'
-const BODY_HEAD = '#w-rep .doc-body .doc-hd h3'
-/** The first sentence of each document. */
-const FIRST_FACT = '#w-rep .doc-facts [data-sentence-id]'
-const FIRST_BODY = '#w-rep .doc-body [data-sentence-id]'
+/** The former document titles, now row tags. */
+const FACTS_HEAD = '#w-rep #factsList .rep-row:first-child .rep-stamp'
+const BODY_HEAD = '#w-rep #bodyList .rep-row:first-child .rep-stamp'
+/** The first sentence in each tagged row group. */
+const FIRST_FACT = '#w-rep #factsList [data-sentence-id]'
+const FIRST_BODY = '#w-rep #bodyList [data-sentence-id]'
 /**
  * A SEATED sentence in the file — the outcome of a mine, not the gesture.
  *
