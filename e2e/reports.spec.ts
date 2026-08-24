@@ -318,6 +318,35 @@ test.describe('report renders once after the last beat', () => {
     expect(Math.abs(firstFact!.x - firstBody!.x), 'fact and body rows do not share one column').toBeLessThan(1)
   })
 
+  test('report renders once after the last beat — the default desk exposes four report rows before scroll', async ({
+    page,
+  }) => {
+    await drain(page)
+    const metrics = await page.evaluate(() => {
+      const rep = document.querySelector('#w-rep') as HTMLElement | null
+      const feed = document.querySelector('#w-feed') as HTMLElement | null
+      const file = document.querySelector('#w-file') as HTMLElement | null
+      const grid = document.querySelector('#w-rep .rep-grid') as HTMLElement | null
+      const row = document.querySelector('#w-rep .rep-row') as HTMLElement | null
+      if (rep === null || feed === null || file === null || grid === null || row === null) return null
+      return {
+        rep: rep.getBoundingClientRect().height,
+        feed: feed.getBoundingClientRect().height,
+        file: file.getBoundingClientRect().height,
+        grid: grid.getBoundingClientRect().height,
+        row: row.getBoundingClientRect().height,
+        scrolls: grid.scrollHeight > grid.clientHeight + 1,
+      }
+    })
+    expect(metrics, 'REPORTS row-height metrics were not measurable').not.toBeNull()
+    expect(Math.round(metrics!.rep)).toBe(306)
+    expect(metrics!.file, 'AGENT FILE remains the taller right-column pane').toBeGreaterThan(metrics!.rep)
+    expect(metrics!.feed, 'LIVE FEED keeps the full-height priority column').toBeGreaterThan(metrics!.file)
+    expect(metrics!.grid / metrics!.row, 'REPORTS should show four rows before scroll').toBeGreaterThanOrEqual(4)
+    expect(metrics!.grid / metrics!.row, 'REPORTS should still be a scrolling pane, not a dominant column').toBeLessThan(5)
+    expect(metrics!.scrolls, 'REPORTS no longer scrolls, so the row-budget premise changed').toBe(true)
+  })
+
   test('report renders once after the last beat — row labels and sentence cells align across sources', async ({
     page,
   }) => {

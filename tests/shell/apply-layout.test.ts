@@ -150,3 +150,23 @@ describe('[u3#c2] the arrangement is derived from the viewport', () => {
     }
   })
 })
+
+describe('[u3#c2] the right column gives REPORTS four visible rows before scroll', () => {
+  it('(a) the 1280x800 floor keeps LIVE FEED full height and leaves AGENT FILE taller than REPORTS', async () => {
+    const a = await applyLayout(MIN)
+    expect(a.feed).toEqual({ x: 14, y: 133, w: 640, h: 653 })
+    expect(a.rep).toEqual({ x: 670, y: 133, w: 596, h: 306 })
+    expect(a.file).toEqual({ x: 670, y: 455, w: 596, h: 331 })
+    expect(a.file!.h, 'AGENT FILE remains the taller right-column pane').toBeGreaterThan(a.rep!.h)
+  })
+
+  it('(b) REPORTS gets the four-row outer height chosen for the real desk, not the old prototype height', async () => {
+    const a = await applyLayout(MIN)
+    const row = 49
+    const reportsChrome = 100
+    expect(a.rep!.h - reportsChrome, 'REPORTS grid budget at the minimum desk').toBeGreaterThanOrEqual(
+      row * 4,
+    )
+    expect(a.rep!.h).toBeGreaterThan(227)
+  })
+})
