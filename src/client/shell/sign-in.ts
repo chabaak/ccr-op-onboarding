@@ -160,10 +160,10 @@ export function countsAsStroke(press: KeyPress): boolean {
    door does not tell the operator to press a key; it reports that it is waiting
    for one, and the blinking caret in the armed well says where.
 
-   The armed pair is the copy this button has always carried. It is restored and
-   not merely revealed, because `↵ ENTER` on a dead button is a lie: Enter does
-   nothing at all until the fifteenth press, and a control that advertises a
-   shortcut it will not honour is worse than a control that says nothing. ═══ */
+   The ready hint is not merely revealed, because `↵ ENTER` on a dead button is a
+   lie: Enter does nothing at all until the fifteenth press, and a control that
+   advertises a shortcut it will not honour is worse than a control that says
+   nothing. ═══ */
 const LOCKED_NAME = '인증 대기 — 인증 정보가 입력되지 않았습니다'
 const LOCKED_HINT = '인증 대기'
 const READY_NAME = '로그인 — 모의 세션을 개시합니다'
@@ -421,9 +421,7 @@ export function openSignIn(app: HTMLElement, body: HTMLElement): Promise<void> {
   const plate = el('section', 'si-plate')
 
   const head = el('div', 'si-plate-hd')
-  const led = el('span', 'si-led')
-  led.setAttribute('aria-hidden', 'true')
-  head.append(led, el('b', undefined, '사용자 인증'), el('i', undefined, `보안 등급 ${PORTAL.clearance}`))
+  head.append(el('b', undefined, '사용자 인증'), el('i', undefined, `보안 등급 ${PORTAL.clearance}`))
 
   const wells: readonly [Well, Well] = [field('아이디', false), field('비밀번호', true)]
   const form = el('div', 'si-form')
@@ -439,6 +437,9 @@ export function openSignIn(app: HTMLElement, body: HTMLElement): Promise<void> {
   login.append(el('b', undefined, 'LOGIN'), hint)
   login.disabled = true
 
+  const foot = el('div', 'si-plate-foot')
+  foot.append(el('span', 'si-state', LOCKED_HINT), login)
+
   const note = el('div', 'si-note')
   note.append(
     el('em', undefined, '※'),
@@ -446,8 +447,8 @@ export function openSignIn(app: HTMLElement, body: HTMLElement): Promise<void> {
   )
 
   const readout = authReadout()
-  plate.append(head, form, login, note, readout)
-  stack.append(crest(), title, el('div', 'si-latin', 'EMERGENCY RESPONSE ROOM'), el('div', 'si-rule'), code, plate)
+  plate.append(head, form, foot, readout)
+  stack.append(crest(), title, el('div', 'si-latin', 'EMERGENCY RESPONSE ROOM'), el('div', 'si-rule'), code, plate, note)
   layer.append(stack)
   app.append(layer)
 
@@ -464,10 +465,9 @@ export function openSignIn(app: HTMLElement, body: HTMLElement): Promise<void> {
     login.disabled = false
     login.title = READY_NAME
     hint.textContent = READY_HINT
-    // The one orchestrated moment on this screen — `signin.css` flashes the slab
-    // from grey to hot and settles it on the seal's red. Focus lands with it, so
-    // an operator who cannot see the flash hears the button instead: it is the
-    // only announcement this door makes, and it is the only one it owes.
+    // The one orchestrated moment on this screen: the dead outline becomes the
+    // live control. Focus lands with it, so an operator who cannot see the flash
+    // hears the button instead.
     login.classList.add('is-armed')
     login.focus()
   }
@@ -487,6 +487,7 @@ export function openSignIn(app: HTMLElement, body: HTMLElement): Promise<void> {
       // The readout is built already — the class is what starts it, so every
       // line's `animation-delay` is measured from the same press.
       plate.classList.add('is-auth')
+      stack.classList.add('is-auth')
       const runway = authLines().length * STEP_MS + TAIL_MS
       sfxLoginStatic(runway)
       window.setTimeout(() => {

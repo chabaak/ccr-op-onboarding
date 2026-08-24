@@ -2,6 +2,7 @@ import { describe, expect, it, vi } from 'vitest'
 
 import { META_KEY } from '../../src/client/shell/run-state.ts'
 import {
+  SCENARIO_PICKER_NOTE,
   SCENARIO_UNLOCK_NOTICE,
   SCENARIO_ENDING_LOAD_FAILURE_NOTICE,
   SCENARIO_UNPLAYABLE_NOTICE,
@@ -9,6 +10,7 @@ import {
   incidentBriefCopy,
   readUnlockedScenarioSlugs,
   restartScenario,
+  scenarioCardModel,
   scenarioStartCheck,
   unlockAllScenarioFiles,
 } from '../../src/client/shell/scenario-desktop.ts'
@@ -21,6 +23,7 @@ import type {
 } from '../../src/client/shell/pack.ts'
 import { sortedScenarioPacks } from '../../src/client/shell/pack.ts'
 import { metaKey, stampKey } from '../../src/runloop/index.ts'
+import { DEFAULT_TOTAL_RUNS } from '../../src/runloop/run-loop.ts'
 
 const MANIFEST: ScenarioIndex = {
   packs: [
@@ -118,7 +121,47 @@ describe('scenario desktop replay files', () => {
     })
   })
 
-  it('(f) a bad ending restart reuses the shared session reset and reloads', () => {
+  it('(f) picker cards carry only assignment metadata before deployment', () => {
+    const entry = sortedScenarioPacks(MANIFEST)[0]!
+    const model = scenarioCardModel(entry, 0, true)
+
+    expect(Object.keys(model)).toEqual(['code', 'difficulty', 'runs', 'status', 'enabled'])
+    expect(model).toEqual({
+      code: 'ERR-2/SC-01',
+      difficulty: '등급 TUTORIAL',
+      runs: `RUN 01 / ${String(DEFAULT_TOTAL_RUNS).padStart(2, '0')}`,
+      status: '배치 가능',
+      enabled: true,
+    })
+    expect(Object.values(model).join(' ')).not.toContain(entry.displayName)
+    expect(SCENARIO_PICKER_NOTE).toContain('사건 개요는 배치 후 회선에서만 열람')
+  })
+
+  it('(g) locked picker cards expose status without becoming playable', () => {
+    const entry = sortedScenarioPacks(MANIFEST)[1]!
+
+    expect(scenarioCardModel(entry, 1, false)).toEqual({
+      code: 'ERR-2/SC-02',
+      difficulty: '등급 STANDARD',
+      runs: `RUN 01 / ${String(DEFAULT_TOTAL_RUNS).padStart(2, '0')}`,
+      status: '미개방',
+      enabled: false,
+    })
+  })
+
+  it('(h) fixture picker cards stay visible as read-only material when unlocked', () => {
+    const entry = sortedScenarioPacks(MANIFEST)[2]!
+
+    expect(scenarioCardModel(entry, 2, true)).toEqual({
+      code: 'ERR-2/SC-03',
+      difficulty: '등급 FIXTURE',
+      runs: `RUN 01 / ${String(DEFAULT_TOTAL_RUNS).padStart(2, '0')}`,
+      status: '열람 전용',
+      enabled: false,
+    })
+  })
+
+  it('(i) a bad ending restart reuses the shared session reset and reloads', () => {
     const storage = new FakeStorage()
     let reloaded = false
 
@@ -139,7 +182,7 @@ describe('scenario desktop replay files', () => {
     expect(reloaded).toBe(true)
   })
 
-  it('(g) a playable pack must prove its ending sidecars before selection can continue', async () => {
+  it('(j) a playable pack must prove its ending sidecars before selection can continue', async () => {
     await expect(
       scenarioStartCheck(packEntry('practice'), {
         fetchEndings: async () => ENDINGS,
@@ -148,7 +191,7 @@ describe('scenario desktop replay files', () => {
     ).resolves.toEqual({ ok: true })
   })
 
-  it('(h) a missing ending sidecar becomes operator-facing copy before the run starts', async () => {
+  it('(k) a missing ending sidecar becomes operator-facing copy before the run starts', async () => {
     await expect(
       scenarioStartCheck(packEntry('practice'), {
         fetchEndings: async () => {
@@ -159,7 +202,7 @@ describe('scenario desktop replay files', () => {
     ).resolves.toEqual({ ok: false, says: SCENARIO_ENDING_LOAD_FAILURE_NOTICE })
   })
 
-  it('(i) fixture packs are visible archive files, not startable runs', async () => {
+  it('(l) fixture packs are visible archive files, not startable runs', async () => {
     const fetchEndings = vi.fn(async () => ENDINGS)
     const fetchScore = vi.fn(async () => SCORE)
 
