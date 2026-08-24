@@ -67,26 +67,21 @@ import type { LiveFeedGapPolicy } from '../../../data/policy/live-feed-pacing.ts
 /* ── the model ───────────────────────────────────────────────────────────── */
 
 /**
- * The per-kind mark, ported from `app.js:405` — with ONE deviation.
- *
- * x10 (민서, 08-10) — `radio` is `''`. The agent's line carries no gutter mark
- * any more, because it does not need one: it is the only thing on the paper
- * printed in `--radio` at 700 weight, and the ink and the weight name the
- * channel between them. `''` is the same "no mark" `wait` and `mark` have
- * always said, and saying it that way rather than special-casing the render is
- * the point — `.fl-c::before` still reserves its 21px, so the agent's text
- * keeps the left edge every other kind's body text sits on. Dropping the mark
- * must not move the column.
+ * The middle column names who is speaking through the fanfold, not which
+ * subsystem produced the row. `npc` is filled from `line.speaker`, so the table
+ * holds only the fixed tags.
  */
-export const FEED_MARKS: Record<FeedKind, string> = {
-  event: '▸',
-  radio: '',
-  npc: '—',
-  symptom: '·',
-  wait: '',
-  fallback: '※',
-  mark: '',
+export const FEED_TAGS: Record<FeedKind, string | null> = {
+  event: '요원',
+  radio: '요원',
+  npc: null,
+  symptom: '요원',
+  wait: null,
+  fallback: '오류',
+  mark: null,
 }
+
+const FALLBACK_GLYPH = '※'
 
 /**
  * One rendered fragment of a line's content column.
@@ -112,7 +107,7 @@ export interface FeedNode {
   kind: FeedKind
   /** The line's own classes. The green band is INSTANCE state, never here. */
   classes: readonly string[]
-  mark: string
+  tag: string | null
   /** The gutter stamp; `null` on a `mark` line, which is one column wide. */
   stamp: string | null
   parts: readonly FeedPart[]
@@ -142,10 +137,10 @@ export interface FeedNode {
  */
 const NPC_RELAY_TAIL = '라고 말한다'
 
-const envelope = (kind: FeedKind, clock: string, parts: FeedPart[]): FeedNode => ({
+const envelope = (kind: FeedKind, clock: string, parts: FeedPart[], tag = FEED_TAGS[kind]): FeedNode => ({
   kind,
   classes: ['fl', `fl-${kind}`],
-  mark: FEED_MARKS[kind],
+  tag,
   // The gutter prints a TIME, and a trailing-plus stamp is not one — see
   // `displayStamp`.
   stamp: kind === 'mark' ? null : displayStamp(clock),
@@ -165,7 +160,7 @@ const envelope = (kind: FeedKind, clock: string, parts: FeedPart[]): FeedNode =>
  */
 export function feedLineModel(line: FeedLine): FeedNode {
   const kind = line.kind
-  if (!Object.prototype.hasOwnProperty.call(FEED_MARKS, kind)) {
+  if (!Object.prototype.hasOwnProperty.call(FEED_TAGS, kind)) {
     throw new Error(`live feed: '${String(kind)}' is not a FeedKind`)
   }
   switch (kind) {
@@ -176,11 +171,8 @@ export function feedLineModel(line: FeedLine): FeedNode {
       // fanfold's header already prints that name once at the top of the run —
       // so the caption was a header fact restated three or four times a beat,
       // and it was restated directly above the only sentences in this window
-      // anyone reads it for. What marks the channel now is what marked it
-      // anyway: the ink and the weight (`.fl-radio .fl-c` — `--radio`, 700).
-      // The gutter mark went at the same time and for the same reason; see
-      // `FEED_MARKS`, and note the mark COLUMN stays reserved there so losing
-      // it does not pull the agent's text out of line with every other kind's.
+      // anyone reads it for. The row is now tagged 요원 in its own column, and
+      // the sentence treatment supplies the priority.
       const parts: FeedPart[] = [{ p: 'text', text: line.text }]
       // U5.4 — the slots the agent cited, named the way the AGENT FILE names
       // them. It says WHICH sentence reached the agent and nothing about how:
@@ -203,10 +195,9 @@ export function feedLineModel(line: FeedLine): FeedNode {
     }
     case 'npc':
       return envelope(kind, line.clock, [
-        { p: 'label', text: `${line.speaker ?? ''} ` },
         { p: 'quote', text: line.text },
         { p: 'text', text: NPC_RELAY_TAIL },
-      ])
+      ], line.speaker ?? '')
     case 'mark':
       return envelope(kind, line.clock, [{ p: 'span', text: line.text }])
     // x6 — `wait` survives here because it is the SEAM's kind and the seam is
@@ -215,13 +206,9 @@ export function feedLineModel(line: FeedLine): FeedNode {
     // reach the DOM and the waiting markers are gone (see `appendLine`). The
     // case stays so the projection is total for every kind the seam can send.
     //
-    // x8 — and `symptom` is now the second such kind, for the same reason and
-    // by the same mechanism. It is still on the seam and still reaches Call 2 as
-    // `SCENE_SYMPTOMS` (the only channel state change has at all —
-    // `contract-calls.md` §3 rule 5); it simply no longer lands on the paper.
     case 'wait':
-    case 'symptom':
     case 'event':
+    case 'symptom':
     case 'fallback':
       return envelope(kind, line.clock, [{ p: 'text', text: line.text }])
     default: {
@@ -357,20 +344,22 @@ export function feedGapMs(
  * arriving-now animation as a real one. It is the desk reporting on itself, in
  * the same breath as the `※` and the hatched band it prints on, and it should
  * read as stamped rather than as spoken.
+ *
+ * `symptom` is a quiet supporting row, not a foreground dispatch. Printing it
+ * whole keeps the beat state visible without making REPORTS wait for every
+ * muted sentence to type at full live-feed pace.
  */
-export const typesOut = (kind: FeedKind): boolean => kind !== 'mark' && kind !== 'fallback'
+export const typesOut = (kind: FeedKind): boolean => kind !== 'mark' && kind !== 'fallback' && kind !== 'symptom'
 
 /**
- * The two kinds the fanfold DROPS — one owner, and two readers of it.
+ * The kind the fanfold DROPS — one owner, and two readers of it.
  *
- * x8 put `symptom` beside x6's `wait`; the reasons are at `appendLine`, which is
- * where the drop happens. It is a named predicate rather than a condition
- * spelled out there because the reveal pump asks the same question a second
- * time (`printsFeedLine`): a dropped line prints nothing, so the pump may not
- * charge time for it, and two copies of "which kinds are undrawn" would be two
- * ways for the paper and its clock to disagree about what a beat contains.
+ * The reveal pump asks the same question a second time (`printsFeedLine`): a
+ * dropped line prints nothing, so the pump may not charge time for it, and two
+ * copies of "which kinds are undrawn" would be two ways for the paper and its
+ * clock to disagree about what a beat contains.
  */
-const isUndrawn = (line: FeedLine): boolean => line.kind === 'wait' || line.kind === 'symptom'
+const isUndrawn = (line: FeedLine): boolean => line.kind === 'wait'
 
 /**
  * Will this queued event put a line on the paper?
@@ -561,9 +550,9 @@ function partNode(part: FeedPart): Node {
  * (`components/report-view.ts`, `components/slot-board.ts`), so this is the
  * first time the cost has come due, and it is paid by splitting the row:
  *
- *  * `.fl-c` keeps its class, its `data-mark` and its part structure — every
- *    e2e selector on this window reads it, and they stay correct because a
- *    finished line is exactly what it always was — and gains `aria-hidden`.
+ *  * `.fl-c` keeps its class and its part structure — every e2e selector on
+ *    this window reads it, and they stay correct because a finished line is
+ *    exactly what it always was — and gains `aria-hidden`.
  *  * `.fl-sr` carries the complete text, landed at once, so the region announces
  *    the line once and says all of it.
  *
@@ -577,16 +566,16 @@ function lineElement(
 ): { li: HTMLLIElement; content: HTMLElement } {
   const li = el('li', node.classes.join(' '))
   if (band) li.classList.add('band')
+  if (node.tag !== null) li.dataset.feedTag = node.tag
   for (const [key, value] of Object.entries(node.data)) li.setAttribute(`data-${key}`, value)
 
   if (node.stamp !== null) li.append(el('div', 'fl-t', node.stamp))
+  if (node.kind === 'fallback') li.append(el('div', 'fl-k', FALLBACK_GLYPH))
+  else if (node.tag !== null) li.append(el('div', 'fl-k', node.tag))
 
   const content = el('div', 'fl-c')
-  if (node.kind !== 'mark') content.dataset.mark = node.mark
   content.setAttribute('aria-hidden', 'true')
-  // A typed row opens EMPTY — the cursor writes it from the next tick on. The
-  // gutter mark is `::before` on this node, so what the operator sees in that
-  // first frame is the print head and nothing after it.
+  // A typed row opens EMPTY — the cursor writes it from the next tick on.
   if (!typed) content.append(...node.parts.map(partNode))
   li.append(content, el('div', SR_LINE_CLASS, lineText(node)))
   return { li, content }
@@ -635,9 +624,9 @@ export function createRunFeed(host: HTMLElement, driver: FixtureDriver): RunFeed
 
   // Instance state: the green band alternates down the page (app.js:434).
   //
-  // x8 — the symptom watch is gone with the symptom line. It counted a beat's
-  // symptoms so a silent one could still print `(변화 없음)`; nothing prints
-  // either now, so `beat_start` / `beat_end` carry nothing for this window.
+  // x8 — the symptom watch is gone with the empty-symptom line. It counted a
+  // beat's symptoms so a silent one could still print `(변화 없음)`; this feed
+  // brings real symptom rows back, but beat boundaries still carry nothing here.
   let band = false
   let stamp = ''
   // The sitting's name, until `meta` lands one — and since x10 (민서, 08-10) it
@@ -768,15 +757,10 @@ export function createRunFeed(host: HTMLElement, driver: FixtureDriver): RunFeed
    * report hold is gone (see where `REPORT_HOLD_MS` was), and the reasoning here
    * never depended on it, only on there being a queue at all.
    *
-   * x8 — and it is called for the lines the fanfold DROPS as well as the ones it
-   * prints (민서, 08-10), which is why it is a function now. Dropping the
-   * symptom line took the desk clock with it the first time: a demo day's last
-   * minute can belong to a beat whose only line is a symptom, so the clock
-   * stopped before the run end, and the 집계 line — which reuses this stamp
-   * because `score` carries no clock of its own — was stamped with it.
-   * A dropped line is still a minute the run got to. It is not a line the reader
-   * has to wait for, and it is dropped inside the reveal pump, so this stays in
-   * step with the paper either way.
+   * It is called for dropped lines as well as printed ones, because a dropped
+   * line is still a minute the run got to. It is not a line the reader has to
+   * wait for, and it is dropped inside the reveal pump, so this stays in step
+   * with the paper either way.
    */
   const advanceStamp = (at: string | null): void => {
     if (at === null || at === '') return
@@ -875,19 +859,6 @@ export function createRunFeed(host: HTMLElement, driver: FixtureDriver): RunFeed
     // Dropped HERE rather than at the model, because `feedLineModel` is the pure
     // projection the seam's every kind must survive (see its `wait` case).
     //
-    // x8 — a symptom line is not printed either (민서, 08-10), and the reasoning
-    // rhymes. The symptoms were the engine's delta journal rendered into
-    // sentences, printed in italic under every beat: on most beats they said
-    // `(변화 없음)`, and on the rest they reported a weaker thing than the line
-    // directly above them already does. The citation mark over the utterance
-    // (`인수인계 01 · 03`) names the slots the agent actually cited, which is the
-    // signal the operator is looking for — whether their handover reached the
-    // agent. The symptoms sat in the noisiest slot on the paper saying less.
-    //
-    // They are NOT deleted upstream: `SCENE_SYMPTOMS` is the only channel state
-    // change has into Call 2 at all (`contract-calls.md` §3, rule 5), so the
-    // model still knows how the roster is behaving. Only the print is gone.
-    //
     // x11 — the drop is `isUndrawn` (see there) rather than the kinds spelled
     // out here, because the reveal pump has to ask the same question before it
     // charges anyone time. Everything else about this guard is unchanged, and
@@ -898,10 +869,15 @@ export function createRunFeed(host: HTMLElement, driver: FixtureDriver): RunFeed
       return false
     }
     if (pending !== null && line.kind !== 'fallback') {
-      append(feedLineModel(fallbackNoticeLine(pending.cls, line.clock)))
+      append({
+        ...feedLineModel(fallbackNoticeLine(pending.cls, line.clock)),
+        data: { 'fallback-class': pending.cls, 'fallback-code': pending.code },
+      })
       pending = null
     }
-    const node = feedLineModel(line)
+    const node = feedLineModel(pending !== null && line.kind === 'fallback'
+      ? fallbackNoticeLine(pending.cls, line.clock)
+      : line)
     if (pending !== null) {
       append({ ...node, data: { 'fallback-class': pending.cls, 'fallback-code': pending.code } })
       pending = null
@@ -917,7 +893,7 @@ export function createRunFeed(host: HTMLElement, driver: FixtureDriver): RunFeed
    * x11 — the answer is the pump's whole accounting. Time is charged for a line,
    * never for an event: everything that lands nothing (`meta`, the `waiting`
    * edges, a `fallback` arming its class, the beat boundaries, `report`,
-   * `run_end`, and a dropped `wait`/`symptom` line) is consumed for free. See
+   * `run_end`, and a dropped `wait` line) is consumed for free. See
    * `printsFeedLine`, which answers the same question one step earlier so the
    * pump can look at the head of the queue before it commits to a pause.
    *
@@ -1035,11 +1011,9 @@ export function createRunFeed(host: HTMLElement, driver: FixtureDriver): RunFeed
    * The free loop is where x11's second half lives. Non-printing events are
    * shifted off the head and cost NOTHING, so a gate beat's `beat_start`, four
    * `waiting` edges and `beat_end` no longer sit between two lines charging a
-   * reveal delay each. A dropped `symptom` goes the same way — free, but through
-   * `apply`, because it still has to move the desk clock on its way out. That is
-   * why symptoms stay in the queue instead of being filtered at `receive`:
-   * publishing their stamp on arrival would put the chrome ahead of the paper,
-   * which is the exact bug x6 fixed.
+   * reveal delay each. A dropped `wait` goes the same way — free, but through
+   * `apply`, because publishing its stamp on arrival would put the chrome ahead
+   * of the paper, which is the exact bug x6 fixed.
    */
   const printNext = (): void => {
     let guard = queue.length

@@ -205,13 +205,10 @@ test.describe('acceptance 1-7', () => {
       .evaluateAll((nodes) => nodes.map((n) => n.textContent ?? '').filter((t) => /\d/.test(t)))
     expect(digits, 'a digit reached an NPC line (inv 2)').toEqual([])
 
-    // (d) …was 'the empty symptom set renders its own copy, never a blank line'.
-    // There is no symptom line on the paper to be empty, so `(변화 없음)` is not
-    // minted anywhere any more (x8). What replaces it is the negative: the
-    // symptom channel is CLOSED at the DOM, and the stream above proves the
-    // symptoms it is closed against are really being produced.
+    // (d) symptom lines are visible again under #130, but still never split
+    // into the handoff's separate 신체/정체 kinds.
     expect(perBeat.some((n) => n > 0), 'the round produced no symptom at all — (d) is vacuous').toBe(true)
-    expect(await page.locator('#w-feed .fl-symptom').count(), 'a symptom line reached the paper').toBe(0)
+    expect(await page.locator('#w-feed .fl-symptom').count(), 'no symptom line reached the paper').toBeGreaterThan(0)
     await expect(page.locator(FEED.list)).not.toContainText('(변화 없음)')
   })
 
@@ -257,12 +254,8 @@ test.describe('acceptance 1-7', () => {
 
     // The player pane sees the judgment as PROSE — the agent's own radio line.
     //
-    // This half used to count `.fl-symptom` nodes: a gate moved state, the state
-    // rendered into symptom sentences, and those printed. x8 closed that channel
-    // at the DOM (민서, 08-10), so the surface a gate now leaves the player is
-    // Call 1's utterance on the radio line. The symptoms are still produced —
-    // they are what `SCENE_SYMPTOMS` carries into Call 2 — so the second half
-    // below holds the channel shut against something real rather than nothing.
+    // #130 reopens symptom lines as quiet 요원 rows. The radio line remains the
+    // direct gate prose, and symptoms remain non-minable state.
     //
     // What is deliberately NOT asserted here: that the radio line carries no
     // digit. Inv 2 scopes to the NPC channel, and the agent's own speech is
@@ -277,7 +270,7 @@ test.describe('acceptance 1-7', () => {
       (e) => e.type === 'feed' && (e as { line?: { kind?: string } }).line?.kind === 'symptom',
     )
     expect(symptoms.length, 'the round produced no symptom — the next assert is vacuous').toBeGreaterThan(0)
-    expect(await page.locator('#w-feed .fl-symptom').count(), 'a symptom reached the player pane').toBe(0)
+    expect(await page.locator('#w-feed .fl-symptom').count(), 'no symptom reached the player pane').toBeGreaterThan(0)
   })
 
   test("#4 the round report renders exactly once, after the round's last beat", async ({ page }) => {

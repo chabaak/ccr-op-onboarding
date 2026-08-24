@@ -26,7 +26,7 @@ import type { FeedKind, FeedLine, ViewEvent } from '../../src/shared/view-driver
 import { woodariRun03 } from '../../src/client/driver/fixtures/index.ts'
 import { MS_PER_SIM_MIN, hhmm, mm } from '../../src/client/driver/clock.ts'
 import {
-  FEED_MARKS,
+  FEED_TAGS,
   FEED_PACE,
   feedGapMs,
   feedLineModel,
@@ -36,7 +36,12 @@ import {
 } from '../../src/client/components/run-feed.ts'
 import type { FeedNode, FeedPart } from '../../src/client/components/run-feed.ts'
 import { typeDuration } from '../../src/client/components/typewriter.ts'
-import { FALLBACK_CLASS, FALLBACK_LABEL } from '../../src/client/components/fallback-notice.ts'
+import {
+  FALLBACK_CLASS,
+  FALLBACK_LABEL,
+  fallbackNoticeLine,
+} from '../../src/client/components/fallback-notice.ts'
+import type { FallbackClass } from '../../src/client/components/fallback-notice.ts'
 import {
   LIVE_FEED_DEFAULT_GAP_POLICY,
   LIVE_FEED_PACING,
@@ -96,7 +101,7 @@ const DIGIT = /\d/
 const KINDS: FeedKind[] = ['event', 'radio', 'npc', 'symptom', 'wait', 'fallback', 'mark']
 
 /**
- * The kinds the fanfold DROPS — x6 took `wait`, x8 took `symptom`.
+ * The kinds the fanfold DROPS — x6 took `wait`.
  *
  * At module scope since x11, because two blocks need it: `[u5#c1] (n)`/`(o)`
  * hold the drop shut, and the pacing block below has to know which queued
@@ -104,34 +109,18 @@ const KINDS: FeedKind[] = ['event', 'radio', 'npc', 'symptom', 'wait', 'fallback
  * anything. The source-side owner of the same list is `run-feed.ts`'s
  * `isUndrawn`, and `(o)` is what ties the two together.
  */
-const UNDRAWN_KINDS: FeedKind[] = ['wait', 'symptom']
+const UNDRAWN_KINDS: FeedKind[] = ['wait']
 
-/** Feed gutter marks owned by the live-feed component. */
-const REFERENCE_MARKS: Record<FeedKind, string> = {
-  event: '▸',
-  radio: '◈',
-  npc: '—',
-  symptom: '·',
-  wait: '',
-  fallback: '※',
-  mark: '',
+/** Feed kind tags owned by the live-feed component. */
+const EXPECTED_TAGS: Record<FeedKind, string | null> = {
+  event: '요원',
+  radio: '요원',
+  npc: null,
+  symptom: '요원',
+  wait: null,
+  fallback: '오류',
+  mark: null,
 }
-
-/**
- * The port's deviations from that table — one, x10 (민서, 08-10): the radio
- * prints NO mark. The `◈` sat in the gutter of a line that is already the only
- * thing on the paper in `--radio` at 700 weight, so the ink and the weight were
- * doing the marking twice; it went out with the `ECHO-n · 무전` caption that
- * used to head the same line ((i) below).
- *
- * It is kept as a DELTA against the reference rather than written into the table
- * so both halves stay provable: what the reference printed, and what this port
- * decided not to. `''` and not "absent" — that is what keeps the 21px mark
- * gutter reserved, and the radio's text on the common left edge.
- */
-const MARK_DEVIATIONS: Partial<Record<FeedKind, string>> = { radio: '' }
-
-const EXPECTED_MARKS: Record<FeedKind, string> = { ...REFERENCE_MARKS, ...MARK_DEVIATIONS }
 
 const EVENTS: readonly ViewEvent[] = woodariRun03.events
 
@@ -156,7 +145,12 @@ const nodeText = (node: FeedNode): string =>
 function paperCost(events: readonly ViewEvent[], policy: LiveFeedGapPolicy): number {
   let at = ''
   let paper = 0
+  let pendingFallback: FallbackClass | null = null
   for (const event of events) {
+    if (event.type === 'fallback') {
+      pendingFallback = FALLBACK_CLASS[event.call]
+      continue
+    }
     if (event.type === 'feed' && UNDRAWN_KINDS.includes(event.line.kind)) {
       at = event.line.clock
       continue
@@ -166,7 +160,12 @@ function paperCost(events: readonly ViewEvent[], policy: LiveFeedGapPolicy): num
       paper += FEED_PACE.msBetween
       continue
     }
-    const node = model(event.line)
+    const line =
+      pendingFallback !== null && event.line.kind === 'fallback'
+        ? fallbackNoticeLine(pendingFallback, event.line.clock)
+        : event.line
+    pendingFallback = null
+    const node = model(line)
     paper += feedGapMs(at, event.line.clock, policy)
     const chars = nodeText(node).length
     paper += typesOut(event.line.kind) ? typeDuration([chars], FEED_PACE) : FEED_PACE.msBetween
@@ -178,38 +177,31 @@ function paperCost(events: readonly ViewEvent[], policy: LiveFeedGapPolicy): num
 /* ══ [u5#c1] the seven kinds map 1:1 ═════════════════════════════════════ */
 
 describe('[u5#c1] seven kinds map 1:1', () => {
-  it('(a) FEED_MARKS has exactly the seven FeedKind keys — no more, no fewer', () => {
-    expect(Object.keys(FEED_MARKS).sort()).toEqual([...KINDS].sort())
+  it('(a) FEED_TAGS has exactly the seven FeedKind keys — no more, no fewer', () => {
+    expect(Object.keys(FEED_TAGS).sort()).toEqual([...KINDS].sort())
   })
 
-  it('(b) every mark is the reference mark (app.js:405) but the one declared deviation', () => {
+  it('(b) every fixed kind tag matches the three-value feed vocabulary', () => {
     for (const kind of KINDS) {
-      expect(`${kind}:${FEED_MARKS[kind]}`).toBe(`${kind}:${EXPECTED_MARKS[kind]}`)
+      expect(`${kind}:${FEED_TAGS[kind] ?? ''}`).toBe(`${kind}:${EXPECTED_TAGS[kind] ?? ''}`)
     }
-    // The deviation is DECLARED, not discovered: exactly one kind may differ
-    // from the reference table, and it is the radio, and it differs by having
-    // no mark at all. A second silent drift fails here rather than in review.
-    const drifted = KINDS.filter((k) => FEED_MARKS[k] !== REFERENCE_MARKS[k])
-    expect(drifted).toEqual(['radio'])
-    expect(FEED_MARKS.radio).toBe('')
-    expect(REFERENCE_MARKS.radio, 'what the reference printed, kept on the record').toBe('◈')
   })
 
-  it('(c) FEED_MARKS is exactly keyed by FeedKind at the type level', () => {
+  it('(c) FEED_TAGS is exactly keyed by FeedKind at the type level', () => {
     // Compile-time half of "an unknown kind is a type error": `tsc -p
     // tsconfig.test.json` rejects this file if the key set ever drifts.
     type Exact<A, B> = [A] extends [B] ? ([B] extends [A] ? true : false) : false
-    const keysAreExactlyFeedKind: Exact<keyof typeof FEED_MARKS, FeedKind> = true
+    const keysAreExactlyFeedKind: Exact<keyof typeof FEED_TAGS, FeedKind> = true
     expect(keysAreExactlyFeedKind).toBe(true)
   })
 
-  it('(d) every kind yields the reference classes `fl fl-<kind>` and its mark', () => {
+  it('(d) every kind yields the reference classes `fl fl-<kind>` and its tag', () => {
     for (const kind of KINDS) {
       const node = model({ kind, clock: '08:50', text: '본문', speaker: '서지형' })
       expect(node.kind).toBe(kind)
       expect(node.classes).toContain('fl')
       expect(node.classes).toContain(`fl-${kind}`)
-      expect(node.mark).toBe(EXPECTED_MARKS[kind])
+      expect(node.tag).toBe(kind === 'npc' ? '서지형' : EXPECTED_TAGS[kind])
     }
   })
 
@@ -242,12 +234,12 @@ describe('[u5#c1] seven kinds map 1:1', () => {
   // prints once per run. What is left to pin is its ABSENCE, which is a claim
   // the caption's own test cannot make — the utterance alone, no caption before
   // it, no mark beside it, and the U5.4 citation still free to follow it.
-  it('(i) radio renders the utterance alone — no channel caption, no mark', () => {
+  it('(i) radio renders the utterance alone — no channel caption, tagged as 요원', () => {
     const line: FeedLine = { kind: 'radio', clock: '08:51', text: '회선 유지합니다.' }
     const node = model(line)
     expect(node.parts.map((p: FeedPart) => p.p)).toEqual(['text'])
     expect(nodeText(node)).toBe(line.text)
-    expect(node.mark).toBe('')
+    expect(node.tag).toBe('요원')
     // Not merely "no `label` part": the caption may not come back wearing
     // another part type either.
     expect(nodeText(node)).not.toContain('무전')
@@ -263,18 +255,18 @@ describe('[u5#c1] seven kinds map 1:1', () => {
   it('(j) npc renders the speaker, the text inside a quote, and the relay tail last', () => {
     const line: FeedLine = { kind: 'npc', clock: '08:50', text: '막을 수 있다.', speaker: '서지형' }
     const node = model(line)
-    const label = node.parts.find((p: FeedPart) => p.p === 'label')
     const quote = node.parts.find((p: FeedPart) => p.p === 'quote')
-    expect(label && 'text' in label ? label.text : '').toContain('서지형')
+    expect(node.tag).toBe('서지형')
     expect(quote && 'text' in quote ? quote.text : '').toBe(line.text)
 
-    // Order is the sentence: name, then what was said, then the framing verb.
-    expect(node.parts.map((p: FeedPart) => p.p)).toEqual(['label', 'quote', 'text'])
+    // Order is the sentence: what was said, then the framing verb. The speaker
+    // lives in the tag column.
+    expect(node.parts.map((p: FeedPart) => p.p)).toEqual(['quote', 'text'])
     // The frame closes the line — it is a suffix, never wrapped around the text.
     expect(nodeText(node)).toMatch(/라고 [가-힣]+다$/)
     // …and it did not get there by touching the run's own words.
     expect(nodeText(node)).toContain(line.text)
-    expect(nodeText(node)).toContain(line.speaker!)
+    expect(node.tag).toBe(line.speaker!)
   })
 
   it('(k) mark renders its text inside a span (the ruled divider), no stamp column', () => {
@@ -312,19 +304,10 @@ describe('[u5#c1] seven kinds map 1:1', () => {
     }
   })
 
-  // x6 — SIX skins, not seven. The seventh was `.fl-wait`, and it went with the
-  // marker: the sheet is read with its comments blanked so the header's own
-  // account of the removal cannot answer this scan for it.
-  //
-  // x8 — FIVE now. `.fl-symptom` went the same way and for a reason of the same
-  // shape (민서, 08-10): the line is dropped before the DOM, so a skin for it
-  // could only ever be dead paint. Both undrawn kinds are banned by name below,
-  // so either one growing a skin back is a failure and not a silence.
-  //
-  // x11 — hoisted to module scope (`UNDRAWN_KINDS`), unchanged in content.
+  // `wait` remains the only undrawn kind; `symptom` is a row again.
   const UNDRAWN = UNDRAWN_KINDS
 
-  it('(n) u1 skin selectors exist for all five DRAWN kinds — the port has somewhere to land', () => {
+  it('(n) u1 skin selectors exist for all six DRAWN kinds — the port has somewhere to land', () => {
     const css = code('src/client/styles/win-live-feed.css')
     for (const kind of KINDS.filter((k) => !UNDRAWN.includes(k))) expect(css).toContain(`.fl-${kind}`)
     for (const kind of UNDRAWN) {
@@ -344,13 +327,11 @@ describe('[u5#c1] seven kinds map 1:1', () => {
   // belongs to `e2e/run-loop.spec.ts` (`latency`), which reads `#feedList` on a
   // real desk and holds it at zero. What is provable here is that neither door
   // reaches `append`.
-  it('(o) neither door draws a line — `wait` and `symptom` are dropped, a `waiting` event lands nothing', () => {
+  it('(o) wait draws no line, symptom draws, and a `waiting` event lands nothing', () => {
     const source = code('src/client/components/run-feed.ts')
 
-    // Door 1: `appendLine` returns before it can build a node — for BOTH
-    // undrawn kinds, in one guard. x8 put `symptom` beside `wait` there.
-    //
-    // x11 — and the two kinds are now named in a PREDICATE rather than in the
+    // Door 1: `appendLine` returns before it can build a node for every
+    // undrawn kind, named in a PREDICATE rather than in the
     // `if` itself, because the reveal pump asks the same question a second time:
     // a line that prints nothing may not cost the reader any time
     // (`printsFeedLine`), and two lists of which kinds are undrawn would be two
@@ -365,6 +346,7 @@ describe('[u5#c1] seven kinds map 1:1', () => {
         new RegExp(`line\\.kind\\s*===\\s*'${kind}'`),
       )
     }
+    expect(rule, 'symptom is still being treated as undrawn').not.toMatch(/'symptom'/)
 
     const drop = new RegExp(`if\\s*\\(\\s*${ownerName}\\(line\\)\\s*\\)\\s*\\{([^}]*)\\}`).exec(source)
     expect(drop, 'nothing short-circuits on the undrawn kinds before `append` any more').toBeTruthy()
@@ -450,7 +432,7 @@ describe('x11 the reveal pump charges time for lines, never for events', () => {
     const free = EVENTS.filter((e) => !printsFeedLine(e))
     const kinds = [...new Set(free.map((e) => e.type))].sort()
     expect(kinds, 'the stream stopped carrying non-printing events').not.toEqual([])
-    expect(free.some((e) => e.type === 'feed'), 'no dropped feed line is in the stream').toBe(true)
+    expect(free.some((e) => e.type === 'feed'), 'a feed line is still being dropped').toBe(false)
     expect(kinds).toContain('waiting')
     expect(kinds).toContain('beat_start')
     expect(kinds).toContain('beat_end')
@@ -552,7 +534,13 @@ describe('x11 the reveal pump charges time for lines, never for events', () => {
       const to = hhmm(open + gap)
       expect(feedGapMs('08:00', to, policy), `${gap} minute gap`).toBe(expected)
     }
-    expect(paperCost(EVENTS, policy)).toBe(130088)
+    expect(paperCost(EVENTS, policy)).toBe(140772)
+  })
+
+  it('(d4) symptom rows land whole so supporting state does not slow the report gate', () => {
+    expect(typesOut('symptom')).toBe(false)
+    expect(typesOut('npc')).toBe(true)
+    expect(typesOut('radio')).toBe(true)
   })
 
   it('(e) the whole demo day of paper stays inside the human-readable presentation band', () => {
@@ -575,7 +563,7 @@ describe('x11 the reveal pump charges time for lines, never for events', () => {
     const day = (mm(woodariRun03.end) - mm(woodariRun03.start)) * MS_PER_SIM_MIN
     const ratio = paper / day
     expect(paper, 'the paper is racing the day again instead of staying readable').toBeGreaterThan(day)
-    expect(ratio, 'the paper outgrew the readable candidate-D trade').toBeLessThan(2)
+    expect(ratio, 'the paper outgrew the readable candidate-D trade').toBeLessThan(2.2)
     expect(ratio, 'the pacing collapsed — the day would print as a dump').toBeGreaterThan(1.5)
   })
 })
@@ -940,7 +928,7 @@ describe('[u5#c9] the window renders, never authors', () => {
   // the empty-symptom line, so the window authors neither word any more; the
   // NPC relay frame `'라고 말한다'` is what took their place. The set shrinking
   // is itself part of the guard — do not put either departure back.
-  it('(c) run-feed.ts authors exactly the five declared chrome literals', () => {
+  it('(c) run-feed.ts authors exactly the declared chrome literals', () => {
     const ALLOWED = new Set([
       '상황실 무전 기록',
       '열람 전용 — 이 창은 조작되지 않습니다',
@@ -957,6 +945,10 @@ describe('[u5#c9] the window renders, never authors', () => {
       // operator's own file — the same word the AGENT FILE prints over those
       // slots — and authors nothing about the scenario.
       '인수인계',
+      // #130's fixed tag vocabulary. `npc` reads the speaker from the line
+      // instead of authoring one here.
+      '요원',
+      '오류',
       // U2's behind-indicator. Chrome about the VIEWPORT — it counts lines the
       // window has already printed and authors nothing about the run itself.
       '▾ 미열람 ${missed}줄',
