@@ -201,7 +201,8 @@ export function installScenarioDesktop(deps: ScenarioDesktopDeps): ScenarioDeskt
 
   function pickerShell(): HTMLElement {
     if (picker) return picker
-    picker = el('section', 'scenario-picker')
+    picker = el('div', 'scenario-picker')
+    picker.setAttribute('role', 'group')
     picker.setAttribute('aria-labelledby', 'scenario-picker-title')
 
     const head = el('div', 'scenario-picker-head')
