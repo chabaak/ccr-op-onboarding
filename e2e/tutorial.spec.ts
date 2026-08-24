@@ -56,9 +56,10 @@ const DEPLOY = '#btnDeploy'
 const PAGE_NEXT = '#w-file .pg-nav .pg-next'
 const FEED_WIN = '#w-feed'
 const REP_WIN = '#w-rep'
-const FACTS_HEAD = '#w-rep .doc-facts .doc-hd h3'
-const BODY_HEAD = '#w-rep .doc-body .doc-hd h3'
-const FIRST_BODY = '#w-rep .doc-body [data-sentence-id]'
+const FACTS_HEAD = '#w-rep #factsList .rep-row:first-child .rep-stamp'
+const BODY_HEAD = '#w-rep #bodyList .rep-row:first-child .rep-stamp'
+const FIRST_FACT = '#w-rep #factsList [data-sentence-id]'
+const FIRST_BODY = '#w-rep #bodyList [data-sentence-id]'
 const HANDOVER = '#w-file [data-sect="handover"]'
 const UNSET = '#w-file .slot-unset'
 
@@ -332,7 +333,7 @@ test.describe('[x3] the walk says what the operator needs next', () => {
     // the document's furniture, and plate 3 points at it precisely because it is
     // stable. What is empty this early is the column UNDER it, which is the thing
     // the gate is protecting the copy from.
-    await expect(page.locator(`${REP_WIN} .doc-facts [data-sentence-id]`)).toHaveCount(0)
+    await expect(page.locator(FIRST_FACT)).toHaveCount(0)
     await page.locator(OK).click()
     await expect(page.locator(PLATE)).toHaveCount(0)
     // Still nothing a beat later — this is the assertion that would fail if a
@@ -348,11 +349,11 @@ test.describe('[x3] the walk says what the operator needs next', () => {
 
     // 3 — the record is on the page by the time its plate names it.
     await acknowledge(page, SAID[2]!, DAY_MS)
-    await expect(page.locator(FACTS_HEAD)).toBeVisible()
+    await expect(page.locator(FACTS_HEAD)).toBeVisible({ timeout: DAY_MS })
 
     // 4 — the other document. The difference between the two is the lesson.
     await acknowledge(page, SAID[3]!)
-    await expect(page.locator(BODY_HEAD)).toBeVisible()
+    await expect(page.locator(BODY_HEAD)).toBeVisible({ timeout: DAY_MS })
 
     // NOT asserted, and deliberately: that plate 3 waits specifically for
     // `run_end` as distinct from the report. The fixture day files its one
@@ -461,8 +462,12 @@ test.describe('[x3] the walk says what the operator needs next', () => {
     expect(sawPlate, 'the walk raised a plate while the simulation was still running').toBe(false)
 
     // The day really did produce a report on the way past — otherwise there was
-    // nothing for the old gate to have fired on and this proves nothing.
-    await expect(page.locator(`${REP_WIN} .doc-facts [data-sentence-id]`).first()).toBeVisible({
+    // nothing for the old gate to have fired on and this proves nothing. The
+    // record can still be behind the paper when the phase first reaches tally,
+    // so this uses the same drain path as the rest of the debrief tests before
+    // checking the REPORTS target.
+    await drain(page)
+    await expect(page.locator(FIRST_FACT).first()).toBeVisible({
       timeout: DAY_MS,
     })
     // And now that it is over, the walk picks back up — on REPORTS, the plate
@@ -498,7 +503,7 @@ test.describe('[x3] 튜토리얼 건너뛰기 ends the walk, not the step', () =
     await expect(page.locator(PLATE)).toHaveCount(0)
     await expect(page.locator(LAYER)).toHaveCount(0)
     // The desk is fully playable after a skip — the walk was never in the way.
-    await expect(page.locator('#w-rep .doc-facts [data-sentence-id]').first()).toBeVisible({
+    await expect(page.locator(FIRST_FACT).first()).toBeVisible({
       timeout: DAY_MS,
     })
   })
