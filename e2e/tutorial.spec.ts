@@ -97,6 +97,14 @@ const DAY_MS = 90_000
 
 test.use({ viewport: { width: 1280, height: 800 } })
 
+interface CoachTargetMeasurement {
+  target: { width: number; height: number; y: number; bottom: number }
+  clip: { y: number; bottom: number } | null
+  visibleHeight: number
+  edgeD: string
+  leadD: string
+}
+
 /* ══ helpers ═════════════════════════════════════════════════════════════ */
 
 /** Boots with the walk asked for, and waits for the desk to be uncovered. */
@@ -128,6 +136,47 @@ async function plate(page: Page, line: string, timeout = PLATE_MS): Promise<void
 async function acknowledge(page: Page, next: string, timeout = PLATE_MS): Promise<void> {
   await page.locator(OK).click()
   await plate(page, next, timeout)
+}
+
+async function expectCoachTargetVisible(page: Page, selector: string): Promise<CoachTargetMeasurement> {
+  const handle = await page.waitForFunction(
+    (targetSelector) => {
+      const target = document.querySelector(targetSelector)
+      const edgeD = document.querySelector('.coach-edge')?.getAttribute('d') ?? ''
+      const leadD = document.querySelector('.coach-lead')?.getAttribute('d') ?? ''
+      if (!(target instanceof HTMLElement)) return null
+
+      const win = target.closest('.win')
+      const body = win?.querySelector('.win-body')
+      const targetRect = target.getBoundingClientRect()
+      const clipRect = body instanceof HTMLElement && body !== target && body.contains(target)
+        ? body.getBoundingClientRect()
+        : null
+      const clipTop = Math.max(0, clipRect?.top ?? 0)
+      const clipBottom = Math.min(window.innerHeight, clipRect?.bottom ?? window.innerHeight)
+      const visibleHeight = Math.max(0, Math.min(targetRect.bottom, clipBottom) - Math.max(targetRect.top, clipTop))
+      const measurement = {
+        target: {
+          width: Math.round(targetRect.width),
+          height: Math.round(targetRect.height),
+          y: Math.round(targetRect.y),
+          bottom: Math.round(targetRect.bottom),
+        },
+        clip: clipRect === null ? null : { y: Math.round(clipRect.y), bottom: Math.round(clipRect.bottom) },
+        visibleHeight: Math.round(visibleHeight),
+        edgeD,
+        leadD,
+      }
+      return visibleHeight > 0 && edgeD.length > 0 && leadD.length > 0 ? measurement : null
+    },
+    selector,
+    { timeout: 5_000 },
+  )
+  const measurement = (await handle.jsonValue()) as CoachTargetMeasurement
+  expect(measurement.visibleHeight, `${selector} has no clipped visible height`).toBeGreaterThan(0)
+  expect(measurement.edgeD, `${selector} has no coach edge path`).not.toBe('')
+  expect(measurement.leadD, `${selector} has no coach leader path`).not.toBe('')
+  return measurement
 }
 
 /**
@@ -349,10 +398,12 @@ test.describe('[x3] the walk says what the operator needs next', () => {
     // 3 — the record group is on the page by the time its plate names it.
     await acknowledge(page, SAID[2]!, DAY_MS)
     await expect(page.locator(FACTS_GROUP)).toBeVisible({ timeout: DAY_MS })
+    await expectCoachTargetVisible(page, FACTS_GROUP)
 
     // 4 — the other row group. The difference between the two is the lesson.
     await acknowledge(page, SAID[3]!)
     await expect(page.locator(BODY_GROUP)).toBeVisible({ timeout: DAY_MS })
+    await expectCoachTargetVisible(page, BODY_GROUP)
 
     // NOT asserted, and deliberately: that plate 3 waits specifically for
     // `run_end` as distinct from the report. The fixture day files its one

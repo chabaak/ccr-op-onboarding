@@ -211,12 +211,13 @@ function boxPath(r: Rect): string {
 /**
  * The target, or `null` when the desk has taken it away.
  *
- * Three ways a step can lose its target, and all three are answered here rather
- * than in the caller, so a step can never strand the walk: the selector resolves
- * to nothing; it resolves inside a window the operator has shut or folded, which
- * is the question `thread-layer.ts`'s `bodyRect()` asks in these same three class
- * names; or it has been scrolled clean out of the `.win-body` that clips it. The
- * plate still goes up in all three — centred, with no hole and no leader.
+ * Two ways a step can lose its target outright, and both are answered here
+ * rather than in the caller, so a step can never strand the walk: the selector
+ * resolves to nothing, or it resolves inside a window the operator has shut or
+ * folded, which is the question `thread-layer.ts`'s `bodyRect()` asks in these
+ * same three class names. A target scrolled clean out of the `.win-body` that
+ * clips it is still returned, because `reveal()` needs that node before the
+ * clipped-visibility test can fairly decide whether the mark has a target.
  */
 function resolveTarget(selector: string): Found | null {
   const node = document.querySelector(selector)
@@ -230,8 +231,12 @@ function resolveTarget(selector: string): Found | null {
   const clip = body !== null && body !== node && body.contains(node) ? rectOf(body) : null
   const rect = rectOf(node)
   if (rect.width === 0 || rect.height === 0) return null
-  if (clip !== null && intersect(rect, clip) === null) return null
   return { node, rect, clip }
+}
+
+function visibleTarget(found: Found): Found | null {
+  if (found.clip !== null && intersect(found.rect, found.clip) === null) return null
+  return found
 }
 
 /** The hole to cut for `found`, clipped to its window and to the viewport. */
@@ -318,11 +323,6 @@ function leaderPath(hole: Rect, plate: Rect): string | null {
   return `M${Math.round(ax)} ${Math.round(ay)}L${Math.round(bx)} ${Math.round(by)}`
 }
 
-/** The operator has asked for less movement. */
-function still(): boolean {
-  return window.matchMedia('(prefers-reduced-motion: reduce)').matches
-}
-
 /**
  * Brings the target into view before the mark is measured against it.
  *
@@ -334,13 +334,16 @@ function still(): boolean {
  * scrolled out of an `overflow:hidden` body still reports a rect inside the
  * viewport, so the viewport test alone passes for a target nobody can see.
  *
- * Once per mark, on the first pass where the target resolves. It is never
- * re-asserted: after that the operator owns the scrollbar, and a mark that kept
- * dragging the page back would be fighting the person it is teaching.
+ * Once per mark, on the first pass where the target resolves. It is immediate
+ * rather than animated because the same draw pass is about to measure the hole;
+ * a smooth scroll would briefly put up a centred no-target plate for a target
+ * the coach already knows how to reveal. It is never re-asserted: after that the
+ * operator owns the scrollbar, and a mark that kept dragging the page back would
+ * be fighting the person it is teaching.
  */
 function reveal(found: Found, view: Rect): void {
   if (spannedBy(found.rect, view) && (found.clip === null || spannedBy(found.rect, found.clip))) return
-  found.node.scrollIntoView({ block: 'center', behavior: still() ? 'auto' : 'smooth' })
+  found.node.scrollIntoView({ block: 'center', behavior: 'auto' })
 }
 
 /* ── the layer ───────────────────────────────────────────────────────────── */
@@ -445,15 +448,13 @@ export function createCoach(app: HTMLElement): CoachHandle {
     const view: Rect = { x: 0, y: 0, width: window.innerWidth, height: window.innerHeight }
     cut.setAttribute('viewBox', `0 0 ${view.width} ${view.height}`)
 
-    const found = resolveTarget(live.mark.target)
+    let found = resolveTarget(live.mark.target)
     if (found !== null && !live.revealed) {
       live.revealed = true
-      // The scroll it may start is what re-arms this pass: a smooth scroll
-      // fires `scroll` all the way down, and the capture-phase listener below
-      // turns every one of those into another frame, so the mark rides the
-      // movement instead of having to predict where it lands.
       reveal(found, view)
+      found = resolveTarget(live.mark.target)
     }
+    found = found === null ? null : visibleTarget(found)
     const hole = found === null ? null : holeFor(found, view)
 
     scrim.setAttribute('d', hole === null ? boxPath(view) : `${boxPath(view)}${boxPath(hole)}`)
