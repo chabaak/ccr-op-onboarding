@@ -115,7 +115,7 @@ async function boot(page: Page, opts: { reduced: boolean }): Promise<void> {
   await page.goto('./')
   await expect(page.locator(REP)).toBeVisible()
   await turnToAgent(page)
-  await page.locator(`${REP} .win-bar`).click()
+  await page.locator(`${REP} .win-caption`).click()
 }
 
 function reportsOf(f: Frame): ReportEvent[] {
@@ -162,7 +162,7 @@ async function fileAnotherRun(page: Page): Promise<void> {
     timeout: 30_000,
   })
   await drain(page)
-  await page.locator(`${REP} .win-bar`).click()
+  await page.locator(`${REP} .win-caption`).click()
 }
 
 function metaOf(f: Frame): MetaEvent | null {

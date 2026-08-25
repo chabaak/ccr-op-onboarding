@@ -230,7 +230,7 @@ body.booting .scenario-file{visibility:hidden}
 /* ═══ WINDOW SHELL ════════════════════════════════════════════════════════ */
 .win{position:fixed;left:var(--x);top:var(--y);width:var(--w);height:var(--h);
   z-index:var(--z);display:flex;flex-direction:column;
-  box-shadow:var(--shadow-win);
+  border:1px solid var(--ink-line);background:var(--surface);box-shadow:var(--shadow-win);
   animation:winIn .7s cubic-bezier(.16,.9,.2,1) both;
   animation-delay:var(--delay,0s)}
 @keyframes winIn{from{opacity:0;transform:translateY(22px) scale(.985);filter:blur(6px)}
@@ -271,30 +271,28 @@ body.booting .win{visibility:hidden}
    This was also the sheet's ONE `clip-path` trapezoid. If a later plate wants
    the idiom, the polygon above is the one the desk actually used. */
 
-.win-bar{display:flex;align-items:center;gap:var(--space-9);height:45px;
-  padding:0 var(--space-6) 0 var(--space-11);
-  background:linear-gradient(to bottom,var(--bar-hi),var(--chrome-hi));
-  border-bottom:1px solid var(--edge);cursor:grab;flex:0 0 auto;position:relative}
-.win-bar::after{content:'';position:absolute;left:0;right:0;bottom:0;height:1px;
-  background:linear-gradient(90deg,var(--warning),transparent 60%);opacity:.5}
-.win.focused .win-bar{background:linear-gradient(to bottom,var(--bar-hi-on),var(--chrome-raise-2))}
-.win.focused .win-bar::after{opacity:1}
-.win-dot{width:9px;height:9px;background:var(--dot);flex:0 0 auto}
-.win.focused .win-dot{background:var(--warning);box-shadow:0 0 8px var(--warning)}
-.win-dot.live{background:var(--warning);animation:livePulse 1.4s ease-in-out infinite}
+.win-caption{display:flex;align-items:baseline;gap:var(--space-8);
+  min-height:39px;padding:var(--space-10) var(--space-12) var(--space-8);
+  border-bottom:1px solid var(--ink-line);cursor:grab;flex:0 0 auto;position:relative}
+.win-caption:focus-visible{outline:1px solid var(--warning);outline-offset:-2px}
+.win.focused{border-color:var(--signal)}
+.win.focused .win-caption{color:var(--signal)}
 @keyframes livePulse{0%,100%{opacity:.35;box-shadow:none}50%{opacity:1;box-shadow:0 0 9px var(--warning)}}
 /* x1 — `white-space:nowrap` on the title. At 1.5× the two right-column
    windows are 383 px wide and `AGENT FILE` broke over two lines, which doubled
    the bar's height and pushed the body down behind it.
-   x5 — the Korean subtitle that used to sit beside it is gone (`.win-bar h2 i`,
-   deleted with `WindowDef.sub`), so the bar carries the English name alone. */
-.win-bar h2{font-size:var(--fs-10);font-weight:600;letter-spacing:.22em;color:var(--txt-2);
-  display:flex;align-items:baseline;gap:var(--space-10);min-width:0;white-space:nowrap}
-.win.focused .win-bar h2{color:var(--txt-hi)}
+   x5 — the Korean subtitle that used to sit beside it is gone with
+   `WindowDef.sub`, so the caption carries one structured line. */
+.win-caption-label{font-family:var(--mono);font-size:var(--fs-10);font-weight:500;line-height:1.2;
+  letter-spacing:.24em;color:var(--surface-muted-2);min-width:0;white-space:nowrap;
+  overflow:hidden;text-overflow:ellipsis}
+.win.focused .win-caption-label{color:var(--signal)}
 .win-ctl{margin-left:auto;display:flex;gap:var(--space-1)}
-.wc{width:36px;height:30px;font-size:var(--fs-11);line-height:1;color:var(--txt-5);transition:.12s}
-.wc:hover{background:var(--ctl-hover);color:var(--txt-hi)}
-.wc-close:hover{background:var(--warning-strong);color:var(--txt-max)}
+.wc{width:28px;height:22px;font-size:var(--fs-10);line-height:1;color:var(--surface-muted-2);
+  border:1px solid transparent;transition:.12s}
+.wc:hover,.wc:focus-visible{border-color:var(--ink-line);background:var(--surface-rule);color:var(--surface-text)}
+.wc:focus-visible{outline:1px solid var(--warning);outline-offset:2px}
+.wc-close:hover,.wc-close:focus-visible{border-color:var(--warning-strong);color:var(--warning)}
 
 .win-body{flex:1;min-height:0;position:relative;overflow:hidden}
 .win-grip{position:absolute;right:0;bottom:0;width:24px;height:24px;cursor:nwse-resize;z-index:5}

@@ -2,7 +2,7 @@
 //
 // Rewritten in TS from docs/design/phase2-ui/app.js lines 51..97 (WINS,
 // buildTaskbar, syncTaskbar, focusWin, openWin, toggleWin) and 123..170
-// (initWindows — title-bar drag, corner-grip resize, collapse, close). The
+// (initWindows — caption drag, corner-grip resize, collapse, close). The
 // reference kept the set of windows in a module-global map; here the set comes
 // from the shell-owned registry ([u3#c6]) and the default arrangement from the
 // pure `applyLayout` ([u3#c2]).
@@ -24,7 +24,7 @@ const MIN_H = 140
 /** How far one arrow key nudges a window ([u3#c5] keyboard move). */
 const KEY_STEP = 12
 /**
- * Drag clamps. A window may hang off an edge by at most a title bar's worth —
+ * Drag clamps. A window may hang off an edge by at most a caption strip's worth —
  * past that it is out of reach, and the desk has to stay recoverable by drag
  * alone (there is no "move to front" menu anywhere in this build). The top is
  * clamped harder: nothing may slide under the chrome.
@@ -115,26 +115,26 @@ export function createWindowManager(deps: Deps): WindowManager {
   }
 
   function wireDrag(frame: WindowFrame): void {
-    frame.bar.addEventListener('pointerdown', (event: PointerEvent) => {
+    frame.caption.addEventListener('pointerdown', (event: PointerEvent) => {
       if (event.target instanceof Element && event.target.closest('.wc')) return
       event.preventDefault()
       const rect = frame.root.getBoundingClientRect()
       const ox = event.clientX - rect.left
       const oy = event.clientY - rect.top
       frame.root.classList.add('dragging')
-      frame.bar.setPointerCapture(event.pointerId)
+      frame.caption.setPointerCapture(event.pointerId)
 
       const onMove = (ev: PointerEvent): void => move(frame, ev.clientX - ox, ev.clientY - oy)
       const onUp = (): void => {
         frame.root.classList.remove('dragging')
-        frame.bar.removeEventListener('pointermove', onMove)
-        frame.bar.removeEventListener('pointerup', onUp)
+        frame.caption.removeEventListener('pointermove', onMove)
+        frame.caption.removeEventListener('pointerup', onUp)
       }
-      frame.bar.addEventListener('pointermove', onMove)
-      frame.bar.addEventListener('pointerup', onUp)
+      frame.caption.addEventListener('pointermove', onMove)
+      frame.caption.addEventListener('pointerup', onUp)
     })
 
-    frame.bar.addEventListener('keydown', (event: KeyboardEvent) => {
+    frame.caption.addEventListener('keydown', (event: KeyboardEvent) => {
       const step: Record<string, [number, number]> = {
         ArrowLeft: [-KEY_STEP, 0],
         ArrowRight: [KEY_STEP, 0],
@@ -149,7 +149,7 @@ export function createWindowManager(deps: Deps): WindowManager {
       // was pointer-only, and two of the four booted windows ship clipped — the
       // block deck is 843 px tall inside a 257 px body — so a keyboard operator
       // could not see the deck at all (WCAG 2.1.1, Level A). Same MIN_W/MIN_H
-      // clamp as the drag; the bar's accessible name says so.
+      // clamp as the drag; the caption's accessible name says so.
       //
       // A fixed sheet is the one exception, and it is gated HERE rather than
       // desk-wide for exactly the reason above: this branch exists BECAUSE a

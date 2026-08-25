@@ -31,7 +31,7 @@ export const CHROME = {
 /* ── window chrome ops (item 9) ──────────────────────────────────────────── */
 export const WIN = {
   any: '.win',
-  bar: '.win-bar',
+  bar: '.win-caption',
   body: '.win-body',
   grip: '.win-grip',
   collapse: '.wc-min',

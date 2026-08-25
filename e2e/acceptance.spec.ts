@@ -495,7 +495,7 @@ test.describe('acceptance 9-12', () => {
 
     const win = page.locator(WINDOWS.rep)
 
-    // drag by the title bar
+    // drag by the caption
     const start = (await win.boundingBox())!
     await page.locator(`${WINDOWS.rep} ${WIN.bar}`).hover()
     await page.mouse.down()
@@ -518,7 +518,7 @@ test.describe('acceptance 9-12', () => {
     const resized = (await win.boundingBox())!
     expect(Math.abs(resized.width - dragged.width), 'the window did not resize').toBeGreaterThan(4)
 
-    // collapse to the title bar, from the keyboard (controls are reachable)
+    // collapse to the caption, from the keyboard (controls are reachable)
     const collapse = page.locator(`${WINDOWS.rep} ${WIN.collapse}`)
     await collapse.focus()
     await expect(collapse).toBeFocused()
