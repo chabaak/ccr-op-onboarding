@@ -320,7 +320,6 @@ const tsSurfaceByFile = new Map([
   ['fallback-notice.ts', ['notice', 'fallback notice']],
   ['game-clock.ts', ['desktop', 'desk clock']],
   ['minable-sentence.ts', ['보고서', 'report sentence controls']],
-  ['red-thread.ts', ['요원 파일', 'handover thread']],
   ['report-archive.ts', ['보고서', 'report archive']],
   ['report-view.ts', ['보고서', 'report documents']],
   ['run-counter.ts', ['desktop', 'run counter']],
