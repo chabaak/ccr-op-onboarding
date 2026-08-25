@@ -37,10 +37,9 @@ const MEMBRANE_OPS = ['slot', 'unslot', 'mine', 'deploy', 'new_run'] as const
 const MEMBRANE_SELECTOR = MEMBRANE_OPS.map((op) => `[data-op="${op}"]`).join(', ')
 
 /**
- * The NPC state channels (spec §3 inv 2). The clock stamp `.fl-t` is chrome, excluded.
- *
- * #130 reopens `.fl-symptom` as a quiet 요원 row, so it is back in scope beside
- * `.fl-npc`.
+ * The NPC state channel (spec §3 inv 2). The clock stamp `.fl-t` is chrome,
+ * excluded. `symptom` still rides the seam for Call 2 state, but it no longer
+ * reaches the DOM.
  *
  * x11 — TWO COLUMNS OF THE ONE CHANNEL (민서, 08-10). The reveal became a
  * typewriter, so a line is printed twice: `.fl-c` fills character by character
@@ -52,7 +51,7 @@ const MEMBRANE_SELECTOR = MEMBRANE_OPS.map((op) => `[data-op="${op}"]`).join(', 
  * assistive-tech user actually receives, was never scanned at all. Both columns
  * are in scope and neither is `.fl-t`, so the exclusion below is unaffected.
  */
-const NPC_TEXT_SELECTOR = '.fl-npc .fl-c, .fl-npc .fl-sr, .fl-symptom .fl-c, .fl-symptom .fl-sr'
+const NPC_TEXT_SELECTOR = '.fl-npc .fl-c, .fl-npc .fl-sr'
 /** Digit-bearing surfaces that are score or chrome, never NPC state. */
 /* x4 — the ledger's table became record lines; the exclusion follows the
    selectors that actually carry score digits. Kept in step with
@@ -801,7 +800,7 @@ test.describe('inv 2 · rendered DOM — no digit renders for NPC state', () => 
     await boot(page)
   })
 
-  test('inv 2 — no digit renders inside an NPC or symptom line', async ({ page }) => {
+  test('inv 2 — no digit renders inside an NPC line', async ({ page }) => {
     // Scoped BY SELECTOR: the NPC line's two content columns only — `.fl-c`,
     // what the paper prints, and `.fl-sr`, what a reader hears (x11). The
     // per-line clock stamp `.fl-t` is a sibling of both and is not read.

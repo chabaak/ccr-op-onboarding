@@ -87,13 +87,12 @@ const PLATE_MS = 30_000
 /**
  * …and the gates that wait for the simulation to produce something.
  *
- * Measured after the issue 130 live-feed rows landed: `origin/main` produced
- * the first report 53.3s after tally, while the fixed branch takes 64.4s
- * because symptom support rows are visible again. The repeat-each lane runs two
- * tutorial workers together, so keep headroom above the measured report gate
- * without letting a missing report inherit a broad test default.
+ * Measured after symptom rows became undrawn again: the gate test `(h)` reaches
+ * the report plates in 12.8s locally, and the live-feed paper total is 128.168s
+ * instead of the 140.772s symptom-row build. Restore the pre-#151 ceiling so a
+ * missing report cannot inherit a timeout tuned for a removed condition.
  */
-const DAY_MS = 90_000
+const DAY_MS = 60_000
 
 test.use({ viewport: { width: 1280, height: 800 } })
 

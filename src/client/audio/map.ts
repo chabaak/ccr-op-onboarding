@@ -35,12 +35,19 @@ export const TRIGGERS = [
 
 export type Trigger = (typeof TRIGGERS)[number]
 
-/** `FeedKind` → its trigger. Exhaustive by construction: a new kind is a type error. */
-export const FEED_TRIGGER: Record<FeedKind, Trigger> = {
+type AudibleFeedKind = Exclude<FeedKind, 'symptom'>
+
+/**
+ * Revealed feed rows → their triggers.
+ *
+ * `symptom` is still a frozen seam kind, but the LIVE FEED drops it before a
+ * row reaches the DOM. There is therefore no revealed-line caller for
+ * `feed:symptom`.
+ */
+export const FEED_TRIGGER: Record<AudibleFeedKind, Trigger> = {
   event: 'feed:event',
   radio: 'feed:radio',
   npc: 'feed:npc',
-  symptom: 'feed:symptom',
   wait: 'feed:wait',
   fallback: 'feed:fallback',
   mark: 'feed:mark',

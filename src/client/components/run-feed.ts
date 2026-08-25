@@ -345,9 +345,10 @@ export function feedGapMs(
  * the same breath as the `※` and the hatched band it prints on, and it should
  * read as stamped rather than as spoken.
  *
- * `symptom` is a quiet supporting row, not a foreground dispatch. Printing it
- * whole keeps the beat state visible without making REPORTS wait for every
- * muted sentence to type at full live-feed pace.
+ * `symptom` is undrawn by the fanfold again, but the projection remains total
+ * for the frozen seam. If a test or diagnostic projects one directly, keep it
+ * whole so it cannot charge typewriter time for a row the real feed never
+ * prints.
  */
 export const typesOut = (kind: FeedKind): boolean => kind !== 'mark' && kind !== 'fallback' && kind !== 'symptom'
 
@@ -359,7 +360,7 @@ export const typesOut = (kind: FeedKind): boolean => kind !== 'mark' && kind !==
  * copies of "which kinds are undrawn" would be two ways for the paper and its
  * clock to disagree about what a beat contains.
  */
-const isUndrawn = (line: FeedLine): boolean => line.kind === 'wait'
+const isUndrawn = (line: FeedLine): boolean => line.kind === 'wait' || line.kind === 'symptom'
 
 /**
  * Will this queued event put a line on the paper?
@@ -625,8 +626,8 @@ export function createRunFeed(host: HTMLElement, driver: FixtureDriver): RunFeed
   // Instance state: the green band alternates down the page (app.js:434).
   //
   // x8 — the symptom watch is gone with the empty-symptom line. It counted a
-  // beat's symptoms so a silent one could still print `(변화 없음)`; this feed
-  // brings real symptom rows back, but beat boundaries still carry nothing here.
+  // beat's symptoms so a silent one could still print `(변화 없음)`; symptom
+  // rows are undrawn again, and beat boundaries still carry nothing here.
   let band = false
   let stamp = ''
   // The sitting's name, until `meta` lands one — and since x10 (민서, 08-10) it

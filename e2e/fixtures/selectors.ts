@@ -69,7 +69,7 @@ export const FEED = {
    * The clock stamp `.fl-t` is a SIBLING of both and is deliberately outside
    * this scope — it is chrome, and inv 2 is about NPC state.
    */
-  npcColumns: '#w-feed #feedList :is(.fl-npc, .fl-symptom) :is(.fl-c, .fl-sr)',
+  npcColumns: '#w-feed #feedList .fl-npc :is(.fl-c, .fl-sr)',
   /** The behind-indicator (U2) — shown only while the feed is NOT following. */
   behind: '#w-feed #feedBehind',
 } as const

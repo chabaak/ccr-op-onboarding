@@ -30,7 +30,7 @@
     "radio-open": { "files": ["radio-squelch-open"], "bus": "sfx", "gain": 0.6, "cooldownMs": 80 },
     "radio-close": { "files": ["radio-squelch-close"], "bus": "sfx", "gain": 0.45, "cooldownMs": 80 },
     "npc": { "files": ["npc-handset"], "bus": "sfx", "gain": 0.5, "cooldownMs": 120 },
-    "$symptom": "Deliberately the quietest one-shot in the pack. A player who notices every one of these is being told which lines carry temperament, and that is the deduction the game is made of.",
+    "$symptom": "Dormant while symptom feed rows are undrawn. The cut stays in the pack so rebinding remains a data edit if the row ever prints again.",
     "symptom": { "files": ["symptom-chime"], "bus": "sfx", "gain": 0.18, "cooldownMs": 2200 },
     "mark": { "files": ["pen-mark"], "bus": "sfx", "gain": 0.5, "cooldownMs": 120 },
 
@@ -78,7 +78,8 @@
     "feed:radio": "radio-open",
     "feed:radio-end": "radio-close",
     "feed:npc": "npc",
-    "feed:symptom": "symptom",
+    "$feed-symptom": "UNREACHABLE while symptom rows are undrawn. Feed cues fire when a line is REVEALED, and components/run-feed.ts drops kind:'symptom' before it reaches the DOM. The seam still carries the kind for Call 2 state.",
+    "feed:symptom": null,
     "feed:mark": "mark",
     "$feed-fallback": "Silent: the fallback ViewEvent already sounds the degrade at the moment it happens (event:fallback:*), which is where shell/announcer.ts announces it too, and the notice LINE rides a later feed line.",
     "feed:fallback": null,

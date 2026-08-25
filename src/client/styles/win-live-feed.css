@@ -1,9 +1,9 @@
 /* ===========================================================================
    win-live-feed.css — WINDOW 2 · LIVE FEED (desktop.css lines 414..470).
 
-   Fanfold printing as you watch: one grid row per line, with stamp, speaker tag
-   and sentence columns. `symptom` rows print again as quiet 요원 state; `wait`
-   still stays silent.
+   Fanfold printing as you watch: one grid row per printed line, with stamp,
+   speaker tag and sentence columns. `symptom` and `wait` stay silent on the
+   paper; the seam still carries both.
 
    And the older removal, kept because it is the precedent: `wait` is a kind on the frozen seam
    (`shared/view-driver.ts`) and has no skin here because x6 removed the waiting
@@ -71,11 +71,10 @@
 
    An empty `.fl-c` is the print head before the line. */
 
-/* Each kind below sets its typographic treatment. The tag column says who; the
-   sentence treatment says what kind of event the operator is reading. */
+/* Each printed kind below sets its typographic treatment. The tag column says
+   who; the sentence treatment says what kind of event the operator is reading. */
 .fl-event .fl-c{font-weight:400;color:var(--feed-1)}
 .fl-radio .fl-c{font-weight:600;color:var(--feed-1)}
-.fl-symptom .fl-c{font-size:var(--fs-12);color:var(--surface-muted-2)}
 .fl-npc .fl-k{color:var(--warning)}
 .fl-npc .fl-c{font-size:var(--fs-13);color:var(--feed-3)}
 /* x8 — the speaker sits INSIDE a sentence now (`표기웅 “…”라고 말한다`), so it is
