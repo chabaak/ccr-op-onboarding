@@ -37,7 +37,6 @@ const ACCENT_TOKENS = [
   '--warning',
   '--warning-strong',
   '--warning-wash',
-  '--evidence-thread',
 ]
 
 const OLD_STOCK_TOKENS = [
@@ -107,8 +106,8 @@ describe('[issue #107] accents are named for terminal roles, not paper marks', (
     expect(norm(valueOf('--signal'))).not.toBe(norm(valueOf('--warning')))
   })
 
-  it('(b) warning and evidence-thread colours remain tokenized', () => {
-    for (const name of ['--warning', '--warning-strong', '--warning-wash', '--evidence-thread']) {
+  it('(b) warning colours remain tokenized', () => {
+    for (const name of ['--warning', '--warning-strong', '--warning-wash']) {
       expect(valueOf(name), `${name} is empty`).not.toBe('')
     }
   })

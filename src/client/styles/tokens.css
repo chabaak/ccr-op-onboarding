@@ -39,13 +39,11 @@
   --surface-muted:#93a6c6;
   --surface-muted-2:#6b7c99;
 
-  /* accents — one signal, one warning, one evidence-thread ink */
+  /* accents — one signal, one warning ink */
   --signal:#8fd0ff;
   --warning:#e88a6a;
   --warning-strong:#e88a6a;
   --warning-wash:rgba(232,138,106,.10);
-  --evidence-thread:#e88a6a;
-  --highlight:#8fd0ff;
 
   --shadow-win:0 2px 0 rgba(5,7,12,.5), 0 28px 64px -20px rgba(5,7,12,.9),
                0 0 0 1px rgba(5,7,12,.7);
@@ -174,7 +172,6 @@
   --sh-07:rgba(5,7,12,.07);
   --sh-13:rgba(5,7,12,.13);
   --sh-14:rgba(5,7,12,.14);
-  --sh-15:rgba(5,7,12,.15);
   --sh-18:rgba(5,7,12,.18);
   --sh-2:rgba(5,7,12,.2);
   --sh-22:rgba(5,7,12,.22);
@@ -206,7 +203,7 @@
   --sheen-warm:rgba(223,233,255,.5);
 }
 
-/* ─── warning at low alpha + the evidence thread ──────────────────────── */
+/* ─── warning at low alpha ────────────────────────────────────────────── */
 :root{
   --warning-a08:rgba(232,138,106,.08);
   --warning-a09:rgba(232,138,106,.09);
@@ -216,10 +213,7 @@
   --warning-a4:rgba(232,138,106,.4);
   --warning-a5:rgba(232,138,106,.5);
   --warning-a55:rgba(232,138,106,.55);
-  --evidence-thread-a55:rgba(232,138,106,.55);
-  --evidence-thread-a8:rgba(232,138,106,.8);
   --horizon:rgba(232,138,106,.16);
-  --highlight-a62:rgba(143,208,255,.62);
 }
 
 /* ─── boot scanline + instrument glow ─────────────────────────────────── */
