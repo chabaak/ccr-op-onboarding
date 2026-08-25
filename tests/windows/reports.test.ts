@@ -339,6 +339,17 @@ describe('[u6#c5] minable states', () => {
     expect(classes[3]!.split(/\s+/)).toContain('carried')
   })
 
+  it('(c2) source: the row receives the same state on first paint and refresh', () => {
+    const view = scannedSources().find((s) => s.file.endsWith('components/report-view.ts'))
+    expect(view, 'the REPORTS view is not in the scanned set').toBeTruthy()
+    const text = view!.text
+    expect(text, 'row state classes are missing').toContain('ROW_STATE_CLASSES')
+    expect(text, 'initial render does not mark the tagged record row').toMatch(/applyRowState\(\s*row,\s*state\s*\)/)
+    expect(text, 'refresh repaints the sentence but leaves the row stale').toMatch(
+      /applyState\(\s*anchor\.node,\s*state\s*\)[\s\S]{0,120}applyRowState\(\s*anchor\.row,\s*state\s*\)/,
+    )
+  })
+
   it('(d) deriveMarks folds store.mined, the slot values and meta.carried — and mutates nothing', async () => {
     const m = await minable()
     const snapshot = store({ mined: ['a'], slots: { 0: 'b', 3: 'c' } })
