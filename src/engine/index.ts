@@ -49,6 +49,7 @@ import type {
 } from '../shared/contracts.ts'
 import type { Symptoms, Temperament } from '../shared/datapack.ts'
 import type { PredicateState } from '../shared/predicates.ts'
+import { segmentReportBody } from '../shared/segment.ts'
 
 import { buildSchedule, createBeatDriver, eventExposed, parseClock } from './beat/index.ts'
 import type {
@@ -190,6 +191,11 @@ export interface EngineHandle extends Engine {
 /** spec-engine §5's substitute report body — used when Call 3 never lands. */
 export const SUBSTITUTE_REPORT_BODY =
   '무전이 끊겨 보고가 도착하지 않았다. 요원은 홀로 판단했다. 이 라운드는 현장 기록으로만 남는다.'
+
+function usableReporter(response: ReporterResponse | null): ReporterResponse | null {
+  if (response === null) return null
+  return segmentReportBody(response.report_body).length > 0 ? response : null
+}
 
 /** The state core, as the beat driver's `StateCorePort` sees it, over `./state`'s pure functions. */
 function createStateCore(
@@ -490,12 +496,13 @@ export function createEngine(deps: EngineDeps): EngineHandle {
       const beat = beatNow()
       const roundIndex = beat.roundIndex
       if (roundIndex === null) throw new Error(`beat ${beat.index} belongs to no round`)
+      const reporter = usableReporter(response)
       // §5 recovery: with no reporter body, facts fall back to the objective
       // log — the assembled round events, which owe nothing to the model. NOT
       // `experienced()`: that one carries the `inner_note`, and `facts` are
       // minted, emitted and minable (see `withholdInnerNote`).
-      const facts = response === null ? assembler.objectiveLog(roundIndex) : response.facts
-      const body = response === null ? SUBSTITUTE_REPORT_BODY : response.report_body
+      const facts = reporter === null ? assembler.objectiveLog(roundIndex) : reporter.facts
+      const body = reporter === null ? SUBSTITUTE_REPORT_BODY : reporter.report_body
       // The membrane, held on both paths: a reporter that echoed its own prompt
       // would put the note back on the `f` channel by itself.
       const note = roundGates.get(roundIndex)?.inner_note ?? ''

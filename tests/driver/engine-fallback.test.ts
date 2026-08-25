@@ -396,12 +396,54 @@ describe('[#116 D] a call that lands unusable is a fallback too', () => {
     expect(reports[0]!.report_body.length).toBeGreaterThan(0)
   })
 
-  it('(f) a well-formed run emits none of these — the guard is not firing on success', async () => {
+  it('(f) a present-but-empty reporter body is still unusable and reaches the engine as null', async () => {
+    const recorder = createRecorder()
+    const events = await drain(
+      makeRig({
+        shaped: true,
+        transport: rawBodyTransport('reporter', { facts: ['모델이 사실을 남겼다.'], report_body: '' }),
+        wrapEngine: (engine) => recordEngine(engine, recorder),
+      }),
+    )
+
+    expect(
+      recorder.log.filter((entry) => entry.name === 'engine.applyReport').map((entry) => entry.value),
+    ).toEqual([null])
+    expect(fallbacks(events).filter((event) => event.call === 3)).toEqual([
+      { type: 'fallback', call: 3, code: UNUSABLE_PAYLOAD_CODE, beat: 1 },
+    ])
+    const reports = events.flatMap((event) => (event.type === 'report' ? [event] : []))
+    expect(reports).toHaveLength(1)
+    expect(reports[0]!.report_body.length).toBeGreaterThan(0)
+  })
+
+  it('(g) a markdown-only reporter body is judged after segmentation and uses the substitute', async () => {
+    const recorder = createRecorder()
+    const events = await drain(
+      makeRig({
+        shaped: true,
+        transport: rawBodyTransport('reporter', { facts: ['모델이 사실을 남겼다.'], report_body: '#\n- \n1.   ' }),
+        wrapEngine: (engine) => recordEngine(engine, recorder),
+      }),
+    )
+
+    expect(
+      recorder.log.filter((entry) => entry.name === 'engine.applyReport').map((entry) => entry.value),
+    ).toEqual([null])
+    expect(fallbacks(events).filter((event) => event.call === 3)).toEqual([
+      { type: 'fallback', call: 3, code: UNUSABLE_PAYLOAD_CODE, beat: 1 },
+    ])
+    const reports = events.flatMap((event) => (event.type === 'report' ? [event] : []))
+    expect(reports).toHaveLength(1)
+    expect(reports[0]!.report_body.length).toBeGreaterThan(0)
+  })
+
+  it('(h) a well-formed run emits none of these — the guard is not firing on success', async () => {
     const events = await drain(makeRig({ shaped: true, pack: twoRounds() }))
     expect(fallbacks(events)).toEqual([])
   })
 
-  it('(g) every `waiting` is still paired when the unusable payload arrives', async () => {
+  it('(i) every `waiting` is still paired when the unusable payload arrives', async () => {
     const events = await drain(makeRig({ shaped: true, transport: unusableTransport('judgment', 'stance') }))
     const edges = events.flatMap((e) => (e.type === 'waiting' && e.for === 'judgment' ? [e.active] : []))
     expect(edges).toEqual([true, false])

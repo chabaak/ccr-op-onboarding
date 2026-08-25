@@ -46,6 +46,7 @@ import type {
 import { createBlockStore } from './blocks.ts'
 import { createEmitter } from './emitter.ts'
 import { createMembrane } from './membrane.ts'
+import { segmentReportBody } from '../shared/segment.ts'
 
 /** Which pause the player is shown, per call number (§5.2's `for`). */
 const WAITING_FOR = {
@@ -84,7 +85,13 @@ function readNarration(body: AnyBody): CallResponse['narration'] | null {
 }
 
 function readReporter(body: AnyBody): CallResponse['reporter'] | null {
-  return 'report_body' in body ? body : null
+  if (body === null || typeof body !== 'object') return null
+  const value = body as Partial<CallResponse['reporter']>
+  return Array.isArray(value.facts) &&
+    typeof value.report_body === 'string' &&
+    segmentReportBody(value.report_body).length > 0
+    ? (value as CallResponse['reporter'])
+    : null
 }
 
 export function createLiveDriver(deps: LiveDriverDeps): LiveDriver {
