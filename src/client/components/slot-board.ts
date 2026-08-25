@@ -302,11 +302,10 @@ export function createSlotBoard(options: SlotBoardOptions): SlotBoard {
   /**
    * One seated sentence in one of the four handover slots.
    *
-   * Every attribute the thread layer, membrane census and tutorial reach for
-   * survives (`data-slot`, `data-no`, `data-block-id`, `.slot-pin`,
-   * `[data-op=unslot]`). The visible number comes from the skin via
-   * `data-label`, so the semantic slot number remains stable for callers that
-   * already read `data-no`.
+   * Every attribute the membrane census, tests and tutorial reach for survives
+   * (`data-slot`, `data-no`, `data-block-id`, `.slot-pin`, `[data-op=unslot]`).
+   * The visible number comes from the skin via `data-label`, so the semantic
+   * slot number remains stable for callers that already read `data-no`.
    */
   function buildSeat(cell: SlotCell, blockId: string, chars?: number): HTMLElement {
     const node = el('div', 'slot filled')
@@ -315,16 +314,15 @@ export function createSlotBoard(options: SlotBoardOptions): SlotBoard {
     node.dataset.no = no
     node.dataset.label = `칸 ${cell.slot + 1}`
     // I1 (spec-client §3 inv 3): the slot holds an authored ID, and the pin
-    // anchor carries the same one — u8's RedThread pins to it.
+    // anchor carries the same one for the slot's own controls and tests.
     node.dataset.blockId = blockId
     if (deployed) node.classList.add('locked')
 
     // H3 — `chars` is the reveal's cursor: the row is mid-type, so it shows
-    // that many characters and NOT its release control or its thread anchor.
+    // that many characters and NOT its release control.
     // A 해제 the operator can press on a sentence that has not finished arriving
-    // is a control offered for a thing that is not there yet, and the pin would
-    // have `shell/thread-layer.ts` drawing a red thread to a half-written line.
-    // Both arrive with the last character (see `render`).
+    // is a control offered for a thing that is not there yet. The control
+    // arrives with the last character (see `render`).
     const typing = chars !== undefined
     const model = blockCardModel(blockId, options.resolve(blockId))
     node.append(
@@ -346,7 +344,7 @@ export function createSlotBoard(options: SlotBoardOptions): SlotBoard {
       node.append(unset)
     }
 
-    // The thread's anchor CLOSES the run rather than opening it.
+    // The pin closes the seated sentence rather than opening it.
     //
     // It sat between the number and the sentence to begin with, and a paragraph
     // has soft-wrap opportunities the four boxes never did: the line broke

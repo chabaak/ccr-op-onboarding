@@ -31,10 +31,10 @@
    fully operable under a mark, which is what lets a step come down when the
    operator presses the thing the mark points at.
 
-   Z-ORDER 690: above the top bar (500), the thread layer (460), the manual (480)
-   and every window (`--z`, which starts at 30); below the door (700), the grain
-   and vignette (900/901) and the confirmation plate (970). A mark must never be
-   the thing on top of an irreversible question.
+   Z-ORDER 690: above the top bar (500), the manual (480) and every window
+   (`--z`, which starts at 30); below the door (700), the grain and vignette
+   (900/901) and the confirmation plate (970). A mark must never be the thing
+   on top of an irreversible question.
 
    The grain falling across the plate is deliberate at this height, not tolerated:
    the mark is furniture on this desk and the film is on the desk, so a plate the
@@ -50,11 +50,11 @@
 #coach:not(.coach-up){display:none}
 
 /* ─── the scrim and the leader — one SVG, two paths and a stroke ─────────── */
-/* `width`/`height` as well as `inset`, unlike `#threads`: an outermost `<svg>`
-   is a replaced element, and a fixed box with `inset:0` and auto sizing leaves
-   its extent to the intrinsic-ratio rules. The viewBox is written per frame from
-   the real viewport, so the element it maps onto must be the whole viewport and
-   not nearly. */
+/* `width`/`height` as well as `inset`: an outermost `<svg>` is a replaced
+   element, and a fixed box with `inset:0` and auto sizing leaves its extent to
+   the intrinsic-ratio rules. The viewBox is written per frame from the real
+   viewport, so the element it maps onto must be the whole viewport and not
+   nearly. */
 .coach-cut{position:fixed;inset:0;width:100%;height:100%;pointer-events:none}
 /* Even-odd is what makes the second subpath a HOLE rather than a second box:
    the viewport rect is filled, the target's rect is cut back out of it. */

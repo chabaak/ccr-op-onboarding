@@ -741,11 +741,10 @@ export function mount(host: HTMLElement, driver: FixtureDriver): void {
    * as one.
    *
    * These are still NOT slots: no `.slot`, no `.slot-pin`, and above all no
-   * `data-block-id`, which is what `shell/thread-layer.ts:28` selects slot
-   * anchors by — a past page is invisible to the thread layer by construction,
-   * so do not add the attribute for symmetry. `blockCardModel` is still what
-   * resolves the text, because F1's fallback for an unresolvable id is already
-   * its job; only the card's markup is dropped.
+   * `data-block-id`. A past page is read-only handover prose, so do not add the
+   * attribute for symmetry. `blockCardModel` is still what resolves the text,
+   * because F1's fallback for an unresolvable id is already its job; only the
+   * card's markup is dropped.
    */
   function filedHost(ids: readonly string[]): HTMLElement {
     const host = el('div', 'filed-file')

@@ -29,10 +29,6 @@ import { PORTAL, TASKBAR_HINT } from './portal-identity.ts'
 import { clearRunState } from './run-state.ts'
 import { WINDOW_REGISTRY } from './window-registry.ts'
 import { createWindowManager } from './window-manager.ts'
-// A namespace import on purpose: the overlay may only be mounted once the desk
-// exists, and naming `createThreadLayer` up here would put the identifier above
-// `desk.arrange` in this file — the very ordering [u8]'s suite pins.
-import * as threadLayer from './thread-layer.ts'
 
 /** The dev/test handle: the driver's own view of the world, undecorated. */
 export interface ShellHandle {
@@ -305,19 +301,6 @@ export async function bootShell(): Promise<void> {
   window.addEventListener('resize', () => {
     desk.arrange({ width: window.innerWidth, height: window.innerHeight })
   })
-
-  // 4b — the evidence threads. Decoration over the arranged desk: it reads the
-  // slot and sentence anchors the windows already wrote and adds no state of
-  // its own, so it can only exist once the desk it measures does ([u8#c7]).
-  // `createThreadLayer` carries the mount side effect, so the call stays
-  // unconditional; only the dev handle it hands back is gated (inv 11, same rule
-  // as `__shell` below).
-  const threads = threadLayer.createThreadLayer({
-    host: must<SVGSVGElement>('#threads'),
-    root: app,
-    slotted: () => Object.values(driver.frame().store.slots),
-  })
-  if (import.meta.env.DEV) window.__threads = threads
 
   // 4c — the ear. Mounted here because it observes what the windows wrote:
   // `[data-op]`, the `.hidden` class the manager toggles, the fanfold's revealed

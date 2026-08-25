@@ -193,11 +193,11 @@ async function packSlug(page: Page): Promise<string> {
  * Every pinned `data-block-id` the file currently shows, in DOM order — one per
  * filled slot.
  *
- * Scoped to the pin ANCHOR (`.slot-pin`, u8's RedThread attachment point)
- * because a filled slot carries the id twice by contract: on the `.slot` itself
- * and on its pin (u4 spec D9, asserted by (a) below and by [u4#c6] (d)). An
- * unscoped `[data-block-id]` would count each filled slot twice and contradict
- * those asserts; the anchors are the ids "the file shows".
+ * Scoped to the pin ANCHOR (`.slot-pin`) because a filled slot carries the id
+ * twice by contract: on the `.slot` itself and on its pin (u4 spec D9, asserted
+ * by (a) below and by [u4#c6] (d)). An unscoped `[data-block-id]` would count
+ * each filled slot twice and contradict those asserts; the anchors are the ids
+ * "the file shows".
  */
 async function pinnedIds(page: Page): Promise<string[]> {
   return page.locator(`${FILE} .slot-pin[data-block-id]`).evaluateAll((nodes) =>

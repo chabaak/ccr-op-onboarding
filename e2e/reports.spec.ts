@@ -4,11 +4,11 @@
 // lives here (u6 design D1). The pure half is `tests/windows/reports.test.ts`.
 //
 // Covers [u6#c1] report renders once after the last beat · [u6#c2] typewriter
-// is replay · [u6#c4] archive segmentation and highlight marks · [u6#c7] a11y.
+// is replay · [u6#c4] archive segmentation and selection marks · [u6#c7] a11y.
 //
 // Test titles are load-bearing — the unit's verification commands filter with
 // `-g 'report renders once after the last beat'`, `-g 'typewriter is replay'`,
-// `-g 'archive segmentation and highlight marks'` and `-g 'a11y'`.
+// `-g 'archive segmentation and selection marks'` and `-g 'a11y'`.
 //
 // C3 (placeholder fixtures being retired): NOTHING here asserts fixture
 // CONTENT. Every expectation is read back out of the driver's own stream
@@ -349,26 +349,44 @@ test.describe('report renders once after the last beat', () => {
     expect(metrics!.scrolls, 'REPORTS no longer scrolls, so the row-budget premise changed').toBe(true)
   })
 
-  test('report renders once after the last beat — row labels and sentence cells align across sources', async ({
+  test('report renders once after the last beat — row labels split by source and sentence cells align', async ({
     page,
   }) => {
     await drain(page)
-    const row = async (sel: string): Promise<{ columns: string; label: number; sentence: number }> =>
+    const row = async (sel: string): Promise<{ columns: string; label: number; sentence: number; color: string }> =>
       page.locator(sel).first().evaluate((n) => {
         const root = n as HTMLElement
         const style = getComputedStyle(n as HTMLElement)
+        const label = root.querySelector('.rep-stamp')!
         return {
           columns: style.gridTemplateColumns,
-          label: root.querySelector('.rep-stamp')!.getBoundingClientRect().left,
+          label: label.getBoundingClientRect().left,
           sentence: root.querySelector('.rep-s')!.getBoundingClientRect().left,
+          color: getComputedStyle(label).color,
         }
       })
 
     const facts = await row(`${FACTS} .rep-row`)
     const body = await row(`${BODY} .rep-row`)
+    const tokens = await page.evaluate(() => {
+      const root = getComputedStyle(document.documentElement)
+      const read = (name: string): string => {
+        const probe = document.createElement('span')
+        probe.style.all = 'initial'
+        probe.style.transition = 'none'
+        probe.style.color = root.getPropertyValue(name).trim()
+        document.body.append(probe)
+        const color = getComputedStyle(probe).color
+        probe.remove()
+        return color
+      }
+      return { scene: read('--warning'), agent: read('--surface-muted-2') }
+    })
     expect(facts.columns).toBe(body.columns)
     expect(Math.abs(facts.label - body.label), 'source labels are not in one column').toBeLessThan(1)
     expect(Math.abs(facts.sentence - body.sentence), 'sentences are not in one column').toBeLessThan(1)
+    expect(facts.color, 'scene/fact rows should use the LIVE FEED scene-side tag color').toBe(tokens.scene)
+    expect(body.color, 'radio/body rows should use the LIVE FEED agent-side tag color').toBe(tokens.agent)
   })
 })
 
@@ -559,9 +577,9 @@ test.describe('typewriter is replay', () => {
   })
 })
 
-/* ══ [u6#c4] archive segmentation and highlight marks ═══════════════════ */
+/* ══ [u6#c4] archive segmentation and selection marks ═══════════════════ */
 
-test.describe('archive segmentation and highlight marks', () => {
+test.describe('archive segmentation and selection marks', () => {
   test.beforeEach(async ({ page }) => {
     await boot(page, { reduced: true })
     await drain(page)
@@ -570,7 +588,7 @@ test.describe('archive segmentation and highlight marks', () => {
     await raiseWindow(page, 'rep')
   })
 
-  test('archive segmentation and highlight marks — the rail is segmented by run and time', async ({
+  test('archive segmentation and selection marks — the rail is segmented by run and time', async ({
     page,
   }) => {
     const meta = metaOf(await frame(page))
@@ -618,7 +636,7 @@ test.describe('archive segmentation and highlight marks', () => {
     }
   })
 
-  test('archive segmentation and highlight marks — no gate label reaches the player surface', async ({
+  test('archive segmentation and selection marks — no gate label reaches the player surface', async ({
     page,
   }) => {
     await expect(page.locator(OPTION), 'the rail is empty — the gate-label scan is vacuous').not.toHaveCount(0)
@@ -632,7 +650,7 @@ test.describe('archive segmentation and highlight marks', () => {
     expect(attrs.filter((a) => /gate|게이트/i.test(a))).toEqual([])
   })
 
-  test('archive segmentation and highlight marks — exactly one segment reads as selected', async ({ page }) => {
+  test('archive segmentation and selection marks — exactly one segment reads as selected', async ({ page }) => {
     await expect(page.locator(`${OPTION}[aria-selected="true"]`)).toHaveCount(1)
 
     const count = await page.locator(OPTION).count()
@@ -651,7 +669,7 @@ test.describe('archive segmentation and highlight marks', () => {
     }
   })
 
-  test('archive segmentation and highlight marks — switching runs re-renders that run’s document', async ({
+  test('archive segmentation and selection marks — switching runs re-renders that run’s document', async ({
     page,
   }) => {
     // C17 / [u11#c12] — the second document is TAKEN, not assumed (see
@@ -672,7 +690,7 @@ test.describe('archive segmentation and highlight marks', () => {
     }
   })
 
-  test('archive segmentation and highlight marks — mined marks survive a run switch, keyed by id', async ({
+  test('archive segmentation and selection marks — mined marks survive a run switch, keyed by id', async ({
     page,
   }) => {
     // C17 / [u11#c12] — same re-aim as the switch oracle above: play the loop
@@ -719,7 +737,7 @@ test.describe('archive segmentation and highlight marks', () => {
     for (const id of marked) expect(store).toContain(id)
   })
 
-  test('archive segmentation and highlight marks — previously-slotted sentences carry the slotted mark', async ({
+  test('archive segmentation and selection marks — previously-slotted sentences carry the slotted mark', async ({
     page,
   }) => {
     await expect(page.locator(`${REP} .min`), 'nothing is rendered — the mark scan is vacuous').not.toHaveCount(0)
@@ -858,7 +876,25 @@ test.describe('slotting from the report (T1)', () => {
     const id = await mineFirst(page)
     await expect.poll(async () => (await frame(page)).store.slots[0]).toBe(id)
     await raiseWindow(page, 'rep')
-    await expect(page.locator(`${REP} [data-sentence-id="${id}"]`).first()).toHaveClass(/\bslotted\b/)
+    const sentence = page.locator(`${REP} [data-sentence-id="${id}"]`).first()
+    await expect(sentence).toHaveClass(/\bslotted\b/)
+    await expect
+      .poll(async () =>
+        sentence.evaluate((node) => {
+          const textStyle = getComputedStyle(node as HTMLElement)
+          const rowStyle = getComputedStyle(node.closest('.rep-row') as HTMLElement)
+          return {
+            textBackground: textStyle.backgroundImage,
+            textOutline: textStyle.outlineStyle,
+            rowOutline: rowStyle.outlineStyle,
+          }
+        }),
+      )
+      .toEqual({
+        textBackground: 'none',
+        textOutline: 'solid',
+        rowOutline: 'none',
+      })
   })
 
   test('a11y — slotting and unslotting complete with the keyboard alone, zero pointer events', async ({ page }) => {
@@ -895,21 +931,19 @@ test.describe('slotting from the report (T1)', () => {
     await expect
       .poll(async () =>
         page.locator(`${REP} [data-sentence-id="${id}"]`).first().evaluate((node) => {
-          const row = node.closest('.rep-row') as HTMLElement | null
-          const rowStyle = row === null ? null : getComputedStyle(row)
           const textStyle = getComputedStyle(node as HTMLElement)
           return {
-            hasTransferredLabel: row?.textContent?.includes('이관됨') ?? true,
-            hasBoxBackground: (rowStyle?.backgroundColor ?? '') !== 'rgba(0, 0, 0, 0)',
-            hasBoxBorder: (rowStyle?.borderTopColor ?? '') !== 'rgba(0, 0, 0, 0)',
+            hasTransferredLabel: node.textContent?.includes('이관됨') ?? true,
+            background: textStyle.backgroundImage,
+            outline: textStyle.outlineStyle,
             textDecoration: textStyle.textDecorationLine,
           }
         }),
       )
       .toEqual({
         hasTransferredLabel: false,
-        hasBoxBackground: true,
-        hasBoxBorder: true,
+        background: 'none',
+        outline: 'none',
         textDecoration: 'none',
       })
     expect(

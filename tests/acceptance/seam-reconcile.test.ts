@@ -123,14 +123,11 @@ describe('[u11#c14] the whole suite stays a real suite', () => {
     // be waved through as "a runtime guard on a precondition, not a disabled
     // test", and the regex above waved it through BY CONSTRUCTION: requiring a
     // quote straight after the paren means a condition can never match it. That
-    // blind spot is how `e2e/red-thread.spec.ts`'s `test.skip(!scrolled, …)`
-    // shipped — [u8#c3]'s own scroll-out oracle, skipped in the full run, with
-    // this ledger reporting a clean tree. A skipped test is an unexercised
-    // criterion whatever the syntax, so it is counted here too, against an
-    // EXPLICIT allowlist. Nothing is on it: the one entry it would have carried
-    // was re-aimed instead (the case now makes its precondition with u3's resize
-    // grip and fails loudly if it cannot). Anything added here must name the
-    // criterion it leaves unmeasured and point at the issue that accepted it.
+    // blind spot let a runtime-skipped oracle ship with this ledger reporting a
+    // clean tree. A skipped test is an unexercised criterion whatever the
+    // syntax, so it is counted here too, against an EXPLICIT allowlist. Nothing
+    // is on it; anything added here must name the criterion it leaves
+    // unmeasured and point at the issue that accepted it.
     const DISABLED = /\b(it|test|describe)\.(skip|fixme)\s*\(\s*['"`]|\bx(it|describe)\s*\(|\b(it|test)\.todo\b/
     const CONDITIONAL = /\b(it|test)\.skip\s*\(\s*(?!['"`])/
     const ALLOWED_CONDITIONAL: readonly string[] = []

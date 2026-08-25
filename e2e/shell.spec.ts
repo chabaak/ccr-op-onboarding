@@ -670,12 +670,12 @@ test.describe('topbar', () => {
     expect(stored['dday.meta.stamp.멈춘회전문']).not.toBe('stale')
   })
 
-  test('topbar — desktop dressing and the u8 overlay hosts are present', async ({ page }) => {
-    for (const id of ['#wallpaper', '#threads', '#grain', '#vignette', '#sweep', '#toast']) {
+  test('topbar — desktop dressing and live-region hosts are present', async ({ page }) => {
+    for (const id of ['#wallpaper', '#grain', '#vignette', '#sweep', '#toast']) {
       await expect(page.locator(id)).toHaveCount(1)
     }
     // Dressing is decoration: it must not be announced.
-    for (const id of ['#wallpaper', '#threads', '#grain', '#vignette', '#sweep']) {
+    for (const id of ['#wallpaper', '#grain', '#vignette', '#sweep']) {
       await expect(page.locator(id)).toHaveAttribute('aria-hidden', 'true')
     }
     await expect(page.locator('#toast')).toHaveAttribute('role', 'status')

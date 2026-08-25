@@ -378,7 +378,6 @@ describe('[x3] the mark cannot come between the operator and the desk', () => {
     // Under the mark: the furniture it explains.
     for (const [sheet, selector] of [
       [shell, '#topbar'],
-      [shell, '#threads'],
       [path.join(CLIENT, 'styles/win-manual.css'), '#manual'],
     ] as const) {
       expect(coach, `#coach is not above ${selector}`).toBeGreaterThan(zIndexOf(sheet, selector))

@@ -39,9 +39,9 @@ describe('[u3#c9] index.html carries the shell containers and nothing more', () 
     expect(scripts[0]![1]).toBe('/src/main.ts')
   })
 
-  it('(b) it hosts the desktop dressing and the u8 overlay hosts', () => {
+  it('(b) it hosts the desktop dressing and live-region hosts', () => {
     const doc = html()
-    for (const id of ['wallpaper', 'threads', 'grain', 'vignette', 'sweep', 'toast']) {
+    for (const id of ['wallpaper', 'grain', 'vignette', 'sweep', 'toast']) {
       expect(doc, `index.html is missing #${id}`).toMatch(new RegExp(`id=["']${id}["']`))
     }
   })
