@@ -1,0 +1,84 @@
+{
+  "_what": "새는탱크로리 G1 reduced screen — baseline은 주입 문장 없이 frozen record만 보고, live는 화물 불일치 접수 전파 full key를 C-BLOCK으로 받았을 때 a에서 live stance로 움직이는지 잰다.",
+  "_authoring_provenance": {
+    "owner": "mechanism measurement",
+    "baseline_construction": "baseline은 no injected block이다. frozen TIMELINE_EXCERPT는 런타임과 같이 해당 시각까지의 기록을 그대로 담는다.",
+    "excerpt_rule": "20:55까지 compiled timeline.json 행을 그대로 쓴다. arm 차이는 C-BLOCK의 BLOCKS뿐이다.",
+    "screen_scope": "deadline screen: baseline/live 두 arm만, 각 10회. placebo와 negative control은 이 round에서 의도적으로 제외한다.",
+    "saturation_note": "frozen record 자체가 key carrier를 포함하므로 baseline이 live stance에 포화될 수 있다. 그 경우 suite 결함이 아니라 gate headroom 결함으로 판정한다."
+  },
+  "experiment": "TANK-G1-screen",
+  "call_type": "judgment",
+  "channel": "C-BLOCK",
+  "template_version": "v0.5",
+  "model": "claude-haiku-4-5-20251001",
+  "temperament": "tank-base",
+  "max_tokens": 1024,
+  "timeout_ms": 120000,
+  "pre_registration": {
+    "hypothesis": "G1는 no-block baseline에서 기본 stance a가 살아 있고, 화물 불일치 접수 전파 full key를 받은 live arm에서 stance b로 움직일 것이다. 단 frozen record가 이미 key carrier를 담기 때문에 baseline이 stance b에 포화될 위험이 있으며, 그 경우 이 gate는 handover가 더할 headroom이 없는 것으로 판정한다.",
+    "n_per_arm": 10,
+    "call_cost": 20,
+    "drop_condition": "baseline에서 default가 0/10이면 skill §3 rule 4에 따라 broken gate다. baseline이 live 기대 stance b를 9/10 이상 고르면 saturated baseline으로 headroom 없음이다. live가 b를 6/10 이하로 고르면 movement failure이고, 7/10 또는 8/10은 n=10 boundary라 definitive result로 보지 않는다. Positive screen은 baseline default 9/10 이상, baseline live stance 1/10 이하, live b 9/10 이상일 때만 기록한다.",
+    "expected_stance_by_arm": {
+      "baseline": "a",
+      "live": "b"
+    },
+    "contingencies": [
+      "baseline이 default를 전혀 고르지 않으면 질문이나 stance label이 기본 독해를 잃은 것이다.",
+      "baseline이 stance b에 포화되면 frozen record만으로 이미 live 판단이 나오는 것이므로 handover screen에는 headroom이 없다.",
+      "live가 stance b로 충분히 움직이지 않으면 key block wording이 약하거나 default attraction이 지나치게 강하다.",
+      "because_block_ids가 live arm에서 제공하지 않은 block id를 꾸며내면 fabricated block id로 따로 보고한다."
+    ],
+    "not_claimed": "이 reduced screen은 submission deadline 때문에 placebo와 negative-control arms를 의도적으로 dropped한다. 따라서 각 gate가 baseline에서 live로 움직이는지 여부만 본다. It does not establish discrimination, near-miss behavior, or full play reachability."
+  },
+  "slots": {
+    "FLAW": "[결함] 너는 첫 화면의 적하목록과 신고자 진술이 맞아 보이면 통상 절차를 먼저 믿는다.",
+    "INCIDENT": "[내력] 얼마 전, 위험 표지를 크게 잡아 세운 조치가 과잉 대응으로 기록된 적이 있다.",
+    "PRIORITY_LIST": [
+      "확인된 전표와 화면을 먼저 맞춘다",
+      "눈앞의 누출 지점에서 사람을 떼어 놓는다"
+    ],
+    "TIMELINE_EXCERPT": [
+      "20:40 남기표가 탱크로리 하부에서 젖은 줄이 번진다고 신고하며 적하목록의 세정제명을 그대로 읽는다.",
+      "20:43 탱크 옆면 위험 표지 두 칸이 닳아 있고, 남은 기호가 적하목록 품명과 맞지 않는다.",
+      "20:45 접수 화면의 적하목록 행은 `품명: 산업용 세정액`을 보이지만 위험 표지 칸은 `W`와 `부식`으로 남아 있다.",
+      "20:48 유재승이 “세척장에서 쓰는 약품일 뿐입니다. 물로 밀면 끝납니다”라고 말한다.",
+      "20:50 출하 전표 조회가 유재승의 말보다 이른 출발 시각과 다른 출하지명을 띄운다.",
+      "20:52 야간 위험물 요율표에서 같은 표지 조합은 할증과 도심 통행 제한 대상이라고 표시된다.",
+      "20:55 남기표가 “목록에 세정액이면 일반 유출 아닙니까. 차단띠만 치고 씻기면 됩니다”라고 재촉한다."
+    ],
+    "GATE_QUESTION": "첫 전파에는 어떤 장면을 실어 보내겠습니까",
+    "STANCE_SET": [
+      {
+        "id": "a",
+        "label": "장부 첫줄로 넘김"
+      },
+      {
+        "id": "b",
+        "label": "화물 불일치로 묶음"
+      }
+    ]
+  },
+  "arms": {
+    "baseline": {
+      "BLOCKS": []
+    },
+    "live": {
+      "BLOCKS": [
+        {
+          "id": "g1_k1_manifest",
+          "text": "접수 화면의 품명은 산업용 세정액이지만 같은 행의 위험 표지 칸은 물 반응성과 부식을 함께 보인다."
+        },
+        {
+          "id": "g1_k1_waybill",
+          "text": "출하 전표의 출발 시각과 출하지가 유재승의 첫 진술과 맞지 않는다."
+        },
+        {
+          "id": "g1_k1_tariff",
+          "text": "야간 위험물 요율표가 같은 표지 조합을 할증과 통행 제한 대상으로 묶는다."
+        }
+      ]
+    }
+  }
+}

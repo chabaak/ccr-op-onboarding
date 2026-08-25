@@ -1,0 +1,256 @@
+# TANK-G1-screen — arm `live`
+
+| field | value |
+|---|---|
+| call type | judgment |
+| channel | C-BLOCK |
+| template | v0.5 |
+| model | `claude-haiku-4-5-20251001` |
+| transport | anthropic |
+| temperament | tank-base |
+| N planned | 10 |
+| N kept | 10 |
+
+## Pre-registration
+
+- **Hypothesis:** G1는 no-block baseline에서 기본 stance a가 살아 있고, 화물 불일치 접수 전파 full key를 받은 live arm에서 stance b로 움직일 것이다. 단 frozen record가 이미 key carrier를 담기 때문에 baseline이 stance b에 포화될 위험이 있으며, 그 경우 이 gate는 handover가 더할 headroom이 없는 것으로 판정한다.
+- **Drop condition:** baseline에서 default가 0/10이면 skill §3 rule 4에 따라 broken gate다. baseline이 live 기대 stance b를 9/10 이상 고르면 saturated baseline으로 headroom 없음이다. live가 b를 6/10 이하로 고르면 movement failure이고, 7/10 또는 8/10은 n=10 boundary라 definitive result로 보지 않는다. Positive screen은 baseline default 9/10 이상, baseline live stance 1/10 이하, live b 9/10 이상일 때만 기록한다.
+- **Contingency:** baseline이 default를 전혀 고르지 않으면 질문이나 stance label이 기본 독해를 잃은 것이다.
+- **Contingency:** baseline이 stance b에 포화되면 frozen record만으로 이미 live 판단이 나오는 것이므로 handover screen에는 headroom이 없다.
+- **Contingency:** live가 stance b로 충분히 움직이지 않으면 key block wording이 약하거나 default attraction이 지나치게 강하다.
+- **Contingency:** because_block_ids가 live arm에서 제공하지 않은 block id를 꾸며내면 fabricated block id로 따로 보고한다.
+
+## Calls (verbatim)
+
+### 01
+
+latency 5.587s · stop_reason `tool_use` · schema_retries 0 · foreign_tool_uses 0
+
+```json
+{
+  "stance": "b",
+  "inner_note": "적하목록의 품명과 위험 표지가 일치하지 않는다. 물 반응성과 부식 표지가 남아 있는데 세정액이라는 품명과 맞지 않는다. 유재승의 진술도 출하 전표와 맞지 않고, 요율표에서 그 표지 조합은 특별 취급 대상이다. 눈앞의 상황이 일관되지 않으면 먼저 멈춘다.",
+  "because_referent": "남기표의 초기 신고와 유재승의 진술이 적하목록 품명으로 일치하는 것처럼 보였지만, 위험 표지와 출하 전표가 다른 이야기를 한다.",
+  "because_block_ids": [
+    "g1_k1_manifest",
+    "g1_k1_waybill",
+    "g1_k1_tariff"
+  ],
+  "rejected_stance": "a",
+  "rejected_reason": "장부 첫줄로 넘기는 것은 적하목록 품명만 보고 표지와 전표의 불일치를 무시하는 것이다. 통상 절차를 먼저 믿는 기질도 있지만, 화면에 명백히 뜬 모순을 지나가서는 안 된다. 야간 통행 제한 대상이 일반 유출로 처리되면 책임을 설명할 수 없다.",
+  "utterance": "화물 불일치 확인. 현장 격리 요청. 제품 재확인 대기."
+}
+```
+
+### 02
+
+latency 4.775s · stop_reason `tool_use` · schema_retries 0 · foreign_tool_uses 0
+
+```json
+{
+  "stance": "b",
+  "inner_note": "적하목록 품명과 위험 표지 조합이 맞지 않고, 출하 전표까지 진술과 다르다. 물 접촉 후 기체가 짙어질 수 있는 물 반응성 물질인데 세척만 권하는 건 위험하다.",
+  "because_referent": "적하목록 행의 품명은 산업용 세정액이지만 위험 표지는 물 반응성과 부식을 함께 나타내고 있으며, 출하 전표의 출발 시각과 출하지가 신고자 진술과 맞지 않는다.",
+  "because_block_ids": [
+    "g1_k1_manifest",
+    "g1_k1_waybill"
+  ],
+  "rejected_stance": "a",
+  "rejected_reason": "적하목록 품명만으로 판단하면 안 된다. 같은 행의 위험 표지가 물 반응성을 나타내고 있는데, 이는 일반 세정액 취급으로는 맞지 않다. 출하 전표 불일치까지 함께 고려하면 화물 확인 없이 진행할 수 없다.",
+  "utterance": "화물 불일치 의심. 현장 확인 요청한다. 적하목록 품명과 위험 표지 조합이 맞지 않고 출하 전표 정보도 다르다. 추가 지시까지 기다린다."
+}
+```
+
+### 03
+
+latency 3.905s · stop_reason `tool_use` · schema_retries 0 · foreign_tool_uses 0
+
+```json
+{
+  "stance": "b",
+  "inner_note": "적하목록 품명과 위험 표지가 맞지 않는다. 출하 전표도 현장 진술과 맞지 않는다. 세정액이라는 말만으로는 물 반응성 표지를 설명할 수 없다.",
+  "because_referent": "현장과 문서가 말하는 것이 다르다",
+  "because_block_ids": [
+    "g1_k1_manifest",
+    "g1_k1_waybill"
+  ],
+  "rejected_stance": "a",
+  "rejected_reason": "적하목록 품명만 믿고 넘길 수 없다. 같은 행의 위험 표지가 세정액과 맞지 않으며, 출하 전표 수치가 현장 진술과 다르다. 야간 할증 대상이 맞는지도 확인이 필요하다.",
+  "utterance": "화물 불일치 의심. 적하목록 품명과 위험 표지 확인 중. 출하 전표 조회 결과 현장 진술과 다름. 화물 재확인 요청."
+}
+```
+
+### 04
+
+latency 4.771s · stop_reason `tool_use` · schema_retries 0 · foreign_tool_uses 0
+
+```json
+{
+  "stance": "b",
+  "inner_note": "화물 특성이 문서로도 현장으로도 명확하지 않다. 적하목록 품명과 위험 표지가 안 맞고, 진술과 전표도 안 맞는다. 물 반응성이 있다면 세척 지시는 위험하다.",
+  "because_referent": "적하목록 품명과 위험 표지 칸이 서로 다른 것을 가리킨다. 물 반응성 표지가 있는데 세척을 권하는 것은 맞지 않는다.",
+  "because_block_ids": [
+    "g1_k1_manifest",
+    "g1_k1_waybill",
+    "g1_k1_tariff"
+  ],
+  "rejected_stance": "a",
+  "rejected_reason": "적하목록 첫 줄은 품명만 보이는데, 같은 행의 위험 표지와 맞지 않는다. 진술과 전표 시각도 일치하지 않는다. 물 반응성이 있을 가능성을 확인하지 않고 세척을 지시하면 안 된다.",
+  "utterance": "화물 불일치 확인 중. 야적장 통제. 적하목록 품명과 위험 표지 대조. 물 반응성 여부 확인 대기."
+}
+```
+
+### 05
+
+latency 4.791s · stop_reason `tool_use` · schema_retries 0 · foreign_tool_uses 0
+
+```json
+{
+  "inner_note": "적하목록과 위험표지가 맞지 않는다. 물반응성 부식성 물질이 세정액으로 기록된 것 같다. 출하 전표도 진술과 다르다. 확인된 불일치 세 개가 같은 방향을 가리킨다.",
+  "stance": "b",
+  "because_referent": "적하목록의 품명과 위험 표지가 맞지 않고, 출하 전표가 신고자 진술과 다르며, 요율표가 같은 표지 조합을 제한 대상으로 표시했기 때문이다.",
+  "because_block_ids": [
+    "g1_k1_manifest",
+    "g1_k1_waybill",
+    "g1_k1_tariff"
+  ],
+  "rejected_stance": "a",
+  "rejected_reason": "신고자와 현장 담당자의 진술이 출하 전표와 맞지 않고, 적하목록 기록이 현장의 위험 표지와 불일치하며, 요율표의 경고가 있어 통상 절차로는 충분하지 않다.",
+  "utterance": "화물 불일치 의심. 현장 통제 강화. 배수 차단부터 확보한다. 본부에 화물 확인 요청."
+}
+```
+
+### 06
+
+latency 4.386s · stop_reason `tool_use` · schema_retries 0 · foreign_tool_uses 0
+
+```json
+{
+  "stance": "b",
+  "inner_note": "적하목록 품명과 위험 표지가 맞지 않는다. 출하 전표 기록도 현장 진술과 어긋난다. 통상 절차 믿기 전에 화물을 먼저 확인해야 한다.",
+  "because_referent": "접수 화면의 품명 행과 위험 표지 칸이 서로 다른 물질을 가리킨다.",
+  "because_block_ids": [
+    "g1_k1_manifest",
+    "g1_k1_waybill",
+    "g1_k1_tariff"
+  ],
+  "rejected_stance": "a",
+  "rejected_reason": "장부 첫줄로 넘기면 현장 인력이 산업용 세정액으로 대응할 텐데, 위험 표지는 물 반응성과 부식을 가리킨다. 물로 밀면 상황이 악화될 수 있다.",
+  "utterance": "화물 불일치 접수. 적하목록과 위험 표지 재확인 요청. 탱크 상부 제조사 명기 촬영 부탁. 현장 진입 유보."
+}
+```
+
+### 07
+
+latency 5.346s · stop_reason `tool_use` · schema_retries 0 · foreign_tool_uses 0
+
+```json
+{
+  "stance": "b",
+  "inner_note": "접수 화면 적하목록의 품명과 위험 표지가 맞지 않는다. 출하 전표까지 진술과 어긋난다. 물 반응성 표지가 있는데 \"물로 밀면 된다\"는 말은 위험하다.",
+  "because_referent": "적하목록 품명 칸과 위험 표지 칸이 같은 행에서 불일치하고, 출하 전표가 현장 진술과 맞지 않으며, 야간 위험물 요율표가 이 표지 조합을 제한 대상으로 본다.",
+  "because_block_ids": [
+    "g1_k1_manifest",
+    "g1_k1_waybill",
+    "g1_k1_tariff"
+  ],
+  "rejected_stance": "a",
+  "rejected_reason": "장부 첫줄 통상 절차는 적하목록과 실물 표지가 일치할 때 신뢰할 근거다. 여기서는 같은 행 안에서 이미 어긋났고, 진술과 전표도 맞지 않는다. 물 반응성 표지가 있으면서 희석을 권하는 것은 판단 착오의 신호다.",
+  "utterance": "화물 불일치 상황 확인. 야적장 통제 먼저 건다. 배수반과 맨홀 확인 동시 진행."
+}
+```
+
+### 08
+
+latency 4.619s · stop_reason `tool_use` · schema_retries 0 · foreign_tool_uses 0
+
+```json
+{
+  "stance": "b",
+  "inner_note": "적하목록 품명과 위험 표지가 맞지 않는다. 물 반응성 표지가 남아 있는데 세정액이라면 일반 유출이 아닐 수 있다. 출하 전표도 진술과 안 맞는다.",
+  "because_referent": "적하목록 행의 품명 '산업용 세정액'과 남은 위험 표지 'W·부식'이 대응하지 않으며, 출하 전표 정보가 현장 진술과 일치하지 않기 때문이다.",
+  "because_block_ids": [
+    "g1_k1_manifest",
+    "g1_k1_waybill"
+  ],
+  "rejected_stance": "a",
+  "rejected_reason": "신고자와 현장 관계자 진술만으로는 물 반응성 표지와 부식 표지의 존재를 설명할 수 없으며, 출하 전표 불일치까지 더해져 장부 첫줄 통상 절차로 진행할 수 없다.",
+  "utterance": "화물 불일치 의심. 현장 정지. 적하목록 재확인 및 위험물 성상 재검증 진행한다."
+}
+```
+
+### 09
+
+latency 4.371s · stop_reason `tool_use` · schema_retries 0 · foreign_tool_uses 0
+
+```json
+{
+  "stance": "b",
+  "inner_note": "적하목록의 품명과 위험 표지가 맞지 않는다. 물 반응성 표지와 부식 표지가 함께 있는데 산업용 세정액이라는 품명과는 맞지 않는다. 출하 전표도 진술과 다르다. 표지 조합은 할증과 통행 제한 대상이다.",
+  "because_referent": "화물 표지 불일치와 출하 전표 불일치가 함께 들어왔다. 신고자와 운전자의 진술보다 문서의 불일치가 우선이다.",
+  "because_block_ids": [
+    "g1_k1_manifest",
+    "g1_k1_waybill",
+    "g1_k1_tariff"
+  ],
+  "rejected_stance": "a",
+  "rejected_reason": "적하목록 첫줄이 맞아 보여도 같은 적하목록 행의 위험 표지와 맞지 않는다. 신고자의 재촉도 출하 전표와 진술 불일치를 덮지 못한다.",
+  "utterance": "화물 불일치 확인. 야적장 인입 차단. 운송장 재확인 요청."
+}
+```
+
+### 10
+
+latency 4.435s · stop_reason `tool_use` · schema_retries 0 · foreign_tool_uses 0
+
+```json
+{
+  "inner_note": "적하목록 품명과 위험 표지가 맞지 않는다. 출하 전표도 신고자 진술과 어긋난다. 낮은 위험으로 읽기는 어렵다.",
+  "stance": "b",
+  "because_referent": "적하목록과 위험 표지 칸이 같은 행에서 엇갈려 있고, 출하 전표가 신고자 진술보다 이르고 다르다.",
+  "because_block_ids": [
+    "g1_k1_manifest",
+    "g1_k1_waybill"
+  ],
+  "rejected_stance": "a",
+  "rejected_reason": "장부 첫줄로 넘기면 표지 불일치와 전표 어긋남을 통상 절차 안에서 검토하지 못한다. 야간 위험물 요율표의 할증 대상 표지와 물 반응성 기호가 현장 변화와 맞닿는다.",
+  "utterance": "화물 불일치 의심. 적하목록 재확인 요청. 탱크 위험 표지 사진 촬영. 안전 거리 확보하라."
+}
+```
+
+## Arm table
+
+| # | stance | rejected_stance | because_referent | because_block_ids |
+|---|---|---|---|---|
+| 01 | b | a | 남기표의 초기 신고와 유재승의 진술이 적하목록 품명으로 일치하는 것처럼 보였지만, 위험 표지와 출하 전표가 다른 이야기를 한다. | g1_k1_manifest g1_k1_waybill g1_k1_tariff |
+| 02 | b | a | 적하목록 행의 품명은 산업용 세정액이지만 위험 표지는 물 반응성과 부식을 함께 나타내고 있으며, 출하 전표의 출발 시각과 출하지가 신고자 진술과 맞지 않는다. | g1_k1_manifest g1_k1_waybill |
+| 03 | b | a | 현장과 문서가 말하는 것이 다르다 | g1_k1_manifest g1_k1_waybill |
+| 04 | b | a | 적하목록 품명과 위험 표지 칸이 서로 다른 것을 가리킨다. 물 반응성 표지가 있는데 세척을 권하는 것은 맞지 않는다. | g1_k1_manifest g1_k1_waybill g1_k1_tariff |
+| 05 | b | a | 적하목록의 품명과 위험 표지가 맞지 않고, 출하 전표가 신고자 진술과 다르며, 요율표가 같은 표지 조합을 제한 대상으로 표시했기 때문이다. | g1_k1_manifest g1_k1_waybill g1_k1_tariff |
+| 06 | b | a | 접수 화면의 품명 행과 위험 표지 칸이 서로 다른 물질을 가리킨다. | g1_k1_manifest g1_k1_waybill g1_k1_tariff |
+| 07 | b | a | 적하목록 품명 칸과 위험 표지 칸이 같은 행에서 불일치하고, 출하 전표가 현장 진술과 맞지 않으며, 야간 위험물 요율표가 이 표지 조합을 제한 대상으로 본다. | g1_k1_manifest g1_k1_waybill g1_k1_tariff |
+| 08 | b | a | 적하목록 행의 품명 '산업용 세정액'과 남은 위험 표지 'W·부식'이 대응하지 않으며, 출하 전표 정보가 현장 진술과 일치하지 않기 때문이다. | g1_k1_manifest g1_k1_waybill |
+| 09 | b | a | 화물 표지 불일치와 출하 전표 불일치가 함께 들어왔다. 신고자와 운전자의 진술보다 문서의 불일치가 우선이다. | g1_k1_manifest g1_k1_waybill g1_k1_tariff |
+| 10 | b | a | 적하목록과 위험 표지 칸이 같은 행에서 엇갈려 있고, 출하 전표가 신고자 진술보다 이르고 다르다. | g1_k1_manifest g1_k1_waybill |
+
+**Sequence (kept calls):** `b,b,b,b,b,b,b,b,b,b`
+
+**Stance coverage (sampled diagnostic):** offered `a`, `b` · unobserved in this arm: `a`
+
+> Diagnostic only — absence at this N is not a dead delta row. The architecture spec §3.1 write test is a static check on the delta table plus the reachability audit (§5.2 B1); a stance unobserved across every arm is a lead for that check, not a failure verdict. Carried to the verdict card (§9.2) as a diagnostic.
+
+## Advisory logs (§5.3)
+
+_Operator-written. Observation only — these never affect distributions,
+boundary laws, or pass/drop judgments._
+
+**State-variable shadow log** — which candidate variables (architecture spec
+§3.1 pool) would this run have moved, and which payload symptom mapped to which?
+
+**Mineability log** — would `utterance` / `inner_note` survive as mining
+material? Block count, specificity (names, quantities, referents), and whether
+it says anything the payload did not already say.
+
+## Pairing verdict
+
+_Operator writes this against the other arms. Sequences, not rates (§9.2)._

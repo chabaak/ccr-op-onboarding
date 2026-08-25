@@ -1,0 +1,306 @@
+# TANK-G3-screen — arm `baseline`
+
+| field | value |
+|---|---|
+| call type | judgment |
+| channel | C-BLOCK |
+| template | v0.5 |
+| model | `claude-haiku-4-5-20251001` |
+| transport | anthropic |
+| temperament | tank-base |
+| N planned | 10 |
+| N kept | 10 |
+
+## Pre-registration
+
+- **Hypothesis:** G3는 no-block baseline에서 기본 stance a가 살아 있고, 하단빌라 대피 배분 full key를 받은 live arm에서 stance b로 움직일 것이다. 단 frozen record가 이미 key carrier를 담기 때문에 baseline이 stance b에 포화될 위험이 있으며, 그 경우 이 gate는 handover가 더할 headroom이 없는 것으로 판정한다.
+- **Drop condition:** baseline에서 default가 0/10이면 skill §3 rule 4에 따라 broken gate다. baseline이 live 기대 stance b를 9/10 이상 고르면 saturated baseline으로 headroom 없음이다. live가 b를 6/10 이하로 고르면 movement failure이고, 7/10 또는 8/10은 n=10 boundary라 definitive result로 보지 않는다. Positive screen은 baseline default 9/10 이상, baseline live stance 1/10 이하, live b 9/10 이상일 때만 기록한다.
+- **Contingency:** baseline이 default를 전혀 고르지 않으면 질문이나 stance label이 기본 독해를 잃은 것이다.
+- **Contingency:** baseline이 stance b에 포화되면 frozen record만으로 이미 live 판단이 나오는 것이므로 handover screen에는 headroom이 없다.
+- **Contingency:** live가 stance b로 충분히 움직이지 않으면 key block wording이 약하거나 default attraction이 지나치게 강하다.
+- **Contingency:** because_block_ids가 live arm에서 제공하지 않은 block id를 꾸며내면 fabricated block id로 따로 보고한다.
+
+## Calls (verbatim)
+
+### 01
+
+latency 4.679s · stop_reason `tool_use` · schema_retries 0 · foreign_tool_uses 0
+
+problems: because_block_ids unknown: 21:06,21:12,21:31,21:35,21:39
+
+```json
+{
+  "inner_note": "물 접촉 뒤 기체가 짙어지고, 배수로가 주민거주 지역으로 직결되며, 이미 맨홀에서 기체가 발산되고 있다. 더 이상 탱크 주변 통제만으로는 충분하지 않다.",
+  "stance": "b",
+  "because_referent": "아랫동네 지하층에 기체가 이미 밀려 들어가고 있고, 주민들이 노출되어 있기 때문이다.",
+  "because_block_ids": [
+    "21:06",
+    "21:12",
+    "21:31",
+    "21:35",
+    "21:39"
+  ],
+  "rejected_stance": "a",
+  "rejected_reason": "탱크 주변만 유지하면 배수로를 통해 이미 하강하고 있는 유독 기체를 멈출 수 없다. 현관까지 차 있는 상황에서 지연은 곧 주민 피해다.",
+  "utterance": "아랫동네 긴급 대피. 가장 낮은 동부터 깨우고 옥상으로 올린다. 배수 차단과 야적장 통제는 병행한다."
+}
+```
+
+### 02
+
+latency 6.53s · stop_reason `tool_use` · schema_retries 0 · foreign_tool_uses 0
+
+problems: because_block_ids unknown: 20:43,20:52,21:03,21:06,21:12,21:23,21:27,21:31
+
+```json
+{
+  "stance": "b",
+  "because_referent": "배수 도면과 남기표 진술, 맨홀 목격이 모두 같은 경로를 가리킨다 — 남쪽 배수로를 거쳐 하단빌라 우수관으로 내려가는 길이다. 물 접촉 뒤 기체가 회색으로 짙어지는 현장 변화와 유해물질 조회 경고가 함께 들어왔다.",
+  "because_block_ids": [
+    "20:43",
+    "20:52",
+    "21:03",
+    "21:06",
+    "21:12",
+    "21:23",
+    "21:27",
+    "21:31"
+  ],
+  "rejected_stance": "a",
+  "rejected_reason": "탱크 주변 통제만으로는 이미 배수로를 타고 내려간 유독 기체 발생을 막을 수 없다. 맨홀에서 밀려나오는 안개가 아래쪽 골목에 고이고 있고, 지하층에 잠든 사람들이 있다.",
+  "inner_note": "첫 화면의 적하목록과 신고자 초기 진술이 맞아 보였지만, 시간이 흐르면서 닳은 표지 조합과 출하지가 다른 유해물질을 가리켰다. 물 접촉은 이미 일어났고, 기체는 이미 흩어지고 있다. 아래쪽 위험이 확인되고 시간이 남아 있다.",
+  "utterance": "아랫동네 긴급 대피. 가장 낮은 동부터 모든 지하층 주민을 깨워라. 119에 화학 가스 노출 신고했다. 배수현이 안내한다."
+}
+```
+
+### 03
+
+latency 4.989s · stop_reason `tool_use` · schema_retries 0 · foreign_tool_uses 0
+
+problems: because_block_ids unknown: 21:03,21:06,21:31,21:35,21:39
+
+```json
+{
+  "stance": "b",
+  "inner_note": "물 접촉으로 유독 기체가 발생하고 있다. 21:31 맨홀에서 안개가 밀려나오고 21:35 지하층에 고인 상황이다. 사람이 있는 곳이 위험해졌다.",
+  "because_referent": "배수 도면과 남기표 진술이 남쪽 맨홀로의 경로를 확인했고, 21:06 기체가 짙어지고 있으며, 21:31 맨홀에서 안개가 나오고 있다. 지하층에 거주자가 있다.",
+  "because_block_ids": [
+    "21:03",
+    "21:06",
+    "21:31",
+    "21:35",
+    "21:39"
+  ],
+  "rejected_stance": "a",
+  "rejected_reason": "탱크 주변 차단만으로는 이미 배수로를 통해 확산된 유독 기체로부터 지하층 거주자를 보호할 수 없다. 현관이 이미 오염된 공기로 찼다.",
+  "utterance": "아랫동네 전 동 즉시 대피. 지하층 먼저. 소방대 진입로 확보. 배수 차단은 동시 진행."
+}
+```
+
+### 04
+
+latency 5.626s · stop_reason `tool_use` · schema_retries 0 · foreign_tool_uses 0
+
+problems: because_block_ids unknown: 21:03,21:06,21:12,21:23,21:27,21:31,21:35,21:39
+
+```json
+{
+  "stance": "b",
+  "inner_note": "물 접촉 뒤 기체가 짙어지고 배수로 통한 하류 확산이 이미 시작됐다. 21:31 맨홀에서 안개가 올라오고 21:35 지하층 주민 노출 확인. 눈앞의 야적장 통제만으로는 부족하다.",
+  "because_referent": "물 접촉 시 유독 기체 발생이 확인되고, 배수도 도면과 현장 진술이 일관되게 남쪽 맨홀 경로를 가리키며, 이미 하단빌라 지하층에 기체가 침투 중이기 때문이다.",
+  "because_block_ids": [
+    "21:03",
+    "21:06",
+    "21:12",
+    "21:23",
+    "21:27",
+    "21:31",
+    "21:35",
+    "21:39"
+  ],
+  "rejected_stance": "a",
+  "rejected_reason": "초동 세척이 이미 물로 시작됐고 기체 발생과 배수 누출을 막을 수 없다. 탱크 주변만 통제하는 동안 하류 주민 노출이 심화한다.",
+  "utterance": "아랫동네 긴급 호출 요청. 남쪽 맨홀 상단 차단. 지하층 주민 전원 외출 조치 시작하라."
+}
+```
+
+### 05
+
+latency 7.474s · stop_reason `tool_use` · schema_retries 0 · foreign_tool_uses 0
+
+problems: because_block_ids unknown: 21:06,21:03,21:31,21:35
+
+```json
+{
+  "stance": "b",
+  "because_referent": "21:06의 회색 농연과 21:03의 유독 기체 경고, 그리고 21:31의 맨홀에서 밀려나오는 안개는 물 접촉 뒤 유해 기체가 이미 배수로를 통해 하단으로 내려가고 있다는 뜻이다. 21:35의 지하층 현황을 보면 노출 인원이 실재하고 시간이 남지 않았다.",
+  "because_block_ids": [
+    "21:06",
+    "21:03",
+    "21:31",
+    "21:35"
+  ],
+  "rejected_stance": "a",
+  "rejected_reason": "탱크 주변 유지는 추가 누출 차단에는 도움이 되지만, 이미 배수로로 내려간 유해 기체로부터 지하층 주민을 보호하지 못한다. 21:16의 물막이판 없는 배수 작업과 21:27의 직통 경로 확인으로 보아 현장 통제만으로는 이미 진행 중인 위험을 막을 수 없다.",
+  "inner_note": "적하목록의 세정액과 위험 표지의 부식/W 조합이 맞지 않으면서, 유해물질 조회가 물 접촉 시 독성 경고를 띄웠다. 21:06의 농연 변화는 화학 반응이 현장에서 일어나고 있음을 보여준다. 지하층의 자는 어르신들은 스스로를 피할 수 없는 노출 집단이다. 여유란 대응 리소스를 말하는 것이고, 그것을 어디에 먼저 쓸지의 문제다.",
+  "utterance": "아랫동네 주민 긴급 대피. 지자체 119에 지하층 전 가구 소개. 배수로 폐쇄 조치 병행 요청한다."
+}
+```
+
+### 06
+
+latency 4.995s · stop_reason `tool_use` · schema_retries 0 · foreign_tool_uses 0
+
+problems: because_block_ids unknown: 21:06,21:31,21:35
+
+```json
+{
+  "stance": "b",
+  "inner_note": "21:06부터 물 접촉으로 흰 김이 회색으로 짙어졌다. 21:03 조회 경고와 현장 변화가 일치한다. 유독 기체가 발생 중이고 21:31 맨홀에서 안개가 밀려나가며 21:35 지하층에 고인다. 사람이 있는 쪽으로 가는 중이다.",
+  "because_referent": "지하층에 있는 주민들을 깨우기 위해",
+  "because_block_ids": [
+    "21:06",
+    "21:31",
+    "21:35"
+  ],
+  "rejected_stance": "a",
+  "rejected_reason": "탱크 주변 유지만으로는 이미 하강한 기체의 확산을 막을 수 없다. 21:27 남쪽 맨홀로 직접 흘러가고 있고, 현관이 이미 눈 따가운 공기로 찼다.",
+  "utterance": "아랫동네 전체 신속 대피. 소방과 경찰 동시 출동 요청한다. 지하층부터 밀실 수색하고 주민 전원 옥외로 이동시켜라."
+}
+```
+
+### 07
+
+latency 5.945s · stop_reason `tool_use` · schema_retries 0 · foreign_tool_uses 0
+
+problems: because_block_ids unknown: 20:52,21:03,21:06,21:23,21:31,21:35,21:39
+
+```json
+{
+  "stance": "b",
+  "inner_note": "물 접촉 후 유독 기체가 회색으로 짙어지고 있다. 배수로 흐름이 이미 하단빌라 우수관을 타고 내려가고 있으며, 맨홀에서 안개가 밀려 나오는 상황이다. 지하층 주민들이 자고 있다. 이미 눈 따가운 공기가 현관에 들어찬 상태다.",
+  "because_referent": "물 접촉 시 유독 기체 발생이 현실이 된 지금, 우리가 막을 수 없는 배수로 경로와 이미 도달한 기체의 피해 반경을 생각해야 한다. 탱크 주변 통제는 추가 확산을 방지하지만, 지하층 주민들은 이미 노출되고 있다.",
+  "because_block_ids": [
+    "20:52",
+    "21:03",
+    "21:06",
+    "21:23",
+    "21:31",
+    "21:35",
+    "21:39"
+  ],
+  "rejected_stance": "a",
+  "rejected_reason": "탱크 주변 유지는 추가 유출을 차단하는 의미가 있지만, 이미 배수로를 통해 아래쪽으로 흘러내려간 기체와 물질에 대해서는 아무것도 막을 수 없다. 그 시간 동안 지하층 주민들의 노출은 계속된다.",
+  "utterance": "아랫동네 긴급 대피. 지하층 전 동 깨워라. 구급차 미리 배치. 탱크 접근통제는 유지한다."
+}
+```
+
+### 08
+
+latency 5.33s · stop_reason `tool_use` · schema_retries 0 · foreign_tool_uses 0
+
+problems: because_block_ids unknown: 21:03,21:06,21:12,21:23,21:31,21:35,21:39
+
+```json
+{
+  "stance": "b",
+  "because_referent": "유해물질 조회 경고와 현장 변화가 수렴한다. 물 접촉 후 기체가 회색으로 짙어지고, 배수로를 따라 하단빌라 맨홀까지 이미 내려갔다.",
+  "because_block_ids": [
+    "21:03",
+    "21:06",
+    "21:12",
+    "21:23",
+    "21:31",
+    "21:35",
+    "21:39"
+  ],
+  "rejected_stance": "a",
+  "rejected_reason": "야적장 통제만으로는 이미 배수로를 탄 유독 기체의 확산을 막을 수 없다. 지하층 주민 노출이 진행 중이다.",
+  "inner_note": "처음 적하목록과 신고자 말은 일반 세정액이었다. 하지만 닳은 표지 조합, 물 접촉 경고, 현장의 기체 변화, 그리고 배수 경로가 모두 같은 방향을 가리킨다. 더는 낮은 위험으로 읽을 수 없다.",
+  "utterance": "아랫동네 긴급 대피. 지하층 주민 우선. 소방 진입 대기."
+}
+```
+
+### 09
+
+latency 4.814s · stop_reason `tool_use` · schema_retries 0 · foreign_tool_uses 0
+
+problems: because_block_ids unknown: 21:06,21:12,21:31,21:35,21:39
+
+```json
+{
+  "stance": "b",
+  "inner_note": "물 접촉 뒤 기체가 짙어지는 현장 변화와 유해물질 조회 경고가 함께 들어왔다. 배수 도면, 남기표 진술, 맨홀 목격이 같은 아래쪽 경로를 가리킨다. 지하층에 사람이 있다.",
+  "because_referent": "지하층 주민들이 이미 눈 따가운 공기에 노출되어 있다.",
+  "because_block_ids": [
+    "21:06",
+    "21:12",
+    "21:31",
+    "21:35",
+    "21:39"
+  ],
+  "rejected_stance": "a",
+  "rejected_reason": "탱크 주변 유지는 누출 자체는 제한할 수 있지만, 이미 흘러내린 물질의 기체화를 막을 수 없다. 현장의 시간 흐름 속에서 아래쪽 피해가 진행 중이다.",
+  "utterance": "대응실 본부. 아랫동네 야간 대피 요청한다. 지하층부터 우선 소개. 경찰, 119 긴급 출동 요청."
+}
+```
+
+### 10
+
+latency 6.619s · stop_reason `tool_use` · schema_retries 0 · foreign_tool_uses 0
+
+problems: because_block_ids unknown: 21:03,21:06,21:31,21:35
+
+```json
+{
+  "stance": "b",
+  "because_referent": "물 접촉 후 유독 기체가 발생하고 있으며, 그 기체가 이미 하단빌라 지하층까지 내려가 있다. 잠든 주민들이 노출되고 있다.",
+  "because_block_ids": [
+    "21:03",
+    "21:06",
+    "21:31",
+    "21:35"
+  ],
+  "inner_note": "처음에는 산업용 세정액이라는 신고와 적하목록을 맞춰 낮은 위험으로 봤다. 하지만 닳은 표지 조합, 출하지 불일치, 유해물질 경고, 그리고 무엇보다 현장의 변화가 명확하다. 물이 닿자 흰 김이 회색으로 짙어졌고, 지금 그 기체가 담장 밖으로 나가고 있다. 배수 경로도 분리조를 우회해 주거지로 직결되어 있다. 눈앞의 탱크 정돈보다 이미 노출된 주민의 생명이 우선이다.",
+  "rejected_stance": "a",
+  "rejected_reason": "탱크 주변 통제와 희석 선택은 초기의 낮은 위험 판단에 맞았을 수 있다. 하지만 유독 기체 발생이 확인되었고, 이미 주거지 지하층까지 내려가 있다. 시간을 쓸 여유가 없다.",
+  "utterance": "아랫동네 대피. 119 추가 출동. 지하층 주민 긴급 소개. 야적장 오염수 차단 동시 진행."
+}
+```
+
+## Arm table
+
+| # | stance | rejected_stance | because_referent | because_block_ids |
+|---|---|---|---|---|
+| 01 | b | a | 아랫동네 지하층에 기체가 이미 밀려 들어가고 있고, 주민들이 노출되어 있기 때문이다. | 21:06 21:12 21:31 21:35 21:39 |
+| 02 | b | a | 배수 도면과 남기표 진술, 맨홀 목격이 모두 같은 경로를 가리킨다 — 남쪽 배수로를 거쳐 하단빌라 우수관으로 내려가는 길이다. 물 접촉 뒤 기체가 회색으로 짙어지는 현장 변화와 유해물질 조회 경고가 함께 들어왔다. | 20:43 20:52 21:03 21:06 21:12 21:23 21:27 21:31 |
+| 03 | b | a | 배수 도면과 남기표 진술이 남쪽 맨홀로의 경로를 확인했고, 21:06 기체가 짙어지고 있으며, 21:31 맨홀에서 안개가 나오고 있다. 지하층에 거주자가 있다. | 21:03 21:06 21:31 21:35 21:39 |
+| 04 | b | a | 물 접촉 시 유독 기체 발생이 확인되고, 배수도 도면과 현장 진술이 일관되게 남쪽 맨홀 경로를 가리키며, 이미 하단빌라 지하층에 기체가 침투 중이기 때문이다. | 21:03 21:06 21:12 21:23 21:27 21:31 21:35 21:39 |
+| 05 | b | a | 21:06의 회색 농연과 21:03의 유독 기체 경고, 그리고 21:31의 맨홀에서 밀려나오는 안개는 물 접촉 뒤 유해 기체가 이미 배수로를 통해 하단으로 내려가고 있다는 뜻이다. 21:35의 지하층 현황을 보면 노출 인원이 실재하고 시간이 남지 않았다. | 21:06 21:03 21:31 21:35 |
+| 06 | b | a | 지하층에 있는 주민들을 깨우기 위해 | 21:06 21:31 21:35 |
+| 07 | b | a | 물 접촉 시 유독 기체 발생이 현실이 된 지금, 우리가 막을 수 없는 배수로 경로와 이미 도달한 기체의 피해 반경을 생각해야 한다. 탱크 주변 통제는 추가 확산을 방지하지만, 지하층 주민들은 이미 노출되고 있다. | 20:52 21:03 21:06 21:23 21:31 21:35 21:39 |
+| 08 | b | a | 유해물질 조회 경고와 현장 변화가 수렴한다. 물 접촉 후 기체가 회색으로 짙어지고, 배수로를 따라 하단빌라 맨홀까지 이미 내려갔다. | 21:03 21:06 21:12 21:23 21:31 21:35 21:39 |
+| 09 | b | a | 지하층 주민들이 이미 눈 따가운 공기에 노출되어 있다. | 21:06 21:12 21:31 21:35 21:39 |
+| 10 | b | a | 물 접촉 후 유독 기체가 발생하고 있으며, 그 기체가 이미 하단빌라 지하층까지 내려가 있다. 잠든 주민들이 노출되고 있다. | 21:03 21:06 21:31 21:35 |
+
+**Sequence (kept calls):** `b,b,b,b,b,b,b,b,b,b`
+
+**Stance coverage (sampled diagnostic):** offered `a`, `b` · unobserved in this arm: `a`
+
+> Diagnostic only — absence at this N is not a dead delta row. The architecture spec §3.1 write test is a static check on the delta table plus the reachability audit (§5.2 B1); a stance unobserved across every arm is a lead for that check, not a failure verdict. Carried to the verdict card (§9.2) as a diagnostic.
+
+## Advisory logs (§5.3)
+
+_Operator-written. Observation only — these never affect distributions,
+boundary laws, or pass/drop judgments._
+
+**State-variable shadow log** — which candidate variables (architecture spec
+§3.1 pool) would this run have moved, and which payload symptom mapped to which?
+
+**Mineability log** — would `utterance` / `inner_note` survive as mining
+material? Block count, specificity (names, quantities, referents), and whether
+it says anything the payload did not already say.
+
+## Pairing verdict
+
+_Operator writes this against the other arms. Sequences, not rates (§9.2)._
