@@ -85,24 +85,26 @@ describe('scenario desktop replay files', () => {
 
     expect(readUnlockedScenarioSlugs(MANIFEST, storage)).toEqual([
       sorted[0]!.slug,
+      sorted[1]!.slug,
       sorted[2]!.slug,
     ])
   })
 
-  it('(c) the tutorial file is the desktop floor before any completion', () => {
+  it('(c) every playable file is the desktop floor before any completion', () => {
     const storage = new FakeStorage()
-    const tutorial = sortedScenarioPacks(MANIFEST)[0]!
+    const sorted = sortedScenarioPacks(MANIFEST)
+    const expected = [sorted[0]!.slug, sorted[1]!.slug]
 
-    expect(readUnlockedScenarioSlugs(MANIFEST, storage)).toEqual([tutorial.slug])
-    expect(readUnlockedScenarioSlugs(MANIFEST, null)).toEqual([tutorial.slug])
+    expect(readUnlockedScenarioSlugs(MANIFEST, storage)).toEqual(expected)
+    expect(readUnlockedScenarioSlugs(MANIFEST, null)).toEqual(expected)
   })
 
-  it('(d) a malformed unlock list fails back to the tutorial instead of showing no-name files', () => {
+  it('(d) a malformed unlock list fails back to playable files instead of showing no-name files', () => {
     const storage = new FakeStorage()
-    const tutorial = sortedScenarioPacks(MANIFEST)[0]!
+    const sorted = sortedScenarioPacks(MANIFEST)
     storage.setItem(UNLOCKED_SCENARIOS_KEY, '{')
 
-    expect(readUnlockedScenarioSlugs(MANIFEST, storage)).toEqual([tutorial.slug])
+    expect(readUnlockedScenarioSlugs(MANIFEST, storage)).toEqual([sorted[0]!.slug, sorted[1]!.slug])
   })
 
   it('(e) a good ending unlocks every completed scenario as replayable', () => {

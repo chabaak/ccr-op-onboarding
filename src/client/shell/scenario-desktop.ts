@@ -121,34 +121,28 @@ export function readUnlockedScenarioSlugs(
   index: ScenarioIndex,
   storage: StoragePort | null | undefined,
 ): readonly string[] {
-  const floor = tutorialScenarioPack(index).slug
+  tutorialScenarioPack(index)
+  const sorted = sortedScenarioPacks(index)
+  const floor = sorted.filter(isScenarioPlayable).map((pack) => pack.slug)
   const port = storageOf(storage)
-  if (port === null) return [floor]
+  if (port === null) return floor
   const raw = port.getItem(UNLOCKED_SCENARIOS_KEY)
   const known = knownSlugs(index)
-  const unlocked = new Set<string>([floor])
+  const unlocked = new Set<string>(floor)
   if (raw === null) {
-    return sortedScenarioPacks(index)
-      .map((pack) => pack.slug)
-      .filter((slug) => unlocked.has(slug))
+    return sorted.map((pack) => pack.slug).filter((slug) => unlocked.has(slug))
   }
   try {
     const value = JSON.parse(raw)
     if (!Array.isArray(value)) {
-      return sortedScenarioPacks(index)
-        .map((pack) => pack.slug)
-        .filter((slug) => unlocked.has(slug))
+      return sorted.map((pack) => pack.slug).filter((slug) => unlocked.has(slug))
     }
     for (const item of value) {
       if (typeof item === 'string' && known.has(item)) unlocked.add(item)
     }
-    return sortedScenarioPacks(index)
-      .map((pack) => pack.slug)
-      .filter((slug) => unlocked.has(slug))
+    return sorted.map((pack) => pack.slug).filter((slug) => unlocked.has(slug))
   } catch {
-    return sortedScenarioPacks(index)
-      .map((pack) => pack.slug)
-      .filter((slug) => unlocked.has(slug))
+    return sorted.map((pack) => pack.slug).filter((slug) => unlocked.has(slug))
   }
 }
 
