@@ -52,7 +52,7 @@ import { fetchScenarioInPlay } from '../shell/pack-session.ts'
 import { PORTAL } from '../shell/portal-identity.ts'
 import { pad2 } from '../components/block-card.ts'
 import { getSlotBoard, SLOT_CAP } from '../components/slot-board.ts'
-import { getScoreTally } from '../components/score-tally.ts'
+import { createScoreTally } from '../components/score-tally.ts'
 import type { TallyModel } from '../components/score-tally.ts'
 
 /** What the record is called, and what it grades against — relocated verbatim
@@ -103,7 +103,7 @@ export function mount(host: HTMLElement, driver: FixtureDriver): void {
   let run = 0
   let slug = ''
   let title = ''
-  const records = new Map<number, HTMLElement>()
+  const records = new Map<number, ReturnType<typeof createScoreTally>>()
 
   const marks = (): MarkSets => deriveMarks(driver.store(), carried)
 
@@ -282,7 +282,8 @@ export function mount(host: HTMLElement, driver: FixtureDriver): void {
   function mountRecord(): void {
     const docFacts = host.querySelector('article.doc-facts')
     if (docFacts === null) return
-    for (const [sitting, node] of records) {
+    for (const [sitting, record] of records) {
+      const node = record.root
       if (sitting === active) {
         if (node.parentElement !== docFacts) docFacts.append(node)
       } else {
@@ -372,10 +373,19 @@ export function mount(host: HTMLElement, driver: FixtureDriver): void {
       // document was read under the latest day's 집계표. Exactly one is ever
       // mounted: `mountRecord()` attaches the active sitting's and detaches
       // every other.
-      records.get(run)?.remove()
+      const previous = records.get(run)
+      previous?.reset()
+      previous?.root.remove()
       const node = el('article', 'terminal-record')
       node.setAttribute('aria-label', '시행 결과')
-      records.set(run, node)
+      const sitting = run
+      const tally = createScoreTally({
+        host: node,
+        onFinal: () => {
+          window.dispatchEvent(new CustomEvent('score-tally:final', { detail: { run: sitting } }))
+        },
+      })
+      records.set(run, tally)
       // The scored day takes the rail and the record mounts under it. Going
       // through `sync()` rather than straight to `mountRecord()` is what covers
       // a day that filed NO report (`?drill=tally-lapse`): without a rail
@@ -389,8 +399,6 @@ export function mount(host: HTMLElement, driver: FixtureDriver): void {
       // a day that filed no report still takes its identity.
       sync(false)
       mountRecord()
-      const tally = getScoreTally()
-      if (tally === null) return
       tally.open()
       // x12 — THE RECORD IS ON THE DESK NOW; THE NUMBER IS NOT. `open()` leaves
       // it `pending` — the article mounted, blank, waiting — and the count-up
@@ -404,7 +412,6 @@ export function mount(host: HTMLElement, driver: FixtureDriver): void {
       // the desk may be on the next sitting; a model read late would be the same
       // event scored against whatever `run` had become.
       const record = scoreModel(event)
-      const sitting = run
       afterPaper({ at: 'score', run: sitting }, () => tally.run(record))
       return
     }

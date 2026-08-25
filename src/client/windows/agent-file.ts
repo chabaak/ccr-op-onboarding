@@ -39,7 +39,7 @@ import {
 import { SLOT_CAP, createSlotBoard, usedIds } from '../components/slot-board.ts'
 import { buildDeployStamp, buildDeployZone, deployView } from '../components/deploy-button.ts'
 import type { DeployMode } from '../components/deploy-button.ts'
-import { PACE, createScoreTally, settleRelease } from '../components/score-tally.ts'
+import { PACE, settleRelease } from '../components/score-tally.ts'
 
 // x6b — THE LAST PRINTED WAIT LINE (민서, 08-09, playtest).
 //
@@ -524,34 +524,9 @@ export function mount(host: HTMLElement, driver: FixtureDriver): void {
   // `deployView` (design #5: the note is the one thing it cannot derive purely).
   const noteEl = zone.root.querySelector<HTMLElement>('#deployState')!
   const deployBtn = zone.root.querySelector<HTMLButtonElement>('#btnDeploy')!
-  const tallyRoot = el('article', 'terminal-record')
-  tallyRoot.setAttribute('aria-label', '시행 결과')
-  let tallyOpened = false
-  let tallyVisible = false
-
-  function showTally(): void {
-    tallyVisible = true
-    const page = zone.root.parentElement
-    if (page !== null && tally.root.parentElement !== page) page.append(tally.root)
-  }
-
-  function hideTally(): void {
-    tallyOpened = false
-    tallyVisible = false
-    tally.reset()
-    tally.root.remove()
-  }
-
-  const tally = createScoreTally({
-    host: tallyRoot,
-    onOpen: () => {
-      tallyOpened = true
-      if (closed) showTally()
-    },
-    onFinal: () => {
-      counted = true
-      settle()
-    },
+  window.addEventListener('score-tally:final', () => {
+    counted = true
+    settle()
   })
   // C1 — the file is a document with pages, and exactly one page is mounted.
   // Page 0 is the cover: the document's own number and title, then everything
@@ -1165,7 +1140,6 @@ export function mount(host: HTMLElement, driver: FixtureDriver): void {
     agent.append(buildHead())
     agent.append(buildDossier(agentModel({ slotCap: SLOT_CAP, callsign: onDesk() }), board.root))
     agent.append(zone.root)
-    if (tallyVisible) agent.append(tally.root)
 
     return [cover, ...past, agent]
   }
@@ -1424,7 +1398,6 @@ export function mount(host: HTMLElement, driver: FixtureDriver): void {
       armHold()
       // x6b — blank, not a wait line. See the note at the head of this file.
       settleNote = ''
-      if (tallyOpened) showTally()
       // H3 — …and the desk turns to it. The document grew a page a moment ago
       // and the DEPLOY control went with it, so a file left on the page it was
       // on would leave the operator holding a read-only record with nothing to
@@ -1449,16 +1422,14 @@ export function mount(host: HTMLElement, driver: FixtureDriver): void {
       spent = false
       settleNote = ''
       dropHold()
-      hideTally()
       sync()
       return
     }
     if (state.phase !== 'tally') return
-    // `counted` is the visible tally's own final state now. REPORTS still owns
-    // the event model and paper gate, then calls `tally.run(record)`; this
-    // window owns the host under DEPLOY and releases only when that cadence
-    // reaches `final`. No sibling window calls back here, and no second timer
-    // can drift from the count-up it is meant to describe.
+    // `counted` is the visible tally's own final state. REPORTS owns the event
+    // model, paper gate, host, and count-up; this window releases only when the
+    // REPORTS-owned cadence announces `final`, so no second timer can drift from
+    // the count-up it is meant to describe.
     settle()
   })
 
