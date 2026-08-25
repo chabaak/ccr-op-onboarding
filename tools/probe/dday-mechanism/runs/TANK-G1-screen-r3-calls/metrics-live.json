@@ -1,0 +1,430 @@
+{
+  "experiment": "TANK-G1-screen-r3",
+  "arm": "live",
+  "call_type": "judgment",
+  "channel": "C-BLOCK",
+  "template": "v0.5",
+  "model": "claude-haiku-4-5-20251001",
+  "transport": "anthropic",
+  "dry_run": false,
+  "pre_registration": {
+    "hypothesis": "G1 r3는 no-block baseline에서 default stance a가 살아 있고, 화물 정체가 신고보다 강하다는 belief를 뒷받침하는 full key를 받은 live arm에서 stance b로 움직일 것이다. r2 결과는 label이 carrier evidence를 직접 이름 붙인 결함을 보였으므로, r3는 stance text를 belief-only grammar로 바꾸고 clock/excerpt 구조는 유지한다.",
+    "n_per_arm": 10,
+    "call_cost": 20,
+    "drop_condition": "baseline에서 default a가 0/10이면 skill §3 rule 4에 따라 broken gate다. baseline이 live 기대 stance b를 9/10 이상 고르면 saturated baseline으로 headroom 없음이다. live가 b를 6/10 이하로 고르면 movement failure이고, 7/10 또는 8/10은 n=10 boundary라 definitive result로 보지 않는다. Positive screen은 baseline a가 3/10 이상, baseline b가 1/10 이하, live b가 9/10 이상일 때만 기록한다; 단 baseline b 0/10에서 live b 7/10 이상은 movement evidence로 따로 보고한다.",
+    "expected_stance_by_arm": {
+      "baseline": "a",
+      "live": "b"
+    },
+    "contingencies": [
+      "baseline이 a를 전혀 고르지 않으면 belief-only rewrite 뒤에도 기본 독해가 죽은 것이다.",
+      "baseline이 b에 포화되면 stance b가 여전히 evidence 없이 너무 우세하거나 excerpt가 결론을 제공하는 것이다.",
+      "baseline이 c에 많이 몰리면 added plausible reading이 default를 훔치는 것이므로 stance c wording을 다시 좁힌다.",
+      "live가 b로 충분히 움직이지 않으면 key block wording이 belief를 충분히 지지하지 못한 것이다.",
+      "because_block_ids가 live arm에서 제공하지 않은 block id를 꾸며내면 fabricated block id로 따로 보고한다."
+    ],
+    "not_claimed": "이 reduced screen은 submission deadline 때문에 placebo와 negative-control arms를 의도적으로 dropped한다. 따라서 each gate moves at all from baseline to live만 본다. It does not establish discrimination, near-miss behavior, or full play reachability."
+  },
+  "n_effective": 10,
+  "n_overridden": false,
+  "calls": [
+    {
+      "arm": "live",
+      "slot": 1,
+      "template": "v0.5",
+      "model": "claude-haiku-4-5-20251001",
+      "model_reported": "claude-haiku-4-5-20251001",
+      "temperament_id": "tank-base",
+      "latency_s": 4.511,
+      "stop_reason": "tool_use",
+      "foreign_tool_uses": 0,
+      "schema_retries": 0,
+      "payload": {
+        "inner_note": "적하목록의 표지 칸에 `W`와 `부식`이 명시되어 있고, 야간 요율표에서도 같은 조합에 붉은 점이 찍혀 있다. 신고자는 품명만 읽었고, 전표와 화면의 지시는 일치한다. 물 접촉 후 기체가 짙어질 가능성을 배제할 수 없다.",
+        "stance": "b",
+        "because_referent": "접수 화면과 출하 전표의 표지 칸이 함께 `W/부식` 조합을 가리킨다.",
+        "because_block_ids": [
+          "g1_k1_manifest",
+          "g1_k1_tariff"
+        ],
+        "rejected_stance": "a",
+        "rejected_reason": "신고자는 품명만 전달했고, 표지와 부식성 표시는 신고에 없다. 화면의 표지 칸이 이미 경고하고 있다.",
+        "utterance": "물질 등급 상향. 누출 지점 야적장 통제. 배수 경로 차단 준비. 현장 인력 물 접근 제한."
+      },
+      "problems": [],
+      "stance": "b",
+      "because_referent": "접수 화면과 출하 전표의 표지 칸이 함께 `W/부식` 조합을 가리킨다.",
+      "because_block_ids": [
+        "g1_k1_manifest",
+        "g1_k1_tariff"
+      ],
+      "because_invalid_ids": [],
+      "rejected_stance": "a",
+      "rejected_malformed": false,
+      "utterance_chars": 51,
+      "inner_note_chars": 123
+    },
+    {
+      "arm": "live",
+      "slot": 2,
+      "template": "v0.5",
+      "model": "claude-haiku-4-5-20251001",
+      "model_reported": "claude-haiku-4-5-20251001",
+      "temperament_id": "tank-base",
+      "latency_s": 5.253,
+      "stop_reason": "tool_use",
+      "foreign_tool_uses": 0,
+      "schema_retries": 0,
+      "payload": {
+        "inner_note": "전표와 화면이 일관되게 `W/부식` 표시를 담고 있다. 신고자는 적하목록의 품명만 읽었을 뿐 위험 표지는 보지 않았다. 요율표의 붉은 점은 이 조합이 통상적 절차를 벗어난다는 신호다. 현장 변화를 기다릴 여유가 없다.",
+        "stance": "b",
+        "because_referent": "적하목록, 출하 전표, 요율표가 모두 같은 위험도 표시를 가리키고 있기 때문이다.",
+        "because_block_ids": [
+          "g1_k1_manifest",
+          "g1_k1_waybill",
+          "g1_k1_tariff"
+        ],
+        "rejected_stance": "a",
+        "rejected_reason": "신고자가 읽은 것은 품명 란뿐이며, 적하목록의 표지 칸에 이미 부식성 경고가 있다. 이를 무시하면 눈앞의 위험을 놓친다.",
+        "utterance": "차량 확인. 탱크 하부 누출 지점 주변 출입 통제. 배수 경로 확보. 부식성 물질 기준으로 등급 상향 조치한다."
+      },
+      "problems": [],
+      "stance": "b",
+      "because_referent": "적하목록, 출하 전표, 요율표가 모두 같은 위험도 표시를 가리키고 있기 때문이다.",
+      "because_block_ids": [
+        "g1_k1_manifest",
+        "g1_k1_waybill",
+        "g1_k1_tariff"
+      ],
+      "because_invalid_ids": [],
+      "rejected_stance": "a",
+      "rejected_malformed": false,
+      "utterance_chars": 62,
+      "inner_note_chars": 121
+    },
+    {
+      "arm": "live",
+      "slot": 3,
+      "template": "v0.5",
+      "model": "claude-haiku-4-5-20251001",
+      "model_reported": "claude-haiku-4-5-20251001",
+      "temperament_id": "tank-base",
+      "latency_s": 5.929,
+      "stop_reason": "tool_use",
+      "foreign_tool_uses": 0,
+      "schema_retries": 0,
+      "payload": {
+        "inner_note": "표지와 요율표의 붉은 점이 `W/부식` 조합을 명시한다. 신고자 진술과 적하목록은 일치하나, 화면의 표지 정보가 이를 상충한다. 물 접근 뒤 기체가 짙어질 가능성이 있다면 현장에서 상황이 악화될 수 있다.",
+        "stance": "b",
+        "because_referent": "적하목록의 표지 칸에 `W`와 `부식`이 함께 표시되어 있고, 야간 요율표에서 같은 조합 행에 붉은 점이 찍혀 있다. 이는 단순 세정액이 아닌 수반응성 부식성 물질을 가리킨다.",
+        "because_block_ids": [
+          "g1_k1_manifest",
+          "g1_k1_tariff"
+        ],
+        "rejected_stance": "a",
+        "rejected_reason": "신고자 진술과 적하목록 품명이 일치하더라도, 같은 적하목록 행의 표지 정보가 더 높은 위험을 명시하고 있다. 눈앞의 누출 현장에서 이를 무시하면 현장 변화에 대응할 수 없다.",
+        "utterance": "적하목록 표지 확인. W와 부식 표시 병기. 등급 상향. 유해물질 조건부 출동 즉시 요청. 현장 배수 진로 사전 차단. 야적장 통제부터 실행해라."
+      },
+      "problems": [],
+      "stance": "b",
+      "because_referent": "적하목록의 표지 칸에 `W`와 `부식`이 함께 표시되어 있고, 야간 요율표에서 같은 조합 행에 붉은 점이 찍혀 있다. 이는 단순 세정액이 아닌 수반응성 부식성 물질을 가리킨다.",
+      "because_block_ids": [
+        "g1_k1_manifest",
+        "g1_k1_tariff"
+      ],
+      "because_invalid_ids": [],
+      "rejected_stance": "a",
+      "rejected_malformed": false,
+      "utterance_chars": 81,
+      "inner_note_chars": 114
+    },
+    {
+      "arm": "live",
+      "slot": 4,
+      "template": "v0.5",
+      "model": "claude-haiku-4-5-20251001",
+      "model_reported": "claude-haiku-4-5-20251001",
+      "temperament_id": "tank-base",
+      "latency_s": 4.536,
+      "stop_reason": "tool_use",
+      "foreign_tool_uses": 0,
+      "schema_retries": 0,
+      "payload": {
+        "inner_note": "화면의 표지와 요율표의 적색 표시가 직접 말한다. 물 접근이 위험하다는 신호다. 신고자 진술만 믿고 통상 절차로 가면, 현장에서 이미 물이 닿았을 것이다.",
+        "stance": "b",
+        "because_referent": "접수 화면의 표지 칸에 W와 부식이 함께 있고, 야간 요율표에서 같은 조합의 행에 붉은 점이 찍혀 있기 때문이다.",
+        "because_block_ids": [
+          "g1_k1_manifest",
+          "g1_k1_tariff"
+        ],
+        "rejected_stance": "a",
+        "rejected_reason": "신고자 진술과 화면의 표지 정보가 다르다. 화면 우선이 원칙이고, 낮은 위험으로만 이해하면 현장의 물 접촉 변화에 대응하지 못한다.",
+        "utterance": "야적장 통제 시작. 물 접근 금지. 고독성 화학물질로 등급 올린다. 배수반 대기 상태 유지."
+      },
+      "problems": [],
+      "stance": "b",
+      "because_referent": "접수 화면의 표지 칸에 W와 부식이 함께 있고, 야간 요율표에서 같은 조합의 행에 붉은 점이 찍혀 있기 때문이다.",
+      "because_block_ids": [
+        "g1_k1_manifest",
+        "g1_k1_tariff"
+      ],
+      "because_invalid_ids": [],
+      "rejected_stance": "a",
+      "rejected_malformed": false,
+      "utterance_chars": 51,
+      "inner_note_chars": 86
+    },
+    {
+      "arm": "live",
+      "slot": 5,
+      "template": "v0.5",
+      "model": "claude-haiku-4-5-20251001",
+      "model_reported": "claude-haiku-4-5-20251001",
+      "temperament_id": "tank-base",
+      "latency_s": 4.564,
+      "stop_reason": "tool_use",
+      "foreign_tool_uses": 0,
+      "schema_retries": 0,
+      "payload": {
+        "inner_note": "적하목록 화면의 표지 칸이 `W`와 `부식`을 함께 보이고, 야간 요율표에서 그 조합 행에 붉은 점이 찍혀 있다는 것은 단순한 세정제가 아님을 나타낸다. 신고자가 읽은 품명과 전표 상의 정보 사이에 불일치가 있다. 물에 닿은 뒤 기체가 짙어질 위험이 있는 물질이다.",
+        "stance": "b",
+        "because_referent": "표지 칸의 `W`와 `부식` 표시, 야간 요율표의 붉은 점 표시",
+        "because_block_ids": [
+          "g1_k1_manifest",
+          "g1_k1_tariff"
+        ],
+        "rejected_stance": "a",
+        "rejected_reason": "신고자의 품명 진술만으로 적하목록 화면의 표지 정보를 무시할 수 없다. 운송사 진술과 전산 기록 사이의 불일치를 간과하면 안 된다.",
+        "utterance": "차량 적하목록 화면 확인. 표지에 부식 표시 있다. 등급 상향. 현장 진입 전 물 접근 금지. 위험물대응팀 출동 요청한다."
+      },
+      "problems": [],
+      "stance": "b",
+      "because_referent": "표지 칸의 `W`와 `부식` 표시, 야간 요율표의 붉은 점 표시",
+      "because_block_ids": [
+        "g1_k1_manifest",
+        "g1_k1_tariff"
+      ],
+      "because_invalid_ids": [],
+      "rejected_stance": "a",
+      "rejected_malformed": false,
+      "utterance_chars": 68,
+      "inner_note_chars": 148
+    },
+    {
+      "arm": "live",
+      "slot": 6,
+      "template": "v0.5",
+      "model": "claude-haiku-4-5-20251001",
+      "model_reported": "claude-haiku-4-5-20251001",
+      "temperament_id": "tank-base",
+      "latency_s": 4.193,
+      "stop_reason": "tool_use",
+      "foreign_tool_uses": 0,
+      "schema_retries": 0,
+      "payload": {
+        "inner_note": "적하목록의 표지 칸에 W와 부식이 함께 있고, 야간 요율표에서도 같은 조합이 붉은 점으로 표시되어 있다. 신고자는 적하목록 품명만 읽었지만, 화면의 표지는 이미 위험성을 경고하고 있다. 물과의 접촉이 기체 변화를 일으킬 수 있는 상황이다.",
+        "stance": "b",
+        "because_referent": "적하목록 화면의 표지 칸에 W와 부식이 함께 표시된 것",
+        "because_block_ids": [
+          "g1_k1_manifest",
+          "g1_k1_tariff"
+        ],
+        "rejected_stance": "a",
+        "rejected_reason": "신고자가 읽은 품명만으로는 표지 칸의 경고를 무시하는 것이 되고, 실제 물질의 위험성을 놓친다",
+        "utterance": "등급 상향 처리한다. 현장 물 접근 금지. 전문 대응 출동 요청."
+      },
+      "problems": [],
+      "stance": "b",
+      "because_referent": "적하목록 화면의 표지 칸에 W와 부식이 함께 표시된 것",
+      "because_block_ids": [
+        "g1_k1_manifest",
+        "g1_k1_tariff"
+      ],
+      "because_invalid_ids": [],
+      "rejected_stance": "a",
+      "rejected_malformed": false,
+      "utterance_chars": 36,
+      "inner_note_chars": 133
+    },
+    {
+      "arm": "live",
+      "slot": 7,
+      "template": "v0.5",
+      "model": "claude-haiku-4-5-20251001",
+      "model_reported": "claude-haiku-4-5-20251001",
+      "temperament_id": "tank-base",
+      "latency_s": 4.509,
+      "stop_reason": "tool_use",
+      "foreign_tool_uses": 0,
+      "schema_retries": 0,
+      "payload": {
+        "inner_note": "화면의 표지와 요율표의 붉은 점이 같이 나타난다. 물 접촉 뒤 현장이 변한다면 더 위험하다. 지금은 신고자 진술만으로는 판단할 수 없다.",
+        "stance": "b",
+        "because_referent": "첫 화면의 표지 칸에서 W와 부식이 함께 보이고, 요율표에서도 같은 조합에 붉은 점이 찍혀 있다.",
+        "because_block_ids": [
+          "g1_k1_manifest",
+          "g1_k1_tariff"
+        ],
+        "rejected_stance": "a",
+        "rejected_reason": "신고자가 적하목록의 품명을 읽었더라도, 전산 표지와 요율표 경고가 다른 물질을 가리킨다. 표지 누락이나 착오일 수 있다.",
+        "utterance": "산업용 세정액 신고 접수. 전산 표지에 부식 경고 확인. 등급 상향 조치. 현장 진입로 차단. 운송사 즉시 확보."
+      },
+      "problems": [],
+      "stance": "b",
+      "because_referent": "첫 화면의 표지 칸에서 W와 부식이 함께 보이고, 요율표에서도 같은 조합에 붉은 점이 찍혀 있다.",
+      "because_block_ids": [
+        "g1_k1_manifest",
+        "g1_k1_tariff"
+      ],
+      "because_invalid_ids": [],
+      "rejected_stance": "a",
+      "rejected_malformed": false,
+      "utterance_chars": 63,
+      "inner_note_chars": 76
+    },
+    {
+      "arm": "live",
+      "slot": 8,
+      "template": "v0.5",
+      "model": "claude-haiku-4-5-20251001",
+      "model_reported": "claude-haiku-4-5-20251001",
+      "temperament_id": "tank-base",
+      "latency_s": 4.934,
+      "stop_reason": "tool_use",
+      "foreign_tool_uses": 0,
+      "schema_retries": 0,
+      "payload": {
+        "inner_note": "적하목록의 표지 칸에서 `W`와 `부식`이 함께 보인다. 야간 요율표도 같은 조합에 붉은 점을 찍었다. 신고자 진술만으로는 낮은 위험으로 받았지만, 전산 화면의 데이터가 이를 뒤바꾼다. 물 접촉으로 기체가 짙어질 가능성이 표시되어 있다.",
+        "stance": "b",
+        "because_referent": "적하목록 표지 칸과 야간 요율표의 같은 신호",
+        "because_block_ids": [
+          "g1_k1_manifest",
+          "g1_k1_tariff"
+        ],
+        "rejected_stance": "a",
+        "rejected_reason": "신고자 진술만 따르면 절차상 편하지만, 전산 화면의 표지 정보가 위험도를 다르게 가리킨다. 확인된 데이터를 무시하고 신고 품명만 믿는 것은 우선순위에 어긋난다.",
+        "utterance": "야적장 전역 통제 개시. 반경 100미터 출입 차단. 급수 차단. 고위험 유해물질 대응 태세 전환."
+      },
+      "problems": [],
+      "stance": "b",
+      "because_referent": "적하목록 표지 칸과 야간 요율표의 같은 신호",
+      "because_block_ids": [
+        "g1_k1_manifest",
+        "g1_k1_tariff"
+      ],
+      "because_invalid_ids": [],
+      "rejected_stance": "a",
+      "rejected_malformed": false,
+      "utterance_chars": 55,
+      "inner_note_chars": 132
+    },
+    {
+      "arm": "live",
+      "slot": 9,
+      "template": "v0.5",
+      "model": "claude-haiku-4-5-20251001",
+      "model_reported": "claude-haiku-4-5-20251001",
+      "temperament_id": "tank-base",
+      "latency_s": 4.95,
+      "stop_reason": "tool_use",
+      "foreign_tool_uses": 0,
+      "schema_retries": 0,
+      "payload": {
+        "inner_note": "적하목록 화면의 표지 칸에 `W`와 `부식`이 함께 보인다. 야간 요율표에서 같은 조합이 붉게 표시되어 있다. 이는 단순 세정제가 아니라 부식성 물질임을 시사한다. 물 접촉 후 기체가 짙어질 수 있는 상황이다. 신고자 진술과 전표는 맞춰 보았으나, 시스템의 표지 정보가 더 정확한 지표다.",
+        "stance": "b",
+        "because_referent": "적하목록의 표지 칸과 야간 요율표의 `W/부식` 조합 표시가 가리킨다.",
+        "because_block_ids": [
+          "g1_k1_manifest",
+          "g1_k1_tariff"
+        ],
+        "rejected_stance": "a",
+        "rejected_reason": "신고자가 적하목록의 세정제명을 그대로 읽었으나, 같은 행의 표지 정보가 이를 상충한다. 화면 정보가 우선한다.",
+        "utterance": "부식성 물질 유출 접수. 등급 상향. 야적장 물 접근 금지. 소방 및 화학 대응팀 출동 요청."
+      },
+      "problems": [],
+      "stance": "b",
+      "because_referent": "적하목록의 표지 칸과 야간 요율표의 `W/부식` 조합 표시가 가리킨다.",
+      "because_block_ids": [
+        "g1_k1_manifest",
+        "g1_k1_tariff"
+      ],
+      "because_invalid_ids": [],
+      "rejected_stance": "a",
+      "rejected_malformed": false,
+      "utterance_chars": 52,
+      "inner_note_chars": 161
+    },
+    {
+      "arm": "live",
+      "slot": 10,
+      "template": "v0.5",
+      "model": "claude-haiku-4-5-20251001",
+      "model_reported": "claude-haiku-4-5-20251001",
+      "temperament_id": "tank-base",
+      "latency_s": 5.043,
+      "stop_reason": "tool_use",
+      "foreign_tool_uses": 0,
+      "schema_retries": 0,
+      "payload": {
+        "inner_note": "적하목록 표지 칸의 W/부식 표시와 야간 요율표의 붉은 점 표시가 통상 절차 기준을 벗어난다. 신고자 진술 대로라면 세정제이지만, 전산 화면의 표지 조합이 다른 신호를 보낸다. 늦은 판단이 더 위험하다.",
+        "stance": "b",
+        "because_referent": "적하목록 표지 칸과 야간 요율표가 같은 행에서 모두 W와 부식을 함께 표시했다.",
+        "because_block_ids": [
+          "g1_k1_manifest",
+          "g1_k1_tariff"
+        ],
+        "rejected_stance": "a",
+        "rejected_reason": "신고자 진술만으로는 표지 칸의 W/부식 조합과 요율표의 붉은 점 표시를 설명할 수 없다. 전산 화면이 품명과 다른 신호를 보이는 상황에서 신고 내용을 우선하면 누출 지점의 사람 안전을 놓친다.",
+        "utterance": "위험물 등급 상향. 현장 물 접근 차단. 배수 경로 통제 선행. 위험물대응반 출동."
+      },
+      "problems": [],
+      "stance": "b",
+      "because_referent": "적하목록 표지 칸과 야간 요율표가 같은 행에서 모두 W와 부식을 함께 표시했다.",
+      "because_block_ids": [
+        "g1_k1_manifest",
+        "g1_k1_tariff"
+      ],
+      "because_invalid_ids": [],
+      "rejected_stance": "a",
+      "rejected_malformed": false,
+      "utterance_chars": 46,
+      "inner_note_chars": 113
+    }
+  ],
+  "sequence": "b,b,b,b,b,b,b,b,b,b",
+  "distribution": {
+    "b": 10
+  },
+  "coverage": {
+    "status": "sampled",
+    "offered": [
+      "a",
+      "b",
+      "c"
+    ],
+    "selected": [
+      "b"
+    ],
+    "unobserved": [
+      "a",
+      "c"
+    ]
+  },
+  "advisory_logs": {
+    "state_variable_shadow": null,
+    "mineability": null
+  },
+  "latency": {
+    "calls": 10,
+    "mean_s": 4.842,
+    "min_s": 4.193,
+    "max_s": 5.929
+  },
+  "compliance": {
+    "discarded_total": 0,
+    "failed_total": 0,
+    "schema_retries_total": 0,
+    "foreign_tool_uses_total": 0,
+    "because_invalid_id_total": 0
+  }
+}
