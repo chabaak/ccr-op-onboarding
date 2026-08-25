@@ -302,11 +302,10 @@ export function createSlotBoard(options: SlotBoardOptions): SlotBoard {
   /**
    * One seated sentence in one of the four handover slots.
    *
-   * Every attribute the thread layer, membrane census and tutorial reach for
-   * survives (`data-slot`, `data-no`, `data-block-id`, `.slot-pin`,
-   * `[data-op=unslot]`). The visible number comes from the skin via
-   * `data-label`, so the semantic slot number remains stable for callers that
-   * already read `data-no`.
+   * Every attribute the membrane census, tests and tutorial reach for survives
+   * (`data-slot`, `data-no`, `data-block-id`, `.slot-pin`, `[data-op=unslot]`).
+   * The visible number comes from the skin via `data-label`, so the semantic
+   * slot number remains stable for callers that already read `data-no`.
    */
   function buildSeat(cell: SlotCell, blockId: string, chars?: number): HTMLElement {
     const node = el('div', 'slot filled')

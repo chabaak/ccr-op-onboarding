@@ -370,15 +370,17 @@ test.describe('report renders once after the last beat', () => {
     const body = await row(`${BODY} .rep-row`)
     const tokens = await page.evaluate(() => {
       const root = getComputedStyle(document.documentElement)
-      const probe = document.createElement('span')
-      document.body.append(probe)
       const read = (name: string): string => {
+        const probe = document.createElement('span')
+        probe.style.all = 'initial'
+        probe.style.transition = 'none'
         probe.style.color = root.getPropertyValue(name).trim()
-        return getComputedStyle(probe).color
+        document.body.append(probe)
+        const color = getComputedStyle(probe).color
+        probe.remove()
+        return color
       }
-      const colors = { scene: read('--warning'), agent: read('--surface-muted-2') }
-      probe.remove()
-      return colors
+      return { scene: read('--warning'), agent: read('--surface-muted-2') }
     })
     expect(facts.columns).toBe(body.columns)
     expect(Math.abs(facts.label - body.label), 'source labels are not in one column').toBeLessThan(1)

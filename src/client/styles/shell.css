@@ -202,7 +202,7 @@
 .tb-hint{margin-left:auto;font-size:var(--fs-8-5);letter-spacing:.16em;color:var(--txt-8);
   padding-right:var(--space-4)}
 
-/* ═══ DESKTOP + THREADS ═══════════════════════════════════════════════════ */
+/* ═══ DESKTOP ═════════════════════════════════════════════════════════════ */
 /* no stacking context here — every .win must share the one runtime `--z`
    ladder the window manager writes. The rule outlived its original reason
    (BLOCK STORE used to sit outside #desktop in the markup; T1 dissolved it):
