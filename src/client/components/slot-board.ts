@@ -344,7 +344,7 @@ export function createSlotBoard(options: SlotBoardOptions): SlotBoard {
       node.append(unset)
     }
 
-    // The thread's anchor CLOSES the run rather than opening it.
+    // The pin closes the seated sentence rather than opening it.
     //
     // It sat between the number and the sentence to begin with, and a paragraph
     // has soft-wrap opportunities the four boxes never did: the line broke
