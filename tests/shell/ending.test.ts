@@ -330,11 +330,10 @@ describe('[x6] the plates', () => {
       {
         head: '모의 과정 완료',
         corner: '3 / 3',
-        lead: '평가가 보류되었습니다.',
+        lead: '시행 횟수가 모두 소진되었습니다. 평가가 보류되었습니다.',
         body: [
           '본 단말의 모의 과정은 여기서 종료됩니다. 동일 사건으로 재평가가 편성됩니다.',
           '한내돔의 기록은 그대로 남았습니다. 다음 시행에서 다시 뵙겠습니다.',
-          '시행 횟수가 모두 소진되었습니다.',
         ],
       },
     ])
@@ -352,7 +351,8 @@ describe('[x6] the plates', () => {
     const plates = endingPlates('bad', other, ENDINGS)
     expect(plates[0]!.lead).toBe('57명이 한내돔을 탈출하지 못하여 사망했습니다.')
     expect(plates[0]!.body).not.toContain('시행 횟수가 모두 소진되었습니다.')
-    expect(plates[2]!.body.at(-1)).toBe('시행 횟수가 모두 소진되었습니다.')
+    expect(plates[2]!.lead).toBe('시행 횟수가 모두 소진되었습니다. 평가가 보류되었습니다.')
+    expect(plates[2]!.body).not.toContain('시행 횟수가 모두 소진되었습니다.')
   })
 
   it('(f) the good ending`s copy is fixed and reads no number off the day', () => {
