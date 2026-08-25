@@ -25,9 +25,9 @@
 
 ### 01 — FAILED
 
-latency 0.271s · stop_reason `—` · schema_retries 0 · foreign_tool_uses 0
+latency 0.242s · stop_reason `—` · schema_retries 0 · foreign_tool_uses 0
 
-error: anthropic 400: {"type":"error","error":{"type":"invalid_request_error","message":"Your credit balance is too low to access the Anthropic API. Please go to Plans & Billing to upgrade or purchase credits."},"request_id":"req_011CePtYhikJxWBwUVuvegHA"}
+error: anthropic 400: {"type":"error","error":{"type":"invalid_request_error","message":"Your credit balance is too low to access the Anthropic API. Please go to Plans & Billing to upgrade or purchase credits."},"request_id":"req_011CePtaR7vLTN457m4ZMYvf"}
 
 ```json
 null
@@ -35,9 +35,9 @@ null
 
 ### 02 — FAILED
 
-latency 0.324s · stop_reason `—` · schema_retries 1 · foreign_tool_uses 0
+latency 0.25s · stop_reason `—` · schema_retries 1 · foreign_tool_uses 0
 
-error: anthropic 400: {"type":"error","error":{"type":"invalid_request_error","message":"Your credit balance is too low to access the Anthropic API. Please go to Plans & Billing to upgrade or purchase credits."},"request_id":"req_011CePtYj3d3koHGiSgMcLqu"}
+error: anthropic 400: {"type":"error","error":{"type":"invalid_request_error","message":"Your credit balance is too low to access the Anthropic API. Please go to Plans & Billing to upgrade or purchase credits."},"request_id":"req_011CePtaSARhukqHeUFAy9rV"}
 
 ```json
 null
@@ -45,9 +45,9 @@ null
 
 ### 03 — FAILED
 
-latency 0.38s · stop_reason `—` · schema_retries 2 · foreign_tool_uses 0
+latency 0.253s · stop_reason `—` · schema_retries 2 · foreign_tool_uses 0
 
-error: anthropic 400: {"type":"error","error":{"type":"invalid_request_error","message":"Your credit balance is too low to access the Anthropic API. Please go to Plans & Billing to upgrade or purchase credits."},"request_id":"req_011CePtYkLGFYiJTENCAKNdh"}
+error: anthropic 400: {"type":"error","error":{"type":"invalid_request_error","message":"Your credit balance is too low to access the Anthropic API. Please go to Plans & Billing to upgrade or purchase credits."},"request_id":"req_011CePtaTFQrCV4PM3on1RHh"}
 
 ```json
 null
@@ -65,9 +65,9 @@ null
 
 ### 05 — FAILED
 
-latency 0.26s · stop_reason `—` · schema_retries 0 · foreign_tool_uses 0
+latency 0.285s · stop_reason `—` · schema_retries 0 · foreign_tool_uses 0
 
-error: anthropic 400: {"type":"error","error":{"type":"invalid_request_error","message":"Your credit balance is too low to access the Anthropic API. Please go to Plans & Billing to upgrade or purchase credits."},"request_id":"req_011CePtYmr3YDgvxut733Eid"}
+error: anthropic 400: {"type":"error","error":{"type":"invalid_request_error","message":"Your credit balance is too low to access the Anthropic API. Please go to Plans & Billing to upgrade or purchase credits."},"request_id":"req_011CePtaUKA2beSe16iYtAhA"}
 
 ```json
 null
@@ -75,9 +75,9 @@ null
 
 ### 06 — FAILED
 
-latency 0.478s · stop_reason `—` · schema_retries 1 · foreign_tool_uses 0
+latency 0.25s · stop_reason `—` · schema_retries 1 · foreign_tool_uses 0
 
-error: anthropic 400: {"type":"error","error":{"type":"invalid_request_error","message":"Your credit balance is too low to access the Anthropic API. Please go to Plans & Billing to upgrade or purchase credits."},"request_id":"req_011CePtYoSYRyqNukQ9njAfP"}
+error: anthropic 400: {"type":"error","error":{"type":"invalid_request_error","message":"Your credit balance is too low to access the Anthropic API. Please go to Plans & Billing to upgrade or purchase credits."},"request_id":"req_011CePtaVYpb8fGRuBmjNFCm"}
 
 ```json
 null
@@ -85,9 +85,9 @@ null
 
 ### 07 — FAILED
 
-latency 0.259s · stop_reason `—` · schema_retries 2 · foreign_tool_uses 0
+latency 0.253s · stop_reason `—` · schema_retries 2 · foreign_tool_uses 0
 
-error: anthropic 400: {"type":"error","error":{"type":"invalid_request_error","message":"Your credit balance is too low to access the Anthropic API. Please go to Plans & Billing to upgrade or purchase credits."},"request_id":"req_011CePtYpzJrrBdcoi416Gzy"}
+error: anthropic 400: {"type":"error","error":{"type":"invalid_request_error","message":"Your credit balance is too low to access the Anthropic API. Please go to Plans & Billing to upgrade or purchase credits."},"request_id":"req_011CePtaWbaEsF8NVDDRPm3r"}
 
 ```json
 null
@@ -105,9 +105,9 @@ null
 
 ### 09 — FAILED
 
-latency 0.249s · stop_reason `—` · schema_retries 0 · foreign_tool_uses 0
+latency 0.255s · stop_reason `—` · schema_retries 0 · foreign_tool_uses 0
 
-error: anthropic 400: {"type":"error","error":{"type":"invalid_request_error","message":"Your credit balance is too low to access the Anthropic API. Please go to Plans & Billing to upgrade or purchase credits."},"request_id":"req_011CePtYr5HjMVSduTU5yEKm"}
+error: anthropic 400: {"type":"error","error":{"type":"invalid_request_error","message":"Your credit balance is too low to access the Anthropic API. Please go to Plans & Billing to upgrade or purchase credits."},"request_id":"req_011CePtaXj37eaVmPUw1eTYy"}
 
 ```json
 null
@@ -115,9 +115,9 @@ null
 
 ### 10 — FAILED
 
-latency 0.242s · stop_reason `—` · schema_retries 1 · foreign_tool_uses 0
+latency 0.342s · stop_reason `—` · schema_retries 1 · foreign_tool_uses 0
 
-error: anthropic 400: {"type":"error","error":{"type":"invalid_request_error","message":"Your credit balance is too low to access the Anthropic API. Please go to Plans & Billing to upgrade or purchase credits."},"request_id":"req_011CePtYs9n8Z9ErHkKcAn7j"}
+error: anthropic 400: {"type":"error","error":{"type":"invalid_request_error","message":"Your credit balance is too low to access the Anthropic API. Please go to Plans & Billing to upgrade or purchase credits."},"request_id":"req_011CePtaYtVT3XsYUrDZ55rq"}
 
 ```json
 null
@@ -125,9 +125,9 @@ null
 
 ### 11 — FAILED
 
-latency 0.26s · stop_reason `—` · schema_retries 2 · foreign_tool_uses 0
+latency 0.31s · stop_reason `—` · schema_retries 2 · foreign_tool_uses 0
 
-error: anthropic 400: {"type":"error","error":{"type":"invalid_request_error","message":"Your credit balance is too low to access the Anthropic API. Please go to Plans & Billing to upgrade or purchase credits."},"request_id":"req_011CePtYtCHUBB5QcYSwUt6t"}
+error: anthropic 400: {"type":"error","error":{"type":"invalid_request_error","message":"Your credit balance is too low to access the Anthropic API. Please go to Plans & Billing to upgrade or purchase credits."},"request_id":"req_011CePtaaM3dqBxLHXSaCVT1"}
 
 ```json
 null
@@ -145,9 +145,9 @@ null
 
 ### 13 — FAILED
 
-latency 0.251s · stop_reason `—` · schema_retries 0 · foreign_tool_uses 0
+latency 0.243s · stop_reason `—` · schema_retries 0 · foreign_tool_uses 0
 
-error: anthropic 400: {"type":"error","error":{"type":"invalid_request_error","message":"Your credit balance is too low to access the Anthropic API. Please go to Plans & Billing to upgrade or purchase credits."},"request_id":"req_011CePtYuJGYbczUzHLFfQKp"}
+error: anthropic 400: {"type":"error","error":{"type":"invalid_request_error","message":"Your credit balance is too low to access the Anthropic API. Please go to Plans & Billing to upgrade or purchase credits."},"request_id":"req_011CePtabaiNtkK9FLNuQDFs"}
 
 ```json
 null
@@ -155,9 +155,9 @@ null
 
 ### 14 — FAILED
 
-latency 0.245s · stop_reason `—` · schema_retries 1 · foreign_tool_uses 0
+latency 0.59s · stop_reason `—` · schema_retries 1 · foreign_tool_uses 0
 
-error: anthropic 400: {"type":"error","error":{"type":"invalid_request_error","message":"Your credit balance is too low to access the Anthropic API. Please go to Plans & Billing to upgrade or purchase credits."},"request_id":"req_011CePtYvMWyxRyfks9TapjV"}
+error: anthropic 400: {"type":"error","error":{"type":"invalid_request_error","message":"Your credit balance is too low to access the Anthropic API. Please go to Plans & Billing to upgrade or purchase credits."},"request_id":"req_011CePtae62b2cQxwUCyrC43"}
 
 ```json
 null
@@ -165,9 +165,9 @@ null
 
 ### 15 — FAILED
 
-latency 0.291s · stop_reason `—` · schema_retries 2 · foreign_tool_uses 0
+latency 0.255s · stop_reason `—` · schema_retries 2 · foreign_tool_uses 0
 
-error: anthropic 400: {"type":"error","error":{"type":"invalid_request_error","message":"Your credit balance is too low to access the Anthropic API. Please go to Plans & Billing to upgrade or purchase credits."},"request_id":"req_011CePtYwVyB113QjhN61ghM"}
+error: anthropic 400: {"type":"error","error":{"type":"invalid_request_error","message":"Your credit balance is too low to access the Anthropic API. Please go to Plans & Billing to upgrade or purchase credits."},"request_id":"req_011CePtafAmGg4Wtia1m6QcM"}
 
 ```json
 null
@@ -185,9 +185,9 @@ null
 
 ### 17 — FAILED
 
-latency 0.274s · stop_reason `—` · schema_retries 0 · foreign_tool_uses 0
+latency 0.241s · stop_reason `—` · schema_retries 0 · foreign_tool_uses 0
 
-error: anthropic 400: {"type":"error","error":{"type":"invalid_request_error","message":"Your credit balance is too low to access the Anthropic API. Please go to Plans & Billing to upgrade or purchase credits."},"request_id":"req_011CePtYxnrpAzz9VbmfGuCN"}
+error: anthropic 400: {"type":"error","error":{"type":"invalid_request_error","message":"Your credit balance is too low to access the Anthropic API. Please go to Plans & Billing to upgrade or purchase credits."},"request_id":"req_011CePtagC2g1an6iDNb3LgM"}
 
 ```json
 null
@@ -195,9 +195,9 @@ null
 
 ### 18 — FAILED
 
-latency 0.251s · stop_reason `—` · schema_retries 1 · foreign_tool_uses 0
+latency 0.245s · stop_reason `—` · schema_retries 1 · foreign_tool_uses 0
 
-error: anthropic 400: {"type":"error","error":{"type":"invalid_request_error","message":"Your credit balance is too low to access the Anthropic API. Please go to Plans & Billing to upgrade or purchase credits."},"request_id":"req_011CePtYyqNB21Z4EAjJiXLt"}
+error: anthropic 400: {"type":"error","error":{"type":"invalid_request_error","message":"Your credit balance is too low to access the Anthropic API. Please go to Plans & Billing to upgrade or purchase credits."},"request_id":"req_011CePtahF2naX1hjVXuidwH"}
 
 ```json
 null
@@ -205,9 +205,9 @@ null
 
 ### 19 — FAILED
 
-latency 0.243s · stop_reason `—` · schema_retries 2 · foreign_tool_uses 0
+latency 0.25s · stop_reason `—` · schema_retries 2 · foreign_tool_uses 0
 
-error: anthropic 400: {"type":"error","error":{"type":"invalid_request_error","message":"Your credit balance is too low to access the Anthropic API. Please go to Plans & Billing to upgrade or purchase credits."},"request_id":"req_011CePtYzurXf2naVtU4n4ZJ"}
+error: anthropic 400: {"type":"error","error":{"type":"invalid_request_error","message":"Your credit balance is too low to access the Anthropic API. Please go to Plans & Billing to upgrade or purchase credits."},"request_id":"req_011CePtaiJXkRYg3Rm9aAS4u"}
 
 ```json
 null
@@ -225,9 +225,9 @@ null
 
 ### 21 — FAILED
 
-latency 0.248s · stop_reason `—` · schema_retries 0 · foreign_tool_uses 0
+latency 0.637s · stop_reason `—` · schema_retries 0 · foreign_tool_uses 0
 
-error: anthropic 400: {"type":"error","error":{"type":"invalid_request_error","message":"Your credit balance is too low to access the Anthropic API. Please go to Plans & Billing to upgrade or purchase credits."},"request_id":"req_011CePtZ1wczsLqraCB8X5Nz"}
+error: anthropic 400: {"type":"error","error":{"type":"invalid_request_error","message":"Your credit balance is too low to access the Anthropic API. Please go to Plans & Billing to upgrade or purchase credits."},"request_id":"req_011CePtam3EY58e3nzMEHYAX"}
 
 ```json
 null
@@ -235,9 +235,9 @@ null
 
 ### 22 — FAILED
 
-latency 0.233s · stop_reason `—` · schema_retries 1 · foreign_tool_uses 0
+latency 0.245s · stop_reason `—` · schema_retries 1 · foreign_tool_uses 0
 
-error: anthropic 400: {"type":"error","error":{"type":"invalid_request_error","message":"Your credit balance is too low to access the Anthropic API. Please go to Plans & Billing to upgrade or purchase credits."},"request_id":"req_011CePtZ2z8Cy8zvrgnTnABD"}
+error: anthropic 400: {"type":"error","error":{"type":"invalid_request_error","message":"Your credit balance is too low to access the Anthropic API. Please go to Plans & Billing to upgrade or purchase credits."},"request_id":"req_011CePtan7UXDEb8XibPYLVz"}
 
 ```json
 null
@@ -245,9 +245,9 @@ null
 
 ### 23 — FAILED
 
-latency 0.252s · stop_reason `—` · schema_retries 2 · foreign_tool_uses 0
+latency 0.248s · stop_reason `—` · schema_retries 2 · foreign_tool_uses 0
 
-error: anthropic 400: {"type":"error","error":{"type":"invalid_request_error","message":"Your credit balance is too low to access the Anthropic API. Please go to Plans & Billing to upgrade or purchase credits."},"request_id":"req_011CePtZ3z9hZFmWp2TKhKKc"}
+error: anthropic 400: {"type":"error","error":{"type":"invalid_request_error","message":"Your credit balance is too low to access the Anthropic API. Please go to Plans & Billing to upgrade or purchase credits."},"request_id":"req_011CePtao8jzzFmTKiAxgwoQ"}
 
 ```json
 null
@@ -265,9 +265,9 @@ null
 
 ### 25 — FAILED
 
-latency 0.262s · stop_reason `—` · schema_retries 0 · foreign_tool_uses 0
+latency 0.826s · stop_reason `—` · schema_retries 0 · foreign_tool_uses 0
 
-error: anthropic 400: {"type":"error","error":{"type":"invalid_request_error","message":"Your credit balance is too low to access the Anthropic API. Please go to Plans & Billing to upgrade or purchase credits."},"request_id":"req_011CePtZ56sckFsEBVyGmvkQ"}
+error: anthropic 400: {"type":"error","error":{"type":"invalid_request_error","message":"Your credit balance is too low to access the Anthropic API. Please go to Plans & Billing to upgrade or purchase credits."},"request_id":"req_011CePtaq64y4UB2EZXcui6s"}
 
 ```json
 null
@@ -275,9 +275,9 @@ null
 
 ### 26 — FAILED
 
-latency 0.273s · stop_reason `—` · schema_retries 1 · foreign_tool_uses 0
+latency 0.243s · stop_reason `—` · schema_retries 1 · foreign_tool_uses 0
 
-error: anthropic 400: {"type":"error","error":{"type":"invalid_request_error","message":"Your credit balance is too low to access the Anthropic API. Please go to Plans & Billing to upgrade or purchase credits."},"request_id":"req_011CePtZ6H4qLpnBwoWj9pP6"}
+error: anthropic 400: {"type":"error","error":{"type":"invalid_request_error","message":"Your credit balance is too low to access the Anthropic API. Please go to Plans & Billing to upgrade or purchase credits."},"request_id":"req_011CePtasjKB56T9gFPW12dc"}
 
 ```json
 null
@@ -285,9 +285,9 @@ null
 
 ### 27 — FAILED
 
-latency 0.245s · stop_reason `—` · schema_retries 2 · foreign_tool_uses 0
+latency 0.244s · stop_reason `—` · schema_retries 2 · foreign_tool_uses 0
 
-error: anthropic 400: {"type":"error","error":{"type":"invalid_request_error","message":"Your credit balance is too low to access the Anthropic API. Please go to Plans & Billing to upgrade or purchase credits."},"request_id":"req_011CePtZ7MJpa6wqKREnipbi"}
+error: anthropic 400: {"type":"error","error":{"type":"invalid_request_error","message":"Your credit balance is too low to access the Anthropic API. Please go to Plans & Billing to upgrade or purchase credits."},"request_id":"req_011CePtatnKHFCVZEWXRMX53"}
 
 ```json
 null
@@ -305,9 +305,9 @@ null
 
 ### 29 — FAILED
 
-latency 0.287s · stop_reason `—` · schema_retries 0 · foreign_tool_uses 0
+latency 0.243s · stop_reason `—` · schema_retries 0 · foreign_tool_uses 0
 
-error: anthropic 400: {"type":"error","error":{"type":"invalid_request_error","message":"Your credit balance is too low to access the Anthropic API. Please go to Plans & Billing to upgrade or purchase credits."},"request_id":"req_011CePtZ8XVkUq2DnAfNRqWJ"}
+error: anthropic 400: {"type":"error","error":{"type":"invalid_request_error","message":"Your credit balance is too low to access the Anthropic API. Please go to Plans & Billing to upgrade or purchase credits."},"request_id":"req_011CePtauoqHjsBER3aH177W"}
 
 ```json
 null
@@ -315,9 +315,9 @@ null
 
 ### 30 — FAILED
 
-latency 0.241s · stop_reason `—` · schema_retries 1 · foreign_tool_uses 0
+latency 0.244s · stop_reason `—` · schema_retries 1 · foreign_tool_uses 0
 
-error: anthropic 400: {"type":"error","error":{"type":"invalid_request_error","message":"Your credit balance is too low to access the Anthropic API. Please go to Plans & Billing to upgrade or purchase credits."},"request_id":"req_011CePtZ9dENqxUqAwXA3B1E"}
+error: anthropic 400: {"type":"error","error":{"type":"invalid_request_error","message":"Your credit balance is too low to access the Anthropic API. Please go to Plans & Billing to upgrade or purchase credits."},"request_id":"req_011CePtavrLHHZuyKeddipvD"}
 
 ```json
 null
@@ -327,7 +327,7 @@ null
 
 latency 0.257s · stop_reason `—` · schema_retries 2 · foreign_tool_uses 0
 
-error: anthropic 400: {"type":"error","error":{"type":"invalid_request_error","message":"Your credit balance is too low to access the Anthropic API. Please go to Plans & Billing to upgrade or purchase credits."},"request_id":"req_011CePtZAgjKoy5ANkHZzXTG"}
+error: anthropic 400: {"type":"error","error":{"type":"invalid_request_error","message":"Your credit balance is too low to access the Anthropic API. Please go to Plans & Billing to upgrade or purchase credits."},"request_id":"req_011CePtawv5dUQiGUzVBR7kY"}
 
 ```json
 null
@@ -345,9 +345,9 @@ null
 
 ### 33 — FAILED
 
-latency 0.301s · stop_reason `—` · schema_retries 0 · foreign_tool_uses 0
+latency 0.245s · stop_reason `—` · schema_retries 0 · foreign_tool_uses 0
 
-error: anthropic 400: {"type":"error","error":{"type":"invalid_request_error","message":"Your credit balance is too low to access the Anthropic API. Please go to Plans & Billing to upgrade or purchase credits."},"request_id":"req_011CePtZBqge46MkTzibyzNG"}
+error: anthropic 400: {"type":"error","error":{"type":"invalid_request_error","message":"Your credit balance is too low to access the Anthropic API. Please go to Plans & Billing to upgrade or purchase credits."},"request_id":"req_011CePtaxzKVzhUphhpiNuuN"}
 
 ```json
 null
@@ -355,9 +355,9 @@ null
 
 ### 34 — FAILED
 
-latency 0.26s · stop_reason `—` · schema_retries 1 · foreign_tool_uses 0
+latency 0.244s · stop_reason `—` · schema_retries 1 · foreign_tool_uses 0
 
-error: anthropic 400: {"type":"error","error":{"type":"invalid_request_error","message":"Your credit balance is too low to access the Anthropic API. Please go to Plans & Billing to upgrade or purchase credits."},"request_id":"req_011CePtZD6LPpyL7BYyh8Dmi"}
+error: anthropic 400: {"type":"error","error":{"type":"invalid_request_error","message":"Your credit balance is too low to access the Anthropic API. Please go to Plans & Billing to upgrade or purchase credits."},"request_id":"req_011CePtaz3KtJ7FPTa6TGLS8"}
 
 ```json
 null
@@ -365,9 +365,9 @@ null
 
 ### 35 — FAILED
 
-latency 0.242s · stop_reason `—` · schema_retries 2 · foreign_tool_uses 0
+latency 0.277s · stop_reason `—` · schema_retries 2 · foreign_tool_uses 0
 
-error: anthropic 400: {"type":"error","error":{"type":"invalid_request_error","message":"Your credit balance is too low to access the Anthropic API. Please go to Plans & Billing to upgrade or purchase credits."},"request_id":"req_011CePtZEBKoEiTS9weToAto"}
+error: anthropic 400: {"type":"error","error":{"type":"invalid_request_error","message":"Your credit balance is too low to access the Anthropic API. Please go to Plans & Billing to upgrade or purchase credits."},"request_id":"req_011CePtb1561bk219LqQst8L"}
 
 ```json
 null
@@ -385,9 +385,9 @@ null
 
 ### 37 — FAILED
 
-latency 0.239s · stop_reason `—` · schema_retries 0 · foreign_tool_uses 0
+latency 0.261s · stop_reason `—` · schema_retries 0 · foreign_tool_uses 0
 
-error: anthropic 400: {"type":"error","error":{"type":"invalid_request_error","message":"Your credit balance is too low to access the Anthropic API. Please go to Plans & Billing to upgrade or purchase credits."},"request_id":"req_011CePtZFCay7nrxiK5U3rzs"}
+error: anthropic 400: {"type":"error","error":{"type":"invalid_request_error","message":"Your credit balance is too low to access the Anthropic API. Please go to Plans & Billing to upgrade or purchase credits."},"request_id":"req_011CePtb2LyyBtSAPdCE8iDt"}
 
 ```json
 null
@@ -395,9 +395,9 @@ null
 
 ### 38 — FAILED
 
-latency 0.27s · stop_reason `—` · schema_retries 1 · foreign_tool_uses 0
+latency 0.256s · stop_reason `—` · schema_retries 1 · foreign_tool_uses 0
 
-error: anthropic 400: {"type":"error","error":{"type":"invalid_request_error","message":"Your credit balance is too low to access the Anthropic API. Please go to Plans & Billing to upgrade or purchase credits."},"request_id":"req_011CePtZGJpEdPqJ7CaPEKjR"}
+error: anthropic 400: {"type":"error","error":{"type":"invalid_request_error","message":"Your credit balance is too low to access the Anthropic API. Please go to Plans & Billing to upgrade or purchase credits."},"request_id":"req_011CePtb3RizQ81pjphTMk9q"}
 
 ```json
 null
@@ -405,9 +405,9 @@ null
 
 ### 39 — FAILED
 
-latency 0.243s · stop_reason `—` · schema_retries 2 · foreign_tool_uses 0
+latency 0.252s · stop_reason `—` · schema_retries 2 · foreign_tool_uses 0
 
-error: anthropic 400: {"type":"error","error":{"type":"invalid_request_error","message":"Your credit balance is too low to access the Anthropic API. Please go to Plans & Billing to upgrade or purchase credits."},"request_id":"req_011CePtZHPJkxKYCA3L2NZVJ"}
+error: anthropic 400: {"type":"error","error":{"type":"invalid_request_error","message":"Your credit balance is too low to access the Anthropic API. Please go to Plans & Billing to upgrade or purchase credits."},"request_id":"req_011CePtb4Wi7dX9GwoeyoTXe"}
 
 ```json
 null

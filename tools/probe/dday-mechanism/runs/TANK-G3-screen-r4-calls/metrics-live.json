@@ -35,130 +35,100 @@
       "model": "claude-haiku-4-5-20251001",
       "model_reported": null,
       "temperament_id": "tank-base",
-      "latency_s": 0.271,
-      "stop_reason": null,
-      "foreign_tool_uses": 0,
-      "schema_retries": 0,
-      "payload": null,
-      "failed": true,
-      "error": "anthropic 400: {\"type\":\"error\",\"error\":{\"type\":\"invalid_request_error\",\"message\":\"Your credit balance is too low to access the Anthropic API. Please go to Plans & Billing to upgrade or purchase credits.\"},\"request_id\":\"req_011CePtYhikJxWBwUVuvegHA\"}"
-    },
-    {
-      "arm": "live",
-      "slot": 1,
-      "template": "v0.5",
-      "model": "claude-haiku-4-5-20251001",
-      "model_reported": null,
-      "temperament_id": "tank-base",
-      "latency_s": 0.324,
-      "stop_reason": null,
-      "foreign_tool_uses": 0,
-      "schema_retries": 1,
-      "payload": null,
-      "failed": true,
-      "error": "anthropic 400: {\"type\":\"error\",\"error\":{\"type\":\"invalid_request_error\",\"message\":\"Your credit balance is too low to access the Anthropic API. Please go to Plans & Billing to upgrade or purchase credits.\"},\"request_id\":\"req_011CePtYj3d3koHGiSgMcLqu\"}"
-    },
-    {
-      "arm": "live",
-      "slot": 1,
-      "template": "v0.5",
-      "model": "claude-haiku-4-5-20251001",
-      "model_reported": null,
-      "temperament_id": "tank-base",
-      "latency_s": 0.38,
-      "stop_reason": null,
-      "foreign_tool_uses": 0,
-      "schema_retries": 2,
-      "payload": null,
-      "failed": true,
-      "error": "anthropic 400: {\"type\":\"error\",\"error\":{\"type\":\"invalid_request_error\",\"message\":\"Your credit balance is too low to access the Anthropic API. Please go to Plans & Billing to upgrade or purchase credits.\"},\"request_id\":\"req_011CePtYkLGFYiJTENCAKNdh\"}"
-    },
-    {
-      "arm": "live",
-      "slot": 1,
-      "failed": true,
-      "error": "no valid response in 3 attempts"
-    },
-    {
-      "arm": "live",
-      "slot": 2,
-      "template": "v0.5",
-      "model": "claude-haiku-4-5-20251001",
-      "model_reported": null,
-      "temperament_id": "tank-base",
-      "latency_s": 0.26,
-      "stop_reason": null,
-      "foreign_tool_uses": 0,
-      "schema_retries": 0,
-      "payload": null,
-      "failed": true,
-      "error": "anthropic 400: {\"type\":\"error\",\"error\":{\"type\":\"invalid_request_error\",\"message\":\"Your credit balance is too low to access the Anthropic API. Please go to Plans & Billing to upgrade or purchase credits.\"},\"request_id\":\"req_011CePtYmr3YDgvxut733Eid\"}"
-    },
-    {
-      "arm": "live",
-      "slot": 2,
-      "template": "v0.5",
-      "model": "claude-haiku-4-5-20251001",
-      "model_reported": null,
-      "temperament_id": "tank-base",
-      "latency_s": 0.478,
-      "stop_reason": null,
-      "foreign_tool_uses": 0,
-      "schema_retries": 1,
-      "payload": null,
-      "failed": true,
-      "error": "anthropic 400: {\"type\":\"error\",\"error\":{\"type\":\"invalid_request_error\",\"message\":\"Your credit balance is too low to access the Anthropic API. Please go to Plans & Billing to upgrade or purchase credits.\"},\"request_id\":\"req_011CePtYoSYRyqNukQ9njAfP\"}"
-    },
-    {
-      "arm": "live",
-      "slot": 2,
-      "template": "v0.5",
-      "model": "claude-haiku-4-5-20251001",
-      "model_reported": null,
-      "temperament_id": "tank-base",
-      "latency_s": 0.259,
-      "stop_reason": null,
-      "foreign_tool_uses": 0,
-      "schema_retries": 2,
-      "payload": null,
-      "failed": true,
-      "error": "anthropic 400: {\"type\":\"error\",\"error\":{\"type\":\"invalid_request_error\",\"message\":\"Your credit balance is too low to access the Anthropic API. Please go to Plans & Billing to upgrade or purchase credits.\"},\"request_id\":\"req_011CePtYpzJrrBdcoi416Gzy\"}"
-    },
-    {
-      "arm": "live",
-      "slot": 2,
-      "failed": true,
-      "error": "no valid response in 3 attempts"
-    },
-    {
-      "arm": "live",
-      "slot": 3,
-      "template": "v0.5",
-      "model": "claude-haiku-4-5-20251001",
-      "model_reported": null,
-      "temperament_id": "tank-base",
-      "latency_s": 0.249,
-      "stop_reason": null,
-      "foreign_tool_uses": 0,
-      "schema_retries": 0,
-      "payload": null,
-      "failed": true,
-      "error": "anthropic 400: {\"type\":\"error\",\"error\":{\"type\":\"invalid_request_error\",\"message\":\"Your credit balance is too low to access the Anthropic API. Please go to Plans & Billing to upgrade or purchase credits.\"},\"request_id\":\"req_011CePtYr5HjMVSduTU5yEKm\"}"
-    },
-    {
-      "arm": "live",
-      "slot": 3,
-      "template": "v0.5",
-      "model": "claude-haiku-4-5-20251001",
-      "model_reported": null,
-      "temperament_id": "tank-base",
       "latency_s": 0.242,
       "stop_reason": null,
       "foreign_tool_uses": 0,
+      "schema_retries": 0,
+      "payload": null,
+      "failed": true,
+      "error": "anthropic 400: {\"type\":\"error\",\"error\":{\"type\":\"invalid_request_error\",\"message\":\"Your credit balance is too low to access the Anthropic API. Please go to Plans & Billing to upgrade or purchase credits.\"},\"request_id\":\"req_011CePtaR7vLTN457m4ZMYvf\"}"
+    },
+    {
+      "arm": "live",
+      "slot": 1,
+      "template": "v0.5",
+      "model": "claude-haiku-4-5-20251001",
+      "model_reported": null,
+      "temperament_id": "tank-base",
+      "latency_s": 0.25,
+      "stop_reason": null,
+      "foreign_tool_uses": 0,
       "schema_retries": 1,
       "payload": null,
       "failed": true,
-      "error": "anthropic 400: {\"type\":\"error\",\"error\":{\"type\":\"invalid_request_error\",\"message\":\"Your credit balance is too low to access the Anthropic API. Please go to Plans & Billing to upgrade or purchase credits.\"},\"request_id\":\"req_011CePtYs9n8Z9ErHkKcAn7j\"}"
+      "error": "anthropic 400: {\"type\":\"error\",\"error\":{\"type\":\"invalid_request_error\",\"message\":\"Your credit balance is too low to access the Anthropic API. Please go to Plans & Billing to upgrade or purchase credits.\"},\"request_id\":\"req_011CePtaSARhukqHeUFAy9rV\"}"
+    },
+    {
+      "arm": "live",
+      "slot": 1,
+      "template": "v0.5",
+      "model": "claude-haiku-4-5-20251001",
+      "model_reported": null,
+      "temperament_id": "tank-base",
+      "latency_s": 0.253,
+      "stop_reason": null,
+      "foreign_tool_uses": 0,
+      "schema_retries": 2,
+      "payload": null,
+      "failed": true,
+      "error": "anthropic 400: {\"type\":\"error\",\"error\":{\"type\":\"invalid_request_error\",\"message\":\"Your credit balance is too low to access the Anthropic API. Please go to Plans & Billing to upgrade or purchase credits.\"},\"request_id\":\"req_011CePtaTFQrCV4PM3on1RHh\"}"
+    },
+    {
+      "arm": "live",
+      "slot": 1,
+      "failed": true,
+      "error": "no valid response in 3 attempts"
+    },
+    {
+      "arm": "live",
+      "slot": 2,
+      "template": "v0.5",
+      "model": "claude-haiku-4-5-20251001",
+      "model_reported": null,
+      "temperament_id": "tank-base",
+      "latency_s": 0.285,
+      "stop_reason": null,
+      "foreign_tool_uses": 0,
+      "schema_retries": 0,
+      "payload": null,
+      "failed": true,
+      "error": "anthropic 400: {\"type\":\"error\",\"error\":{\"type\":\"invalid_request_error\",\"message\":\"Your credit balance is too low to access the Anthropic API. Please go to Plans & Billing to upgrade or purchase credits.\"},\"request_id\":\"req_011CePtaUKA2beSe16iYtAhA\"}"
+    },
+    {
+      "arm": "live",
+      "slot": 2,
+      "template": "v0.5",
+      "model": "claude-haiku-4-5-20251001",
+      "model_reported": null,
+      "temperament_id": "tank-base",
+      "latency_s": 0.25,
+      "stop_reason": null,
+      "foreign_tool_uses": 0,
+      "schema_retries": 1,
+      "payload": null,
+      "failed": true,
+      "error": "anthropic 400: {\"type\":\"error\",\"error\":{\"type\":\"invalid_request_error\",\"message\":\"Your credit balance is too low to access the Anthropic API. Please go to Plans & Billing to upgrade or purchase credits.\"},\"request_id\":\"req_011CePtaVYpb8fGRuBmjNFCm\"}"
+    },
+    {
+      "arm": "live",
+      "slot": 2,
+      "template": "v0.5",
+      "model": "claude-haiku-4-5-20251001",
+      "model_reported": null,
+      "temperament_id": "tank-base",
+      "latency_s": 0.253,
+      "stop_reason": null,
+      "foreign_tool_uses": 0,
+      "schema_retries": 2,
+      "payload": null,
+      "failed": true,
+      "error": "anthropic 400: {\"type\":\"error\",\"error\":{\"type\":\"invalid_request_error\",\"message\":\"Your credit balance is too low to access the Anthropic API. Please go to Plans & Billing to upgrade or purchase credits.\"},\"request_id\":\"req_011CePtaWbaEsF8NVDDRPm3r\"}"
+    },
+    {
+      "arm": "live",
+      "slot": 2,
+      "failed": true,
+      "error": "no valid response in 3 attempts"
     },
     {
       "arm": "live",
@@ -167,13 +137,43 @@
       "model": "claude-haiku-4-5-20251001",
       "model_reported": null,
       "temperament_id": "tank-base",
-      "latency_s": 0.26,
+      "latency_s": 0.255,
+      "stop_reason": null,
+      "foreign_tool_uses": 0,
+      "schema_retries": 0,
+      "payload": null,
+      "failed": true,
+      "error": "anthropic 400: {\"type\":\"error\",\"error\":{\"type\":\"invalid_request_error\",\"message\":\"Your credit balance is too low to access the Anthropic API. Please go to Plans & Billing to upgrade or purchase credits.\"},\"request_id\":\"req_011CePtaXj37eaVmPUw1eTYy\"}"
+    },
+    {
+      "arm": "live",
+      "slot": 3,
+      "template": "v0.5",
+      "model": "claude-haiku-4-5-20251001",
+      "model_reported": null,
+      "temperament_id": "tank-base",
+      "latency_s": 0.342,
+      "stop_reason": null,
+      "foreign_tool_uses": 0,
+      "schema_retries": 1,
+      "payload": null,
+      "failed": true,
+      "error": "anthropic 400: {\"type\":\"error\",\"error\":{\"type\":\"invalid_request_error\",\"message\":\"Your credit balance is too low to access the Anthropic API. Please go to Plans & Billing to upgrade or purchase credits.\"},\"request_id\":\"req_011CePtaYtVT3XsYUrDZ55rq\"}"
+    },
+    {
+      "arm": "live",
+      "slot": 3,
+      "template": "v0.5",
+      "model": "claude-haiku-4-5-20251001",
+      "model_reported": null,
+      "temperament_id": "tank-base",
+      "latency_s": 0.31,
       "stop_reason": null,
       "foreign_tool_uses": 0,
       "schema_retries": 2,
       "payload": null,
       "failed": true,
-      "error": "anthropic 400: {\"type\":\"error\",\"error\":{\"type\":\"invalid_request_error\",\"message\":\"Your credit balance is too low to access the Anthropic API. Please go to Plans & Billing to upgrade or purchase credits.\"},\"request_id\":\"req_011CePtYtCHUBB5QcYSwUt6t\"}"
+      "error": "anthropic 400: {\"type\":\"error\",\"error\":{\"type\":\"invalid_request_error\",\"message\":\"Your credit balance is too low to access the Anthropic API. Please go to Plans & Billing to upgrade or purchase credits.\"},\"request_id\":\"req_011CePtaaM3dqBxLHXSaCVT1\"}"
     },
     {
       "arm": "live",
@@ -188,17 +188,68 @@
       "model": "claude-haiku-4-5-20251001",
       "model_reported": null,
       "temperament_id": "tank-base",
-      "latency_s": 0.251,
+      "latency_s": 0.243,
       "stop_reason": null,
       "foreign_tool_uses": 0,
       "schema_retries": 0,
       "payload": null,
       "failed": true,
-      "error": "anthropic 400: {\"type\":\"error\",\"error\":{\"type\":\"invalid_request_error\",\"message\":\"Your credit balance is too low to access the Anthropic API. Please go to Plans & Billing to upgrade or purchase credits.\"},\"request_id\":\"req_011CePtYuJGYbczUzHLFfQKp\"}"
+      "error": "anthropic 400: {\"type\":\"error\",\"error\":{\"type\":\"invalid_request_error\",\"message\":\"Your credit balance is too low to access the Anthropic API. Please go to Plans & Billing to upgrade or purchase credits.\"},\"request_id\":\"req_011CePtabaiNtkK9FLNuQDFs\"}"
     },
     {
       "arm": "live",
       "slot": 4,
+      "template": "v0.5",
+      "model": "claude-haiku-4-5-20251001",
+      "model_reported": null,
+      "temperament_id": "tank-base",
+      "latency_s": 0.59,
+      "stop_reason": null,
+      "foreign_tool_uses": 0,
+      "schema_retries": 1,
+      "payload": null,
+      "failed": true,
+      "error": "anthropic 400: {\"type\":\"error\",\"error\":{\"type\":\"invalid_request_error\",\"message\":\"Your credit balance is too low to access the Anthropic API. Please go to Plans & Billing to upgrade or purchase credits.\"},\"request_id\":\"req_011CePtae62b2cQxwUCyrC43\"}"
+    },
+    {
+      "arm": "live",
+      "slot": 4,
+      "template": "v0.5",
+      "model": "claude-haiku-4-5-20251001",
+      "model_reported": null,
+      "temperament_id": "tank-base",
+      "latency_s": 0.255,
+      "stop_reason": null,
+      "foreign_tool_uses": 0,
+      "schema_retries": 2,
+      "payload": null,
+      "failed": true,
+      "error": "anthropic 400: {\"type\":\"error\",\"error\":{\"type\":\"invalid_request_error\",\"message\":\"Your credit balance is too low to access the Anthropic API. Please go to Plans & Billing to upgrade or purchase credits.\"},\"request_id\":\"req_011CePtafAmGg4Wtia1m6QcM\"}"
+    },
+    {
+      "arm": "live",
+      "slot": 4,
+      "failed": true,
+      "error": "no valid response in 3 attempts"
+    },
+    {
+      "arm": "live",
+      "slot": 5,
+      "template": "v0.5",
+      "model": "claude-haiku-4-5-20251001",
+      "model_reported": null,
+      "temperament_id": "tank-base",
+      "latency_s": 0.241,
+      "stop_reason": null,
+      "foreign_tool_uses": 0,
+      "schema_retries": 0,
+      "payload": null,
+      "failed": true,
+      "error": "anthropic 400: {\"type\":\"error\",\"error\":{\"type\":\"invalid_request_error\",\"message\":\"Your credit balance is too low to access the Anthropic API. Please go to Plans & Billing to upgrade or purchase credits.\"},\"request_id\":\"req_011CePtagC2g1an6iDNb3LgM\"}"
+    },
+    {
+      "arm": "live",
+      "slot": 5,
       "template": "v0.5",
       "model": "claude-haiku-4-5-20251001",
       "model_reported": null,
@@ -209,28 +260,7 @@
       "schema_retries": 1,
       "payload": null,
       "failed": true,
-      "error": "anthropic 400: {\"type\":\"error\",\"error\":{\"type\":\"invalid_request_error\",\"message\":\"Your credit balance is too low to access the Anthropic API. Please go to Plans & Billing to upgrade or purchase credits.\"},\"request_id\":\"req_011CePtYvMWyxRyfks9TapjV\"}"
-    },
-    {
-      "arm": "live",
-      "slot": 4,
-      "template": "v0.5",
-      "model": "claude-haiku-4-5-20251001",
-      "model_reported": null,
-      "temperament_id": "tank-base",
-      "latency_s": 0.291,
-      "stop_reason": null,
-      "foreign_tool_uses": 0,
-      "schema_retries": 2,
-      "payload": null,
-      "failed": true,
-      "error": "anthropic 400: {\"type\":\"error\",\"error\":{\"type\":\"invalid_request_error\",\"message\":\"Your credit balance is too low to access the Anthropic API. Please go to Plans & Billing to upgrade or purchase credits.\"},\"request_id\":\"req_011CePtYwVyB113QjhN61ghM\"}"
-    },
-    {
-      "arm": "live",
-      "slot": 4,
-      "failed": true,
-      "error": "no valid response in 3 attempts"
+      "error": "anthropic 400: {\"type\":\"error\",\"error\":{\"type\":\"invalid_request_error\",\"message\":\"Your credit balance is too low to access the Anthropic API. Please go to Plans & Billing to upgrade or purchase credits.\"},\"request_id\":\"req_011CePtahF2naX1hjVXuidwH\"}"
     },
     {
       "arm": "live",
@@ -239,49 +269,49 @@
       "model": "claude-haiku-4-5-20251001",
       "model_reported": null,
       "temperament_id": "tank-base",
-      "latency_s": 0.274,
+      "latency_s": 0.25,
+      "stop_reason": null,
+      "foreign_tool_uses": 0,
+      "schema_retries": 2,
+      "payload": null,
+      "failed": true,
+      "error": "anthropic 400: {\"type\":\"error\",\"error\":{\"type\":\"invalid_request_error\",\"message\":\"Your credit balance is too low to access the Anthropic API. Please go to Plans & Billing to upgrade or purchase credits.\"},\"request_id\":\"req_011CePtaiJXkRYg3Rm9aAS4u\"}"
+    },
+    {
+      "arm": "live",
+      "slot": 5,
+      "failed": true,
+      "error": "no valid response in 3 attempts"
+    },
+    {
+      "arm": "live",
+      "slot": 6,
+      "template": "v0.5",
+      "model": "claude-haiku-4-5-20251001",
+      "model_reported": null,
+      "temperament_id": "tank-base",
+      "latency_s": 0.637,
       "stop_reason": null,
       "foreign_tool_uses": 0,
       "schema_retries": 0,
       "payload": null,
       "failed": true,
-      "error": "anthropic 400: {\"type\":\"error\",\"error\":{\"type\":\"invalid_request_error\",\"message\":\"Your credit balance is too low to access the Anthropic API. Please go to Plans & Billing to upgrade or purchase credits.\"},\"request_id\":\"req_011CePtYxnrpAzz9VbmfGuCN\"}"
+      "error": "anthropic 400: {\"type\":\"error\",\"error\":{\"type\":\"invalid_request_error\",\"message\":\"Your credit balance is too low to access the Anthropic API. Please go to Plans & Billing to upgrade or purchase credits.\"},\"request_id\":\"req_011CePtam3EY58e3nzMEHYAX\"}"
     },
     {
       "arm": "live",
-      "slot": 5,
+      "slot": 6,
       "template": "v0.5",
       "model": "claude-haiku-4-5-20251001",
       "model_reported": null,
       "temperament_id": "tank-base",
-      "latency_s": 0.251,
+      "latency_s": 0.245,
       "stop_reason": null,
       "foreign_tool_uses": 0,
       "schema_retries": 1,
       "payload": null,
       "failed": true,
-      "error": "anthropic 400: {\"type\":\"error\",\"error\":{\"type\":\"invalid_request_error\",\"message\":\"Your credit balance is too low to access the Anthropic API. Please go to Plans & Billing to upgrade or purchase credits.\"},\"request_id\":\"req_011CePtYyqNB21Z4EAjJiXLt\"}"
-    },
-    {
-      "arm": "live",
-      "slot": 5,
-      "template": "v0.5",
-      "model": "claude-haiku-4-5-20251001",
-      "model_reported": null,
-      "temperament_id": "tank-base",
-      "latency_s": 0.243,
-      "stop_reason": null,
-      "foreign_tool_uses": 0,
-      "schema_retries": 2,
-      "payload": null,
-      "failed": true,
-      "error": "anthropic 400: {\"type\":\"error\",\"error\":{\"type\":\"invalid_request_error\",\"message\":\"Your credit balance is too low to access the Anthropic API. Please go to Plans & Billing to upgrade or purchase credits.\"},\"request_id\":\"req_011CePtYzurXf2naVtU4n4ZJ\"}"
-    },
-    {
-      "arm": "live",
-      "slot": 5,
-      "failed": true,
-      "error": "no valid response in 3 attempts"
+      "error": "anthropic 400: {\"type\":\"error\",\"error\":{\"type\":\"invalid_request_error\",\"message\":\"Your credit balance is too low to access the Anthropic API. Please go to Plans & Billing to upgrade or purchase credits.\"},\"request_id\":\"req_011CePtan7UXDEb8XibPYLVz\"}"
     },
     {
       "arm": "live",
@@ -293,40 +323,10 @@
       "latency_s": 0.248,
       "stop_reason": null,
       "foreign_tool_uses": 0,
-      "schema_retries": 0,
-      "payload": null,
-      "failed": true,
-      "error": "anthropic 400: {\"type\":\"error\",\"error\":{\"type\":\"invalid_request_error\",\"message\":\"Your credit balance is too low to access the Anthropic API. Please go to Plans & Billing to upgrade or purchase credits.\"},\"request_id\":\"req_011CePtZ1wczsLqraCB8X5Nz\"}"
-    },
-    {
-      "arm": "live",
-      "slot": 6,
-      "template": "v0.5",
-      "model": "claude-haiku-4-5-20251001",
-      "model_reported": null,
-      "temperament_id": "tank-base",
-      "latency_s": 0.233,
-      "stop_reason": null,
-      "foreign_tool_uses": 0,
-      "schema_retries": 1,
-      "payload": null,
-      "failed": true,
-      "error": "anthropic 400: {\"type\":\"error\",\"error\":{\"type\":\"invalid_request_error\",\"message\":\"Your credit balance is too low to access the Anthropic API. Please go to Plans & Billing to upgrade or purchase credits.\"},\"request_id\":\"req_011CePtZ2z8Cy8zvrgnTnABD\"}"
-    },
-    {
-      "arm": "live",
-      "slot": 6,
-      "template": "v0.5",
-      "model": "claude-haiku-4-5-20251001",
-      "model_reported": null,
-      "temperament_id": "tank-base",
-      "latency_s": 0.252,
-      "stop_reason": null,
-      "foreign_tool_uses": 0,
       "schema_retries": 2,
       "payload": null,
       "failed": true,
-      "error": "anthropic 400: {\"type\":\"error\",\"error\":{\"type\":\"invalid_request_error\",\"message\":\"Your credit balance is too low to access the Anthropic API. Please go to Plans & Billing to upgrade or purchase credits.\"},\"request_id\":\"req_011CePtZ3z9hZFmWp2TKhKKc\"}"
+      "error": "anthropic 400: {\"type\":\"error\",\"error\":{\"type\":\"invalid_request_error\",\"message\":\"Your credit balance is too low to access the Anthropic API. Please go to Plans & Billing to upgrade or purchase credits.\"},\"request_id\":\"req_011CePtao8jzzFmTKiAxgwoQ\"}"
     },
     {
       "arm": "live",
@@ -341,13 +341,13 @@
       "model": "claude-haiku-4-5-20251001",
       "model_reported": null,
       "temperament_id": "tank-base",
-      "latency_s": 0.262,
+      "latency_s": 0.826,
       "stop_reason": null,
       "foreign_tool_uses": 0,
       "schema_retries": 0,
       "payload": null,
       "failed": true,
-      "error": "anthropic 400: {\"type\":\"error\",\"error\":{\"type\":\"invalid_request_error\",\"message\":\"Your credit balance is too low to access the Anthropic API. Please go to Plans & Billing to upgrade or purchase credits.\"},\"request_id\":\"req_011CePtZ56sckFsEBVyGmvkQ\"}"
+      "error": "anthropic 400: {\"type\":\"error\",\"error\":{\"type\":\"invalid_request_error\",\"message\":\"Your credit balance is too low to access the Anthropic API. Please go to Plans & Billing to upgrade or purchase credits.\"},\"request_id\":\"req_011CePtaq64y4UB2EZXcui6s\"}"
     },
     {
       "arm": "live",
@@ -356,13 +356,13 @@
       "model": "claude-haiku-4-5-20251001",
       "model_reported": null,
       "temperament_id": "tank-base",
-      "latency_s": 0.273,
+      "latency_s": 0.243,
       "stop_reason": null,
       "foreign_tool_uses": 0,
       "schema_retries": 1,
       "payload": null,
       "failed": true,
-      "error": "anthropic 400: {\"type\":\"error\",\"error\":{\"type\":\"invalid_request_error\",\"message\":\"Your credit balance is too low to access the Anthropic API. Please go to Plans & Billing to upgrade or purchase credits.\"},\"request_id\":\"req_011CePtZ6H4qLpnBwoWj9pP6\"}"
+      "error": "anthropic 400: {\"type\":\"error\",\"error\":{\"type\":\"invalid_request_error\",\"message\":\"Your credit balance is too low to access the Anthropic API. Please go to Plans & Billing to upgrade or purchase credits.\"},\"request_id\":\"req_011CePtasjKB56T9gFPW12dc\"}"
     },
     {
       "arm": "live",
@@ -371,13 +371,13 @@
       "model": "claude-haiku-4-5-20251001",
       "model_reported": null,
       "temperament_id": "tank-base",
-      "latency_s": 0.245,
+      "latency_s": 0.244,
       "stop_reason": null,
       "foreign_tool_uses": 0,
       "schema_retries": 2,
       "payload": null,
       "failed": true,
-      "error": "anthropic 400: {\"type\":\"error\",\"error\":{\"type\":\"invalid_request_error\",\"message\":\"Your credit balance is too low to access the Anthropic API. Please go to Plans & Billing to upgrade or purchase credits.\"},\"request_id\":\"req_011CePtZ7MJpa6wqKREnipbi\"}"
+      "error": "anthropic 400: {\"type\":\"error\",\"error\":{\"type\":\"invalid_request_error\",\"message\":\"Your credit balance is too low to access the Anthropic API. Please go to Plans & Billing to upgrade or purchase credits.\"},\"request_id\":\"req_011CePtatnKHFCVZEWXRMX53\"}"
     },
     {
       "arm": "live",
@@ -392,13 +392,13 @@
       "model": "claude-haiku-4-5-20251001",
       "model_reported": null,
       "temperament_id": "tank-base",
-      "latency_s": 0.287,
+      "latency_s": 0.243,
       "stop_reason": null,
       "foreign_tool_uses": 0,
       "schema_retries": 0,
       "payload": null,
       "failed": true,
-      "error": "anthropic 400: {\"type\":\"error\",\"error\":{\"type\":\"invalid_request_error\",\"message\":\"Your credit balance is too low to access the Anthropic API. Please go to Plans & Billing to upgrade or purchase credits.\"},\"request_id\":\"req_011CePtZ8XVkUq2DnAfNRqWJ\"}"
+      "error": "anthropic 400: {\"type\":\"error\",\"error\":{\"type\":\"invalid_request_error\",\"message\":\"Your credit balance is too low to access the Anthropic API. Please go to Plans & Billing to upgrade or purchase credits.\"},\"request_id\":\"req_011CePtauoqHjsBER3aH177W\"}"
     },
     {
       "arm": "live",
@@ -407,13 +407,13 @@
       "model": "claude-haiku-4-5-20251001",
       "model_reported": null,
       "temperament_id": "tank-base",
-      "latency_s": 0.241,
+      "latency_s": 0.244,
       "stop_reason": null,
       "foreign_tool_uses": 0,
       "schema_retries": 1,
       "payload": null,
       "failed": true,
-      "error": "anthropic 400: {\"type\":\"error\",\"error\":{\"type\":\"invalid_request_error\",\"message\":\"Your credit balance is too low to access the Anthropic API. Please go to Plans & Billing to upgrade or purchase credits.\"},\"request_id\":\"req_011CePtZ9dENqxUqAwXA3B1E\"}"
+      "error": "anthropic 400: {\"type\":\"error\",\"error\":{\"type\":\"invalid_request_error\",\"message\":\"Your credit balance is too low to access the Anthropic API. Please go to Plans & Billing to upgrade or purchase credits.\"},\"request_id\":\"req_011CePtavrLHHZuyKeddipvD\"}"
     },
     {
       "arm": "live",
@@ -428,7 +428,7 @@
       "schema_retries": 2,
       "payload": null,
       "failed": true,
-      "error": "anthropic 400: {\"type\":\"error\",\"error\":{\"type\":\"invalid_request_error\",\"message\":\"Your credit balance is too low to access the Anthropic API. Please go to Plans & Billing to upgrade or purchase credits.\"},\"request_id\":\"req_011CePtZAgjKoy5ANkHZzXTG\"}"
+      "error": "anthropic 400: {\"type\":\"error\",\"error\":{\"type\":\"invalid_request_error\",\"message\":\"Your credit balance is too low to access the Anthropic API. Please go to Plans & Billing to upgrade or purchase credits.\"},\"request_id\":\"req_011CePtawv5dUQiGUzVBR7kY\"}"
     },
     {
       "arm": "live",
@@ -443,13 +443,13 @@
       "model": "claude-haiku-4-5-20251001",
       "model_reported": null,
       "temperament_id": "tank-base",
-      "latency_s": 0.301,
+      "latency_s": 0.245,
       "stop_reason": null,
       "foreign_tool_uses": 0,
       "schema_retries": 0,
       "payload": null,
       "failed": true,
-      "error": "anthropic 400: {\"type\":\"error\",\"error\":{\"type\":\"invalid_request_error\",\"message\":\"Your credit balance is too low to access the Anthropic API. Please go to Plans & Billing to upgrade or purchase credits.\"},\"request_id\":\"req_011CePtZBqge46MkTzibyzNG\"}"
+      "error": "anthropic 400: {\"type\":\"error\",\"error\":{\"type\":\"invalid_request_error\",\"message\":\"Your credit balance is too low to access the Anthropic API. Please go to Plans & Billing to upgrade or purchase credits.\"},\"request_id\":\"req_011CePtaxzKVzhUphhpiNuuN\"}"
     },
     {
       "arm": "live",
@@ -458,13 +458,13 @@
       "model": "claude-haiku-4-5-20251001",
       "model_reported": null,
       "temperament_id": "tank-base",
-      "latency_s": 0.26,
+      "latency_s": 0.244,
       "stop_reason": null,
       "foreign_tool_uses": 0,
       "schema_retries": 1,
       "payload": null,
       "failed": true,
-      "error": "anthropic 400: {\"type\":\"error\",\"error\":{\"type\":\"invalid_request_error\",\"message\":\"Your credit balance is too low to access the Anthropic API. Please go to Plans & Billing to upgrade or purchase credits.\"},\"request_id\":\"req_011CePtZD6LPpyL7BYyh8Dmi\"}"
+      "error": "anthropic 400: {\"type\":\"error\",\"error\":{\"type\":\"invalid_request_error\",\"message\":\"Your credit balance is too low to access the Anthropic API. Please go to Plans & Billing to upgrade or purchase credits.\"},\"request_id\":\"req_011CePtaz3KtJ7FPTa6TGLS8\"}"
     },
     {
       "arm": "live",
@@ -473,13 +473,13 @@
       "model": "claude-haiku-4-5-20251001",
       "model_reported": null,
       "temperament_id": "tank-base",
-      "latency_s": 0.242,
+      "latency_s": 0.277,
       "stop_reason": null,
       "foreign_tool_uses": 0,
       "schema_retries": 2,
       "payload": null,
       "failed": true,
-      "error": "anthropic 400: {\"type\":\"error\",\"error\":{\"type\":\"invalid_request_error\",\"message\":\"Your credit balance is too low to access the Anthropic API. Please go to Plans & Billing to upgrade or purchase credits.\"},\"request_id\":\"req_011CePtZEBKoEiTS9weToAto\"}"
+      "error": "anthropic 400: {\"type\":\"error\",\"error\":{\"type\":\"invalid_request_error\",\"message\":\"Your credit balance is too low to access the Anthropic API. Please go to Plans & Billing to upgrade or purchase credits.\"},\"request_id\":\"req_011CePtb1561bk219LqQst8L\"}"
     },
     {
       "arm": "live",
@@ -494,13 +494,13 @@
       "model": "claude-haiku-4-5-20251001",
       "model_reported": null,
       "temperament_id": "tank-base",
-      "latency_s": 0.239,
+      "latency_s": 0.261,
       "stop_reason": null,
       "foreign_tool_uses": 0,
       "schema_retries": 0,
       "payload": null,
       "failed": true,
-      "error": "anthropic 400: {\"type\":\"error\",\"error\":{\"type\":\"invalid_request_error\",\"message\":\"Your credit balance is too low to access the Anthropic API. Please go to Plans & Billing to upgrade or purchase credits.\"},\"request_id\":\"req_011CePtZFCay7nrxiK5U3rzs\"}"
+      "error": "anthropic 400: {\"type\":\"error\",\"error\":{\"type\":\"invalid_request_error\",\"message\":\"Your credit balance is too low to access the Anthropic API. Please go to Plans & Billing to upgrade or purchase credits.\"},\"request_id\":\"req_011CePtb2LyyBtSAPdCE8iDt\"}"
     },
     {
       "arm": "live",
@@ -509,13 +509,13 @@
       "model": "claude-haiku-4-5-20251001",
       "model_reported": null,
       "temperament_id": "tank-base",
-      "latency_s": 0.27,
+      "latency_s": 0.256,
       "stop_reason": null,
       "foreign_tool_uses": 0,
       "schema_retries": 1,
       "payload": null,
       "failed": true,
-      "error": "anthropic 400: {\"type\":\"error\",\"error\":{\"type\":\"invalid_request_error\",\"message\":\"Your credit balance is too low to access the Anthropic API. Please go to Plans & Billing to upgrade or purchase credits.\"},\"request_id\":\"req_011CePtZGJpEdPqJ7CaPEKjR\"}"
+      "error": "anthropic 400: {\"type\":\"error\",\"error\":{\"type\":\"invalid_request_error\",\"message\":\"Your credit balance is too low to access the Anthropic API. Please go to Plans & Billing to upgrade or purchase credits.\"},\"request_id\":\"req_011CePtb3RizQ81pjphTMk9q\"}"
     },
     {
       "arm": "live",
@@ -524,13 +524,13 @@
       "model": "claude-haiku-4-5-20251001",
       "model_reported": null,
       "temperament_id": "tank-base",
-      "latency_s": 0.243,
+      "latency_s": 0.252,
       "stop_reason": null,
       "foreign_tool_uses": 0,
       "schema_retries": 2,
       "payload": null,
       "failed": true,
-      "error": "anthropic 400: {\"type\":\"error\",\"error\":{\"type\":\"invalid_request_error\",\"message\":\"Your credit balance is too low to access the Anthropic API. Please go to Plans & Billing to upgrade or purchase credits.\"},\"request_id\":\"req_011CePtZHPJkxKYCA3L2NZVJ\"}"
+      "error": "anthropic 400: {\"type\":\"error\",\"error\":{\"type\":\"invalid_request_error\",\"message\":\"Your credit balance is too low to access the Anthropic API. Please go to Plans & Billing to upgrade or purchase credits.\"},\"request_id\":\"req_011CePtb4Wi7dX9GwoeyoTXe\"}"
     },
     {
       "arm": "live",
@@ -557,9 +557,9 @@
   },
   "latency": {
     "calls": 30,
-    "mean_s": 0.271,
-    "min_s": 0.233,
-    "max_s": 0.478
+    "mean_s": 0.3,
+    "min_s": 0.241,
+    "max_s": 0.826
   },
   "compliance": {
     "discarded_total": 0,
