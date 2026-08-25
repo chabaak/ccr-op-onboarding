@@ -140,6 +140,7 @@ interface ReportModel {
   round: number
   facts: Sentence[]
   report_body: Sentence[]
+  rounds?: readonly { round: number; facts: readonly Sentence[]; report_body: readonly Sentence[] }[]
   opens?: string[]
 }
 
@@ -704,7 +705,7 @@ describe('[w2] a sitting accumulates its rounds into one document', () => {
   it('(a) the first round of a sitting is the document', async () => {
     const v = await view()
     const round = { round: 0, facts: [s('f1')], report_body: [s('b1')] }
-    expect(v.accumulated(null, round)).toEqual(round)
+    expect(v.accumulated(null, round)).toEqual({ ...round, rounds: [round] })
   })
 
   it('(b) each further round appends to both panes, in arrival order', async () => {
@@ -775,7 +776,20 @@ describe('[w2] a sitting accumulates its rounds into one document', () => {
     expect(three.report_body.map((x) => x.id)).toEqual(['b1', 'b2', 'b3', 'b4', 'b5'])
   })
 
-  it('(h) source: an empty report sentence is refused before a row reaches the DOM', () => {
+  it('(h) two resolved rounds keep the sheet order 현장·무전·현장·무전', async () => {
+    const v = await view()
+    const one = v.accumulated(null, { round: 0, facts: [s('f1')], report_body: [s('b1')] })
+    const two = v.accumulated(one, { round: 1, facts: [s('f2')], report_body: [s('b2')] })
+
+    expect(two.rounds?.flatMap((round) => [round.facts[0]?.id, round.report_body[0]?.id])).toEqual([
+      'f1',
+      'b1',
+      'f2',
+      'b2',
+    ])
+  })
+
+  it('(i) source: an empty report sentence is refused before a row reaches the DOM', () => {
     const src = scannedSources().find((s) => s.file.endsWith('components/report-view.ts'))
     expect(src, 'the REPORTS view is not in the scanned set').toBeTruthy()
     const row = /function reportRow\([\s\S]*?\n {2}\}/.exec(src!.text)?.[0] ?? ''
@@ -786,7 +800,7 @@ describe('[w2] a sitting accumulates its rounds into one document', () => {
     )
   })
 
-  it('(i) source: unreached replay rows are hidden instead of spacing sentences apart', () => {
+  it('(j) source: unreached replay rows are hidden instead of spacing sentences apart', () => {
     const src = scannedSources().find((s) => s.file.endsWith('components/report-view.ts'))
     expect(src, 'the REPORTS view is not in the scanned set').toBeTruthy()
     const paint = /function paint\([\s\S]*?\n {2}\}/.exec(src!.text)?.[0] ?? ''
