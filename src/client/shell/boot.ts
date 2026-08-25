@@ -292,6 +292,7 @@ export async function bootShell(): Promise<void> {
     app,
     desktop,
     index: scenarioIndex,
+    visible: returnToDesktop,
     localStorage: window.localStorage,
     sessionStorage: window.sessionStorage,
   })
@@ -388,8 +389,13 @@ export async function bootShell(): Promise<void> {
   }
 
   runPump(driver)
-  if (returnToDesktop) desk.closeAll()
-  else desk.focus('feed')
+  if (returnToDesktop) {
+    scenarioDesktop.show()
+    desk.closeAll()
+  } else {
+    scenarioDesktop.hide()
+    desk.focus('feed')
+  }
 
   // 6 — the hand-over. Signed in, the operator gets one thing on the desk: the
   // sheet the portal issues with the terminal. Closing it uncovers the desk
@@ -439,8 +445,8 @@ export async function bootShell(): Promise<void> {
       score,
       onGoodEnding: async () => {
         scenarioDesktop.unlockAll()
-        await scenarioDesktop.showUnlockNotice()
         desk.closeAll()
+        await scenarioDesktop.showUnlockNotice()
       },
       onBadEnding: () => scenarioDesktop.restartCurrent(),
     })

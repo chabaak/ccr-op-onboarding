@@ -15,6 +15,7 @@ import {
   fetchScenarioScore,
   isScenarioPlayable,
   sortedScenarioPacks,
+  tutorialScenarioPack,
 } from './pack.ts'
 import type { ScenarioEndings, ScenarioIncidentBrief, ScenarioIndex, ScenarioPackEntry, ScenarioScore } from './pack.ts'
 import { resetScenarioSession, returnToScenarioDesktop, switchScenarioPack } from './pack-session.ts'
@@ -60,6 +61,7 @@ export interface ScenarioDesktopDeps {
   app: HTMLElement
   desktop: HTMLElement
   index: ScenarioIndex
+  visible?: boolean
   localStorage?: StoragePort | null
   sessionStorage?: ScenarioSwitchOptions['storage']
   reload?: () => void
@@ -68,6 +70,8 @@ export interface ScenarioDesktopDeps {
 export interface ScenarioDesktopHandle {
   unlockAll(): readonly string[]
   showUnlockNotice(): Promise<void>
+  show(): void
+  hide(): void
   restartCurrent(): void
   returnToDesktop(): void
   render(): void
@@ -117,15 +121,24 @@ export function readUnlockedScenarioSlugs(
   index: ScenarioIndex,
   storage: StoragePort | null | undefined,
 ): readonly string[] {
+  const floor = tutorialScenarioPack(index).slug
   const port = storageOf(storage)
-  if (port === null) return []
+  if (port === null) return [floor]
   const raw = port.getItem(UNLOCKED_SCENARIOS_KEY)
-  if (raw === null) return []
+  const known = knownSlugs(index)
+  const unlocked = new Set<string>([floor])
+  if (raw === null) {
+    return sortedScenarioPacks(index)
+      .map((pack) => pack.slug)
+      .filter((slug) => unlocked.has(slug))
+  }
   try {
     const value = JSON.parse(raw)
-    if (!Array.isArray(value)) return []
-    const known = knownSlugs(index)
-    const unlocked = new Set<string>()
+    if (!Array.isArray(value)) {
+      return sortedScenarioPacks(index)
+        .map((pack) => pack.slug)
+        .filter((slug) => unlocked.has(slug))
+    }
     for (const item of value) {
       if (typeof item === 'string' && known.has(item)) unlocked.add(item)
     }
@@ -133,7 +146,9 @@ export function readUnlockedScenarioSlugs(
       .map((pack) => pack.slug)
       .filter((slug) => unlocked.has(slug))
   } catch {
-    return []
+    return sortedScenarioPacks(index)
+      .map((pack) => pack.slug)
+      .filter((slug) => unlocked.has(slug))
   }
 }
 
@@ -198,6 +213,7 @@ export function installScenarioDesktop(deps: ScenarioDesktopDeps): ScenarioDeskt
   const files = new Map<string, HTMLButtonElement>()
   let picker: HTMLElement | null = null
   let grid: HTMLElement | null = null
+  let visible = deps.visible === true
 
   function pickerShell(): HTMLElement {
     if (picker) return picker
@@ -220,8 +236,18 @@ export function installScenarioDesktop(deps: ScenarioDesktopDeps): ScenarioDeskt
       grid,
       el('div', 'scenario-picker-foot', SCENARIO_PICKER_FOOT),
     )
-    deps.desktop.append(picker)
     return picker
+  }
+
+  function syncPickerMount(): void {
+    if (picker === null) return
+    picker.hidden = !visible
+    picker.setAttribute('aria-hidden', visible ? 'false' : 'true')
+    if (visible) {
+      if (!picker.isConnected) deps.desktop.append(picker)
+    } else {
+      picker.remove()
+    }
   }
 
   function renderPips(node: HTMLElement, model: ScenarioCardModel): void {
@@ -301,6 +327,7 @@ export function installScenarioDesktop(deps: ScenarioDesktopDeps): ScenarioDeskt
         files.delete(slug)
       }
     }
+    syncPickerMount()
   }
 
   render()
@@ -312,6 +339,8 @@ export function installScenarioDesktop(deps: ScenarioDesktopDeps): ScenarioDeskt
       return slugs
     },
     async showUnlockNotice(): Promise<void> {
+      visible = true
+      render()
       const coach = createCoach(deps.app)
       try {
         await coach.show({
@@ -322,6 +351,14 @@ export function installScenarioDesktop(deps: ScenarioDesktopDeps): ScenarioDeskt
       } finally {
         coach.destroy()
       }
+    },
+    show(): void {
+      visible = true
+      render()
+    },
+    hide(): void {
+      visible = false
+      syncPickerMount()
     },
     restartCurrent(): void {
       restartScenario(deps.index, {

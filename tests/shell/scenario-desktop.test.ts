@@ -89,14 +89,23 @@ describe('scenario desktop replay files', () => {
     ])
   })
 
-  it('(c) a malformed unlock list fails closed instead of showing no-name files', () => {
+  it('(c) the tutorial file is the desktop floor before any completion', () => {
     const storage = new FakeStorage()
-    storage.setItem(UNLOCKED_SCENARIOS_KEY, '{')
+    const tutorial = sortedScenarioPacks(MANIFEST)[0]!
 
-    expect(readUnlockedScenarioSlugs(MANIFEST, storage)).toEqual([])
+    expect(readUnlockedScenarioSlugs(MANIFEST, storage)).toEqual([tutorial.slug])
+    expect(readUnlockedScenarioSlugs(MANIFEST, null)).toEqual([tutorial.slug])
   })
 
-  it('(d) a good ending unlocks every completed scenario as replayable', () => {
+  it('(d) a malformed unlock list fails back to the tutorial instead of showing no-name files', () => {
+    const storage = new FakeStorage()
+    const tutorial = sortedScenarioPacks(MANIFEST)[0]!
+    storage.setItem(UNLOCKED_SCENARIOS_KEY, '{')
+
+    expect(readUnlockedScenarioSlugs(MANIFEST, storage)).toEqual([tutorial.slug])
+  })
+
+  it('(e) a good ending unlocks every completed scenario as replayable', () => {
     const storage = new FakeStorage()
     const expected = sortedScenarioPacks(MANIFEST).map((pack) => pack.slug)
 
@@ -104,7 +113,7 @@ describe('scenario desktop replay files', () => {
     expect(JSON.parse(storage.getItem(UNLOCKED_SCENARIOS_KEY) ?? 'null')).toEqual(expected)
   })
 
-  it('(e) the case brief uses pack prose only for the case-specific lines', () => {
+  it('(f) the case brief uses pack prose only for the case-specific lines', () => {
     const entry = sortedScenarioPacks(MANIFEST)[0]!
     const brief: ScenarioIncidentBrief = {
       lead: '사건 장소와 출발 상황.',
@@ -121,7 +130,7 @@ describe('scenario desktop replay files', () => {
     })
   })
 
-  it('(f) picker cards carry only assignment metadata before deployment', () => {
+  it('(g) picker cards carry only assignment metadata before deployment', () => {
     const entry = sortedScenarioPacks(MANIFEST)[0]!
     const model = scenarioCardModel(entry, 0, true)
 
@@ -137,7 +146,7 @@ describe('scenario desktop replay files', () => {
     expect(SCENARIO_PICKER_NOTE).toContain('사건 개요는 배치 후 회선에서만 열람')
   })
 
-  it('(g) locked picker cards expose status without becoming playable', () => {
+  it('(h) locked picker cards expose status without becoming playable', () => {
     const entry = sortedScenarioPacks(MANIFEST)[1]!
 
     expect(scenarioCardModel(entry, 1, false)).toEqual({
@@ -149,7 +158,7 @@ describe('scenario desktop replay files', () => {
     })
   })
 
-  it('(h) fixture picker cards stay visible as read-only material when unlocked', () => {
+  it('(i) fixture picker cards stay visible as read-only material when unlocked', () => {
     const entry = sortedScenarioPacks(MANIFEST)[2]!
 
     expect(scenarioCardModel(entry, 2, true)).toEqual({
@@ -161,7 +170,7 @@ describe('scenario desktop replay files', () => {
     })
   })
 
-  it('(i) a bad ending restart reuses the shared session reset and reloads', () => {
+  it('(j) a bad ending restart reuses the shared session reset and reloads', () => {
     const storage = new FakeStorage()
     let reloaded = false
 
@@ -182,7 +191,7 @@ describe('scenario desktop replay files', () => {
     expect(reloaded).toBe(true)
   })
 
-  it('(j) a playable pack must prove its ending sidecars before selection can continue', async () => {
+  it('(k) a playable pack must prove its ending sidecars before selection can continue', async () => {
     await expect(
       scenarioStartCheck(packEntry('practice'), {
         fetchEndings: async () => ENDINGS,
@@ -191,7 +200,7 @@ describe('scenario desktop replay files', () => {
     ).resolves.toEqual({ ok: true })
   })
 
-  it('(k) a missing ending sidecar becomes operator-facing copy before the run starts', async () => {
+  it('(l) a missing ending sidecar becomes operator-facing copy before the run starts', async () => {
     await expect(
       scenarioStartCheck(packEntry('practice'), {
         fetchEndings: async () => {
@@ -202,7 +211,7 @@ describe('scenario desktop replay files', () => {
     ).resolves.toEqual({ ok: false, says: SCENARIO_ENDING_LOAD_FAILURE_NOTICE })
   })
 
-  it('(l) fixture packs are visible archive files, not startable runs', async () => {
+  it('(m) fixture packs are visible archive files, not startable runs', async () => {
     const fetchEndings = vi.fn(async () => ENDINGS)
     const fetchScore = vi.fn(async () => SCORE)
 
