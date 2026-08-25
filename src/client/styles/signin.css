@@ -127,6 +127,7 @@ body.signin #blueprint{filter:brightness(.35) contrast(1.05)}
 @keyframes siFill{to{width:100%}}
 
 /* ─── 사건 선택: manifest-derived cards, no incident prose on the picker ─── */
+.scenario-picker[hidden]{display:none}
 .scenario-picker{position:fixed;left:30px;right:30px;top:156px;bottom:30px;z-index:20;
   box-sizing:border-box;display:flex;flex-direction:column;gap:var(--space-22);
   color:var(--surface-text);font-family:var(--prose)}
@@ -140,7 +141,7 @@ body.signin #blueprint{filter:brightness(.35) contrast(1.05)}
   box-sizing:border-box;display:grid;grid-template-columns:1fr 1fr;gap:var(--space-10);
   align-items:start;text-align:left;padding:var(--space-18) var(--space-20);
   border:1px solid var(--line-2);background:var(--ink-2);color:var(--surface-text);
-  cursor:pointer}
+  cursor:pointer;visibility:visible;transition:border-color .14s,background .14s,color .14s}
 .scenario-picker .scenario-file:hover,
 .scenario-picker .scenario-file:focus-visible{background:var(--surface-rule);border-color:var(--signal);color:var(--surface-text)}
 .scenario-picker .scenario-file:focus-visible{outline:1px solid var(--signal);outline-offset:2px}
