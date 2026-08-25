@@ -1,0 +1,221 @@
+# TANK-G1-screen-r2 — arm `baseline`
+
+| field | value |
+|---|---|
+| call type | judgment |
+| channel | C-BLOCK |
+| template | v0.5 |
+| model | `claude-haiku-4-5-20251001` |
+| transport | anthropic |
+| temperament | tank-base |
+| N planned | 10 |
+| N kept | 10 |
+
+## Pre-registration
+
+- **Hypothesis:** G1 r2는 no-block baseline에서 기본 stance a가 의미 있는 수로 살아 있고, 표지·전표·요율표를 연결한 화물 불일치 full key를 받은 live arm에서 stance b로 움직일 것이다. r1에서 세 gate 모두 baseline b 10/10로 포화됐으므로, r2는 gate clock을 key carriers 앞으로 옮기고 verdict rows를 ingredient rows로 낮추며 binary stance set을 세 개의 plausible readings로 넓힌 뒤 같은 reduced screen을 반복한다.
+- **Drop condition:** baseline에서 default a가 0/10이면 skill §3 rule 4에 따라 broken gate다. baseline이 live 기대 stance b를 9/10 이상 고르면 saturated baseline으로 headroom 없음이다. live가 b를 6/10 이하로 고르면 movement failure이고, 7/10 또는 8/10은 n=10 boundary라 definitive result로 보지 않는다. Positive screen은 baseline a가 3/10 이상, baseline b가 1/10 이하, live b가 9/10 이상일 때만 기록한다.
+- **Contingency:** baseline이 a를 전혀 고르지 않으면 gate clock 이동 뒤에도 기본 독해가 죽은 것이다.
+- **Contingency:** baseline이 b에 포화되면 excerpt가 아직 key conclusion을 제공하거나 live stance wording이 너무 우세한 것이다.
+- **Contingency:** baseline이 c에 많이 몰리면 added plausible reading이 default를 훔치는 것이므로 stance c wording을 다시 좁힌다.
+- **Contingency:** live가 b로 충분히 움직이지 않으면 key block wording이 later carriers를 결론으로 묶지 못한 것이다.
+- **Contingency:** because_block_ids가 live arm에서 제공하지 않은 block id를 꾸며내면 fabricated block id로 따로 보고한다.
+
+## Calls (verbatim)
+
+### 01
+
+latency 3.567s · stop_reason `tool_use` · schema_retries 0 · foreign_tool_uses 0
+
+```json
+{
+  "stance": "a",
+  "inner_note": "적하목록의 세정제명과 신고자 진술이 일치한다. 낮은 위험으로 보인다. 현장 통제와 확인은 병행하되, 과잉 조치는 피한다.",
+  "because_referent": "남기표가 적하목록의 세정제명을 그대로 읽었다",
+  "because_block_ids": [],
+  "rejected_stance": "b",
+  "rejected_reason": "표지 손상만으로 미상 반응성 화물로 상향하기는 너무 크다. 신고와 전표가 일치하는 현 상황에서는 불필요한 상향이다",
+  "utterance": "세정제 누출 신고. 적하목록 일치 확인. 생활화학 으로 접수하고 소규모 출동대 출발. 하역장 격리 시작해."
+}
+```
+
+### 02
+
+latency 3.514s · stop_reason `tool_use` · schema_retries 0 · foreign_tool_uses 0
+
+```json
+{
+  "stance": "a",
+  "inner_note": "신고자가 적하목록의 세정제명을 그대로 읽었다. 첫 화면 전표와 신고가 맞아 보인다. 통상 절차를 믿는다.",
+  "because_referent": "남기표가 적하목록을 명확히 읽었고, 젖은 줄은 생활화학 유출의 초기 징후다.",
+  "because_block_ids": [],
+  "rejected_stance": "b",
+  "rejected_reason": "표지 손상과 줄 변색만으로 미상 반응성 물질로 상향하기엔 신고 내용이 너무 명확하다. 과잉 대응이 될 수 있다.",
+  "utterance": "세정제 유출 신고 접수. 생활화학으로 분류한다. 소규모 출동대 출발 요청. 야적장 주변 인원 대피 준비."
+}
+```
+
+### 03
+
+latency 3.736s · stop_reason `tool_use` · schema_retries 0 · foreign_tool_uses 0
+
+```json
+{
+  "stance": "a",
+  "inner_note": "적하목록의 세정제명과 신고자 진술이 일치한다. 현장 정보가 제한적이므로 전표를 우선 신뢰한다. 낮은 위험 액체로 이해하는 동안 확산보다 안전한 선택을 취한다.",
+  "because_referent": "남기표가 적하목록의 세정제명을 읽으며 신고했고, 현장 확인 수단이 없으므로 전표 정보를 바탕으로 판단한다.",
+  "because_block_ids": [],
+  "rejected_stance": "b",
+  "rejected_reason": "표지 긁힘과 전표의 나이를 미상 반응성 화물의 근거로 보기 위해서는 추가 확인이 필요한데, 현장 정보가 부족하다. 통상 절차인 적하목록 우선 신뢰 원칙에 어긋난다.",
+  "utterance": "생활화학 유출 접수. 소규모 출동대 출발 요청. 야적장 통제 시작한다."
+}
+```
+
+### 04
+
+latency 4.843s · stop_reason `tool_use` · schema_retries 0 · foreign_tool_uses 0
+
+```json
+{
+  "inner_note": "신고자가 적하목록 품명을 직접 읽었다. 하지만 물에 젖은 줄이 번진 것은 표지 손상을 암시한다. 현장 표지와 서류 간 불일치 가능성이 있다. 지금은 물 접촉 전이고, 기체 변화도 없다. 낮은 위험으로 시작하되 표지 확인이 필수다.",
+  "stance": "c",
+  "because_referent": "남기표의 신고가 적하목록 품명을 따르고 있지만, 젖은 줄과 번진 자국은 탱크 상부 표지 손상을 시사한다. 서류와 현장 표지의 일치 여부를 운송사에서 확인할 때까지 확산 위험보다 확인 지연을 선택한다.",
+  "because_block_ids": [],
+  "rejected_stance": "a",
+  "rejected_reason": "신고 품명만으로 세정제 확정은 표지 손상 신호를 무시한다. 새 스티커 가능성은 현장에서 미확인 상태다.",
+  "utterance": "야적장 출입 통제. 운송사 확인 대기. 현장에서 탱크 상부 표지 상태 사진 요청."
+}
+```
+
+### 05
+
+latency 3.861s · stop_reason `tool_use` · schema_retries 0 · foreign_tool_uses 0
+
+```json
+{
+  "inner_note": "적하목록 품명과 신고자 진술이 일치한다. 표지 손상은 확인 지연이지 품명 변경 사유가 아니다. 현장 확인 전까지는 신고 내용을 기본으로 삼는다.",
+  "stance": "a",
+  "because_referent": "남기표의 신고가 적하목록 품명과 일치했고, 야적장 통제로 확산을 먼저 차단할 수 있다.",
+  "because_block_ids": [],
+  "rejected_stance": "b",
+  "rejected_reason": "표지 손상만으로 품명을 의심하기에는, 신고 내용과 전표가 같은 말을 하고 있다. 확인되지 않은 추정으로 절차를 상향하면 필요한 초기 대응을 늦춘다.",
+  "utterance": "세정제 유출 접수. 야적장 출입 통제하고 소규모 출동대 출발."
+}
+```
+
+### 06
+
+latency 4.341s · stop_reason `tool_use` · schema_retries 0 · foreign_tool_uses 0
+
+```json
+{
+  "stance": "a",
+  "inner_note": "적하목록의 세정제명과 신고자 진술이 일치한다. 첫 화면 정보가 맞아 보이므로 통상 절차를 먼저 믿는다. 낮은 위험 액체로 이해하는 동안은 희석과 세척을 피해야 하지만, 확산 차단이 더 안전한 선택이다.",
+  "because_referent": "남기표의 신고가 적하목록 세정제명과 일치하므로",
+  "because_block_ids": [],
+  "rejected_stance": "b",
+  "rejected_reason": "표지 손상만으로 미상 반응성 화물로 상향하면, 확인되지 않은 위험을 근거로 과잉 대응할 위험이 있다. 과거에 위험 표지를 크게 잡아 세운 조치가 과잉 대응으로 기록된 경험이 있다.",
+  "utterance": "세정액 유출 신고 접수. 소규모 출동대 출발 요청. 야적장 진입 통제 시작."
+}
+```
+
+### 07
+
+latency 3.599s · stop_reason `tool_use` · schema_retries 0 · foreign_tool_uses 0
+
+```json
+{
+  "stance": "a",
+  "inner_note": "적하목록의 세정제명과 신고자 진술이 일치한다. 첫 화면 정보를 신뢰한다. 낮은 위험으로 판단하면 통상 절차를 먼저 본다.",
+  "because_referent": "남기표가 적하목록의 세정제명을 그대로 읽어 신고했으므로",
+  "because_block_ids": [],
+  "rejected_stance": "b",
+  "rejected_reason": "표지 손상과 기록 불일치를 먼저 의심하기보다, 주어진 적하목록과 진술이 일치하는 정보를 먼저 맞춘다. 확인된 품명이 있는 상태에서 미상 반응성으로 상향하는 것은 과잉 판단이다.",
+  "utterance": "세정제 누출 접수. 소규모 출동대 출동 요청."
+}
+```
+
+### 08
+
+latency 4.293s · stop_reason `tool_use` · schema_retries 0 · foreign_tool_uses 0
+
+```json
+{
+  "stance": "a",
+  "inner_note": "적하목록의 세정제명과 신고자 진술이 일치한다. 첫 화면 정보를 신뢰하는 것이 원칙이다. 표지 훼손은 있지만 품명 확인은 되었다.",
+  "because_referent": "남기표 신고자가 적하목록 품명을 그대로 읽어 전달했고, 세정제는 생활화학 범주의 낮은 위험 물질이다.",
+  "because_block_ids": [],
+  "rejected_stance": "b",
+  "rejected_reason": "표지 조각만으로 '반응성 화물'로 상향하는 것은 과잉 판단이다. 확인된 품명과 전표가 일치하므로 불필요한 상향이 된다. 과거 과잉 대응 기록이 있어 더욱 신중해야 한다.",
+  "utterance": "세정제 유출 신고 접수. 생활화학 범주. 소규모 출동대 출발해라. 야적장 진입만 통제하고 피해 반경 확인한다."
+}
+```
+
+### 09
+
+latency 3.709s · stop_reason `tool_use` · schema_retries 0 · foreign_tool_uses 0
+
+```json
+{
+  "stance": "a",
+  "because_referent": "남기표 신고자가 적하목록의 세정제명을 그대로 읽었고, 새 스티커와 신고 내용이 일치한다",
+  "because_block_ids": [],
+  "rejected_stance": "b",
+  "rejected_reason": "표지 조각과 전표 줄이 오래된 기록이라는 판단은 현장 확인 없이 의심하는 것이다. 첫 전파에서 미상 화물로 상향하면 과잉 대응으로 기록될 수 있다",
+  "inner_note": "적하목록과 신고자 진술이 맞아 보인다. 생활화학 세정제는 낮은 위험으로 분류되며, 통상 절차를 먼저 믿는다. 소규모 출동대의 현장 확인으로 상황을 정확히 파악할 수 있다",
+  "utterance": "생활화학 세정제 유출로 접수한다. 소방대 출동 요청. 야적장 출입 통제 시작."
+}
+```
+
+### 10
+
+latency 4.398s · stop_reason `tool_use` · schema_retries 0 · foreign_tool_uses 0
+
+```json
+{
+  "stance": "a",
+  "because_referent": "남기표의 신고가 적하목록의 세정제명을 그대로 읽으며, 첫 화면 정보가 일관되게 같은 물건을 가리킨다",
+  "because_block_ids": [],
+  "rejected_stance": "b",
+  "rejected_reason": "표지 긁힘과 전표의 나이를 추측할 근거가 없고, 확인된 신고 내용을 의심하는 것은 과잉 판단이다",
+  "inner_note": "생활화학 유출은 통상 절차로 대응 가능하다. 지금 막아야 할 것은 추가 물 접촉으로 인한 확산이지만, 야적장 통제와 배수 차단으로 먼저 안전을 잡는다.",
+  "utterance": "세정제 유출 접수. 소규모 출동대 출발 요청. 야적장 출입통제 시작한다."
+}
+```
+
+## Arm table
+
+| # | stance | rejected_stance | because_referent | because_block_ids |
+|---|---|---|---|---|
+| 01 | a | b | 남기표가 적하목록의 세정제명을 그대로 읽었다 |  |
+| 02 | a | b | 남기표가 적하목록을 명확히 읽었고, 젖은 줄은 생활화학 유출의 초기 징후다. |  |
+| 03 | a | b | 남기표가 적하목록의 세정제명을 읽으며 신고했고, 현장 확인 수단이 없으므로 전표 정보를 바탕으로 판단한다. |  |
+| 04 | c | a | 남기표의 신고가 적하목록 품명을 따르고 있지만, 젖은 줄과 번진 자국은 탱크 상부 표지 손상을 시사한다. 서류와 현장 표지의 일치 여부를 운송사에서 확인할 때까지 확산 위험보다 확인 지연을 선택한다. |  |
+| 05 | a | b | 남기표의 신고가 적하목록 품명과 일치했고, 야적장 통제로 확산을 먼저 차단할 수 있다. |  |
+| 06 | a | b | 남기표의 신고가 적하목록 세정제명과 일치하므로 |  |
+| 07 | a | b | 남기표가 적하목록의 세정제명을 그대로 읽어 신고했으므로 |  |
+| 08 | a | b | 남기표 신고자가 적하목록 품명을 그대로 읽어 전달했고, 세정제는 생활화학 범주의 낮은 위험 물질이다. |  |
+| 09 | a | b | 남기표 신고자가 적하목록의 세정제명을 그대로 읽었고, 새 스티커와 신고 내용이 일치한다 |  |
+| 10 | a | b | 남기표의 신고가 적하목록의 세정제명을 그대로 읽으며, 첫 화면 정보가 일관되게 같은 물건을 가리킨다 |  |
+
+**Sequence (kept calls):** `a,a,a,c,a,a,a,a,a,a`
+
+**Stance coverage (sampled diagnostic):** offered `a`, `b`, `c` · unobserved in this arm: `b`
+
+> Diagnostic only — absence at this N is not a dead delta row. The architecture spec §3.1 write test is a static check on the delta table plus the reachability audit (§5.2 B1); a stance unobserved across every arm is a lead for that check, not a failure verdict. Carried to the verdict card (§9.2) as a diagnostic.
+
+## Advisory logs (§5.3)
+
+_Operator-written. Observation only — these never affect distributions,
+boundary laws, or pass/drop judgments._
+
+**State-variable shadow log** — which candidate variables (architecture spec
+§3.1 pool) would this run have moved, and which payload symptom mapped to which?
+
+**Mineability log** — would `utterance` / `inner_note` survive as mining
+material? Block count, specificity (names, quantities, referents), and whether
+it says anything the payload did not already say.
+
+## Pairing verdict
+
+_Operator writes this against the other arms. Sequences, not rates (§9.2)._
