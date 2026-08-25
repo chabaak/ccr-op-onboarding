@@ -56,11 +56,16 @@ const ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..')
 const SCENARIO_INDEX = JSON.parse(
   fs.readFileSync(path.join(ROOT, 'data/scenario/index.json'), 'utf8'),
 ) as ScenarioIndexFixture
+const SCENARIO_SLUGS = SCENARIO_INDEX.packs
+  .slice()
+  .sort((a, b) => a.order - b.order)
+  .map((pack) => pack.slug)
 const PLAYABLE_SCENARIO_SLUGS = SCENARIO_INDEX.packs
   .filter((pack) => pack.role === 'tutorial' || pack.role === 'practice')
   .sort((a, b) => a.order - b.order)
   .map((pack) => pack.slug)
 
+if (SCENARIO_SLUGS.length === 0) throw new Error('scenario index has no packs')
 if (PLAYABLE_SCENARIO_SLUGS.length === 0) throw new Error('scenario index has no playable packs')
 
 interface Rect {
@@ -684,8 +689,12 @@ test.describe('topbar', () => {
     await hideDebugPane(page)
 
     await expect(page.locator('#abortMission')).toBeVisible()
-    await expect(page.locator('.scenario-file')).toHaveCount(PLAYABLE_SCENARIO_SLUGS.length)
-    await expect(page.locator('.scenario-file[disabled]')).toHaveCount(0)
+    await expect(page.locator('.scenario-file')).toHaveCount(SCENARIO_SLUGS.length)
+    await expect(page.locator('.scenario-file:not([disabled])')).toHaveCount(PLAYABLE_SCENARIO_SLUGS.length)
+    await expect(page.locator('.scenario-file.is-open')).toHaveCount(PLAYABLE_SCENARIO_SLUGS.length)
+    await expect(page.locator('.scenario-file[disabled]')).toHaveCount(
+      SCENARIO_SLUGS.length - PLAYABLE_SCENARIO_SLUGS.length,
+    )
     for (const w of WINDOWS) await expect(win(page, w.id)).toBeHidden()
 
     const stored = await page.evaluate(() => Object.fromEntries(Object.entries(window.sessionStorage)))
