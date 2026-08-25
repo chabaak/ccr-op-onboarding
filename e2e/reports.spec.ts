@@ -349,26 +349,42 @@ test.describe('report renders once after the last beat', () => {
     expect(metrics!.scrolls, 'REPORTS no longer scrolls, so the row-budget premise changed').toBe(true)
   })
 
-  test('report renders once after the last beat — row labels and sentence cells align across sources', async ({
+  test('report renders once after the last beat — row labels split by source and sentence cells align', async ({
     page,
   }) => {
     await drain(page)
-    const row = async (sel: string): Promise<{ columns: string; label: number; sentence: number }> =>
+    const row = async (sel: string): Promise<{ columns: string; label: number; sentence: number; color: string }> =>
       page.locator(sel).first().evaluate((n) => {
         const root = n as HTMLElement
         const style = getComputedStyle(n as HTMLElement)
+        const label = root.querySelector('.rep-stamp')!
         return {
           columns: style.gridTemplateColumns,
-          label: root.querySelector('.rep-stamp')!.getBoundingClientRect().left,
+          label: label.getBoundingClientRect().left,
           sentence: root.querySelector('.rep-s')!.getBoundingClientRect().left,
+          color: getComputedStyle(label).color,
         }
       })
 
     const facts = await row(`${FACTS} .rep-row`)
     const body = await row(`${BODY} .rep-row`)
+    const tokens = await page.evaluate(() => {
+      const root = getComputedStyle(document.documentElement)
+      const probe = document.createElement('span')
+      document.body.append(probe)
+      const read = (name: string): string => {
+        probe.style.color = root.getPropertyValue(name).trim()
+        return getComputedStyle(probe).color
+      }
+      const colors = { scene: read('--warning'), agent: read('--surface-muted-2') }
+      probe.remove()
+      return colors
+    })
     expect(facts.columns).toBe(body.columns)
     expect(Math.abs(facts.label - body.label), 'source labels are not in one column').toBeLessThan(1)
     expect(Math.abs(facts.sentence - body.sentence), 'sentences are not in one column').toBeLessThan(1)
+    expect(facts.color, 'scene/fact rows should use the LIVE FEED scene-side tag color').toBe(tokens.scene)
+    expect(body.color, 'radio/body rows should use the LIVE FEED agent-side tag color').toBe(tokens.agent)
   })
 })
 

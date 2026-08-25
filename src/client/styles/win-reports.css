@@ -35,7 +35,8 @@
 .rep-row:has(.min.mined){background:var(--band-1);border-color:var(--blueprint)}
 .rep-row:has(.min.mined):hover{background:var(--band-1)}
 .rep-stamp{font-family:var(--mono);font-size:var(--fs-9-5);line-height:1.7;
-  letter-spacing:.1em;color:var(--signal);white-space:nowrap;font-variant-numeric:tabular-nums}
+  letter-spacing:.1em;color:var(--surface-muted-2);white-space:nowrap;font-variant-numeric:tabular-nums}
+.rep-facts .rep-stamp{color:var(--warning)}
 .rep-s{min-width:0;font-family:var(--prose);font-size:var(--fs-13);line-height:1.7;
   color:var(--surface-text);word-break:keep-all}
 .rep-s .min{display:block}
