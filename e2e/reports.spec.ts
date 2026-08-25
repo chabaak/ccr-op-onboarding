@@ -258,7 +258,7 @@ test.describe('report renders once after the last beat', () => {
      have been worse than deleting it — a scope that matches no node passes
      forever. The reason the chop went rather than being timed a fourth time is
      in `components/report-view.ts`; what it certified is now said by the
-     transmission being on the page and by the tally under AGENT FILE's DEPLOY. */
+     transmission being on the page and by the tally under REPORTS. */
 
   test('report renders once after the last beat — both row groups render the event, in event order', async ({
     page,
@@ -306,8 +306,9 @@ test.describe('report renders once after the last beat', () => {
     await drain(page)
     await expect(page.locator(`${REP} .win-body.surface`)).toHaveCount(1)
     await expect(page.locator(`${REP} .doc-hd, ${REP} .doc-body`)).toHaveCount(0)
-    await expect(page.locator(`${REP} .terminal-record .tly-line`)).toHaveCount(0)
-    await expect(page.locator(`#w-file .terminal-record[data-tally-state="final"]`)).toHaveCount(1)
+    await expect(page.locator(`${REP} .terminal-record[data-tally-state="final"]`)).toHaveCount(1)
+    await expect(page.locator(`${REP} .terminal-record .tly-line`)).not.toHaveCount(0)
+    await expect(page.locator(`#w-file .terminal-record`)).toHaveCount(0)
 
     const rows = page.locator(`${REP} .rep-row`)
     await expect(rows, 'no report rows rendered — the layout check is vacuous').not.toHaveCount(0)

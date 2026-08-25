@@ -28,11 +28,18 @@ export interface ReportModel {
   round: number
   facts: Sentence[]
   report_body: Sentence[]
+  rounds?: readonly ReportRoundModel[]
   /**
    * R1 — ids in `report_body` that open a round after the sitting's first. The
    * record breaks a line before each. Absent on a single-round document.
    */
   opens?: string[]
+}
+
+export interface ReportRoundModel {
+  round: number
+  facts: readonly Sentence[]
+  report_body: readonly Sentence[]
 }
 
 // H3 (08-09) — the typewriter itself moved to `components/typewriter.ts`. It
@@ -83,7 +90,19 @@ export function minedCount(model: ReportModel, marks: MarkSets): number {
  * environment — the window itself needs a DOM.
  */
 export function accumulated(held: ReportModel | null, slice: ReportModel): ReportModel {
-  if (held === null) return { round: slice.round, facts: [...slice.facts], report_body: [...slice.report_body] }
+  const round = {
+    round: slice.round,
+    facts: [...slice.facts],
+    report_body: [...slice.report_body],
+  }
+  if (held === null) {
+    return {
+      round: slice.round,
+      facts: [...slice.facts],
+      report_body: [...slice.report_body],
+      rounds: [round],
+    }
+  }
   // R1 — the id that OPENS this round, remembered so a redraw can break before
   // it. Omitted on the first round rather than set empty: the document a
   // sitting starts with is the slice itself, and `(a)` in the `[w2]` block
@@ -94,6 +113,7 @@ export function accumulated(held: ReportModel | null, slice: ReportModel): Repor
     round: slice.round,
     facts: [...held.facts, ...slice.facts],
     report_body: [...held.report_body, ...slice.report_body],
+    rounds: [...(held.rounds ?? [{ round: held.round, facts: held.facts, report_body: held.report_body }]), round],
     opens: opening === undefined ? [...opens] : [...opens, opening.id],
   }
 }
@@ -147,6 +167,12 @@ interface Anchor {
   row: HTMLElement
 }
 
+interface ReplayTarget extends Anchor {}
+
+function reportRounds(model: ReportModel): readonly ReportRoundModel[] {
+  return model.rounds ?? [{ round: model.round, facts: model.facts, report_body: model.report_body }]
+}
+
 /** The former document titles, now rendered as row tags. */
 const FACTS_TITLE = '현장 기록'
 const BODY_TITLE = '무전 기록'
@@ -179,12 +205,9 @@ function applyRowState(row: HTMLElement, state: MinableState): void {
 }
 
 export function createReportView(options: ReportViewOptions): ReportView {
-  const facts = el('section', 'rep-group rep-facts')
-  facts.id = 'factsList'
-  const body = el('section', 'rep-group rep-body')
-  body.id = 'bodyList'
-  // Legacy mount target for the terminal record. Sentence rows live in
-  // #factsList/#bodyList, so tutorial's old document anchors stop matching.
+  const rows = el('section', 'rep-rounds')
+  // Legacy mount target for the terminal record. Sentence rows are grouped by
+  // round above it, so tutorial anchors land on the first source groups.
   const recordMount = el('article', 'doc-facts')
 
   const sig = el('div', 'sig')
@@ -208,7 +231,7 @@ export function createReportView(options: ReportViewOptions): ReportView {
   sig.append(sigLine)
 
   const grid = el('div', 'rep-grid')
-  grid.append(facts, body, recordMount, sig)
+  grid.append(rows, recordMount, sig)
 
   const count = el('b', undefined, '0')
   count.id = 'minedCount'
@@ -228,7 +251,8 @@ export function createReportView(options: ReportViewOptions): ReportView {
   caret.setAttribute('aria-hidden', 'true')
 
   /** One tagged report row: [source tag] [sentence]. */
-  function reportRow(sentence: Sentence, tag: string, marks: MarkSets): { row: HTMLElement; node: HTMLElement } {
+  function reportRow(sentence: Sentence, tag: string, marks: MarkSets): { row: HTMLElement; node: HTMLElement } | null {
+    if (sentence.text.trim().length === 0) return null
     const state = sentenceState(sentence.id, marks)
     const node = sentenceNode(sentence, state)
     node.addEventListener('click', () => {
@@ -270,23 +294,24 @@ export function createReportView(options: ReportViewOptions): ReportView {
     return window.matchMedia('(prefers-reduced-motion: reduce)').matches
   }
 
-  function paint(cursor: TypeState, sentences: Sentence[], nodes: HTMLElement[]): void {
-    sentences.forEach((sentence, i) => {
-      const node = nodes[i]
-      if (!node) return
+  function paint(cursor: TypeState, targets: ReplayTarget[]): void {
+    targets.forEach(({ sentence, node, row }, i) => {
+      const current = i === cursor.sentence
+      const visible = cursor.done || i < cursor.sentence || (current && cursor.chars > 0)
+      row.hidden = !visible
       if (cursor.done || i < cursor.sentence) node.textContent = sentence.text
-      else if (i === cursor.sentence) node.textContent = sentence.text.slice(0, cursor.chars)
+      else if (current) node.textContent = sentence.text.slice(0, cursor.chars)
       else node.textContent = ''
     })
-    if (cursor.done || cursor.sentence >= nodes.length) {
+    if (cursor.done || cursor.sentence >= targets.length) {
       caret.remove()
       return
     }
-    nodes[cursor.sentence]?.after(caret)
+    targets[cursor.sentence]?.node.after(caret)
   }
 
-  function replay(sentences: Sentence[], nodes: HTMLElement[], animate: boolean): void {
-    const lengths = sentences.map((s) => s.text.length)
+  function replay(targets: ReplayTarget[], animate: boolean): void {
+    const lengths = targets.map(({ sentence }) => sentence.text.length)
     // An empty document is not an unstamped one that will get there — it is a
     // sitting that has filed nothing, and there is no transmission to certify.
     //
@@ -294,18 +319,18 @@ export function createReportView(options: ReportViewOptions): ReportView {
     // is one round, and `append()` replays round 7 of a document that already
     // carries six. Both callers set `current` to the whole sitting first.
     if (!animate || motionless()) {
-      paint({ sentence: lengths.length, chars: 0, done: true }, sentences, nodes)
+      paint({ sentence: lengths.length, chars: 0, done: true }, targets)
       // The frozen-animation / reduced-motion sheet is whole on its first paint,
       // so it is TYPED the moment it is painted — but it is not certified until
       // the sitting has closed. The seal rule is the same on both paths.
       return
     }
-    paint(TYPE_START, sentences, nodes)
+    paint(TYPE_START, targets)
     let elapsed = 0
     const unregister = registerAnimation(PUMP, (realMs: number) => {
       elapsed += realMs
       const cursor = typeCursor(TYPE_START, elapsed, lengths)
-      paint(cursor, sentences, nodes)
+      paint(cursor, targets)
       if (!cursor.done) return
       unregister()
       if (stopReplay === unregister) stopReplay = null
@@ -315,6 +340,39 @@ export function createReportView(options: ReportViewOptions): ReportView {
 
   function tally(marks: MarkSets): void {
     count.textContent = current === null ? '0' : String(minedCount(current, marks))
+  }
+
+  function renderRound(
+    round: ReportRoundModel,
+    marks: MarkSets,
+    options: { breakBefore: boolean; factsAnchor: boolean; bodyAnchor: boolean },
+  ): ReplayTarget[] {
+    if (options.breakBefore) rows.append(el('div', 'rep-break'))
+    const group = el('section', 'rep-round')
+    const facts = el('div', 'rep-group rep-facts')
+    if (options.factsAnchor) facts.id = 'factsList'
+    for (const sentence of round.facts) {
+      const built = reportRow(sentence, FACTS_TITLE, marks)
+      if (built === null) continue
+      const { row, node } = built
+      node.textContent = sentence.text
+      facts.append(row)
+    }
+
+    const body = el('div', 'rep-group rep-body')
+    if (options.bodyAnchor) body.id = 'bodyList'
+    const targets: ReplayTarget[] = []
+    for (const sentence of round.report_body) {
+      const built = reportRow(sentence, BODY_TITLE, marks)
+      if (built === null) continue
+      const { row, node } = built
+      body.append(row)
+      targets.push({ sentence, row, node })
+    }
+
+    group.append(facts, body)
+    rows.append(group)
+    return targets
   }
 
   return {
@@ -328,25 +386,14 @@ export function createReportView(options: ReportViewOptions): ReportView {
       stopReplay = null
       caret.remove()
       current = whole
-
-      for (const sentence of slice.facts) {
-        const { row, node } = reportRow(sentence, FACTS_TITLE, marks)
-        node.textContent = sentence.text
-        facts.append(row)
-      }
-
-      // R1 — this round opens below the last one, not beside it. `append()` is
-      // only ever reached for a round that is NOT the sitting's first (the
-      // window draws whole for that one), so the break is unconditional here.
-      body.append(el('div', 'rep-break'))
-      const grown = slice.report_body.map((sentence) => {
-        const { row, node } = reportRow(sentence, BODY_TITLE, marks)
-        body.append(row)
-        return node
+      const grown = renderRound(slice, marks, {
+        breakBefore: rows.childElementCount > 0,
+        factsAnchor: rows.querySelector('#factsList') === null,
+        bodyAnchor: rows.querySelector('#bodyList') === null,
       })
 
       tally(marks)
-      replay(slice.report_body, grown, true)
+      replay(grown, true)
     },
 
     render(model: ReportModel, marks: MarkSets, options?: RenderOptions): void {
@@ -356,30 +403,18 @@ export function createReportView(options: ReportViewOptions): ReportView {
       anchors = []
       current = model
 
-      // The objective log is already filed when the round opens — only the
-      // agent's own report writes itself out (reference: `renderReport()`).
-      facts.replaceChildren()
-      for (const sentence of model.facts) {
-        const { row, node } = reportRow(sentence, FACTS_TITLE, marks)
-        node.textContent = sentence.text
-        facts.append(row)
-      }
-
-      body.replaceChildren()
-      const opens = new Set(model.opens ?? [])
-      const bodyNodes = model.report_body.map((sentence) => {
-        // R1 — a redraw rebuilds the whole sitting from a flat list, so the
-        // round boundary has to come from the model. Appending the break only
-        // in `append()` below would lose it the first time the operator left
-        // this rail tab and came back.
-        if (opens.has(sentence.id)) body.append(el('div', 'rep-break'))
-        const { row, node } = reportRow(sentence, BODY_TITLE, marks)
-        body.append(row)
-        return node
+      rows.replaceChildren()
+      const bodyTargets: ReplayTarget[] = []
+      let factsAnchor = true
+      let bodyAnchor = true
+      reportRounds(model).forEach((round, index) => {
+        bodyTargets.push(...renderRound(round, marks, { breakBefore: index > 0, factsAnchor, bodyAnchor }))
+        factsAnchor = false
+        bodyAnchor = false
       })
 
       tally(marks)
-      replay(model.report_body, bodyNodes, options?.replay ?? true)
+      replay(bodyTargets, options?.replay ?? true)
     },
 
     refresh(marks: MarkSets): void {

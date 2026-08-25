@@ -45,13 +45,14 @@ import type { ArchiveEntry } from '../components/report-archive.ts'
 import { accumulated, createReportView } from '../components/report-view.ts'
 import type { ReportModel } from '../components/report-view.ts'
 import { el } from '../shell/dom.ts'
+import { feedPending } from '../shell/feed-drain.ts'
 import { feedReached } from '../shell/feed-reach.ts'
 import type { FeedCue } from '../shell/feed-reach.ts'
 import { fetchScenarioInPlay } from '../shell/pack-session.ts'
 import { PORTAL } from '../shell/portal-identity.ts'
 import { pad2 } from '../components/block-card.ts'
 import { getSlotBoard, SLOT_CAP } from '../components/slot-board.ts'
-import { getScoreTally } from '../components/score-tally.ts'
+import { createScoreTally } from '../components/score-tally.ts'
 import type { TallyModel } from '../components/score-tally.ts'
 
 /** What the record is called, and what it grades against — relocated verbatim
@@ -102,7 +103,7 @@ export function mount(host: HTMLElement, driver: FixtureDriver): void {
   let run = 0
   let slug = ''
   let title = ''
-  const records = new Map<number, HTMLElement>()
+  const records = new Map<number, ReturnType<typeof createScoreTally>>()
 
   const marks = (): MarkSets => deriveMarks(driver.store(), carried)
 
@@ -158,9 +159,14 @@ export function mount(host: HTMLElement, driver: FixtureDriver): void {
    * into a sibling window. The board is a `components/` module with a published
    * surface, and this window has consumed it since u6.)
    *
-   * `null` — no board mounted — is not a hold. Nothing is drawing.
+   * x14 — the LIVE FEED's paper joins the same hold. The round is not ready to
+   * mine while the fanfold is still printing it; `feedPending()` is the feed's
+   * own published drain count, so this window asks the owner rather than
+   * guessing from the run phase.
+   *
+   * `null` — no board mounted — is not a board hold. Nothing is drawing.
    */
-  const mineHeld = (): boolean => getSlotBoard()?.isRevealing() ?? false
+  const mineHeld = (): boolean => (getSlotBoard()?.isRevealing() ?? false) || feedPending() > 0
 
   const rail = createArchiveRail({
     onSelect: (run: number) => {
@@ -185,21 +191,22 @@ export function mount(host: HTMLElement, driver: FixtureDriver): void {
       // planOps); a refusal is SHOWN, never swallowed.
       const board = getSlotBoard()
 
-      // x10 — …and HELD while the handover is still arriving (민서, 08-10). The
-      // gesture stops HERE, above the seat arithmetic and above `mine()`, which
-      // is what makes the hold airtight rather than decorative: this is the only
-      // path on the desk that reaches the `mine` op, both the click and the
-      // keydown come through it (`components/report-view.ts` binds both to this
-      // one callback), and the op cannot be reached by any gesture that does not.
+      // x10/x14 — held while the handover is still arriving or while the LIVE
+      // FEED is still printing this round. The gesture stops HERE, above the
+      // seat arithmetic and above `mine()`, which is what makes the hold
+      // airtight rather than decorative: this is the only path on the desk that
+      // reaches the `mine` op, both the click and the keydown come through it
+      // (`components/report-view.ts` binds both to this one callback), and the
+      // op cannot be reached by any gesture that does not.
       //
-      // Silent, exactly as the `slotted`/`carried` line above is silent, and for
-      // the same reason: those are the states that paint `aria-disabled`, this is
-      // the third, and a control that says it is unavailable owes no flash when
-      // it is pressed anyway. `view.flash` is kept for the REFUSALS below, which
-      // are cases the sentence looked live for.
+      // It is a refused action, not a dead control: flash the same sentence the
+      // full-file and locked-board refusals flash so the operator sees the rule.
       //
       // Read at the moment of the gesture, never a stored copy — see `mineHeld`.
-      if (board !== null && board.isRevealing()) return
+      if (mineHeld()) {
+        view.flash(id)
+        return
+      }
 
       const slots = driver.store().slots
       const seat = [...Array(SLOT_CAP).keys()].find((i) => slots[i] === undefined)
@@ -275,7 +282,8 @@ export function mount(host: HTMLElement, driver: FixtureDriver): void {
   function mountRecord(): void {
     const docFacts = host.querySelector('article.doc-facts')
     if (docFacts === null) return
-    for (const [sitting, node] of records) {
+    for (const [sitting, record] of records) {
+      const node = record.root
       if (sitting === active) {
         if (node.parentElement !== docFacts) docFacts.append(node)
       } else {
@@ -365,10 +373,19 @@ export function mount(host: HTMLElement, driver: FixtureDriver): void {
       // document was read under the latest day's 집계표. Exactly one is ever
       // mounted: `mountRecord()` attaches the active sitting's and detaches
       // every other.
-      records.get(run)?.remove()
+      const previous = records.get(run)
+      previous?.reset()
+      previous?.root.remove()
       const node = el('article', 'terminal-record')
       node.setAttribute('aria-label', '시행 결과')
-      records.set(run, node)
+      const sitting = run
+      const tally = createScoreTally({
+        host: node,
+        onFinal: () => {
+          window.dispatchEvent(new CustomEvent('score-tally:final', { detail: { run: sitting } }))
+        },
+      })
+      records.set(run, tally)
       // The scored day takes the rail and the record mounts under it. Going
       // through `sync()` rather than straight to `mountRecord()` is what covers
       // a day that filed NO report (`?drill=tally-lapse`): without a rail
@@ -382,8 +399,6 @@ export function mount(host: HTMLElement, driver: FixtureDriver): void {
       // a day that filed no report still takes its identity.
       sync(false)
       mountRecord()
-      const tally = getScoreTally()
-      if (tally === null) return
       tally.open()
       // x12 — THE RECORD IS ON THE DESK NOW; THE NUMBER IS NOT. `open()` leaves
       // it `pending` — the article mounted, blank, waiting — and the count-up
@@ -397,7 +412,6 @@ export function mount(host: HTMLElement, driver: FixtureDriver): void {
       // the desk may be on the next sitting; a model read late would be the same
       // event scored against whatever `run` had become.
       const record = scoreModel(event)
-      const sitting = run
       afterPaper({ at: 'score', run: sitting }, () => tally.run(record))
       return
     }

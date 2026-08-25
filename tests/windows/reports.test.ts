@@ -140,6 +140,7 @@ interface ReportModel {
   round: number
   facts: Sentence[]
   report_body: Sentence[]
+  rounds?: readonly { round: number; facts: readonly Sentence[]; report_body: readonly Sentence[] }[]
   opens?: string[]
 }
 
@@ -704,7 +705,7 @@ describe('[w2] a sitting accumulates its rounds into one document', () => {
   it('(a) the first round of a sitting is the document', async () => {
     const v = await view()
     const round = { round: 0, facts: [s('f1')], report_body: [s('b1')] }
-    expect(v.accumulated(null, round)).toEqual(round)
+    expect(v.accumulated(null, round)).toEqual({ ...round, rounds: [round] })
   })
 
   it('(b) each further round appends to both panes, in arrival order', async () => {
@@ -773,6 +774,39 @@ describe('[w2] a sitting accumulates its rounds into one document', () => {
     // rebuilds the flat list and matches by id, so an id that is not there is
     // simply no break rather than a break in the wrong place.
     expect(three.report_body.map((x) => x.id)).toEqual(['b1', 'b2', 'b3', 'b4', 'b5'])
+  })
+
+  it('(h) two resolved rounds keep the sheet order 현장·무전·현장·무전', async () => {
+    const v = await view()
+    const one = v.accumulated(null, { round: 0, facts: [s('f1')], report_body: [s('b1')] })
+    const two = v.accumulated(one, { round: 1, facts: [s('f2')], report_body: [s('b2')] })
+
+    expect(two.rounds?.flatMap((round) => [round.facts[0]?.id, round.report_body[0]?.id])).toEqual([
+      'f1',
+      'b1',
+      'f2',
+      'b2',
+    ])
+  })
+
+  it('(i) source: an empty report sentence is refused before a row reaches the DOM', () => {
+    const src = scannedSources().find((s) => s.file.endsWith('components/report-view.ts'))
+    expect(src, 'the REPORTS view is not in the scanned set').toBeTruthy()
+    const row = /function reportRow\([\s\S]*?\n {2}\}/.exec(src!.text)?.[0] ?? ''
+    expect(row, 'reportRow is gone').not.toBe('')
+    expect(row, 'blank report text can still build an empty row').toMatch(/sentence\.text\.trim\(\)\.length === 0/)
+    expect(row, 'the blank-row guard must refuse before the anchor is registered').toMatch(
+      /sentence\.text\.trim\(\)\.length === 0[\s\S]*?return null[\s\S]*?anchors\.push/,
+    )
+  })
+
+  it('(j) source: unreached replay rows are hidden instead of spacing sentences apart', () => {
+    const src = scannedSources().find((s) => s.file.endsWith('components/report-view.ts'))
+    expect(src, 'the REPORTS view is not in the scanned set').toBeTruthy()
+    const paint = /function paint\([\s\S]*?\n {2}\}/.exec(src!.text)?.[0] ?? ''
+    expect(paint, 'paint is gone').not.toBe('')
+    expect(paint, 'future replay rows can still stand on the sheet as blank rows').toMatch(/row\.hidden = !visible/)
+    expect(paint, 'the current row should not appear until it has real text').toMatch(/current && cursor\.chars > 0/)
   })
 })
 
@@ -946,6 +980,20 @@ describe('[x10] mining is held while the handover is typing itself out', () => {
     // …and it is a REFUSAL, not a deferral: nothing queues the gesture to be
     // replayed when the reveal lands.
     expect(text, 'a held gesture is remembered instead of refused').not.toMatch(/setTimeout[^\n]*onMine|pendingMine/)
+  })
+
+  it('(d2) source: the feed-printing hold is refused visibly in the same onMine gate', () => {
+    const win = scannedSources().find((s) => s.file.endsWith('windows/reports.ts'))
+    expect(win, 'the REPORTS window is not in the scanned set').toBeTruthy()
+    const text = win!.text
+    const pending = text.indexOf('feedPending() > 0')
+    const held = text.indexOf('if (mineHeld())')
+    const flash = text.indexOf('view.flash(id)', held)
+    const minted = text.indexOf('mine(id, m)')
+    expect(pending, 'the REPORTS mine gate does not read the LIVE FEED drain state').toBeGreaterThan(-1)
+    expect(held, 'the single mine hold branch is gone').toBeGreaterThan(-1)
+    expect(flash, 'a feed-held mine is swallowed instead of visibly refused').toBeGreaterThan(held)
+    expect(flash, 'the refusal flash must happen before any mine op can be minted').toBeLessThan(minted)
   })
 
   it('(e) source: the hold is READ off the board — no body class, no second copy of the fact', () => {

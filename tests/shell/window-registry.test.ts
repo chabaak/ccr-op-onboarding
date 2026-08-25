@@ -30,6 +30,7 @@ interface WindowDef {
   id: string
   en: string
   ko: string
+  caption: string
   mount: (host: unknown, driver: unknown) => void
 }
 
@@ -130,6 +131,13 @@ describe('[u3#c6] the registry is shell-owned', () => {
       expect(typeof def.mount).toBe('function')
       expect(def.mount).toBe(mod.mount)
     }
+  })
+
+  it('(e2) REPORTS keeps its identity without promising immediate mining', async () => {
+    const { WINDOW_REGISTRY } = await loadRegistry()
+    const reports = WINDOW_REGISTRY.find((entry) => entry.key === 'rep')
+    expect(reports?.caption).toBe('REPORTS · 기록')
+    expect(reports?.caption).not.toContain('수신 즉시 채굴')
   })
 
   it('(f) the registry is the only module that imports windows/', () => {

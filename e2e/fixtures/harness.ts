@@ -112,8 +112,8 @@ export async function frame(page: Page): Promise<Frame> {
  * (design #7 — the record does not own the screen, and nothing re-steals
  * focus). What every caller of the old `awaitTallyReveal` actually needed was
  * a point past which the day's results are settled and readable; that point
- * is now the terminal record reaching `final`, since AGENT FILE mounts it under
- * DEPLOY once the closed-day phase begins.
+ * is now the terminal record reaching `final`, since REPORTS mounts it under
+ * the active filed document once the closed-day phase begins.
  */
 export async function awaitRecordFinal(page: Page): Promise<void> {
   // THE BUDGET IS DECLARED HERE BECAUSE THE WAIT IS DECLARED HERE (08-09).
@@ -131,7 +131,7 @@ export async function awaitRecordFinal(page: Page): Promise<void> {
   // wall-clock time (`components/score-tally.ts`'s PACE), so a tighter assertion
   // would just move the flake rather than remove it.
   test.setTimeout(90_000)
-  await expect(page.locator('#w-file .terminal-record')).toHaveAttribute('data-tally-state', 'final', {
+  await expect(page.locator('#w-rep .terminal-record')).toHaveAttribute('data-tally-state', 'final', {
     timeout: 40_000,
   })
 }
@@ -236,8 +236,8 @@ export async function tallyPhase(page: Page): Promise<string> {
  */
 export async function tallyState(page: Page): Promise<string> {
   return page.evaluate(() => {
-    const node = document.querySelector('#w-file .terminal-record')
-    if (!node) throw new Error('#w-file .terminal-record is not on the desk')
+    const node = document.querySelector('#w-rep .terminal-record')
+    if (!node) throw new Error('#w-rep .terminal-record is not on the desk')
     return node.getAttribute('data-tally-state') ?? ''
   })
 }

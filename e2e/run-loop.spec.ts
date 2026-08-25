@@ -33,9 +33,9 @@ interface Frame {
   ended: boolean
 }
 
-/** U3 (playtest g3-1) — TALLY dissolves; x13 moves the terminal record under
- * AGENT FILE's DEPLOY row, where the day's turn already lives. */
-const RECORD = '#w-file .terminal-record'
+/** U3 (playtest g3-1) — TALLY dissolves; #185 mounts the terminal record under
+ * REPORTS, where the day's filed document already lives. */
+const RECORD = '#w-rep .terminal-record'
 const LEDGER = `${RECORD}[data-tally-state]`
 const NEW_RUN = '#w-file #btnDeploy'
 const WAIT = '#w-file #deployState'
@@ -44,7 +44,6 @@ const WAIT = '#w-file #deployState'
 const ROWS = `${RECORD} .tly-line:not(.tl-open):not(.tl-close)`
 const BIG = `${RECORD} #tlyBig`
 const REP = '#w-rep'
-const REPORT_RECORD = '#w-rep .terminal-record'
 const OPTION = `${REP} .arch-rail [role="option"]`
 const FILE = '#w-file'
 
@@ -158,7 +157,7 @@ async function drainAndTime(page: Page): Promise<number> {
     feed.flush()
     await new Promise<void>((resolve) => {
       const step = (): void => {
-        if (document.querySelector('#w-file .terminal-record[data-tally-state="final"]')) resolve()
+        if (document.querySelector('#w-rep .terminal-record[data-tally-state="final"]')) resolve()
         else requestAnimationFrame(step)
       }
       step()
@@ -277,15 +276,13 @@ test.describe('full loop back to BUILD', () => {
     // What the loop turning over means is that the desk left `tally`.
     await expect.poll(async () => phase(page), { timeout: 20_000 }).not.toBe('tally')
     await expect(page.locator(NEW_RUN)).toHaveAttribute('data-op', 'deploy')
-    // x13 — the visible tally belongs to the closed day and leaves AGENT FILE
-    // when the next day opens, so the file can return to a clean deploy page.
-    // REPORTS still keeps the scored sitting's rail identity: selecting it
-    // mounts the record article placeholder, but the tally no longer lives
-    // inside that pane.
+    // #185 — the visible tally belongs to the selected REPORTS sitting, while
+    // AGENT FILE keeps only the deploy control for the current day.
     await expect(page.locator(RECORD)).toHaveCount(0)
+    await expect(page.locator(`${FILE} .terminal-record`)).toHaveCount(0)
     await page.locator(OPTION, { hasText: scoredTab }).first().click()
-    await expect(page.locator(REPORT_RECORD)).toHaveCount(1)
-    await expect(page.locator(`${REPORT_RECORD} .tly-line`)).toHaveCount(0)
+    await expect(page.locator(RECORD)).toHaveCount(1)
+    await expect(page.locator(`${RECORD} .tly-line`)).not.toHaveCount(0)
   })
 
   test('full loop back to BUILD — D-DAY decrements one place, and only off the `meta` event', async ({ page }) => {
@@ -349,7 +346,7 @@ test.describe('count-up pacing absorbs the report call', () => {
     // Immediately after 21:04 the desk is still settling: pending or counting,
     // never final, and the way out stays shut.
     const early = await page.evaluate(() => {
-      const node = document.querySelector('#w-file .terminal-record')
+      const node = document.querySelector('#w-rep .terminal-record')
       return node?.getAttribute('data-tally-state') ?? null
     })
     expect(['pending', 'counting'], `the record reached ${early} before the cadence ran`).toContain(early)
@@ -387,7 +384,7 @@ test.describe('count-up pacing absorbs the report call', () => {
     // The report window is painted while the ledger is still counting.
     await expect(page.locator(`${REP} #bodyList .sent`)).not.toHaveCount(0, { timeout: 20_000 })
     const stateWhilePainted = await page.evaluate(
-      () => document.querySelector('#w-file .terminal-record')?.getAttribute('data-tally-state') ?? null,
+      () => document.querySelector('#w-rep .terminal-record')?.getAttribute('data-tally-state') ?? null,
     )
     expect(stateWhilePainted).not.toBeNull()
 

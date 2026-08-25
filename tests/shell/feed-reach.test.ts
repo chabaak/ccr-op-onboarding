@@ -385,15 +385,15 @@ describe('[x12] the arriving document waits for the paper', () => {
   })
 
   it('(b) the terminal record opens on the event and COUNTS on the paper', () => {
-    // The record identity is reconciled through REPORTS the moment the day
-    // closes, while the visible tally host lives under AGENT FILE's DEPLOY row.
-    // `open()` leaves it `pending`, and the count-up runs when the fanfold
-    // reaches the same `score` it mints the 집계 line from. The two are one
-    // count, printed twice.
+    // The record identity and visible tally host are both reconciled through
+    // REPORTS the moment the day closes. `open()` leaves it `pending`, and the
+    // count-up runs when the fanfold reaches the same `score` it mints the 집계
+    // line from. The two are one count, printed twice.
     const src = code(REPORTS_TS)
     const scored = /if \(event\.type === 'score'\) \{[\s\S]*?\n {6}return\n {4}\}/.exec(src)
     expect(scored, 'the score branch is gone — re-aim this guard').not.toBeNull()
-    expect(scored![0], 'the tally is no longer read from the shared file host').toMatch(/getScoreTally\(\)/)
+    expect(scored![0], 'REPORTS no longer owns the visible score tally').toMatch(/createScoreTally\(\{/)
+    expect(scored![0], 'the tally no longer mounts through the terminal record').toMatch(/host: node/)
     expect(scored![0], 'the record no longer opens when the day closes').toMatch(/tally\.open\(\)/)
     expect(scored![0], 'the count-up no longer waits for the paper').toMatch(
       /afterPaper\(\{ at: 'score'[\s\S]*?tally\.run\(/,
@@ -420,14 +420,17 @@ describe('[x12] the arriving document waits for the paper', () => {
     expect(select, 'selecting a past day now waits on the paper').not.toMatch(/afterPaper|feedReached/)
   })
 
-  it('(d) AGENT FILE releases from the visible count-up, not a second timer', () => {
+  it('(d) AGENT FILE releases from the REPORTS count-up, not a second timer', () => {
     // REPORTS already holds `tally.run(record)` until the paper reaches the
-    // score. AGENT FILE owns the visible host now, so deriving `counted` from
-    // another `feedReached` + timeout here would be a second clock that could
-    // drift from the count-up it is meant to describe.
+    // score and now owns the visible host. AGENT FILE only listens for the
+    // visible tally's final event; deriving `counted` from another
+    // `feedReached` + timeout here would be a second clock that could drift
+    // from the count-up it is meant to describe.
     const src = code(AGENT_FILE_TS)
-    expect(src, 'AGENT FILE no longer mounts the score tally').toMatch(/createScoreTally\(\{[\s\S]*?onFinal:/)
-    expect(src, 'the visible tally no longer marks counted on final').toMatch(/onFinal:[\s\S]*?counted = true/)
+    expect(src, 'AGENT FILE still mounts the score tally').not.toMatch(/createScoreTally\(\{[\s\S]*?onFinal:/)
+    expect(src, 'the visible tally final event no longer marks counted').toMatch(
+      /score-tally:final[\s\S]*?counted = true/,
+    )
     expect(src, 'the duplicate score waiter is back').not.toMatch(/feedReached\(\{ at: 'score'/)
     expect(src, 'the duplicate count timer is back').not.toMatch(/scoreSeen|countTimer/)
   })
