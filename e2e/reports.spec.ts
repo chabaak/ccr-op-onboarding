@@ -341,7 +341,7 @@ test.describe('report renders once after the last beat', () => {
       }
     })
     expect(metrics, 'REPORTS row-height metrics were not measurable').not.toBeNull()
-    expect(Math.round(metrics!.rep)).toBe(306)
+    expect(Math.round(metrics!.rep)).toBe(296)
     expect(metrics!.file, 'AGENT FILE remains the taller right-column pane').toBeGreaterThan(metrics!.rep)
     expect(metrics!.feed, 'LIVE FEED keeps the full-height priority column').toBeGreaterThan(metrics!.file)
     expect(metrics!.grid / metrics!.row, 'REPORTS should show four rows before scroll').toBeGreaterThanOrEqual(4)

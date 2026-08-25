@@ -94,7 +94,7 @@ describe('[u3#c2] nothing is off-screen at the 1280x800 minimum (C9)', () => {
   it('(b) every rect clears the chrome band at the top of the desk', async () => {
     const a = await applyLayout(MIN)
     for (const key of WINDOW_KEYS) {
-      expect(a[key]!.y, `${key} sits under the topbar`).toBeGreaterThanOrEqual(90)
+      expect(a[key]!.y, `${key} sits under the topbar`).toBeGreaterThanOrEqual(89)
     }
   })
 
@@ -154,9 +154,9 @@ describe('[u3#c2] the arrangement is derived from the viewport', () => {
 describe('[u3#c2] the right column gives REPORTS four visible rows before scroll', () => {
   it('(a) the 1280x800 floor keeps LIVE FEED full height and leaves AGENT FILE taller than REPORTS', async () => {
     const a = await applyLayout(MIN)
-    expect(a.feed).toEqual({ x: 14, y: 133, w: 640, h: 653 })
-    expect(a.rep).toEqual({ x: 670, y: 133, w: 596, h: 306 })
-    expect(a.file).toEqual({ x: 670, y: 455, w: 596, h: 331 })
+    expect(a.feed).toEqual({ x: 14, y: 89, w: 640, h: 697 })
+    expect(a.rep).toEqual({ x: 670, y: 89, w: 596, h: 296 })
+    expect(a.file).toEqual({ x: 670, y: 401, w: 596, h: 385 })
     expect(a.file!.h, 'AGENT FILE remains the taller right-column pane').toBeGreaterThan(a.rep!.h)
   })
 

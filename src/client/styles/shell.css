@@ -96,9 +96,9 @@
   opacity:.55}
 
 .tb-row{display:flex;align-items:stretch}
-.tb-row-1{height:71px;padding:0 var(--space-14);gap:0;justify-content:space-between}
+.tb-row-1{height:71px;padding:0 var(--space-14);gap:var(--space-12);align-items:center}
 
-.tb-identity{display:flex;align-items:center;gap:var(--space-12);min-width:0;overflow:hidden;flex:1 1 auto}
+.tb-identity{display:flex;align-items:center;gap:var(--space-12);min-width:0;overflow:hidden;flex:0 1 auto}
 .seal-emblem svg{width:39px;height:39px;display:block}
 .seal-emblem circle{fill:none;stroke:var(--warning);stroke-width:1.2;opacity:.85}
 .seal-emblem text{fill:var(--warning);font-weight:700;font-size:var(--fs-13);line-height:1;
@@ -123,10 +123,10 @@
    With it went the reason for the column — a lone `.clk-face` centred over an
    empty `.clk-rate` reads as a dropped element, so the mute toggle comes up onto
    the digits' own line and the unit becomes what it now is: SIM · time · sound.
-   The 405px column and the two hairline dividers are untouched — they are what
-   holds the top bar's three-part balance, not anything the bar needed. */
-.tb-clock{display:flex;align-items:center;justify-content:center;gap:var(--space-14);
-  padding:0 var(--space-18);width:405px;flex:0 0 auto;position:relative}
+   x12 folds the taskbar into this row, so the column narrows and the dividers
+   now frame only the clock cluster. */
+.tb-clock{display:flex;align-items:center;justify-content:center;gap:var(--space-12);
+  padding:0 var(--space-12);width:282px;flex:0 0 auto;position:relative}
 .tb-clock::before,.tb-clock::after{content:'';position:absolute;top:14px;bottom:14px;width:1px;background:var(--ink-line)}
 .tb-clock::before{left:0}.tb-clock::after{right:0}
 .clk-face{display:flex;align-items:baseline;gap:var(--space-8);justify-content:center}
@@ -150,11 +150,11 @@
 
 /* d-day */
 .tb-dday{display:flex;flex-direction:column;justify-content:center;gap:0;
-  padding-left:var(--space-16);text-align:right;width:198px;flex:0 0 auto}
+  padding-left:var(--space-10);text-align:right;width:172px;flex:0 0 auto}
 /* x6 — the tracking survives the language swap, measured rather than assumed.
    `REMAINING ATTEMPTS` is 18 monospaced characters: 18 × (9px × .6 advance +
-   9px × .24 tracking) ≈ 136px against the 182px this unit has inside its
-   16px pad. It fits with room, so .24em stays — it is what makes this line read
+   9px × .24 tracking) ≈ 136px against the 162px this unit has inside its
+   10px pad. It fits with room, so .24em stays — it is what makes this line read
    as the same rail as OPERATOR / CASE rather than as a word. A longer label
    than this one does NOT fit: tighten here before lengthening the copy. */
 .dd-label{font-size:var(--fs-7-5);letter-spacing:.24em;color:var(--txt-7);line-height:1.5}
@@ -176,8 +176,7 @@
 .dd-pips i.now{background:var(--warning);box-shadow:0 0 6px var(--warning)}
 
 /* taskbar */
-.tb-row-2{height:44px;padding:0 var(--space-10);gap:var(--space-5);align-items:center;
-  background:var(--chrome-deep);border-top:1px solid var(--edge)}
+.tb-taskbar{display:flex;align-items:center;gap:var(--space-5);min-width:0;flex:1 1 auto}
 .task{display:flex;align-items:center;gap:var(--space-7);height:32px;
   padding:0 var(--space-11) 0 var(--space-8);
   border:1px solid var(--ink-line);background:var(--chrome-raise);color:var(--txt-4);
@@ -199,8 +198,9 @@
   color:var(--txt-max);border-color:var(--warning);background:var(--chrome-focus)}
 .abort-mission:focus-visible{outline:1px solid var(--warning);outline-offset:2px}
 .abort-mission[disabled]{opacity:.4;cursor:wait}
-.tb-hint{margin-left:auto;font-size:var(--fs-8-5);letter-spacing:.16em;color:var(--txt-8);
-  padding-right:var(--space-4)}
+.tb-hint{display:none;margin-left:auto;font-size:var(--fs-8-5);letter-spacing:.16em;color:var(--txt-8);
+  padding-right:var(--space-4);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+@media (min-width:1500px){.tb-hint{display:block}}
 
 /* ═══ DESKTOP ═════════════════════════════════════════════════════════════ */
 /* no stacking context here — every .win must share the one runtime `--z`
@@ -259,9 +259,8 @@ body.booting .win{visibility:hidden}
    `position:absolute` off `.win`, so it took no part in the window's column
    flow, and it did not clear itself either: 23 px above a window whose row GAP
    is 16 means 7 px of it hung over the window ABOVE. Nothing on the desk was
-   sized around it — `shell/layout.ts` has `TOP = 133`, and that number is
-   spelled out there as topbar 71 + taskbar 44 + 18 px of desk margin, with no
-   term for a tab.
+   sized around it. The taskbar now lives in the top row, so `shell/layout.ts`
+   starts the desk below that one-row band plus margin, with no term for a tab.
 
    `--tab-hi` / `--tab-lo` stay in `tokens.css`, now unreferenced. That file is a
    declared palette: an unused palette entry makes no false claim about a surface

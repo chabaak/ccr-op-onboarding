@@ -160,7 +160,9 @@ async function tabWalk(page: Page, limit = 60): Promise<TabStop[]> {
         return sum
       }
       const name = (node: Element): string =>
-        `${node.tagName.toLowerCase()}${node.id ? `#${node.id}` : ''}.${node.className || ''}`
+        `${node.tagName.toLowerCase()}${node.id ? `#${node.id}` : ''}${
+          node instanceof HTMLElement && node.dataset.win ? `[data-win="${node.dataset.win}"]` : ''
+        }.${node.className || ''}`
       const scrollerOf = (): string => {
         let node: HTMLElement | null = el.parentElement
         while (node) {
@@ -180,7 +182,7 @@ async function tabWalk(page: Page, limit = 60): Promise<TabStop[]> {
         left: Math.round(r.left + scrolled('scrollLeft')),
         vtop: Math.round(r.top),
         vleft: Math.round(r.left),
-        where: `${el.tagName.toLowerCase()}${el.id ? `#${el.id}` : ''}.${el.className || ''}`,
+        where: name(el),
         win: el.closest('.win')?.id ?? '(chrome)',
         scroller: scrollerOf(),
       }

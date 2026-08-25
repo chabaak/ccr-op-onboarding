@@ -12,7 +12,7 @@
 
 .arch-rail{display:flex;align-items:center;gap:var(--space-4);flex:0 0 auto;
   background:var(--surface-inset);border-bottom:1px solid var(--ink-line);
-  overflow-x:auto;padding:var(--space-8) var(--space-16) var(--space-7)}
+  overflow-x:auto;padding:var(--space-5) var(--space-16) var(--space-4)}
 .arch{flex:0 0 auto;display:flex;align-items:center;padding:var(--space-3) var(--space-8);
   font-size:var(--fs-10);letter-spacing:.24em;color:var(--surface-muted-2);
   border:1px solid transparent;background:transparent;white-space:nowrap;transition:.14s}

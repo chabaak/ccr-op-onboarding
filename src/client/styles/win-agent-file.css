@@ -6,11 +6,11 @@
    =========================================================================== */
 
 .win-file{--delay:.28s}
-.win-file .win-body{padding:var(--space-20) var(--space-22) var(--space-24)}
+.win-file .win-body{padding:var(--space-18) var(--space-22) var(--space-24)}
 
 .file-head{display:flex;justify-content:space-between;align-items:flex-end;
   border-bottom:2px solid var(--surface-text);padding-bottom:var(--space-7);
-  margin-bottom:var(--space-14);position:relative}
+  margin-bottom:var(--space-13);position:relative}
 .file-head::after{content:'';position:absolute;left:0;right:0;bottom:-4px;height:1px;
   background:var(--surface-text);opacity:.5}
 .fh-doc{font-size:var(--fs-8-5);letter-spacing:.13em;color:var(--surface-muted)}

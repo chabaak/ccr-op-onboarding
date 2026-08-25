@@ -67,15 +67,19 @@ export interface WinRect {
 }
 
 /**
- * Chrome band: top row 71 + taskbar 44 + air. Nothing may sit above it.
+ * Chrome band: top row 71 + air. Nothing may sit above it.
  *
  * x1 (08-08) — 94 → 133. This number is not a measurement, it is a promise
  * about `styles/shell.css`, and the 1.5× type scale broke it: `.tb-row-1` went
  * 47 → 71 and `.tb-row-2` 29 → 44, so a desk that still started at 94 would
  * have put REPORTS and LIVE FEED under the taskbar. The 18 px of air between
  * the bar and the first window is unchanged — it is desk margin, not type.
+ *
+ * x3 (08-25) — 133 → 89. The taskbar moved into the top row, giving the old
+ * 44px second row back to the desk while keeping the same 18px air below the
+ * chrome.
  */
-const TOP = 133
+const TOP = 89
 /** Desk margin against the viewport edges. */
 const GUTTER = 14
 /** Air between two columns. */
@@ -97,16 +101,19 @@ const COL_LEFT_RATIO = 0.5
  * roughly 49px each, or about 970px of rows before the rail, signature, footer,
  * breaks, and terminal-record chrome. That cannot fit in any right-column split
  * this desk can offer, so the real decision is the visible row budget before
- * scrolling. At the 1280x800 floor, .48 gives REPORTS a 306px outer window and
- * about 206px of `.rep-grid`, which is four rows at the shipped row height.
- * AGENT FILE remains the taller right-column pane at 331px, and LIVE FEED keeps
+ * scrolling. At the 1280x800 floor before the taskbar fold, .48 gave REPORTS a
+ * 306px outer window and about 206px of `.rep-grid`, which was four rows at the
+ * shipped row height. After x3 reclaims the taskbar row, .435 gives REPORTS
+ * 296px and AGENT FILE 385px; both controls that issue 157 guarded remain
+ * inside their panes, so the ratio moves with the chrome.
+ * AGENT FILE remains the taller right-column pane, and LIVE FEED keeps
  * the full left column because it is the desk's primary reading surface.
  *
  * WHAT IT COSTS, said plainly: REPORTS still scrolls, and AGENT FILE still
  * scrolls. The split buys the record enough first-glance substance without
  * pretending either document can be shown whole or taking height from LIVE FEED.
  */
-const ROW_TOP_RATIO = 0.48
+const ROW_TOP_RATIO = 0.435
 const MIN_W = 240
 const MIN_H = 120
 
