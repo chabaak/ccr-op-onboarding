@@ -45,7 +45,7 @@
     },
     "t2": {
       "time": "20:43",
-      "text_head": "탱크 옆면 위험 표지 ",
+      "text_head": "탱크 옆면 표지 두",
       "effects": {},
       "present": []
     },
@@ -68,13 +68,13 @@
     },
     "t5": {
       "time": "20:50",
-      "text_head": "출하 전표 조회가 유재",
+      "text_head": "출하 전표 조회가 ",
       "effects": {},
       "present": []
     },
     "t6": {
       "time": "20:52",
-      "text_head": "야간 위험물 요율표에서",
+      "text_head": "야간 요율표에서 `",
       "effects": {},
       "present": []
     },
@@ -97,7 +97,7 @@
     },
     "t9": {
       "time": "21:03",
-      "text_head": "유해물질 조회 화면은 ",
+      "text_head": "유해물질 조회 화면",
       "effects": {},
       "present": []
     },
@@ -143,7 +143,7 @@
     },
     "t15": {
       "time": "21:23",
-      "text_head": "배수 도면은 야적장 남",
+      "text_head": "배수 도면은 야적장",
       "effects": {},
       "present": []
     },

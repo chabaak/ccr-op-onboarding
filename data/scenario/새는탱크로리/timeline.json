@@ -26,7 +26,7 @@
       "time": "20:43",
       "surface": "cctv",
       "place_id": "p1",
-      "text": "탱크 옆면 위험 표지 두 칸이 닳아 있고, 남은 기호가 적하목록 품명과 맞지 않는다.",
+      "text": "탱크 옆면 표지 두 칸이 긁혀 있고, 한 칸에는 물결 모양 윗획만, 다른 칸에는 검은 테두리만 남아 있다.",
       "exposure": {
         "visible_from": null,
         "extra_condition": null
@@ -42,7 +42,7 @@
       "time": "20:45",
       "surface": "document",
       "place_id": "p2",
-      "text": "접수 화면의 적하목록 행은 `품명: 산업용 세정액`을 보이지만 위험 표지 칸은 `W`와 `부식`으로 남아 있다.",
+      "text": "접수 화면의 적하목록 행은 `품명: 산업용 세정액`을 보이고, 같은 행의 표지 칸에는 `W`와 `부식`이 따로 남아 있다.",
       "exposure": {
         "visible_from": null,
         "extra_condition": null
@@ -79,7 +79,7 @@
       "time": "20:50",
       "surface": "document",
       "place_id": "p2",
-      "text": "출하 전표 조회가 유재승의 말보다 이른 출발 시각과 다른 출하지명을 띄운다.",
+      "text": "출하 전표 조회가 `출발 18:10`과 `서해정밀 2문`을 띄우고, 유재승은 세척장 임시 출고였다고 말한다.",
       "exposure": {
         "visible_from": null,
         "extra_condition": null
@@ -95,7 +95,7 @@
       "time": "20:52",
       "surface": "document",
       "place_id": "p2",
-      "text": "야간 위험물 요율표에서 같은 표지 조합은 할증과 도심 통행 제한 대상이라고 표시된다.",
+      "text": "야간 요율표에서 `W/부식` 조합 행의 할증 칸과 통행 제한 칸에 붉은 점이 찍혀 있다.",
       "exposure": {
         "visible_from": null,
         "extra_condition": null
@@ -148,7 +148,7 @@
       "time": "21:03",
       "surface": "document",
       "place_id": "p2",
-      "text": "유해물질 조회 화면은 닳은 표지 조합과 출하지를 묶어 `물 접촉 시 유독 기체 발생` 경고를 띄운다.",
+      "text": "유해물질 조회 화면의 후보표에서 닳은 표지 조합과 서해정밀 출하지가 같은 행에 놓이고, 그 옆에 물방울 금지 그림과 회색 기체 그림이 붙어 있다.",
       "exposure": {
         "visible_from": "21:03",
         "extra_condition": null
@@ -254,7 +254,7 @@
       "time": "21:23",
       "surface": "document",
       "place_id": "p3",
-      "text": "배수 도면은 야적장 남쪽 배수로가 폐쇄된 유수분리조를 우회해 하단빌라 우수관으로 내려가는 선을 보인다.",
+      "text": "배수 도면은 야적장 남쪽 배수로가 폐쇄 표시가 붙은 유수분리조 옆을 지나 `HDB 우수관` 선으로 이어지는 것을 보인다.",
       "exposure": {
         "visible_from": "21:23",
         "extra_condition": null
@@ -270,7 +270,7 @@
       "time": "21:27",
       "surface": "call",
       "place_id": "p1",
-      "text": "남기표가 “예전에는 분리조를 거쳤는데 공사 뒤로 남쪽 맨홀로 바로 빠졌습니다”라고 낮춰 말한다.",
+      "text": "남기표가 “예전에는 분리조를 거쳤는데 공사 뒤로 남쪽 맨홀 번호를 새로 불렀습니다”라고 낮춰 말한다.",
       "exposure": {
         "visible_from": "21:27",
         "extra_condition": null
