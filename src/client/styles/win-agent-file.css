@@ -136,7 +136,7 @@
 
 /* 인수인계 사항 — four stable slot addresses, one paragraph on the page. */
 .slots{margin-top:var(--space-8);font-family:var(--prose);font-size:var(--fs-12);
-  line-height:1.72;color:var(--surface-text);text-align:justify;word-break:keep-all}
+  line-height:1.72;color:var(--surface-text);text-align:left;word-break:keep-all}
 
 .handover-para{min-height:74px;padding:var(--space-9) var(--space-12);
   border-left:2px solid var(--surface-rule);background:var(--ink-2)}
@@ -165,6 +165,7 @@
   background:transparent;border:1px dashed transparent;line-height:0}
 .slot-blank .slot-target{cursor:pointer}
 .slot-blank .slot-target:focus-visible{border-color:var(--warning);outline:1px solid var(--warning)}
+.slots.droppable .handover-para{border-left-color:var(--signal);background:var(--ink-3)}
 .slot-blank.droppable .slot-empty{border-color:var(--signal);background:var(--ink-3)}
 
 .deploy-zone{margin-top:var(--space-10);margin-bottom:var(--space-10);

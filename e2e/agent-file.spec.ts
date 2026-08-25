@@ -16,11 +16,10 @@
 //
 // The suite drives the window through `window.__agentFile` (the `window.__shell`
 // precedent) rather than through the block store, so it never blocks on u4s:
-// `index()` seeds the id→Sentence map, `pick()` arms the pick channel a slot
-// click/keypress consumes, and `place`/`clear` delegate to the same SlotBoard
-// the mouse does. Nothing here asserts fixture CONTENT (C3) — the block ids are
-// the frozen authored grammar, the clock band is read out of the pack at
-// runtime, and every other literal is design-target document art.
+// `index()` seeds the id→Sentence map, and `place`/`clear` delegate to the same
+// SlotBoard the mouse does. Nothing here asserts fixture CONTENT (C3) — the
+// block ids are the frozen authored grammar, the clock band is read out of the
+// pack at runtime, and every other literal is design-target document art.
 //
 // It must pass against BOTH servers (dev today, `npm run preview` once u11
 // re-points `playwright.config.ts` per C5) — nothing below assumes a dev server.
@@ -142,12 +141,6 @@ async function place(page: Page, id: string, slot: number): Promise<void> {
     },
     { id, slot },
   )
-}
-
-async function pick(page: Page, id: string | null): Promise<void> {
-  await page.evaluate((blockId) => {
-    ;(window as unknown as Handles).__agentFile!.pick(blockId)
-  }, id)
 }
 
 /** The driver's own view of what the file deployed — through `window.__shell`. */
@@ -286,7 +279,7 @@ test.describe('dossier sections', () => {
         const s = getComputedStyle(n as HTMLElement)
         return { display: s.display, minHeight: s.minHeight, text: s.textAlign }
       }),
-    ).toEqual({ display: 'block', minHeight: '74px', text: 'justify' })
+    ).toEqual({ display: 'block', minHeight: '74px', text: 'left' })
 
     // Two seated out of order: one paragraph carries both, in slot order, and
     // the two empty addresses remain for the next sentences.
@@ -564,10 +557,10 @@ test.describe('a11y membrane ops', () => {
     expect(editable).toBe(0)
   })
 
-  // x11 — RE-AIMED for four slot rows. The rule is unchanged: the file's
-  // controls walk in DOM order and end on DEPLOY. Both empty and mixed states
-  // are walked so blanks and releases prove the same slot sequence.
-  test('[u4#c6] (b) Tab walks the slots then the deploy button, in DOM order', async ({ page }) => {
+  // #182 — blank slot targets stay marked for the membrane/drop path, but they
+  // are no longer a keyboard route. REPORTS Enter/Space mines and seats in one
+  // gesture, so AGENT FILE's Tab order walks only visible release controls.
+  test('[u4#c6] (b) Tab skips blank slots and walks visible controls in DOM order', async ({ page }) => {
     await boot(page)
     await page.locator(`${FILE} .pg-nav .pg-turn`).last().click()
     await seed(page)
@@ -581,25 +574,26 @@ test.describe('a11y membrane ops', () => {
       return seen
     }
 
-    // Empty: four blanks, then the button.
+    // Empty: blank slot targets are not Tab stops.
     await slot(page, 0).locator('.slot-target').focus()
-    expect(await walk(4)).toEqual([
+    expect(await walk(1)).toEqual([
       'slot-target@0',
-      'slot-target@1',
-      'slot-target@2',
-      'slot-target@3',
       '#btnDeploy',
     ])
+    expect(
+      await page.locator(`${FILE} .slot-target`).evaluateAll((nodes) =>
+        nodes.map((n) => n.getAttribute('tabindex')),
+      ),
+    ).toEqual(Array.from({ length: CAP }, () => '-1'))
 
     // Written out of order — seats 1 and 3 — and the walk still follows the
     // slot rows, not the order they were seated in.
     await place(page, SEEDS[0].id, 3)
     await place(page, SEEDS[1].id, 1)
     await slot(page, 0).locator('.slot-target').focus()
-    expect(await walk(4)).toEqual([
+    expect(await walk(3)).toEqual([
       'slot-target@0',
       'slot-unset@1',
-      'slot-target@2',
       'slot-unset@3',
       '#btnDeploy',
     ])
@@ -625,31 +619,22 @@ test.describe('a11y membrane ops', () => {
     expect(unnamed).toEqual([])
   })
 
-  // x11 — both keys still drive both ops on a named slot row: Enter seats,
-  // Enter releases, Space seats, Space releases.
-  test('[u4#c6] (d) Enter and Space slot, unslot and deploy — keyboard alone', async ({ page }) => {
+  // x11 — both keys still drive release on a named slot row. Slotting by
+  // keyboard now lives on REPORTS' mine keydown path (acceptance #5), because
+  // one activation tears the sentence out and seats it in the first free slot.
+  test('[u4#c6] (d) Enter and Space unslot filled handover sentences', async ({ page }) => {
     await boot(page)
     await page.locator(`${FILE} .pg-nav .pg-turn`).last().click()
     await seed(page)
-    const slot0Target = slot(page, 0).locator('.slot-target')
-
-    // Enter places the armed pick into the focused seat.
-    await pick(page, SEEDS[0].id)
-    await slot0Target.focus()
-    await page.keyboard.press('Enter')
-    await expect(slot(page, 0)).toHaveAttribute('data-block-id', SEEDS[0].id)
-    await expect(page.locator('#slotCount')).toHaveText('1 / 4')
+    await place(page, SEEDS[0].id, 0)
 
     // Enter releases it, and the empty slot row stays in place.
     await slot(page, 0).locator('.slot-unset').focus()
     await page.keyboard.press('Enter')
     await expect(page.locator(`${FILE} .slots`)).toHaveAttribute('data-state', 'empty')
-    await expect(slot0Target).toHaveCount(1)
+    await expect(slot(page, 0).locator('.slot-target')).toHaveCount(1)
 
-    // Space places the next one.
-    await pick(page, SEEDS[1].id)
-    await slot0Target.focus()
-    await page.keyboard.press('Space')
+    await place(page, SEEDS[1].id, 0)
     await expect(slot(page, 0)).toHaveAttribute('data-block-id', SEEDS[1].id)
 
     // Space releases it too.
@@ -662,9 +647,7 @@ test.describe('a11y membrane ops', () => {
     await boot(page)
     await page.locator(`${FILE} .pg-nav .pg-turn`).last().click()
     await seed(page)
-    await pick(page, SEEDS[0].id)
-    await slot(page, 0).locator('.slot-target').focus()
-    await page.keyboard.press('Enter')
+    await place(page, SEEDS[0].id, 0)
     await expect(page.locator('#slotCount')).toHaveText('1 / 4')
 
     await page.locator('#btnDeploy').focus()

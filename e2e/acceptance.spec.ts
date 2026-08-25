@@ -324,7 +324,8 @@ test.describe('acceptance 1-7', () => {
     const secondId = await second.getAttribute('data-sentence-id')
     const secondText = await second.textContent()
     expect(secondId, 'the second mineable sentence carries no data-sentence-id').toBeTruthy()
-    await second.click()
+    await second.focus()
+    await page.keyboard.press('Enter')
 
     await expect(page.locator(`${FILE.board} .handover-para`)).toHaveCount(1)
     await expect(page.locator(`${FILE.board} .handover-para .bc-text`)).toHaveText([firstText!, secondText!])

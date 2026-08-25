@@ -374,6 +374,8 @@ export function createSlotBoard(options: SlotBoardOptions): SlotBoard {
     }
 
     const target = button('slot-empty slot-target', `슬롯 ${no}에 배치`, '')
+    target.tabIndex = -1
+    target.setAttribute('aria-hidden', 'true')
     // The `slot` op's control, marked for the PRD §4 membrane census.
     target.dataset.op = 'slot'
     node.append(target)
@@ -397,6 +399,11 @@ export function createSlotBoard(options: SlotBoardOptions): SlotBoard {
     })
 
     return node
+  }
+
+  function firstOpenSlot(): number | null {
+    const slot = slots.findIndex((blockId) => blockId === null)
+    return slot < 0 ? null : slot
   }
 
   function render(): void {
@@ -436,6 +443,25 @@ export function createSlotBoard(options: SlotBoardOptions): SlotBoard {
 
     root.replaceChildren(paragraph)
   }
+
+  root.addEventListener('dragover', (event) => {
+    if (deployed || firstOpenSlot() === null) return
+    event.preventDefault()
+    root.classList.add('droppable')
+  })
+  root.addEventListener('dragleave', (event) => {
+    if (event.relatedTarget instanceof Node && root.contains(event.relatedTarget)) return
+    root.classList.remove('droppable')
+  })
+  root.addEventListener('drop', (event) => {
+    event.preventDefault()
+    root.classList.remove('droppable')
+    if (deployed) return
+    const slot = firstOpenSlot()
+    if (slot === null) return
+    const dropped = event.dataTransfer?.getData('text/plain') ?? ''
+    if (dropped.length > 0) apply({ kind: 'place', blockId: dropped, slot })
+  })
 
   /**
    * H3 — the reveal's own state, and it is DRAWING state, never membrane state.
