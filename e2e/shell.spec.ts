@@ -26,6 +26,10 @@
 // block below), so the terminal stamp is now pinned only where it is a FACT
 // about the pack — `tests/driver/shipped-pack.test.ts`, which plays the pack
 // this file names and derives the band from its own `meta.json`.
+import fs from 'node:fs'
+import path from 'node:path'
+import { fileURLToPath } from 'node:url'
+
 import { expect, test } from 'playwright/test'
 import type { Locator, Page } from 'playwright/test'
 import { hideDebugPane } from './fixtures/dev-surface.ts'
@@ -39,6 +43,25 @@ const WINDOWS = [
 ] as const
 
 const VIEWPORT = { width: 1280, height: 800 }
+
+interface ScenarioIndexFixture {
+  packs: readonly {
+    slug: string
+    role: string
+    order: number
+  }[]
+}
+
+const ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..')
+const SCENARIO_INDEX = JSON.parse(
+  fs.readFileSync(path.join(ROOT, 'data/scenario/index.json'), 'utf8'),
+) as ScenarioIndexFixture
+const PLAYABLE_SCENARIO_SLUGS = SCENARIO_INDEX.packs
+  .filter((pack) => pack.role === 'tutorial' || pack.role === 'practice')
+  .sort((a, b) => a.order - b.order)
+  .map((pack) => pack.slug)
+
+if (PLAYABLE_SCENARIO_SLUGS.length === 0) throw new Error('scenario index has no playable packs')
 
 interface Rect {
   x: number
@@ -643,13 +666,14 @@ test.describe('topbar', () => {
   })
 
   test('topbar — confirming abort resets and returns to the scenario desktop', async ({ page }) => {
-    await page.evaluate(() => {
-      window.sessionStorage.setItem('ndsp:scenario:selected:v1', '멈춘회전문')
+    const selectedSlug = PLAYABLE_SCENARIO_SLUGS[0]!
+    await page.evaluate(({ playableSlugs, selected }) => {
+      window.sessionStorage.setItem('ndsp:scenario:selected:v1', selected)
       window.sessionStorage.setItem('ndsp:meta:v1', 'stale')
-      window.sessionStorage.setItem('dday.meta.멈춘회전문', 'stale')
-      window.sessionStorage.setItem('dday.meta.stamp.멈춘회전문', 'stale')
-      window.localStorage.setItem('ndsp:scenario:unlocked:v1', JSON.stringify(['멈춘회전문']))
-    })
+      window.sessionStorage.setItem(`dday.meta.${selected}`, 'stale')
+      window.sessionStorage.setItem(`dday.meta.stamp.${selected}`, 'stale')
+      window.localStorage.setItem('ndsp:scenario:unlocked:v1', JSON.stringify(playableSlugs))
+    }, { playableSlugs: PLAYABLE_SCENARIO_SLUGS, selected: selectedSlug })
 
     await page.locator('#abortMission').click()
     await Promise.all([
@@ -660,15 +684,16 @@ test.describe('topbar', () => {
     await hideDebugPane(page)
 
     await expect(page.locator('#abortMission')).toBeVisible()
-    await expect(page.locator('.scenario-file')).toHaveCount(1)
+    await expect(page.locator('.scenario-file')).toHaveCount(PLAYABLE_SCENARIO_SLUGS.length)
+    await expect(page.locator('.scenario-file[disabled]')).toHaveCount(0)
     for (const w of WINDOWS) await expect(win(page, w.id)).toBeHidden()
 
     const stored = await page.evaluate(() => Object.fromEntries(Object.entries(window.sessionStorage)))
     expect(stored['ndsp:scenario:selected:v1']).toBeUndefined()
     expect(stored['ndsp:scenario:return-desktop:v1']).toBeUndefined()
     expect(stored['ndsp:meta:v1']).not.toBe('stale')
-    expect(stored['dday.meta.멈춘회전문']).not.toBe('stale')
-    expect(stored['dday.meta.stamp.멈춘회전문']).not.toBe('stale')
+    expect(stored[`dday.meta.${selectedSlug}`]).not.toBe('stale')
+    expect(stored[`dday.meta.stamp.${selectedSlug}`]).not.toBe('stale')
   })
 
   test('topbar — desktop dressing and live-region hosts are present', async ({ page }) => {
