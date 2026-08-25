@@ -6,6 +6,13 @@
       "role": "tutorial",
       "order": 0,
       "difficulty": "tutorial"
+    },
+    {
+      "slug": "새는탱크로리",
+      "display_name": "새는 탱크로리",
+      "role": "practice",
+      "order": 1,
+      "difficulty": "2"
     }
   ]
 }

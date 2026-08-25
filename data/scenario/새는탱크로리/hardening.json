@@ -1,0 +1,314 @@
+{
+  "characters": {
+    "c1": {
+      "m1": {
+        "variable": "supervisor_minimization",
+        "initial": 60
+      },
+      "m2": {
+        "variable": "supervisor_protection",
+        "initial": 35
+      }
+    },
+    "c2": {
+      "m1": {
+        "variable": "driver_concealment",
+        "initial": 70
+      },
+      "m2": {
+        "variable": "driver_resistance",
+        "initial": 60
+      }
+    },
+    "c3": {
+      "m1": {
+        "variable": "resident_signal",
+        "initial": 50
+      },
+      "m2": {
+        "variable": "resident_persistence",
+        "initial": 65
+      }
+    }
+  },
+  "timeline": {
+    "t1": {
+      "time": "20:40",
+      "text_head": "남기표가 탱크로리 하부",
+      "effects": {},
+      "present": [
+        {
+          "char_id": "c1",
+          "side": "line"
+        }
+      ]
+    },
+    "t2": {
+      "time": "20:43",
+      "text_head": "탱크 옆면 위험 표지 ",
+      "effects": {},
+      "present": []
+    },
+    "t3": {
+      "time": "20:45",
+      "text_head": "접수 화면의 적하목록 ",
+      "effects": {},
+      "present": []
+    },
+    "t4": {
+      "time": "20:48",
+      "text_head": "유재승이 “세척장에서 ",
+      "effects": {},
+      "present": [
+        {
+          "char_id": "c2",
+          "side": "line"
+        }
+      ]
+    },
+    "t5": {
+      "time": "20:50",
+      "text_head": "출하 전표 조회가 유재",
+      "effects": {},
+      "present": []
+    },
+    "t6": {
+      "time": "20:52",
+      "text_head": "야간 위험물 요율표에서",
+      "effects": {},
+      "present": []
+    },
+    "t7": {
+      "time": "20:55",
+      "text_head": "남기표가 “목록에 세정",
+      "effects": {},
+      "present": [
+        {
+          "char_id": "c1",
+          "side": "line"
+        }
+      ]
+    },
+    "t8": {
+      "time": "21:00",
+      "text_head": "터미널 직원이 호스를 ",
+      "effects": {},
+      "present": []
+    },
+    "t9": {
+      "time": "21:03",
+      "text_head": "유해물질 조회 화면은 ",
+      "effects": {},
+      "present": []
+    },
+    "t10": {
+      "time": "21:06",
+      "text_head": "초동 세척수가 새는 줄",
+      "effects": {},
+      "present": []
+    },
+    "t11": {
+      "time": "21:09",
+      "text_head": "유재승이 “물은 조금만",
+      "effects": {},
+      "present": [
+        {
+          "char_id": "c2",
+          "side": "line"
+        }
+      ]
+    },
+    "t12": {
+      "time": "21:12",
+      "text_head": "배수현이 빗물받이에서 ",
+      "effects": {},
+      "present": [
+        {
+          "char_id": "c3",
+          "side": "line"
+        }
+      ]
+    },
+    "t13": {
+      "time": "21:16",
+      "text_head": "세척반 선두가 물막이판",
+      "effects": {},
+      "present": []
+    },
+    "t14": {
+      "time": "21:20",
+      "text_head": "시설대장은 유수분리조를",
+      "effects": {},
+      "present": []
+    },
+    "t15": {
+      "time": "21:23",
+      "text_head": "배수 도면은 야적장 남",
+      "effects": {},
+      "present": []
+    },
+    "t16": {
+      "time": "21:27",
+      "text_head": "남기표가 “예전에는 분",
+      "effects": {},
+      "present": [
+        {
+          "char_id": "c1",
+          "side": "line"
+        }
+      ]
+    },
+    "t17": {
+      "time": "21:31",
+      "text_head": "빌라 앞 맨홀 틈에서 ",
+      "effects": {},
+      "present": []
+    },
+    "t18": {
+      "time": "21:35",
+      "text_head": "배수현이 “지하층 방마",
+      "effects": {},
+      "present": [
+        {
+          "char_id": "c3",
+          "side": "line"
+        }
+      ]
+    },
+    "t19": {
+      "time": "21:39",
+      "text_head": "통장과 경비원이 초인종",
+      "effects": {},
+      "present": [
+        {
+          "char_id": "c3",
+          "side": "room"
+        }
+      ]
+    },
+    "t20": {
+      "time": "21:48",
+      "text_head": "물길을 따라 반응한 기",
+      "effects": {},
+      "present": []
+    },
+    "t21": {
+      "time": "22:05",
+      "text_head": "늦게 열린 지하 세대에",
+      "effects": {},
+      "present": []
+    },
+    "t22": {
+      "time": "22:34",
+      "text_head": "병원 수용 현황판이 야",
+      "effects": {},
+      "present": []
+    },
+    "t23": {
+      "time": "23:10+",
+      "text_head": "현장 지휘가 누출은 멈",
+      "effects": {},
+      "present": []
+    }
+  },
+  "symptoms": {
+    "supervisor_minimization": {
+      "up": [
+        {
+          "min": 1,
+          "text": "{who}의 말이 장부 첫줄 쪽으로 더 짧아진다."
+        }
+      ],
+      "down": [
+        {
+          "min": 1,
+          "text": "{who}가 표지와 전표의 어긋남을 인정한다."
+        }
+      ]
+    },
+    "supervisor_protection": {
+      "up": [
+        {
+          "min": 1,
+          "text": "{who}가 작업자를 뒤로 물리자는 말에 힘을 싣는다."
+        }
+      ],
+      "down": [
+        {
+          "min": 1,
+          "text": "{who}가 작업자 보호 이야기를 삼킨다."
+        }
+      ]
+    },
+    "driver_concealment": {
+      "up": [
+        {
+          "min": 1,
+          "text": "{who}가 출하지 이야기를 더 세게 눌러 둔다."
+        }
+      ],
+      "down": [
+        {
+          "min": 1,
+          "text": "{who}가 운송 기록을 더는 밀어내지 못한다."
+        }
+      ]
+    },
+    "driver_resistance": {
+      "up": [
+        {
+          "min": 1,
+          "text": "{who}가 호스를 치우지 말라며 버틴다."
+        }
+      ],
+      "down": [
+        {
+          "min": 1,
+          "text": "{who}가 흡착재 투입에 더 맞서지 못한다."
+        }
+      ]
+    },
+    "resident_signal": {
+      "up": [
+        {
+          "min": 1,
+          "text": "{who}의 골목 보고가 상황판 앞쪽으로 올라온다."
+        }
+      ],
+      "down": [
+        {
+          "min": 1,
+          "text": "{who}의 신고가 통제선 안쪽 소음에 묻힌다."
+        }
+      ]
+    },
+    "resident_persistence": {
+      "up": [
+        {
+          "min": 1,
+          "text": "{who}가 낮은 세대를 깨우는 일을 포기하지 않는다."
+        }
+      ],
+      "down": [
+        {
+          "min": 1,
+          "text": "{who}의 통화가 현장 안쪽 요청 뒤로 밀린다."
+        }
+      ]
+    },
+    "flags": {
+      "suspicious_manifest": {
+        "set": "표지와 전표가 적하목록보다 앞에 놓인다.",
+        "unset": null
+      },
+      "dry_containment": {
+        "set": "호스 대신 모래와 흡착재가 밸브 아래를 감싼다.",
+        "unset": null
+      },
+      "downstream_evacuation": {
+        "set": "낮은 주거지로 대피 전파가 먼저 내려간다.",
+        "unset": null
+      }
+    }
+  }
+}

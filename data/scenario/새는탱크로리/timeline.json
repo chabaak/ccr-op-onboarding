@@ -1,0 +1,412 @@
+{
+  "events": [
+    {
+      "id": "t1",
+      "time": "20:40",
+      "surface": "call",
+      "place_id": "p1",
+      "text": "남기표가 탱크로리 하부에서 젖은 줄이 번진다고 신고하며 적하목록의 세정제명을 그대로 읽는다.",
+      "exposure": {
+        "visible_from": null,
+        "extra_condition": null
+      },
+      "effects": {
+        "deltas": {},
+        "flags": {}
+      },
+      "present": [
+        {
+          "char_id": "c1",
+          "side": "line"
+        }
+      ]
+    },
+    {
+      "id": "t2",
+      "time": "20:43",
+      "surface": "cctv",
+      "place_id": "p1",
+      "text": "탱크 옆면 위험 표지 두 칸이 닳아 있고, 남은 기호가 적하목록 품명과 맞지 않는다.",
+      "exposure": {
+        "visible_from": null,
+        "extra_condition": null
+      },
+      "effects": {
+        "deltas": {},
+        "flags": {}
+      },
+      "present": []
+    },
+    {
+      "id": "t3",
+      "time": "20:45",
+      "surface": "document",
+      "place_id": "p2",
+      "text": "접수 화면의 적하목록 행은 `품명: 산업용 세정액`을 보이지만 위험 표지 칸은 `W`와 `부식`으로 남아 있다.",
+      "exposure": {
+        "visible_from": null,
+        "extra_condition": null
+      },
+      "effects": {
+        "deltas": {},
+        "flags": {}
+      },
+      "present": []
+    },
+    {
+      "id": "t4",
+      "time": "20:48",
+      "surface": "call",
+      "place_id": "p1",
+      "text": "유재승이 “세척장에서 쓰는 약품일 뿐입니다. 물로 밀면 끝납니다”라고 말한다.",
+      "exposure": {
+        "visible_from": null,
+        "extra_condition": null
+      },
+      "effects": {
+        "deltas": {},
+        "flags": {}
+      },
+      "present": [
+        {
+          "char_id": "c2",
+          "side": "line"
+        }
+      ]
+    },
+    {
+      "id": "t5",
+      "time": "20:50",
+      "surface": "document",
+      "place_id": "p2",
+      "text": "출하 전표 조회가 유재승의 말보다 이른 출발 시각과 다른 출하지명을 띄운다.",
+      "exposure": {
+        "visible_from": null,
+        "extra_condition": null
+      },
+      "effects": {
+        "deltas": {},
+        "flags": {}
+      },
+      "present": []
+    },
+    {
+      "id": "t6",
+      "time": "20:52",
+      "surface": "document",
+      "place_id": "p2",
+      "text": "야간 위험물 요율표에서 같은 표지 조합은 할증과 도심 통행 제한 대상이라고 표시된다.",
+      "exposure": {
+        "visible_from": null,
+        "extra_condition": null
+      },
+      "effects": {
+        "deltas": {},
+        "flags": {}
+      },
+      "present": []
+    },
+    {
+      "id": "t7",
+      "time": "20:55",
+      "surface": "call",
+      "place_id": "p1",
+      "text": "남기표가 “목록에 세정액이면 일반 유출 아닙니까. 차단띠만 치고 씻기면 됩니다”라고 재촉한다.",
+      "exposure": {
+        "visible_from": null,
+        "extra_condition": null
+      },
+      "effects": {
+        "deltas": {},
+        "flags": {}
+      },
+      "present": [
+        {
+          "char_id": "c1",
+          "side": "line"
+        }
+      ]
+    },
+    {
+      "id": "t8",
+      "time": "21:00",
+      "surface": "onsite",
+      "place_id": "p1",
+      "text": "터미널 직원이 호스를 끌어오고, 바닥에 닿은 물방울 가장자리가 하얗게 끓어오른다.",
+      "exposure": {
+        "visible_from": "21:00",
+        "extra_condition": null
+      },
+      "effects": {
+        "deltas": {},
+        "flags": {}
+      },
+      "present": []
+    },
+    {
+      "id": "t9",
+      "time": "21:03",
+      "surface": "document",
+      "place_id": "p2",
+      "text": "유해물질 조회 화면은 닳은 표지 조합과 출하지를 묶어 `물 접촉 시 유독 기체 발생` 경고를 띄운다.",
+      "exposure": {
+        "visible_from": "21:03",
+        "extra_condition": null
+      },
+      "effects": {
+        "deltas": {},
+        "flags": {}
+      },
+      "present": []
+    },
+    {
+      "id": "t10",
+      "time": "21:06",
+      "surface": "onsite",
+      "place_id": "p1",
+      "text": "초동 세척수가 새는 줄에 닿자 낮게 깔린 흰 김이 회색으로 짙어지고 작업등 아래로 밀린다.",
+      "exposure": {
+        "visible_from": "21:06",
+        "extra_condition": null
+      },
+      "effects": {
+        "deltas": {},
+        "flags": {}
+      },
+      "present": []
+    },
+    {
+      "id": "t11",
+      "time": "21:09",
+      "surface": "call",
+      "place_id": "p1",
+      "text": "유재승이 “물은 조금만 쓰면 됩니다. 모래를 부으면 탱크 아래를 못 봅니다”라고 버틴다.",
+      "exposure": {
+        "visible_from": "21:09",
+        "extra_condition": null
+      },
+      "effects": {
+        "deltas": {},
+        "flags": {}
+      },
+      "present": [
+        {
+          "char_id": "c2",
+          "side": "line"
+        }
+      ]
+    },
+    {
+      "id": "t12",
+      "time": "21:12",
+      "surface": "call",
+      "place_id": "p4",
+      "text": "배수현이 빗물받이에서 독한 락스 냄새가 올라오고 눈이 따갑다고 말한다.",
+      "exposure": {
+        "visible_from": "21:12",
+        "extra_condition": null
+      },
+      "effects": {
+        "deltas": {},
+        "flags": {}
+      },
+      "present": [
+        {
+          "char_id": "c3",
+          "side": "line"
+        }
+      ]
+    },
+    {
+      "id": "t13",
+      "time": "21:16",
+      "surface": "onsite",
+      "place_id": "p1",
+      "text": "세척반 선두가 물막이판 없이 배수구 쪽으로 거품을 몰고, 한 명이 기침하며 뒤로 물러난다.",
+      "exposure": {
+        "visible_from": "21:16",
+        "extra_condition": "not dry_containment"
+      },
+      "effects": {
+        "deltas": {},
+        "flags": {}
+      },
+      "present": []
+    },
+    {
+      "id": "t14",
+      "time": "21:20",
+      "surface": "document",
+      "place_id": "p3",
+      "text": "시설대장은 유수분리조를 정상 장비로 올려 두었지만 최근 점검란은 비어 있다.",
+      "exposure": {
+        "visible_from": "21:20",
+        "extra_condition": null
+      },
+      "effects": {
+        "deltas": {},
+        "flags": {}
+      },
+      "present": []
+    },
+    {
+      "id": "t15",
+      "time": "21:23",
+      "surface": "document",
+      "place_id": "p3",
+      "text": "배수 도면은 야적장 남쪽 배수로가 폐쇄된 유수분리조를 우회해 하단빌라 우수관으로 내려가는 선을 보인다.",
+      "exposure": {
+        "visible_from": "21:23",
+        "extra_condition": null
+      },
+      "effects": {
+        "deltas": {},
+        "flags": {}
+      },
+      "present": []
+    },
+    {
+      "id": "t16",
+      "time": "21:27",
+      "surface": "call",
+      "place_id": "p1",
+      "text": "남기표가 “예전에는 분리조를 거쳤는데 공사 뒤로 남쪽 맨홀로 바로 빠졌습니다”라고 낮춰 말한다.",
+      "exposure": {
+        "visible_from": "21:27",
+        "extra_condition": null
+      },
+      "effects": {
+        "deltas": {},
+        "flags": {}
+      },
+      "present": [
+        {
+          "char_id": "c1",
+          "side": "line"
+        }
+      ]
+    },
+    {
+      "id": "t17",
+      "time": "21:31",
+      "surface": "cctv",
+      "place_id": "p4",
+      "text": "빌라 앞 맨홀 틈에서 낮은 안개가 밀려 나오고, 편의점 불빛 아래로 아래쪽 골목에 고인다.",
+      "exposure": {
+        "visible_from": "21:31",
+        "extra_condition": null
+      },
+      "effects": {
+        "deltas": {},
+        "flags": {}
+      },
+      "present": []
+    },
+    {
+      "id": "t18",
+      "time": "21:35",
+      "surface": "call",
+      "place_id": "p4",
+      "text": "배수현이 “지하층 방마다 불이 꺼져 있고, 잠든 어르신들이 많습니다”라고 말한다.",
+      "exposure": {
+        "visible_from": "21:35",
+        "extra_condition": null
+      },
+      "effects": {
+        "deltas": {},
+        "flags": {}
+      },
+      "present": [
+        {
+          "char_id": "c3",
+          "side": "line"
+        }
+      ]
+    },
+    {
+      "id": "t19",
+      "time": "21:39",
+      "surface": "onsite",
+      "place_id": "p4",
+      "text": "통장과 경비원이 초인종을 누르지만 가장 낮은 동 현관은 이미 눈 따가운 공기로 차 있다.",
+      "exposure": {
+        "visible_from": "21:39",
+        "extra_condition": "not downstream_evacuation"
+      },
+      "effects": {
+        "deltas": {},
+        "flags": {}
+      },
+      "present": [
+        {
+          "char_id": "c3",
+          "side": "room"
+        }
+      ]
+    },
+    {
+      "id": "t20",
+      "time": "21:48",
+      "surface": "onsite",
+      "place_id": "p1",
+      "text": "물길을 따라 반응한 기체가 야적장 울타리 안쪽 낮은 곳에도 고이고, 세척반 둘이 들것에 실린다.",
+      "exposure": {
+        "visible_from": "21:48",
+        "extra_condition": "not dry_containment"
+      },
+      "effects": {
+        "deltas": {},
+        "flags": {}
+      },
+      "present": []
+    },
+    {
+      "id": "t21",
+      "time": "22:05",
+      "surface": "onsite",
+      "place_id": "p4",
+      "text": "늦게 열린 지하 세대에서 잠든 주민이 잇따라 발견되고, 구급대가 계단을 오르내린다.",
+      "exposure": {
+        "visible_from": "22:05",
+        "extra_condition": "not downstream_evacuation"
+      },
+      "effects": {
+        "deltas": {},
+        "flags": {}
+      },
+      "present": []
+    },
+    {
+      "id": "t22",
+      "time": "22:34",
+      "surface": "document",
+      "place_id": "p2",
+      "text": "병원 수용 현황판이 야적장 야간 인원, 세척반, 하단빌라 주민을 따로 묶어 적색 칸을 늘린다.",
+      "exposure": {
+        "visible_from": "22:34",
+        "extra_condition": "not downstream_evacuation"
+      },
+      "effects": {
+        "deltas": {},
+        "flags": {}
+      },
+      "present": []
+    },
+    {
+      "id": "t23",
+      "time": "23:10+",
+      "surface": "call",
+      "place_id": "p2",
+      "text": "현장 지휘가 누출은 멈췄지만 물길을 탄 노출은 끝까지 되돌리지 못했다고 보고한다.",
+      "exposure": {
+        "visible_from": "23:10+",
+        "extra_condition": "not dry_containment"
+      },
+      "effects": {
+        "deltas": {},
+        "flags": {}
+      },
+      "present": []
+    }
+  ]
+}

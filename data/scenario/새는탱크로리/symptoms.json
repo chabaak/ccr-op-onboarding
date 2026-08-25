@@ -1,0 +1,100 @@
+{
+  "supervisor_minimization": {
+    "up": [
+      {
+        "min": 1,
+        "text": "{who}의 말이 장부 첫줄 쪽으로 더 짧아진다."
+      }
+    ],
+    "down": [
+      {
+        "min": 1,
+        "text": "{who}가 표지와 전표의 어긋남을 인정한다."
+      }
+    ]
+  },
+  "supervisor_protection": {
+    "up": [
+      {
+        "min": 1,
+        "text": "{who}가 작업자를 뒤로 물리자는 말에 힘을 싣는다."
+      }
+    ],
+    "down": [
+      {
+        "min": 1,
+        "text": "{who}가 작업자 보호 이야기를 삼킨다."
+      }
+    ]
+  },
+  "driver_concealment": {
+    "up": [
+      {
+        "min": 1,
+        "text": "{who}가 출하지 이야기를 더 세게 눌러 둔다."
+      }
+    ],
+    "down": [
+      {
+        "min": 1,
+        "text": "{who}가 운송 기록을 더는 밀어내지 못한다."
+      }
+    ]
+  },
+  "driver_resistance": {
+    "up": [
+      {
+        "min": 1,
+        "text": "{who}가 호스를 치우지 말라며 버틴다."
+      }
+    ],
+    "down": [
+      {
+        "min": 1,
+        "text": "{who}가 흡착재 투입에 더 맞서지 못한다."
+      }
+    ]
+  },
+  "resident_signal": {
+    "up": [
+      {
+        "min": 1,
+        "text": "{who}의 골목 보고가 상황판 앞쪽으로 올라온다."
+      }
+    ],
+    "down": [
+      {
+        "min": 1,
+        "text": "{who}의 신고가 통제선 안쪽 소음에 묻힌다."
+      }
+    ]
+  },
+  "resident_persistence": {
+    "up": [
+      {
+        "min": 1,
+        "text": "{who}가 낮은 세대를 깨우는 일을 포기하지 않는다."
+      }
+    ],
+    "down": [
+      {
+        "min": 1,
+        "text": "{who}의 통화가 현장 안쪽 요청 뒤로 밀린다."
+      }
+    ]
+  },
+  "flags": {
+    "suspicious_manifest": {
+      "set": "표지와 전표가 적하목록보다 앞에 놓인다.",
+      "unset": null
+    },
+    "dry_containment": {
+      "set": "호스 대신 모래와 흡착재가 밸브 아래를 감싼다.",
+      "unset": null
+    },
+    "downstream_evacuation": {
+      "set": "낮은 주거지로 대피 전파가 먼저 내려간다.",
+      "unset": null
+    }
+  }
+}

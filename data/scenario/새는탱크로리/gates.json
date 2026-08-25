@@ -1,0 +1,242 @@
+{
+  "gates": [
+    {
+      "gate": "G1",
+      "title": "접수",
+      "clock": "20:55",
+      "place_id": "p1",
+      "availability": null,
+      "scene": "남기표의 신고는 차분하고 익숙하다. 화면 첫 줄도 신고 말을 따라 낮은 위험의 품명을 내민다. 그러나 카메라에 남은 표지와 따로 열린 전표는 같은 차를 다른 물건처럼 말한다.",
+      "branch_note": null,
+      "standard_form": "갈림길 G1에서 기질은 기본 stance a를 낸다. 열쇠 조건 k1을 만족하는 문장 주입 시 b로 이동한다.",
+      "question": "첫 전파에는 어떤 장면을 실어 보내겠습니까",
+      "stances": [
+        {
+          "id": "a",
+          "label": "장부 첫줄로 넘김",
+          "desc": "품명이 낮은 위험으로 보이니 출동을 가볍게 붙인다."
+        },
+        {
+          "id": "b",
+          "label": "화물 불일치로 묶음",
+          "desc": "표지와 전표가 어긋나니 미상 반응성 적재물로 현장을 멈춘다."
+        }
+      ],
+      "default_stance": "a",
+      "key_conditions": [
+        {
+          "id": "k1",
+          "axis": "장부순응",
+          "referent": "탱크로리 적하",
+          "species": "사실",
+          "targets_clause": "기본 성향"
+        }
+      ],
+      "key_examples": [
+        {
+          "for": "k1",
+          "text": "접수 화면의 품명은 산업용 세정액이지만 같은 행의 위험 표지 칸은 물 반응성과 부식을 함께 보인다.",
+          "mined_from": "20:45 문서, 접수 화면 적하목록 행"
+        },
+        {
+          "for": "k1",
+          "text": "출하 전표의 출발 시각과 출하지가 유재승의 첫 진술과 맞지 않는다.",
+          "mined_from": "20:50 문서, 출하 전표 조회"
+        },
+        {
+          "for": "k1",
+          "text": "야간 위험물 요율표가 같은 표지 조합을 할증과 통행 제한 대상으로 묶는다.",
+          "mined_from": "20:52 문서, 위험물 요율표"
+        }
+      ],
+      "predicted_shift": null,
+      "false_leads": [
+        "유재승은 세정제라고 반복하고 남기표는 적하목록 품명만 읽는다."
+      ],
+      "buckets": [
+        {
+          "id": "default",
+          "stances": [
+            "a"
+          ],
+          "deltas": {
+            "supervisor_minimization": 10
+          },
+          "flags": {}
+        },
+        {
+          "id": "live",
+          "stances": [
+            "b"
+          ],
+          "deltas": {
+            "supervisor_minimization": -15,
+            "supervisor_protection": 10
+          },
+          "flags": {
+            "suspicious_manifest": true
+          }
+        }
+      ],
+      "edge_predicates": []
+    },
+    {
+      "gate": "G2",
+      "title": "처치",
+      "clock": "21:15",
+      "place_id": "p1",
+      "availability": null,
+      "scene": "차 밑으로 새는 액체는 아직 작은 줄처럼 보인다. 낮은 위험 액체라면 물로 씻어 내는 판단이 빠르고 그럴듯하다. 문제는 이미 바닥에서, 그리고 골목 빗물받이에서 물을 만난 흔적이 올라오고 있다는 점이다.",
+      "branch_note": null,
+      "standard_form": "갈림길 G2에서 기질은 기본 stance a를 낸다. 열쇠 조건 k1을 만족하는 문장 주입 시 b로 이동한다.",
+      "question": "새는 액체 앞에 무엇을 세우겠습니까",
+      "stances": [
+        {
+          "id": "a",
+          "label": "호스로 밀어냄",
+          "desc": "흘려보내는 편이 낫다고 보고 배수구 쪽으로 보낸다."
+        },
+        {
+          "id": "b",
+          "label": "흡착재로 묶음",
+          "desc": "닿는 액체를 끊고 모래와 흡착재로 밸브 주변을 좁힌다."
+        }
+      ],
+      "default_stance": "a",
+      "key_conditions": [
+        {
+          "id": "k1",
+          "axis": "정석처리신뢰",
+          "referent": "새는 화물",
+          "species": "사실",
+          "targets_clause": "조건절 1"
+        }
+      ],
+      "key_examples": [
+        {
+          "for": "k1",
+          "text": "유해물질 조회 화면은 닳은 표지 조합과 출하지가 맞을 때 물 접촉 유독 기체 경고를 띄운다.",
+          "mined_from": "21:03 문서, 유해물질 조회 화면"
+        },
+        {
+          "for": "k1",
+          "text": "초동 세척수가 새는 줄에 닿은 뒤 흰 김이 회색으로 짙어졌다는 현장 보고가 들어온다.",
+          "mined_from": "21:06 현장, 세척수 접촉 보고"
+        },
+        {
+          "for": "k1",
+          "text": "배수현은 빗물받이에서 독한 락스 냄새와 눈 따가움이 올라온다고 전한다.",
+          "mined_from": "21:12 통화, 하단빌라 골목 신고"
+        }
+      ],
+      "predicted_shift": null,
+      "false_leads": [
+        "일반 유류 유출 표준 대응은 희석과 세척을 먼저 떠올리게 한다."
+      ],
+      "buckets": [
+        {
+          "id": "default",
+          "stances": [
+            "a"
+          ],
+          "deltas": {
+            "driver_resistance": 10
+          },
+          "flags": {}
+        },
+        {
+          "id": "live",
+          "stances": [
+            "b"
+          ],
+          "deltas": {
+            "driver_resistance": -15
+          },
+          "flags": {
+            "dry_containment": true
+          }
+        }
+      ],
+      "edge_predicates": []
+    },
+    {
+      "gate": "G3",
+      "title": "배분",
+      "clock": "21:39",
+      "place_id": "p4",
+      "availability": null,
+      "scene": "누출 지점은 야적장 안에 남아 있고, 사람 눈은 자연히 불빛이 밝은 쪽을 붙든다. 하지만 오래된 시설대장보다 새 도면과 반장의 기억이 더 최근의 물길을 말한다. 담장 아래 동네에서는 맨홀과 지하층이 먼저 반응을 받고 있다.",
+      "branch_note": null,
+      "standard_form": "갈림길 G3에서 기질은 기본 stance a를 낸다. 열쇠 조건 k1을 만족하는 문장 주입 시 b로 이동한다.",
+      "question": "남은 여유를 어느 쪽에 붙이겠습니까",
+      "stances": [
+        {
+          "id": "a",
+          "label": "탱크 주변 유지",
+          "desc": "통제선을 지키며 누출 지점 주변을 더 조인다."
+        },
+        {
+          "id": "b",
+          "label": "아랫동네를 먼저 깨움",
+          "desc": "낮은 주거지로 대피 전파와 문 개방을 보낸다."
+        }
+      ],
+      "default_stance": "a",
+      "key_conditions": [
+        {
+          "id": "k1",
+          "axis": "울타리중심",
+          "referent": "배수로 종착지",
+          "species": "사실",
+          "targets_clause": "조건절 2"
+        }
+      ],
+      "key_examples": [
+        {
+          "for": "k1",
+          "text": "배수 도면은 남쪽 배수로가 폐쇄된 유수분리조를 우회해 하단빌라 우수관으로 내려가는 선을 보인다.",
+          "mined_from": "21:23 문서, 배수 도면"
+        },
+        {
+          "for": "k1",
+          "text": "남기표는 공사 뒤 남쪽 맨홀로 바로 빠졌다고 말한다.",
+          "mined_from": "21:27 통화, 반장 재청취"
+        },
+        {
+          "for": "k1",
+          "text": "하단빌라 CCTV는 맨홀 틈에서 낮은 안개가 올라오는 모습을 보인다.",
+          "mined_from": "21:31 CCTV, 하단빌라 골목 화면"
+        }
+      ],
+      "predicted_shift": null,
+      "false_leads": [
+        "시설대장에는 유수분리조가 정상 장비처럼 남아 있다."
+      ],
+      "buckets": [
+        {
+          "id": "default",
+          "stances": [
+            "a"
+          ],
+          "deltas": {
+            "resident_persistence": -10
+          },
+          "flags": {}
+        },
+        {
+          "id": "live",
+          "stances": [
+            "b"
+          ],
+          "deltas": {
+            "resident_persistence": 15
+          },
+          "flags": {
+            "downstream_evacuation": true
+          }
+        }
+      ],
+      "edge_predicates": []
+    }
+  ]
+}
