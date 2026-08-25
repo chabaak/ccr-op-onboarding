@@ -247,12 +247,9 @@ test.describe('dossier sections', () => {
     await expect(rows.locator('dt').first()).toHaveText('호출부호')
   })
 
-  // x11 — RE-AIMED. The prototype vocabulary is four named handover slots again,
-  // not the paragraph compromise x4 shipped. What matters is not the old box
-  // skin but the four stable rows: each keeps a slot number, empty seats remain
-  // visible, and a filled row still carries the thread anchor and membrane
-  // controls by the same selectors.
-  test('[u4#c1] (c) 인수인계 사항 holds four numbered handover slots', async ({
+  // #182 — RE-AIMED. The operator reads one handover paragraph, while the
+  // membrane still addresses four slots underneath it.
+  test('[u4#c1] (c) 인수인계 사항 reads as one handover paragraph', async ({
     page,
   }) => {
     await boot(page)
@@ -262,13 +259,14 @@ test.describe('dossier sections', () => {
     const board = page.locator(`${FILE} .sect`).nth(1).locator('#slotBoard')
     await expect(board).toHaveCount(1)
 
-    // Empty: four slot rows, each with a button target.
+    // Empty: the board still owns four slot addresses, but the unwritten copy is
+    // printed once on the sheet rather than once per address.
     await expect(board.locator('.slot')).toHaveCount(CAP)
     await expect(board.locator('.slot-blank')).toHaveCount(CAP)
     await expect(board.locator('.slot.filled')).toHaveCount(0)
-    await expect(board.locator('.slot-blank .slot-empty')).toHaveText(
-      Array.from({ length: CAP }, () => '— 비어 있음'),
-    )
+    await expect(board.locator('.handover-para')).toHaveCount(1)
+    await expect(board.locator('.handover-empty')).toHaveText('아직 작성된 인수인계 사항이 없습니다.')
+    await expect(board.locator('.slot-blank .slot-empty')).toHaveText(Array.from({ length: CAP }, () => ''))
     expect(
       await board.locator('.slot').evaluateAll((nodes) =>
         nodes.map((n) => ({
@@ -284,16 +282,17 @@ test.describe('dossier sections', () => {
       { slot: '3', no: '04', label: '칸 4' },
     ])
     expect(
-      await board.locator('.slot-blank').first().evaluate((n) => {
+      await board.locator('.handover-para').evaluate((n) => {
         const s = getComputedStyle(n as HTMLElement)
         return { display: s.display, minHeight: s.minHeight, text: s.textAlign }
       }),
-    ).toEqual({ display: 'flex', minHeight: '42px', text: 'left' })
+    ).toEqual({ display: 'block', minHeight: '74px', text: 'justify' })
 
-    // Two seated: two filled rows, and the two empty rows remain.
+    // Two seated out of order: one paragraph carries both, in slot order, and
+    // the two empty addresses remain for the next sentences.
     await seed(page)
-    await place(page, SEEDS[0].id, 0)
-    await place(page, SEEDS[1].id, 1)
+    await place(page, SEEDS[0].id, 1)
+    await place(page, SEEDS[1].id, 0)
     const seats = board.locator('.slot.filled')
     await expect(seats).toHaveCount(2)
     await expect(board.locator('.slot-blank')).toHaveCount(2)
@@ -305,16 +304,16 @@ test.describe('dossier sections', () => {
       '01',
       '02',
     ])
-    // The numbering is painted by the vendored skin, not by a text node.
-    expect(
-      await seats.evaluateAll((nodes) =>
-        nodes.map((n) => getComputedStyle(n as HTMLElement, '::before').content.replace(/["']/g, '')),
-      ),
-    ).toEqual(['칸 1', '칸 2'])
-    // Rows stack in slot order.
+    await expect(board.locator('.handover-para')).toContainText(SEEDS[1].text)
+    await expect(board.locator('.handover-para')).toContainText(SEEDS[0].text)
+    expect(await board.locator('.handover-para .bc-text').evaluateAll((nodes) => nodes.map((n) => n.textContent))).toEqual([
+      SEEDS[1].text,
+      SEEDS[0].text,
+    ])
+    // The seats sit inline in one paragraph, not as stacked rows.
     expect(
       await seats.evaluateAll((nodes) => nodes.map((n) => getComputedStyle(n as HTMLElement).display)),
-    ).toEqual(['flex', 'flex'])
+    ).toEqual(['inline', 'inline'])
     await expect(page.locator('#slotCount')).toHaveText(`2 / ${CAP}`)
     await expect(page.locator(`${FILE} .dz-meta`)).toHaveText(`2 / ${CAP} 슬롯 사용`)
   })
@@ -449,10 +448,13 @@ test.describe('deploy stamp locks the file', () => {
     await expect(page.locator('#slotCount')).toHaveText('1 / 4')
     await expect(slot(page, 1)).toHaveClass(/\bslot-blank\b/)
     await expect(slot(page, 1)).not.toHaveAttribute('data-block-id', /.+/)
+    await expect(page.locator(`${FILE} .handover-para`)).toContainText(SEEDS[0].text)
+    await expect(page.locator(`${FILE} .handover-para`)).not.toContainText(SEEDS[1].text)
     expect(await pinnedIds(page)).toEqual([SEEDS[0].id])
 
     await slot(page, 0).locator('.slot-unset').click()
     await expect(page.locator(`${FILE} .slots`)).toHaveAttribute('data-state', 'empty')
+    await expect(page.locator(`${FILE} .handover-empty`)).toHaveText('아직 작성된 인수인계 사항이 없습니다.')
     expect(await pinnedIds(page)).toEqual([])
     await expect(page.locator(`${FILE} .slot-blank`)).toHaveCount(CAP)
   })
@@ -529,6 +531,8 @@ test.describe('deploy stamp locks the file', () => {
     await expect(page.locator('#deployStamp')).toHaveClass(/\bon\b/)
     await expect(page.locator('#slotCount')).toHaveText('0 / 4')
     await expect(page.locator(`${FILE} .slots`)).toHaveAttribute('data-state', 'locked')
+    await expect(page.locator(`${FILE} .handover-empty`)).toHaveText('작성된 인수인계 사항 없음 — 잠김')
+    await expect(page.locator(`${FILE} .handover-empty`)).toHaveCount(1)
     const store = await seamStore(page)
     expect(store.deployed).toEqual([])
   })

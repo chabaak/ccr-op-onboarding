@@ -108,6 +108,8 @@ interface SlotBoardModule {
    * it (asserted by source-scan below), so the DOM half owns no second rule set.
    */
   planOps(state: { slots: readonly (string | null)[]; deployed: boolean }, action: SlotAction): OpPlan
+  /** D11 — the four `.slots[data-state]` values, decided once. */
+  boardState(slots: readonly (string | null)[], deployed: boolean): 'empty' | 'partial' | 'full' | 'locked'
   /**
    * x10's pure core for the mining hold: whether a handover of these sentences
    * types at all. `revealHandover`'s early return IS this call, so the two paths
@@ -727,6 +729,16 @@ describe('[u4#c5] slot anchors expose data-block-id', () => {
 })
 
 /* ══ [u4#c4] the deploy view model (DOM asserts live in e2e) ═════════════ */
+
+describe('[u4#c4] boardState still names the four board states', () => {
+  it('(a) empty · partial · full · locked are all returned by the slot board', async () => {
+    const { boardState } = await loadSlotBoard()
+    expect(boardState([null, null, null, null], false)).toBe('empty')
+    expect(boardState(['a', null, null, null], false)).toBe('partial')
+    expect(boardState(['a', 'b', 'c', 'd'], false)).toBe('full')
+    expect(boardState([null, null, null, null], true)).toBe('locked')
+  })
+})
 
 describe('[u4#c4] deployView states — empty · partial · full · locked', () => {
   const at = '08:50'
