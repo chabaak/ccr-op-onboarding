@@ -1,0 +1,437 @@
+{
+  "experiment": "TANK-G1-screen-r2",
+  "arm": "live",
+  "call_type": "judgment",
+  "channel": "C-BLOCK",
+  "template": "v0.5",
+  "model": "claude-haiku-4-5-20251001",
+  "transport": "anthropic",
+  "dry_run": false,
+  "pre_registration": {
+    "hypothesis": "G1 r2는 no-block baseline에서 기본 stance a가 의미 있는 수로 살아 있고, 표지·전표·요율표를 연결한 화물 불일치 full key를 받은 live arm에서 stance b로 움직일 것이다. r1에서 세 gate 모두 baseline b 10/10로 포화됐으므로, r2는 gate clock을 key carriers 앞으로 옮기고 verdict rows를 ingredient rows로 낮추며 binary stance set을 세 개의 plausible readings로 넓힌 뒤 같은 reduced screen을 반복한다.",
+    "n_per_arm": 10,
+    "call_cost": 20,
+    "drop_condition": "baseline에서 default a가 0/10이면 skill §3 rule 4에 따라 broken gate다. baseline이 live 기대 stance b를 9/10 이상 고르면 saturated baseline으로 headroom 없음이다. live가 b를 6/10 이하로 고르면 movement failure이고, 7/10 또는 8/10은 n=10 boundary라 definitive result로 보지 않는다. Positive screen은 baseline a가 3/10 이상, baseline b가 1/10 이하, live b가 9/10 이상일 때만 기록한다.",
+    "expected_stance_by_arm": {
+      "baseline": "a",
+      "live": "b"
+    },
+    "contingencies": [
+      "baseline이 a를 전혀 고르지 않으면 gate clock 이동 뒤에도 기본 독해가 죽은 것이다.",
+      "baseline이 b에 포화되면 excerpt가 아직 key conclusion을 제공하거나 live stance wording이 너무 우세한 것이다.",
+      "baseline이 c에 많이 몰리면 added plausible reading이 default를 훔치는 것이므로 stance c wording을 다시 좁힌다.",
+      "live가 b로 충분히 움직이지 않으면 key block wording이 later carriers를 결론으로 묶지 못한 것이다.",
+      "because_block_ids가 live arm에서 제공하지 않은 block id를 꾸며내면 fabricated block id로 따로 보고한다."
+    ],
+    "not_claimed": "이 reduced screen은 submission deadline 때문에 placebo와 negative-control arms를 의도적으로 dropped한다. 따라서 each gate moves at all from baseline to live만 본다. It does not establish discrimination, near-miss behavior, or full play reachability."
+  },
+  "n_effective": 10,
+  "n_overridden": false,
+  "calls": [
+    {
+      "arm": "live",
+      "slot": 1,
+      "template": "v0.5",
+      "model": "claude-haiku-4-5-20251001",
+      "model_reported": "claude-haiku-4-5-20251001",
+      "temperament_id": "tank-base",
+      "latency_s": 5.338,
+      "stop_reason": "tool_use",
+      "foreign_tool_uses": 0,
+      "schema_retries": 0,
+      "payload": {
+        "inner_note": "화면과 전표가 일관되게 가리키는 것을 먼저 믿어야 한다. 적하목록의 `W`와 `부식` 표지, 요율표의 붉은 점 — 이것들은 통상 절차의 범위를 벗어난다. 동시에 신고자 진술과 화면이 엇갈려 있다. 물 접촉 뒤 기체가 짙어진다는 현장 변화가 없는 지금, 정보 불일치만으로 높은 단계의 조치를 취하기는 과잉이 될 수 있다. 그러나 표지와 요율 기록은 무시할 수 없다.",
+        "stance": "b",
+        "because_referent": "적하목록 화면의 `W`와 `부식` 표지, 그리고 요율표에서 같은 조합에 붉은 점이 찍혀 있기 때문이다.",
+        "because_block_ids": [
+          "g1_k1_manifest",
+          "g1_k1_tariff"
+        ],
+        "rejected_stance": "a",
+        "rejected_reason": "신고자 진술만으로 표지 기록과 요율 경고를 덮을 수 없다. 화면의 명확한 위험 표시를 무시하는 것은 책임질 수 없다.",
+        "utterance": "미상 반응성 물질 신고 접수. 배수 차단 준비. 운송사 화물 확인 동시 진행."
+      },
+      "problems": [],
+      "stance": "b",
+      "because_referent": "적하목록 화면의 `W`와 `부식` 표지, 그리고 요율표에서 같은 조합에 붉은 점이 찍혀 있기 때문이다.",
+      "because_block_ids": [
+        "g1_k1_manifest",
+        "g1_k1_tariff"
+      ],
+      "because_invalid_ids": [],
+      "rejected_stance": "a",
+      "rejected_malformed": false,
+      "utterance_chars": 43,
+      "inner_note_chars": 203
+    },
+    {
+      "arm": "live",
+      "slot": 2,
+      "template": "v0.5",
+      "model": "claude-haiku-4-5-20251001",
+      "model_reported": "claude-haiku-4-5-20251001",
+      "temperament_id": "tank-base",
+      "latency_s": 5.012,
+      "stop_reason": "tool_use",
+      "foreign_tool_uses": 0,
+      "schema_retries": 0,
+      "payload": {
+        "inner_note": "접수 화면의 품명과 신고자 진술이 일치하며, 표지의 부식 표시는 오래된 기록으로 판단. 현장 변화(물 접촉 후 기체 짙어짐)와 유해물질 조회 경고가 함께 들어올 때까지는 신고 품명을 우선 신뢰. 다만 야적장 즉시 통제로 확산을 선제.",
+        "stance": "a",
+        "because_referent": "남기표의 신고가 적하목록 품명과 일치하고, 표지 칸의 부식 표시는 운송사 전표 기록과 구분되는 옛 정보로 판단했기 때문.",
+        "because_block_ids": [
+          "g1_k1_manifest",
+          "g1_k1_waybill"
+        ],
+        "rejected_stance": "b",
+        "rejected_reason": "현장의 즉각적 기체 변화 없이 신고 품명만으로 미상 반응성으로 상향하는 것은 과잉 대응. 과거 위험 표지 기록을 현재 물질 상태로 착각하는 오류를 피해야 함.",
+        "utterance": "생활화학 유출로 접수. 소규모 출동대 출발. 야적장 진입 통제 시작."
+      },
+      "problems": [],
+      "stance": "a",
+      "because_referent": "남기표의 신고가 적하목록 품명과 일치하고, 표지 칸의 부식 표시는 운송사 전표 기록과 구분되는 옛 정보로 판단했기 때문.",
+      "because_block_ids": [
+        "g1_k1_manifest",
+        "g1_k1_waybill"
+      ],
+      "because_invalid_ids": [],
+      "rejected_stance": "b",
+      "rejected_malformed": false,
+      "utterance_chars": 38,
+      "inner_note_chars": 130
+    },
+    {
+      "arm": "live",
+      "slot": 3,
+      "template": "v0.5",
+      "model": "claude-haiku-4-5-20251001",
+      "model_reported": "claude-haiku-4-5-20251001",
+      "temperament_id": "tank-base",
+      "latency_s": 4.856,
+      "stop_reason": "tool_use",
+      "foreign_tool_uses": 0,
+      "schema_retries": 0,
+      "payload": {
+        "stance": "b",
+        "inner_note": "세정액 신고는 신고자 진술이지만, 적하목록의 표지 `W`와 `부식`, 출하 전표의 세척장 임시 출고, 야간 요율표의 할증과 통행 제한 표시는 모두 반응성 화물을 가리킨다. 신고자가 읽은 품명과 시스템 기록이 어긋나는 것은 표지 손상이 아니라 내용물 불일치를 뜻할 수 있다. 물 접촉 뒤 기체 변화가 예상되므로 지금 물 근처에 두는 것은 위험하다.",
+        "because_referent": "적하목록과 출하 전표, 요율표의 기록이 일관되게 반응성 화물을 나타내고 있다.",
+        "because_block_ids": [
+          "g1_k1_manifest",
+          "g1_k1_waybill",
+          "g1_k1_tariff"
+        ],
+        "rejected_stance": "a",
+        "rejected_reason": "신고자 진술만으로 판단하면 생활화학이지만, 세 개의 독립적 기록이 모두 반응성 화물을 가리킨다. 적하목록의 표지가 신고자 진술과 맞지 않는 것을 무시할 수 없다.",
+        "utterance": "미상 반응성 화물로 상향. 물 접근 금지. 야적장 통제 착수."
+      },
+      "problems": [],
+      "stance": "b",
+      "because_referent": "적하목록과 출하 전표, 요율표의 기록이 일관되게 반응성 화물을 나타내고 있다.",
+      "because_block_ids": [
+        "g1_k1_manifest",
+        "g1_k1_waybill",
+        "g1_k1_tariff"
+      ],
+      "because_invalid_ids": [],
+      "rejected_stance": "a",
+      "rejected_malformed": false,
+      "utterance_chars": 34,
+      "inner_note_chars": 193
+    },
+    {
+      "arm": "live",
+      "slot": 4,
+      "template": "v0.5",
+      "model": "claude-haiku-4-5-20251001",
+      "model_reported": "claude-haiku-4-5-20251001",
+      "temperament_id": "tank-base",
+      "latency_s": 4.409,
+      "stop_reason": "tool_use",
+      "foreign_tool_uses": 0,
+      "schema_retries": 0,
+      "payload": {
+        "stance": "b",
+        "inner_note": "적하목록 표지의 '부식'과 요율표의 할증·제한 표시가 '산업용 세정액'과 맞지 않는다. 전표 출발 시각이 신고자의 세척장 임시 출고와 따로 논다는 것은, 이 탱크로리가 어떤 기록으로도 설명되지 않는 화물을 싣고 있을 수 있다는 뜻이다.",
+        "because_referent": "적하목록 표지가 명확히 '부식'을 보이고, 야간 요율표에서 같은 조합의 행이 통행 제한으로 표시되어 있다.",
+        "because_block_ids": [
+          "g1_k1_manifest",
+          "g1_k1_tariff"
+        ],
+        "rejected_stance": "a",
+        "rejected_reason": "신고자의 말이 적하목록 품명과 맞아 보이더라도, 같은 적하목록의 표지 칸이 '부식'을 명확히 보이는 점을 무시할 수 없다. 신고자가 품명만 읽었을 가능성이 높다.",
+        "utterance": "미상 반응성 화물 상향. 물 접근 제한. 야적장 통제 착수."
+      },
+      "problems": [],
+      "stance": "b",
+      "because_referent": "적하목록 표지가 명확히 '부식'을 보이고, 야간 요율표에서 같은 조합의 행이 통행 제한으로 표시되어 있다.",
+      "because_block_ids": [
+        "g1_k1_manifest",
+        "g1_k1_tariff"
+      ],
+      "because_invalid_ids": [],
+      "rejected_stance": "a",
+      "rejected_malformed": false,
+      "utterance_chars": 33,
+      "inner_note_chars": 131
+    },
+    {
+      "arm": "live",
+      "slot": 5,
+      "template": "v0.5",
+      "model": "claude-haiku-4-5-20251001",
+      "model_reported": "claude-haiku-4-5-20251001",
+      "temperament_id": "tank-base",
+      "latency_s": 5.171,
+      "stop_reason": "tool_use",
+      "foreign_tool_uses": 0,
+      "schema_retries": 0,
+      "payload": {
+        "stance": "b",
+        "inner_note": "적하목록 품명과 표지 기호의 불일치가 핵심이다. 신고자는 품명을 그대로 읽었지만, 화면의 표지 칸은 `W`와 `부식`을 명시한다. 출하 전표와 야간 요율표가 같은 신호를 반복한다. 물 접촉 뒤 기체가 짙어진다는 현장 변화까지 고려하면, 이는 단순한 라벨 손상이 아니라 내용물의 성질이 기록된 표지와 맞지 않음을 가리킨다.",
+        "because_referent": "적하목록 표지 칸의 `W/부식` 조합과 출하 전표, 야간 요율표의 같은 기록들이 일관되게 반응성 화물을 가리킨다.",
+        "because_block_ids": [
+          "g1_k1_manifest",
+          "g1_k1_waybill",
+          "g1_k1_tariff"
+        ],
+        "rejected_stance": "a",
+        "rejected_reason": "신고자의 품명 진술만으로 표지 기호와 요율표의 경고를 무시할 수 없다. 생활화학 유출 접수는 과소 평가의 위험을 안는다.",
+        "utterance": "미상 반응성 화물 상향. 야적장 우선 통제. 물 접근 금지. 배수 차단 준비.</utterance>\n</invoke>"
+      },
+      "problems": [],
+      "stance": "b",
+      "because_referent": "적하목록 표지 칸의 `W/부식` 조합과 출하 전표, 야간 요율표의 같은 기록들이 일관되게 반응성 화물을 가리킨다.",
+      "because_block_ids": [
+        "g1_k1_manifest",
+        "g1_k1_waybill",
+        "g1_k1_tariff"
+      ],
+      "because_invalid_ids": [],
+      "rejected_stance": "a",
+      "rejected_malformed": false,
+      "utterance_chars": 65,
+      "inner_note_chars": 179
+    },
+    {
+      "arm": "live",
+      "slot": 6,
+      "template": "v0.5",
+      "model": "claude-haiku-4-5-20251001",
+      "model_reported": "claude-haiku-4-5-20251001",
+      "temperament_id": "tank-base",
+      "latency_s": 5.269,
+      "stop_reason": "tool_use",
+      "foreign_tool_uses": 0,
+      "schema_retries": 0,
+      "payload": {
+        "stance": "b",
+        "inner_note": "접수 화면의 품명과 표지가 불일치한다. 신고자는 적하목록의 세정제명을 읽었지만, 같은 행의 표지 칸은 `W`와 `부식`을 함께 보인다. 출하 전표와 야간 요율표에서도 `W/부식` 조합에 붉은 점이 찍혀 있다. 이는 단순 기록 지연이 아니라 현물과 서류의 불일치를 나타낸다. 물 접촉 뒤 기체가 짙어질 가능성을 배제할 수 없다.",
+        "because_referent": "현장에서 젖은 누출이 보이고, 시스템 기록에는 반응성 표지가 있으며, 출하 전표의 세척장 출고 기록과 접수 화면의 품명이 맞지 않는다.",
+        "because_block_ids": [
+          "g1_k1_manifest",
+          "g1_k1_tariff",
+          "g1_k1_waybill"
+        ],
+        "rejected_stance": "a",
+        "rejected_reason": "신고자 진술만으로 세정액으로 확정하면, 표지 칸과 요율표의 붉은 점 표기를 무시하는 것이다. 적하목록의 품명과 표지 칸이 같은 행에 있으면서 불일치하는 경우, 물 접근을 먼저 차단해야 한다.",
+        "utterance": "미상 반응성 화물 상향. 야적장 통제. 물 접근 금지. 현장 확인팀 출동."
+      },
+      "problems": [],
+      "stance": "b",
+      "because_referent": "현장에서 젖은 누출이 보이고, 시스템 기록에는 반응성 표지가 있으며, 출하 전표의 세척장 출고 기록과 접수 화면의 품명이 맞지 않는다.",
+      "because_block_ids": [
+        "g1_k1_manifest",
+        "g1_k1_tariff",
+        "g1_k1_waybill"
+      ],
+      "because_invalid_ids": [],
+      "rejected_stance": "a",
+      "rejected_malformed": false,
+      "utterance_chars": 41,
+      "inner_note_chars": 182
+    },
+    {
+      "arm": "live",
+      "slot": 7,
+      "template": "v0.5",
+      "model": "claude-haiku-4-5-20251001",
+      "model_reported": "claude-haiku-4-5-20251001",
+      "temperament_id": "tank-base",
+      "latency_s": 4.253,
+      "stop_reason": "tool_use",
+      "foreign_tool_uses": 0,
+      "schema_retries": 0,
+      "payload": {
+        "inner_note": "적하목록의 표지가 W/부식을 명시하는 데, 신고자는 세정액만 말했다. 물에 반응하는 물질이 물 접촉으로 기체를 낸다면 확산 차단이 희석보다 안전하다. 요율표의 붉은 점은 통행 제한 지시다.",
+        "stance": "b",
+        "because_referent": "적하목록의 표지 W/부식 조합과 요율표의 통행 제한 표시가 함께 신호하기 때문이다.",
+        "because_block_ids": [
+          "g1_k1_manifest",
+          "g1_k1_tariff"
+        ],
+        "rejected_stance": "a",
+        "rejected_reason": "신고자 진술만 따르면 물 접촉 뒤 기체가 짙어지는 현장 변화를 설명할 수 없다.",
+        "utterance": "미상 반응성 화물 의심. 물 접근 금지. 야적장 전면 통제. 배수 경로 차단 준비."
+      },
+      "problems": [],
+      "stance": "b",
+      "because_referent": "적하목록의 표지 W/부식 조합과 요율표의 통행 제한 표시가 함께 신호하기 때문이다.",
+      "because_block_ids": [
+        "g1_k1_manifest",
+        "g1_k1_tariff"
+      ],
+      "because_invalid_ids": [],
+      "rejected_stance": "a",
+      "rejected_malformed": false,
+      "utterance_chars": 46,
+      "inner_note_chars": 105
+    },
+    {
+      "arm": "live",
+      "slot": 8,
+      "template": "v0.5",
+      "model": "claude-haiku-4-5-20251001",
+      "model_reported": "claude-haiku-4-5-20251001",
+      "temperament_id": "tank-base",
+      "latency_s": 5.269,
+      "stop_reason": "tool_use",
+      "foreign_tool_uses": 0,
+      "schema_retries": 0,
+      "payload": {
+        "stance": "b",
+        "inner_note": "적하목록 품명과 표지·전표의 불일치가 동시에 드러났다. 물 접촉 후 기체 변화까지 예상된다면, 낮은 위험으로 묶을 근거가 없다. 과거 과잉 판정 기록이 있지만, 지금은 반대 방향 오판의 무게가 더 크다.",
+        "because_referent": "표지의 `W`와 `부식` 조합이 요율표 할증·제한 행과 정확히 일치하고, 전표의 출발 시간과 출고처도 현장 진술과 맞지 않는다.",
+        "because_block_ids": [
+          "g1_k1_manifest",
+          "g1_k1_tariff",
+          "g1_k1_waybill"
+        ],
+        "rejected_stance": "a",
+        "rejected_reason": "신고자가 적하목록 품명을 읽었다는 것만으로 표지의 표시를 무시할 수 없다. 세 개의 기록이 모두 다른 내용을 가리키는 상황에서 가장 낮은 위험 등급으로 가는 것은 정보를 외면하는 것이다.",
+        "utterance": "미상 반응성 화물로 상향. 야적장 통제 개시. 물 접근 금지. 배수반 대기."
+      },
+      "problems": [],
+      "stance": "b",
+      "because_referent": "표지의 `W`와 `부식` 조합이 요율표 할증·제한 행과 정확히 일치하고, 전표의 출발 시간과 출고처도 현장 진술과 맞지 않는다.",
+      "because_block_ids": [
+        "g1_k1_manifest",
+        "g1_k1_tariff",
+        "g1_k1_waybill"
+      ],
+      "because_invalid_ids": [],
+      "rejected_stance": "a",
+      "rejected_malformed": false,
+      "utterance_chars": 42,
+      "inner_note_chars": 113
+    },
+    {
+      "arm": "live",
+      "slot": 9,
+      "template": "v0.5",
+      "model": "claude-haiku-4-5-20251001",
+      "model_reported": "claude-haiku-4-5-20251001",
+      "temperament_id": "tank-base",
+      "latency_s": 4.13,
+      "stop_reason": "tool_use",
+      "foreign_tool_uses": 0,
+      "schema_retries": 0,
+      "payload": {
+        "stance": "c",
+        "inner_note": "적하목록 품명은 산업용 세정액이다. 표지의 W와 부식 표기는 표면 손상으로 읽을 여지가 있다. 전표와 현장 신고가 일치한다. 과잉 대응 이력이 있으므로 확인된 서류 우선이다.",
+        "because_referent": "적하목록과 신고자 진술이 일치하며, 표지만 손상된 것으로 판단되기 때문이다.",
+        "because_block_ids": [
+          "g1_k1_manifest",
+          "g1_k1_waybill"
+        ],
+        "rejected_stance": "b",
+        "rejected_reason": "표지 기록이 더 오래되었다는 근거가 없다. 적하목록이 현재 정보의 기준이다. 물 접근 차단은 화학 성상 확인 전에는 과도하다.",
+        "utterance": "탱크로리 하부 누출 신고. 품명 산업용 세정액으로 접수. 운송사 확인 진행 중. 야적장 출입 통제 시작한다."
+      },
+      "problems": [],
+      "stance": "c",
+      "because_referent": "적하목록과 신고자 진술이 일치하며, 표지만 손상된 것으로 판단되기 때문이다.",
+      "because_block_ids": [
+        "g1_k1_manifest",
+        "g1_k1_waybill"
+      ],
+      "because_invalid_ids": [],
+      "rejected_stance": "b",
+      "rejected_malformed": false,
+      "utterance_chars": 60,
+      "inner_note_chars": 97
+    },
+    {
+      "arm": "live",
+      "slot": 10,
+      "template": "v0.5",
+      "model": "claude-haiku-4-5-20251001",
+      "model_reported": "claude-haiku-4-5-20251001",
+      "temperament_id": "tank-base",
+      "latency_s": 3.792,
+      "stop_reason": "tool_use",
+      "foreign_tool_uses": 0,
+      "schema_retries": 0,
+      "payload": {
+        "stance": "c",
+        "inner_note": "적하목록의 품명(산업용 세정액)이 신고자 진술과 일치한다. 표지와 전표의 불일치는 물리적 손상이나 기록 시간 차이로 설명 가능하다. 확인되지 않은 정보로 과잉 대응하면 안 된다.",
+        "because_referent": "신고자 남기표가 적하목록의 세정액명을 그대로 읽었고, 화면 접수 품명도 산업용 세정액이다.",
+        "because_block_ids": [
+          "g1_k1_manifest",
+          "g1_k1_waybill"
+        ],
+        "rejected_stance": "b",
+        "rejected_reason": "표지 조각(W/부식)과 전표 줄이 더 오래된 기록이라고 단정할 근거가 없다. 같은 물건의 다른 표기일 수 있으며, 확인되지 않은 상태에서 미상 반응성 화물로 상향하는 것은 과잉 대응이다.",
+        "utterance": "하역장 출입 통제한다. 운송사 품명 확인 중."
+      },
+      "problems": [],
+      "stance": "c",
+      "because_referent": "신고자 남기표가 적하목록의 세정액명을 그대로 읽었고, 화면 접수 품명도 산업용 세정액이다.",
+      "because_block_ids": [
+        "g1_k1_manifest",
+        "g1_k1_waybill"
+      ],
+      "because_invalid_ids": [],
+      "rejected_stance": "b",
+      "rejected_malformed": false,
+      "utterance_chars": 25,
+      "inner_note_chars": 99
+    }
+  ],
+  "sequence": "b,a,b,b,b,b,b,b,c,c",
+  "distribution": {
+    "b": 7,
+    "a": 1,
+    "c": 2
+  },
+  "coverage": {
+    "status": "sampled",
+    "offered": [
+      "a",
+      "b",
+      "c"
+    ],
+    "selected": [
+      "a",
+      "b",
+      "c"
+    ],
+    "unobserved": []
+  },
+  "advisory_logs": {
+    "state_variable_shadow": null,
+    "mineability": null
+  },
+  "latency": {
+    "calls": 10,
+    "mean_s": 4.75,
+    "min_s": 3.792,
+    "max_s": 5.338
+  },
+  "compliance": {
+    "discarded_total": 0,
+    "failed_total": 0,
+    "schema_retries_total": 0,
+    "foreign_tool_uses_total": 0,
+    "because_invalid_id_total": 0
+  }
+}

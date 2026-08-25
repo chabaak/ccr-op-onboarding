@@ -1,0 +1,85 @@
+{
+  "_what": "새는탱크로리 G1 reduced screen r2 — failed first screen 뒤 표지·전표·요율표를 연결한 화물 불일치 handover가 moved-earlier gate에서 default를 벗어나게 하는지 잰다.",
+  "_authoring_provenance": {
+    "owner": "mechanism measurement",
+    "predecessor": "TANK-G1-screen failed: baseline b,b,b,b,b,b,b,b,b,b and live b,b,b,b,b,b,b,b,b,b.",
+    "established_defects_fixed_together": "세 gate의 clock이 자기 key carriers 뒤에 있어 baseline이 이미 결론을 볼 수 있었고, 두 stance뿐인 binary gate가 headroom을 더 줄였다. 둘 다 r1 측정과 후속 diagnosis로 확립된 defect라서 r2에서 함께 고친다.",
+    "baseline_construction": "baseline은 no injected block이다. frozen TIMELINE_EXCERPT는 런타임과 같이 해당 시각까지의 compiled timeline 기록을 그대로 담는다.",
+    "excerpt_rule": "20:42까지 compiled timeline.json 행을 그대로 쓴다. G1 key carriers는 이 clock 뒤에 남아 있고, arm 차이는 C-BLOCK의 BLOCKS뿐이다.",
+    "screen_scope": "deadline screen: baseline/live 두 arm만, 각 10회. placebo와 negative control은 이 round에서 의도적으로 제외한다.",
+    "revision": "r2는 gate clock을 자기 carriers 앞으로 옮기고, pre-gate rows를 결론에서 재료로 낮추고, stance set을 세 개의 commensurable reading-plus-action 선택지로 넓힌 successor다."
+  },
+  "experiment": "TANK-G1-screen-r2",
+  "call_type": "judgment",
+  "channel": "C-BLOCK",
+  "template_version": "v0.5",
+  "model": "claude-haiku-4-5-20251001",
+  "temperament": "tank-base",
+  "max_tokens": 1024,
+  "timeout_ms": 120000,
+  "pre_registration": {
+    "hypothesis": "G1 r2는 no-block baseline에서 기본 stance a가 의미 있는 수로 살아 있고, 표지·전표·요율표를 연결한 화물 불일치 full key를 받은 live arm에서 stance b로 움직일 것이다. r1에서 세 gate 모두 baseline b 10/10로 포화됐으므로, r2는 gate clock을 key carriers 앞으로 옮기고 verdict rows를 ingredient rows로 낮추며 binary stance set을 세 개의 plausible readings로 넓힌 뒤 같은 reduced screen을 반복한다.",
+    "n_per_arm": 10,
+    "call_cost": 20,
+    "drop_condition": "baseline에서 default a가 0/10이면 skill §3 rule 4에 따라 broken gate다. baseline이 live 기대 stance b를 9/10 이상 고르면 saturated baseline으로 headroom 없음이다. live가 b를 6/10 이하로 고르면 movement failure이고, 7/10 또는 8/10은 n=10 boundary라 definitive result로 보지 않는다. Positive screen은 baseline a가 3/10 이상, baseline b가 1/10 이하, live b가 9/10 이상일 때만 기록한다.",
+    "expected_stance_by_arm": {
+      "baseline": "a",
+      "live": "b"
+    },
+    "contingencies": [
+      "baseline이 a를 전혀 고르지 않으면 gate clock 이동 뒤에도 기본 독해가 죽은 것이다.",
+      "baseline이 b에 포화되면 excerpt가 아직 key conclusion을 제공하거나 live stance wording이 너무 우세한 것이다.",
+      "baseline이 c에 많이 몰리면 added plausible reading이 default를 훔치는 것이므로 stance c wording을 다시 좁힌다.",
+      "live가 b로 충분히 움직이지 않으면 key block wording이 later carriers를 결론으로 묶지 못한 것이다.",
+      "because_block_ids가 live arm에서 제공하지 않은 block id를 꾸며내면 fabricated block id로 따로 보고한다."
+    ],
+    "not_claimed": "이 reduced screen은 submission deadline 때문에 placebo와 negative-control arms를 의도적으로 dropped한다. 따라서 each gate moves at all from baseline to live만 본다. It does not establish discrimination, near-miss behavior, or full play reachability."
+  },
+  "slots": {
+    "FLAW": "[결함] 너는 첫 화면의 적하목록과 신고자 진술이 맞아 보이면 통상 절차를 먼저 믿는다.",
+    "INCIDENT": "[내력] 얼마 전, 위험 표지를 크게 잡아 세운 조치가 과잉 대응으로 기록된 적이 있다.",
+    "PRIORITY_LIST": [
+      "확인된 전표와 화면을 먼저 맞춘다",
+      "눈앞의 누출 지점에서 사람을 떼어 놓는다"
+    ],
+    "TIMELINE_EXCERPT": [
+      "20:40 남기표가 탱크로리 하부에서 젖은 줄이 번진다고 신고하며 적하목록의 세정제명을 그대로 읽는다."
+    ],
+    "GATE_QUESTION": "첫 전파에는 어떤 장면을 실어 보내겠습니까",
+    "STANCE_SET": [
+      {
+        "id": "a",
+        "label": "세정액 신고와 새 스티커가 같은 물건을 뜻한다고 보아, 생활화학 유출로 접수하고 소규모 출동대를 보낸다"
+      },
+      {
+        "id": "b",
+        "label": "표지 조각과 전표 줄이 품명보다 오래된 기록이라고 보아, 미상 반응성 화물로 상향하고 물 접근을 막는다"
+      },
+      {
+        "id": "c",
+        "label": "표지가 긁힌 탓에 품명 확인만 늦어진다고 보아, 운송사 확인을 기다리며 하역장 출입만 묶는다"
+      }
+    ]
+  },
+  "arms": {
+    "baseline": {
+      "BLOCKS": []
+    },
+    "live": {
+      "BLOCKS": [
+        {
+          "id": "g1_k1_manifest",
+          "text": "접수 화면의 품명은 산업용 세정액이지만 같은 행의 표지 칸은 `W`와 `부식`을 함께 보인다."
+        },
+        {
+          "id": "g1_k1_waybill",
+          "text": "출하 전표의 `출발 18:10`과 `서해정밀 2문`은 유재승이 말한 세척장 임시 출고와 따로 논다."
+        },
+        {
+          "id": "g1_k1_tariff",
+          "text": "야간 요율표에서 `W/부식` 조합 행의 할증 칸과 통행 제한 칸에 붉은 점이 찍혀 있다."
+        }
+      ]
+    }
+  }
+}

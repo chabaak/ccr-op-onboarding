@@ -1,0 +1,260 @@
+{
+  "gates": [
+    {
+      "gate": "G1",
+      "title": "접수",
+      "clock": "20:42",
+      "place_id": "p1",
+      "availability": null,
+      "scene": "남기표의 신고는 차분하고 익숙하다. 화면 첫 줄도 신고 말을 따라 낮은 위험의 품명을 내민다. 아직 카메라는 탱크 옆면을 가까이 잡지 못했고, 전표와 요율표는 열리지 않았다.",
+      "branch_note": null,
+      "standard_form": "갈림길 G1에서 기질은 기본 stance a를 낸다. 열쇠 조건 k1을 만족하는 문장 주입 시 b로 이동한다.",
+      "question": "첫 전파에는 어떤 장면을 실어 보내겠습니까",
+      "stances": [
+        {
+          "id": "a",
+          "label": "운송사가 말한 품명이 그대로 맞다고 보아, 생활화학 유출로 접수하고 소규모 출동대를 보낸다",
+          "desc": "처음 들어온 물품명에 맞춰 출동 단계를 가볍게 둔다."
+        },
+        {
+          "id": "b",
+          "label": "차에 실린 물건이 신고보다 센 물질이라고 보아, 등급을 올리고 물 접근을 막는다",
+          "desc": "화물 정체를 모순 상태로 묶어 현장을 멈춘다."
+        },
+        {
+          "id": "c",
+          "label": "전산과 차량 표시가 정리되지 않은 혼선이라고 보아, 출입만 묶고 운송사 확인을 기다린다",
+          "desc": "화물 상향은 보류하고 이동 제한만 먼저 건다."
+        }
+      ],
+      "default_stance": "a",
+      "key_conditions": [
+        {
+          "id": "k1",
+          "axis": "장부순응",
+          "referent": "탱크로리 적하",
+          "species": "사실",
+          "targets_clause": "기본 성향"
+        }
+      ],
+      "key_examples": [
+        {
+          "for": "k1",
+          "text": "접수 화면의 품명은 산업용 세정액이지만 같은 행의 표지 칸은 `W`와 `부식`을 함께 보인다.",
+          "mined_from": "20:45 문서, 접수 화면 적하목록 행"
+        },
+        {
+          "for": "k1",
+          "text": "출하 전표의 `출발 18:10`과 `서해정밀 2문`은 유재승이 말한 세척장 임시 출고와 따로 논다.",
+          "mined_from": "20:50 문서, 출하 전표 조회"
+        },
+        {
+          "for": "k1",
+          "text": "야간 요율표에서 `W/부식` 조합 행의 할증 칸과 통행 제한 칸에 붉은 점이 찍혀 있다.",
+          "mined_from": "20:52 문서, 위험물 요율표"
+        }
+      ],
+      "predicted_shift": null,
+      "false_leads": [
+        "유재승은 세정제라고 반복하고 남기표는 적하목록 품명만 읽는다."
+      ],
+      "buckets": [
+        {
+          "id": "default",
+          "stances": [
+            "a",
+            "c"
+          ],
+          "deltas": {
+            "supervisor_minimization": 10
+          },
+          "flags": {}
+        },
+        {
+          "id": "live",
+          "stances": [
+            "b"
+          ],
+          "deltas": {
+            "supervisor_minimization": -15,
+            "supervisor_protection": 10
+          },
+          "flags": {
+            "suspicious_manifest": true
+          }
+        }
+      ],
+      "edge_predicates": []
+    },
+    {
+      "gate": "G2",
+      "title": "처치",
+      "clock": "20:58",
+      "place_id": "p1",
+      "availability": null,
+      "scene": "차 밑으로 새는 액체는 아직 작은 줄처럼 보인다. 남기표와 유재승은 낮은 위험 액체라면 사람을 바람 위쪽으로 물리고 희석하는 절차가 맞다고 말한다. 물이 닿은 뒤의 바닥 변화와 골목 빗물받이 신고는 아직 기록에 없다.",
+      "branch_note": null,
+      "standard_form": "갈림길 G2에서 기질은 기본 stance a를 낸다. 열쇠 조건 k1을 만족하는 문장 주입 시 b로 이동한다.",
+      "question": "새는 액체 앞에 무엇을 세우겠습니까",
+      "stances": [
+        {
+          "id": "a",
+          "label": "문서상 세정액에는 작업자를 바람 위쪽으로 물린 뒤 희석 처치가 맞다고 보아, 가는 물로 액체를 줄인다",
+          "desc": "사람을 먼저 떼고 물품명에 맞춘 보호 절차로 들어간다."
+        },
+        {
+          "id": "b",
+          "label": "문서 품명으로 설명되지 않는 화물이라고 보아, 물을 대지 않고 마른 재료로 밸브 둘레를 좁힌다",
+          "desc": "물질 확인 전까지 접촉을 끊고 건식 봉쇄로 바꾼다."
+        },
+        {
+          "id": "c",
+          "label": "새는 지점이 아직 손닿는 범위라고 보아, 사람을 뒤로 뺀 채 밸브 잠금과 계량 확인을 먼저 시킨다",
+          "desc": "물 사용도 건식 봉쇄도 늦추고 원점 확인을 앞세운다."
+        }
+      ],
+      "default_stance": "a",
+      "key_conditions": [
+        {
+          "id": "k1",
+          "axis": "정석처리신뢰",
+          "referent": "새는 화물",
+          "species": "사실",
+          "targets_clause": "조건절 1"
+        }
+      ],
+      "key_examples": [
+        {
+          "for": "k1",
+          "text": "유해물질 조회 화면의 후보표에서 닳은 표지 조합과 서해정밀 출하지가 같은 행에 놓이고, 물방울 금지 그림과 회색 기체 그림이 그 옆에 붙어 있다.",
+          "mined_from": "21:03 문서, 유해물질 조회 화면"
+        },
+        {
+          "for": "k1",
+          "text": "초동 세척수가 새는 줄에 닿은 뒤 흰 김이 회색으로 짙어졌다는 현장 보고가 들어온다.",
+          "mined_from": "21:06 현장, 세척수 접촉 보고"
+        },
+        {
+          "for": "k1",
+          "text": "배수현은 빗물받이에서 독한 락스 냄새와 눈 따가움이 올라온다고 전한다.",
+          "mined_from": "21:12 통화, 하단빌라 골목 신고"
+        }
+      ],
+      "predicted_shift": null,
+      "false_leads": [
+        "일반 유류 유출 표준 대응은 희석과 세척을 먼저 떠올리게 한다."
+      ],
+      "buckets": [
+        {
+          "id": "default",
+          "stances": [
+            "a",
+            "c"
+          ],
+          "deltas": {
+            "driver_resistance": 10
+          },
+          "flags": {}
+        },
+        {
+          "id": "live",
+          "stances": [
+            "b"
+          ],
+          "deltas": {
+            "driver_resistance": -15
+          },
+          "flags": {
+            "dry_containment": true
+          }
+        }
+      ],
+      "edge_predicates": []
+    },
+    {
+      "gate": "G3",
+      "title": "배분",
+      "clock": "21:18",
+      "place_id": "p4",
+      "availability": null,
+      "scene": "누출 지점은 야적장 안에 남아 있고, 불빛 아래 세척반과 반장이 먼저 보인다. 오래된 시설대장은 분리조가 정상이라고 말한다. 새 도면과 반장의 기억, 그리고 골목 맨홀 화면은 아직 뒤쪽 기록에 남아 있다.",
+      "branch_note": null,
+      "standard_form": "갈림길 G3에서 기질은 기본 stance a를 낸다. 열쇠 조건 k1을 만족하는 문장 주입 시 b로 이동한다.",
+      "question": "남은 여유를 어느 쪽에 붙이겠습니까",
+      "stances": [
+        {
+          "id": "a",
+          "label": "가장 가까운 작업자가 아직 차 곁에 있다고 보아, 세척팀과 운송 책임자를 뒤로 빼는 데 남은 인력을 붙인다",
+          "desc": "차 곁의 작업자를 먼저 안전거리 밖으로 물린다."
+        },
+        {
+          "id": "b",
+          "label": "보이지 않는 주거지 사람이 더 급하다고 보아, 빌라 지하층 대피와 문 개방을 먼저 보낸다",
+          "desc": "기록 밖 사람을 먼저 깨우고 대피를 연다."
+        },
+        {
+          "id": "c",
+          "label": "중간 설비가 아직 사람을 지켜 줄 수 있다고 보아, 방재실 밸브와 분리조 확인에 남은 인력을 붙인다",
+          "desc": "시설 차단으로 현장 안팎의 노출을 함께 줄이려 한다."
+        }
+      ],
+      "default_stance": "a",
+      "key_conditions": [
+        {
+          "id": "k1",
+          "axis": "울타리중심",
+          "referent": "배수로 종착지",
+          "species": "사실",
+          "targets_clause": "조건절 2"
+        }
+      ],
+      "key_examples": [
+        {
+          "for": "k1",
+          "text": "배수 도면은 남쪽 배수로가 폐쇄 표시가 붙은 유수분리조 옆을 지나 `HDB 우수관` 선으로 이어지는 것을 보인다.",
+          "mined_from": "21:23 문서, 배수 도면"
+        },
+        {
+          "for": "k1",
+          "text": "남기표는 공사 뒤 남쪽 맨홀 번호를 새로 불렀다고 말한다.",
+          "mined_from": "21:27 통화, 반장 재청취"
+        },
+        {
+          "for": "k1",
+          "text": "하단빌라 CCTV는 맨홀 틈에서 낮은 안개가 올라오는 모습을 보인다.",
+          "mined_from": "21:31 CCTV, 하단빌라 골목 화면"
+        }
+      ],
+      "predicted_shift": null,
+      "false_leads": [
+        "시설대장에는 유수분리조가 정상 장비처럼 남아 있다."
+      ],
+      "buckets": [
+        {
+          "id": "default",
+          "stances": [
+            "a",
+            "c"
+          ],
+          "deltas": {
+            "resident_persistence": -10
+          },
+          "flags": {}
+        },
+        {
+          "id": "live",
+          "stances": [
+            "b"
+          ],
+          "deltas": {
+            "resident_persistence": 15
+          },
+          "flags": {
+            "downstream_evacuation": true
+          }
+        }
+      ],
+      "edge_predicates": []
+    }
+  ]
+}

@@ -1,0 +1,257 @@
+# TANK-G2-screen-r3 — arm `live`
+
+| field | value |
+|---|---|
+| call type | judgment |
+| channel | C-BLOCK |
+| template | v0.5 |
+| model | `claude-haiku-4-5-20251001` |
+| transport | anthropic |
+| temperament | tank-base |
+| N planned | 10 |
+| N kept | 10 |
+
+## Pre-registration
+
+- **Hypothesis:** G2 r3는 no-block baseline에서 default stance a가 살아 있고, 확인되지 않은 반응성 화물이라는 belief를 뒷받침하는 full key를 받은 live arm에서 stance b로 움직일 것이다. r2 결과는 label이 carrier evidence를 직접 이름 붙인 결함을 보였으므로, r3는 stance text를 belief-only grammar로 바꾸고 clock/excerpt 구조는 유지한다.
+- **Drop condition:** baseline에서 default a가 0/10이면 skill §3 rule 4에 따라 broken gate다. baseline이 live 기대 stance b를 9/10 이상 고르면 saturated baseline으로 headroom 없음이다. live가 b를 6/10 이하로 고르면 movement failure이고, 7/10 또는 8/10은 n=10 boundary라 definitive result로 보지 않는다. Positive screen은 baseline a가 3/10 이상, baseline b가 1/10 이하, live b가 9/10 이상일 때만 기록한다; 단 baseline b 0/10에서 live b 7/10 이상은 movement evidence로 따로 보고한다.
+- **Contingency:** baseline이 a를 전혀 고르지 않으면 belief-only rewrite 뒤에도 기본 독해가 죽은 것이다.
+- **Contingency:** baseline이 b에 포화되면 stance b가 여전히 evidence 없이 너무 우세하거나 excerpt가 결론을 제공하는 것이다.
+- **Contingency:** baseline이 c에 많이 몰리면 added plausible reading이 default를 훔치는 것이므로 stance c wording을 다시 좁힌다.
+- **Contingency:** live가 b로 충분히 움직이지 않으면 key block wording이 belief를 충분히 지지하지 못한 것이다.
+- **Contingency:** because_block_ids가 live arm에서 제공하지 않은 block id를 꾸며내면 fabricated block id로 따로 보고한다.
+
+## Calls (verbatim)
+
+### 01
+
+latency 4.8s · stop_reason `tool_use` · schema_retries 0 · foreign_tool_uses 0
+
+```json
+{
+  "stance": "b",
+  "inner_note": "적하목록 세정액과 표지 긁힘 사이의 불일치가 명확하다. 물 접촉 후 기체 변화와 배수 현장의 강한 반응성 신호가 함께 왔다. 문서 신뢰만으로는 이 현장 변화를 설명할 수 없다.",
+  "because_referent": "물방울 금지와 회색 기체 그림이 함께 표시된 유해물질 조회 결과, 그리고 초동 세척수 접촉 뒤 흰 김이 회색으로 짙어진 현장 보고",
+  "because_block_ids": [
+    "g2_k1_lookup",
+    "g2_k1_steam"
+  ],
+  "rejected_stance": "a",
+  "rejected_reason": "적하목록만으로 처치를 정하면, 반응성 화물의 물 접촉 금지 표시와 현장에서 이미 보인 기체 변화를 무시하는 것이 된다. 문서상 세정액 이름이 표지 손상과 맞지 않는 상황에서 희석 처치는 위험하다.",
+  "utterance": "반응성 화물 판정. 물 대지 않는다. 마른 재료로 누출 차단. 현장 밸브 주변 통제부터."
+}
+```
+
+### 02
+
+latency 4.804s · stop_reason `tool_use` · schema_retries 0 · foreign_tool_uses 0
+
+```json
+{
+  "stance": "b",
+  "inner_note": "적하목록 상 세정액으로 보이지만, 표지 손상으로 실제 품목이 불일치하는 상황. 물 접촉 후 흰 김이 회색으로 짙어지는 현상과 배수로에서 올라오는 강한 부식 냄새, 그리고 유해물질 조회의 반응성 화물 경고가 일관되게 지적한다. 문서 신뢰도가 손상되었으므로 안전한 쪽으로.",
+  "because_referent": "현장에서 물 접촉 후 기체 변화와 유해물질 조회 경고",
+  "because_block_ids": [
+    "g2_k1_steam",
+    "g2_k1_lookup",
+    "g2_k1_drain"
+  ],
+  "rejected_stance": "a",
+  "rejected_reason": "표지 손상과 현장 기체 변화가 문서상 세정액 판단을 맞선다. 물 처치는 반응성 화물일 경우 상황을 악화시킨다.",
+  "utterance": "배수반 대기. 드라이 처치 진행. 현장 사진 확보 후 유해물질 재확인 요청한다."
+}
+```
+
+### 03
+
+latency 4.492s · stop_reason `tool_use` · schema_retries 0 · foreign_tool_uses 0
+
+```json
+{
+  "inner_note": "문서와 현장이 맞지 않는다. 적하목록은 세정액이지만, 표지는 두 칸 모두 손상되었고, 물을 뿌린 뒤 기체가 흰 김에서 회색으로 짙어졌다. 배수구에서 락스 냄새가 난다. 유해물질 조회는 물방울 금지와 기체 발생을 경고한다.",
+  "stance": "b",
+  "because_referent": "물을 뿌린 뒤 나타난 회색 기체 변화와 유해물질 조회의 경고 부호가 함께 든다.",
+  "because_block_ids": [
+    "g2_k1_steam",
+    "g2_k1_lookup"
+  ],
+  "rejected_stance": "a",
+  "rejected_reason": "문서상 세정액이지만 물 접촉 뒤 기체 변화가 일어났다. 희석 처치는 반응 가능성이 확인되는 동안 미룬다.",
+  "utterance": "물 접촉 금지. 드라이 캡 요청. 밸브 둘레 확대 차단."
+}
+```
+
+### 04
+
+latency 4.367s · stop_reason `tool_use` · schema_retries 0 · foreign_tool_uses 0
+
+```json
+{
+  "inner_note": "문서는 세정액이지만 현장이 다르다. 표지 두 칸이 닳았는데 물 금지와 부식 표지가 있었다. 물에 닿으니 흰 김이 회색으로 짙어졌다. 배수구에서 락스 냄새와 자극이 올라온다. 문서와 현장이 맞지 않는다.",
+  "stance": "b",
+  "because_referent": "표지 손상과 현장 반응이 가리키는 것",
+  "because_block_ids": [
+    "g2_k1_lookup",
+    "g2_k1_steam",
+    "g2_k1_drain"
+  ],
+  "rejected_stance": "a",
+  "rejected_reason": "물을 대면 더 강한 반응이 일어날 수 있다. 현장의 기체 변화와 배수구 자극은 반응성 물질을 가리킨다.",
+  "utterance": "물 대지 말아라. 마른 재료로 밸브 둘레를 좁혀라. 유해물질 반응 의심."
+}
+```
+
+### 05
+
+latency 4.223s · stop_reason `tool_use` · schema_retries 0 · foreign_tool_uses 0
+
+```json
+{
+  "inner_note": "문서는 세정액이지만 현장이 말한다. 표지 두 칸이 물과 부식을 동시에 가리키고, 물 닿은 뒤 기체가 흰색에서 회색으로 진해졌으며, 배수구에서 강한 반응이 올라온다. 이것은 세정액이 아니다.",
+  "stance": "b",
+  "because_referent": "물접촉 뒤 기체 변화와 유해물질 조회 경고가 함께 들어왔기 때문이다.",
+  "because_block_ids": [
+    "g2_k1_steam",
+    "g2_k1_lookup",
+    "g2_k1_drain"
+  ],
+  "rejected_stance": "a",
+  "rejected_reason": "문서상 세정액 표기는 표지 손상으로 의심된다. 현장 증거가 더 크다. 물을 쓰면 안 된다.",
+  "utterance": "발화 중단. 물 사용 금지. 마른 재료로 밸브 차단. 유해물질 격리 조치 진행."
+}
+```
+
+### 06
+
+latency 4.887s · stop_reason `tool_use` · schema_retries 0 · foreign_tool_uses 0
+
+```json
+{
+  "inner_note": "문서는 세정액이라 하고 신고자도 세척장 용품이라 재촉한다. 그런데 표지 자리에 물 금지와 부식 경고가 함께 있었고, 물을 뿌린 뒤 기체가 흰색에서 회색으로 짙어졌다. 배수구에서는 락스 냄새가 났다. 이것은 통상 세정액이 아닌 다른 것이다.",
+  "stance": "b",
+  "because_referent": "물과 닿은 뒤 기체 변화와 유해물질 조회 경고가 함께 들어왔으므로, 문서만 믿을 수 없다.",
+  "because_block_ids": [
+    "g2_k1_steam",
+    "g2_k1_lookup"
+  ],
+  "rejected_stance": "a",
+  "rejected_reason": "신고자와 문서가 같은 말을 한다 해도, 현장에서 물과의 반응이 보고되었고 유해물질 조회까지 경고를 냈다. 물로 씻는 것은 그 반응을 강하게 할 수 있다.",
+  "utterance": "마른 재료로 밸브 둘레를 좁혀라. 물을 대지 말고 기다려."
+}
+```
+
+### 07
+
+latency 5.278s · stop_reason `tool_use` · schema_retries 0 · foreign_tool_uses 0
+
+```json
+{
+  "inner_note": "문서와 현장이 맞지 않는다. 적하목록은 세정액이지만 표지는 물 접촉 금지와 부식 위험을 가리킨다. 세척수 접촉 뒤 기체가 흰색에서 회색으로 변했고, 배수구에서 염소 냄새와 자극이 올라온다. 이는 강산화제 반응의 특징이다.",
+  "stance": "b",
+  "because_referent": "유해물질 조회 화면에서 표지 조합과 출하지가 같은 행에 물방울 금지와 회색 기체 그림이 붙어 있고, 현장에서 물 접촉 뒤 기체가 짙어졌으며, 배수구에서 염소 냄새가 난다.",
+  "because_block_ids": [
+    "g2_k1_lookup",
+    "g2_k1_steam",
+    "g2_k1_drain"
+  ],
+  "rejected_stance": "a",
+  "rejected_reason": "문서상 품명과 표지의 불일치, 물 접촉 후 기체 변화, 배수구의 화학 반응 증거가 함께 들어왔다. 희석 처치는 물 접촉 금지 표지와 현장 반응에 모순된다.",
+  "utterance": "격리 우선. 마른 재료로 밸브 둘레 차단. 물 접근 금지. 유해물질 대응팀 출동 요청."
+}
+```
+
+### 08
+
+latency 5.477s · stop_reason `tool_use` · schema_retries 0 · foreign_tool_uses 0
+
+```json
+{
+  "inner_note": "문서는 '산업용 세정액'이지만, 표지 흔적은 W와 부식을 동시에 나타낸다. 물 접촉 후 흰 김이 회색으로 짙어지는 반응과 배수에서 올라오는 락스 냄새·눈 따가움이 세정액 수준을 벗어난다. 유재승의 진술과 화면 데이터 사이의 괴리가 명확하다.",
+  "stance": "b",
+  "because_referent": "현장에서 물을 부었을 때 나타난 기체 변화와 배수 경로에서 감지된 화학 반응이 적하목록의 '세정액' 분류와 맞지 않는다.",
+  "because_block_ids": [
+    "g2_k1_lookup",
+    "g2_k1_steam",
+    "g2_k1_drain"
+  ],
+  "rejected_stance": "a",
+  "rejected_reason": "문서 우선 원칙을 적용하면 희석 처치가 맞지만, 물 접촉 후의 기체 변화와 배수 반응이 단순 세정액의 거동과 다르다. 현장 변화가 진술을 앞지르고 있다.",
+  "utterance": "물 금지. 마른 재료로 밸브 주변 격리. 유해물질 상세 조회 재개. 현장 기체 농도 측정 요청."
+}
+```
+
+### 09
+
+latency 4.303s · stop_reason `tool_use` · schema_retries 0 · foreign_tool_uses 0
+
+```json
+{
+  "inner_note": "문서와 현장이 어긋난다. 적하목록은 세정액이지만 표지는 물 금지와 회색 기체를 가리킨다. 물을 부으면 흰 김이 회색으로 짙어진다.",
+  "stance": "b",
+  "because_referent": "유해물질 조회가 물방울 금지와 기체 발생을 함께 띄웠고, 초동 세척수 뒤 현장에서 기체가 짙어졌다.",
+  "because_block_ids": [
+    "g2_k1_lookup",
+    "g2_k1_steam"
+  ],
+  "rejected_stance": "a",
+  "rejected_reason": "문서상 세정액이더라도 물 접촉 뒤 기체 변화가 관찰된 이상, 희석 처치는 반응을 키울 수 있다.",
+  "utterance": "물 대금지 판단. 드라이 처치 시작. 밸브 주변 흡수제 투입. 기체 방향 모니터링 계속."
+}
+```
+
+### 10
+
+latency 5.23s · stop_reason `tool_use` · schema_retries 0 · foreign_tool_uses 0
+
+```json
+{
+  "inner_note": "문서와 현장이 맞지 않는다. 적하목록은 세정액이지만, 표지는 두 칸이 긁혀 있고, 물을 대자 흰 김이 회색으로 짙어졌으며, 배수에서 강한 화학 냄새가 난다. 유재승의 말과 현장 보고가 다르다.",
+  "stance": "b",
+  "because_referent": "물 접촉 뒤 기체가 짙어지는 현장 변화와 유해물질 조회 화면의 금지 표지, 배수에서 올라오는 반응이 함께 가리킨다.",
+  "because_block_ids": [
+    "g2_k1_steam",
+    "g2_k1_lookup",
+    "g2_k1_drain"
+  ],
+  "rejected_stance": "a",
+  "rejected_reason": "문서상 세정액이라는 분류만으로는 현장의 기체 변화와 화학 냄새를 설명할 수 없다. 표지가 긁혀 있어 실제 내용물이 불명이고, 이미 물 접촉으로 반응이 시작되었으므로 추가 희석은 위험하다.",
+  "utterance": "밸브 주변 마른 모래포. 물 대지 말아. 현장 화학 냄새 확인. 유해물질 긴급 조회 진행 중."
+}
+```
+
+## Arm table
+
+| # | stance | rejected_stance | because_referent | because_block_ids |
+|---|---|---|---|---|
+| 01 | b | a | 물방울 금지와 회색 기체 그림이 함께 표시된 유해물질 조회 결과, 그리고 초동 세척수 접촉 뒤 흰 김이 회색으로 짙어진 현장 보고 | g2_k1_lookup g2_k1_steam |
+| 02 | b | a | 현장에서 물 접촉 후 기체 변화와 유해물질 조회 경고 | g2_k1_steam g2_k1_lookup g2_k1_drain |
+| 03 | b | a | 물을 뿌린 뒤 나타난 회색 기체 변화와 유해물질 조회의 경고 부호가 함께 든다. | g2_k1_steam g2_k1_lookup |
+| 04 | b | a | 표지 손상과 현장 반응이 가리키는 것 | g2_k1_lookup g2_k1_steam g2_k1_drain |
+| 05 | b | a | 물접촉 뒤 기체 변화와 유해물질 조회 경고가 함께 들어왔기 때문이다. | g2_k1_steam g2_k1_lookup g2_k1_drain |
+| 06 | b | a | 물과 닿은 뒤 기체 변화와 유해물질 조회 경고가 함께 들어왔으므로, 문서만 믿을 수 없다. | g2_k1_steam g2_k1_lookup |
+| 07 | b | a | 유해물질 조회 화면에서 표지 조합과 출하지가 같은 행에 물방울 금지와 회색 기체 그림이 붙어 있고, 현장에서 물 접촉 뒤 기체가 짙어졌으며, 배수구에서 염소 냄새가 난다. | g2_k1_lookup g2_k1_steam g2_k1_drain |
+| 08 | b | a | 현장에서 물을 부었을 때 나타난 기체 변화와 배수 경로에서 감지된 화학 반응이 적하목록의 '세정액' 분류와 맞지 않는다. | g2_k1_lookup g2_k1_steam g2_k1_drain |
+| 09 | b | a | 유해물질 조회가 물방울 금지와 기체 발생을 함께 띄웠고, 초동 세척수 뒤 현장에서 기체가 짙어졌다. | g2_k1_lookup g2_k1_steam |
+| 10 | b | a | 물 접촉 뒤 기체가 짙어지는 현장 변화와 유해물질 조회 화면의 금지 표지, 배수에서 올라오는 반응이 함께 가리킨다. | g2_k1_steam g2_k1_lookup g2_k1_drain |
+
+**Sequence (kept calls):** `b,b,b,b,b,b,b,b,b,b`
+
+**Stance coverage (sampled diagnostic):** offered `a`, `b`, `c` · unobserved in this arm: `a`, `c`
+
+> Diagnostic only — absence at this N is not a dead delta row. The architecture spec §3.1 write test is a static check on the delta table plus the reachability audit (§5.2 B1); a stance unobserved across every arm is a lead for that check, not a failure verdict. Carried to the verdict card (§9.2) as a diagnostic.
+
+## Advisory logs (§5.3)
+
+_Operator-written. Observation only — these never affect distributions,
+boundary laws, or pass/drop judgments._
+
+**State-variable shadow log** — which candidate variables (architecture spec
+§3.1 pool) would this run have moved, and which payload symptom mapped to which?
+
+**Mineability log** — would `utterance` / `inner_note` survive as mining
+material? Block count, specificity (names, quantities, referents), and whether
+it says anything the payload did not already say.
+
+## Pairing verdict
+
+_Operator writes this against the other arms. Sequences, not rates (§9.2)._

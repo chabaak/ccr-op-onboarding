@@ -1,0 +1,512 @@
+{
+  "experiment": "TANK-G2-screen-r4",
+  "arm": "baseline",
+  "call_type": "judgment",
+  "channel": "C-BLOCK",
+  "template": "v0.5",
+  "model": "claude-haiku-4-5-20251001",
+  "transport": "anthropic",
+  "dry_run": false,
+  "pre_registration": {
+    "hypothesis": "G2 r4는 no-block baseline에서 default stance a가 살아 있고, 문서 품명으로 설명되지 않는 화물이라는 belief를 뒷받침하는 full key를 받은 live arm에서 stance b로 움직일 것이다. r3 결과는 evidence-free label 뒤에도 default action 자체가 under-protective하게 읽히는 결함을 보였으므로, r4는 default를 manifest-based protective standard로 바꾸고 clock/excerpt 구조는 유지한다.",
+    "n_per_arm": 10,
+    "call_cost": 20,
+    "drop_condition": "baseline에서 default a가 0/10이면 skill §3 rule 4에 따라 broken gate다. baseline이 live 기대 stance b를 9/10 이상 고르면 saturated baseline으로 headroom 없음이다. live가 b를 6/10 이하로 고르면 movement failure이고, 7/10 또는 8/10은 n=10 boundary라 definitive result로 보지 않는다. Positive screen은 baseline a가 3/10 이상, baseline b가 1/10 이하, live b가 9/10 이상일 때만 기록한다.",
+    "expected_stance_by_arm": {
+      "baseline": "a",
+      "live": "b"
+    },
+    "contingencies": [
+      "baseline이 a를 전혀 고르지 않으면 protective-standard rewrite 뒤에도 기본 독해가 죽은 것이다.",
+      "baseline이 b에 포화되면 pre-G2 record가 여전히 manifest-based procedure보다 stronger caution을 강제하는 것이다.",
+      "baseline이 c에 많이 몰리면 origin-control reading이 default를 훔치는 것이므로 stance c wording을 다시 좁힌다.",
+      "live가 b로 충분히 움직이지 않으면 key block wording이 belief를 충분히 지지하지 못한 것이다.",
+      "because_block_ids가 live arm에서 제공하지 않은 block id를 꾸며내면 fabricated block id로 따로 보고한다."
+    ],
+    "not_claimed": "이 reduced screen은 submission deadline 때문에 placebo와 negative-control arms를 의도적으로 dropped한다. 따라서 each gate moves at all from baseline to live만 본다. It does not establish discrimination, near-miss behavior, or full play reachability."
+  },
+  "n_effective": 10,
+  "n_overridden": false,
+  "calls": [
+    {
+      "arm": "baseline",
+      "slot": 1,
+      "template": "v0.5",
+      "model": "claude-haiku-4-5-20251001",
+      "model_reported": "claude-haiku-4-5-20251001",
+      "temperament_id": "tank-base",
+      "latency_s": 5.215,
+      "stop_reason": "tool_use",
+      "foreign_tool_uses": 0,
+      "schema_retries": 0,
+      "payload": {
+        "inner_note": "문서와 현장이 맞지 않는다. 적하목록은 세정액이지만 표지는 부식 위험을 말한다. 물 접촉 후 기체가 짙어진다는 변화도 있다. 세정액이라는 확신이 없다.",
+        "stance": "c",
+        "because_referent": "표지 두 칸이 긁혀 있고, 한 칸에는 물결 모양 윗획만, 다른 칸에는 검은 테두리만 남아 있다. 문서상 품명과 표지가 일치하지 않는다.",
+        "because_block_ids": [
+          "20:43",
+          "20:45",
+          "20:52"
+        ],
+        "rejected_stance": "a",
+        "rejected_reason": "물 접촉 후 변화가 예상되지 않는 세정액이라고 확신할 수 없다. 표지 손상으로 실제 품목이 불명확하고, 야간 요율표의 W/부식 조합에 붉은 점이 있다. 물을 먼저 대는 것은 위험하다.",
+        "utterance": "새는 지점 확보. 인원 후퇴 지시. 밸브 잠금 우선. 계량 확인 대기 중."
+      },
+      "problems": [
+        "because_block_ids unknown: 20:43,20:45,20:52"
+      ],
+      "stance": "c",
+      "because_referent": "표지 두 칸이 긁혀 있고, 한 칸에는 물결 모양 윗획만, 다른 칸에는 검은 테두리만 남아 있다. 문서상 품명과 표지가 일치하지 않는다.",
+      "because_block_ids": [
+        "20:43",
+        "20:45",
+        "20:52"
+      ],
+      "because_invalid_ids": [
+        "20:43",
+        "20:45",
+        "20:52"
+      ],
+      "rejected_stance": "a",
+      "rejected_malformed": false,
+      "utterance_chars": 41,
+      "inner_note_chars": 84
+    },
+    {
+      "arm": "baseline",
+      "slot": 2,
+      "template": "v0.5",
+      "model": "claude-haiku-4-5-20251001",
+      "model_reported": "claude-haiku-4-5-20251001",
+      "temperament_id": "tank-base",
+      "latency_s": 4.955,
+      "stop_reason": "tool_use",
+      "foreign_tool_uses": 0,
+      "schema_retries": 0,
+      "payload": {
+        "inner_note": "문서 기록과 현장이 어긋난다. 적하목록은 세정액이지만 탱크 표지는 두 칸 모두 긁혀 있고, W와 부식 표지가 남아 있다. 유재승의 말은 경량이지만 그것이 표지 손상을 설명하지 못한다. 물 처치가 기체를 짙게 만들 가능성을 배제할 수 없다.",
+        "stance": "c",
+        "because_referent": "탱크 표지 손상으로 화물 정체성이 불명확하고, 현장 변화가 뒤따를 수 있기 때문이다.",
+        "because_block_ids": [
+          "20:43",
+          "20:52"
+        ],
+        "rejected_stance": "a",
+        "rejected_reason": "물 처치는 불명확한 화물 앞에서 뒤따를 변화를 통제하지 못한다. 표지 손상과 할증 표시는 단순 세정액 이상의 위험을 가리킨다.",
+        "utterance": "야적장 통제. 인원 후퇴. 밸브 잠금과 계량 먼저 확인한다."
+      },
+      "problems": [
+        "because_block_ids unknown: 20:43,20:52"
+      ],
+      "stance": "c",
+      "because_referent": "탱크 표지 손상으로 화물 정체성이 불명확하고, 현장 변화가 뒤따를 수 있기 때문이다.",
+      "because_block_ids": [
+        "20:43",
+        "20:52"
+      ],
+      "because_invalid_ids": [
+        "20:43",
+        "20:52"
+      ],
+      "rejected_stance": "a",
+      "rejected_malformed": false,
+      "utterance_chars": 33,
+      "inner_note_chars": 133
+    },
+    {
+      "arm": "baseline",
+      "slot": 3,
+      "template": "v0.5",
+      "model": "claude-haiku-4-5-20251001",
+      "model_reported": "claude-haiku-4-5-20251001",
+      "temperament_id": "tank-base",
+      "latency_s": 4.922,
+      "stop_reason": "tool_use",
+      "foreign_tool_uses": 0,
+      "schema_retries": 0,
+      "payload": {
+        "stance": "b",
+        "inner_note": "물 접촉 뒤 기체가 짙어진다는 현장 변화와 유해물질 조회 경고가 함께 들어왔다. 적하목록과 표지가 맞지 않는다. 문서상 세정액이라는 신고자 진술만으로는 이 불일치를 설명할 수 없다.",
+        "because_referent": "남기표의 재촉과 적하목록 상의 세정액 기재",
+        "because_block_ids": [
+          "20:40",
+          "20:45",
+          "20:55"
+        ],
+        "rejected_stance": "a",
+        "rejected_reason": "물 접촉 뒤 기체 짙어짐과 유해물질 조회 경고가 세정액의 표준 처치인 희석을 뒷받침하지 않는다. 표지 손상으로 실제 내용물이 가려져 있다.",
+        "utterance": "대응을 b로 전개한다. 밸브 둘레 마른 재료 좁히기. 인력 후퇴 확인 후 잠금 시도. 통제 강화."
+      },
+      "problems": [
+        "because_block_ids unknown: 20:40,20:45,20:55"
+      ],
+      "stance": "b",
+      "because_referent": "남기표의 재촉과 적하목록 상의 세정액 기재",
+      "because_block_ids": [
+        "20:40",
+        "20:45",
+        "20:55"
+      ],
+      "because_invalid_ids": [
+        "20:40",
+        "20:45",
+        "20:55"
+      ],
+      "rejected_stance": "a",
+      "rejected_malformed": false,
+      "utterance_chars": 54,
+      "inner_note_chars": 101
+    },
+    {
+      "arm": "baseline",
+      "slot": 4,
+      "template": "v0.5",
+      "model": "claude-haiku-4-5-20251001",
+      "model_reported": "claude-haiku-4-5-20251001",
+      "temperament_id": "tank-base",
+      "latency_s": 6.481,
+      "stop_reason": "tool_use",
+      "foreign_tool_uses": 0,
+      "schema_retries": 0,
+      "payload": {
+        "stance": "c",
+        "inner_note": "적하목록은 \"산업용 세정액\"인데 탱크 표지에 긁힌 자국이 남아 있고, 그 중 한 칸은 물결(W) 모양의 윗획만, 다른 칸은 검은 테두리만 남았다. 접수 화면에는 W와 부식 표지가 별도로 나타나 있다. 야간 요율표에서 W/부식 조합은 붉은 점으로 할증과 통행 제한이 표시되어 있다. 물 접촉 시 기체가 짙어질 가능성이 있고, 유해물질 조회 경고와 함께다.",
+        "because_referent": "화물의 실제 성질이 문서상 세정액과 맞지 않을 가능성이 있기 때문이다.",
+        "because_block_ids": [
+          "20:43",
+          "20:45",
+          "20:52"
+        ],
+        "rejected_stance": "a",
+        "rejected_reason": "신고자와 운전자가 세정액으로 읽으라고 촉구하고 있으나, 탱크 표지 손상으로 원래 표지가 가려져 있고, 적하목록 행의 표지 칸에 부식 위험이 기록되어 있다. 물 희석은 부식성 물질 누출 시 발열 반응과 기체 방출을 초래할 수 있다. 문서와 현장이 일치하지 않는 상황에서 안전 절차를 먼저 취한다.",
+        "utterance": "현장 통제 유지. 인근 인원 풍상 후퇴. 밸브 잠금과 남은 적하량 확인 먼저 진행한다. 물 투입 보류."
+      },
+      "problems": [
+        "because_block_ids unknown: 20:43,20:45,20:52"
+      ],
+      "stance": "c",
+      "because_referent": "화물의 실제 성질이 문서상 세정액과 맞지 않을 가능성이 있기 때문이다.",
+      "because_block_ids": [
+        "20:43",
+        "20:45",
+        "20:52"
+      ],
+      "because_invalid_ids": [
+        "20:43",
+        "20:45",
+        "20:52"
+      ],
+      "rejected_stance": "a",
+      "rejected_malformed": false,
+      "utterance_chars": 57,
+      "inner_note_chars": 197
+    },
+    {
+      "arm": "baseline",
+      "slot": 5,
+      "template": "v0.5",
+      "model": "claude-haiku-4-5-20251001",
+      "model_reported": "claude-haiku-4-5-20251001",
+      "temperament_id": "tank-base",
+      "latency_s": 5.742,
+      "stop_reason": "tool_use",
+      "foreign_tool_uses": 0,
+      "schema_retries": 0,
+      "payload": {
+        "inner_note": "문서 기재와 현장 신호가 맞지 않는다. 적하목록은 산업용 세정액이지만, 탱크 표지 두 칸이 긁혀 있고 남은 기호가 물결(W)과 부식을 보인다. 출발 전표 조회의 시간과 유재승 진술 사이에 어긋남이 있다. 물과 접촉했을 때 기체가 짙어진다는 정보가 없지만, 표지의 부식 표시와 할증·제한 표시가 붉게 켜 있다는 신호는 단순한 세정액과 맞지 않는다.",
+        "stance": "c",
+        "because_referent": "문서와 현장 사이의 어긋남이 크다. 적하목록 품명만으로는 표지의 긁힘과 부식 표시, 할증·제한 표시를 설명할 수 없다.",
+        "because_block_ids": [
+          "20:43",
+          "20:45",
+          "20:52"
+        ],
+        "rejected_stance": "a",
+        "rejected_reason": "물을 대는 처치는 실제 화물이 무엇인지 확인한 뒤에 결정해야 한다. 문서상 품명으로만 판단하면 표지의 물결과 부식 표시가 남은 이유를 설명할 수 없고, 그것이 희석을 거부하는 신호일 수 있다.",
+        "utterance": "새는 지점 확인. 사람을 뒤로 뺀다. 밸브 잠금과 계량 확인을 먼저 진행해라."
+      },
+      "problems": [
+        "because_block_ids unknown: 20:43,20:45,20:52"
+      ],
+      "stance": "c",
+      "because_referent": "문서와 현장 사이의 어긋남이 크다. 적하목록 품명만으로는 표지의 긁힘과 부식 표시, 할증·제한 표시를 설명할 수 없다.",
+      "because_block_ids": [
+        "20:43",
+        "20:45",
+        "20:52"
+      ],
+      "because_invalid_ids": [
+        "20:43",
+        "20:45",
+        "20:52"
+      ],
+      "rejected_stance": "a",
+      "rejected_malformed": false,
+      "utterance_chars": 43,
+      "inner_note_chars": 193
+    },
+    {
+      "arm": "baseline",
+      "slot": 6,
+      "template": "v0.5",
+      "model": "claude-haiku-4-5-20251001",
+      "model_reported": "claude-haiku-4-5-20251001",
+      "temperament_id": "tank-base",
+      "latency_s": 5.851,
+      "stop_reason": "tool_use",
+      "foreign_tool_uses": 0,
+      "schema_retries": 0,
+      "payload": {
+        "stance": "c",
+        "inner_note": "적하목록상 세정액이지만, 표지 손상으로 실제 품명이 불명확하다. 물 접촉 시 반응 변화 가능성이 있으므로 안전 우선으로 접근해야 한다. 먼저 사람을 안전거리로 빼고, 화물의 실체를 확인한 뒤 처치를 정한다.",
+        "because_referent": "탱크 표지가 두 칸 손상되었고 한 칸은 물결만, 다른 칸은 검은 테두리만 남아 문서와 현장이 맞지 않는다. 유재승의 \"세척장 임시 출고\" 진술도 적하목록 경로와 맞춰야 한다.",
+        "because_block_ids": [
+          "20:43",
+          "20:45",
+          "20:50",
+          "20:52"
+        ],
+        "rejected_stance": "a",
+        "rejected_reason": "세정액으로 확정되지 않았다. 표지 손상과 야간 요율표의 W/부식 할증·제한 표시가 단순 세정액 이상의 위험을 시사한다. 물로 먼저 희석하는 것은 미확인 화물에 대한 성급한 처치다.",
+        "utterance": "사람 뒤로 뺀다. 밸브 잠금 확인하고 계량 재점검 시킨다. 표지 손상 현장 사진과 적하목록 재확인 중."
+      },
+      "problems": [
+        "because_block_ids unknown: 20:43,20:45,20:50,20:52"
+      ],
+      "stance": "c",
+      "because_referent": "탱크 표지가 두 칸 손상되었고 한 칸은 물결만, 다른 칸은 검은 테두리만 남아 문서와 현장이 맞지 않는다. 유재승의 \"세척장 임시 출고\" 진술도 적하목록 경로와 맞춰야 한다.",
+      "because_block_ids": [
+        "20:43",
+        "20:45",
+        "20:50",
+        "20:52"
+      ],
+      "because_invalid_ids": [
+        "20:43",
+        "20:45",
+        "20:50",
+        "20:52"
+      ],
+      "rejected_stance": "a",
+      "rejected_malformed": false,
+      "utterance_chars": 57,
+      "inner_note_chars": 115
+    },
+    {
+      "arm": "baseline",
+      "slot": 7,
+      "template": "v0.5",
+      "model": "claude-haiku-4-5-20251001",
+      "model_reported": "claude-haiku-4-5-20251001",
+      "temperament_id": "tank-base",
+      "latency_s": 6.118,
+      "stop_reason": "tool_use",
+      "foreign_tool_uses": 0,
+      "schema_retries": 0,
+      "payload": {
+        "inner_note": "적하목록과 신고 진술은 \"세정액\"이라 하지만, 표지의 손상된 기호는 물질 정체성을 지운다. W와 부식이 함께 표시되고, 야간 요율표는 이 조합에 붉은 점을 찍어 할증과 제한을 명시했다. 물 접촉 뒤 기체가 짙어진다는 징후는 아직 없지만, 물 처치의 결정은 물질 정체성이 확정된 뒤여야 한다. 표지 손상은 우연이 아니다.",
+        "stance": "c",
+        "because_referent": "야간 요율표의 W/부식 조합이 통행 제한과 할증을 붉은 점으로 명시했고, 탱크 표지의 손상된 기호는 화물 정체성을 의도적으로 지웠다는 의심을 키운다.",
+        "because_block_ids": [
+          "20:43",
+          "20:45",
+          "20:52"
+        ],
+        "rejected_stance": "a",
+        "rejected_reason": "문서상 품명과 표지 손상이 모순되는 상황에서 문서만 믿고 물을 대는 것은, 변화된 현장 상태를 확인할 기회를 버리는 것이다. 세정액 명의는 편하지만, 그 명의 아래서 표지가 긁혀 지워진 이유를 먼저 알아야 한다.",
+        "utterance": "사람 먼저 뺀다. 밸브 잠금 확인하고 계량 점검 진행해."
+      },
+      "problems": [
+        "because_block_ids unknown: 20:43,20:45,20:52"
+      ],
+      "stance": "c",
+      "because_referent": "야간 요율표의 W/부식 조합이 통행 제한과 할증을 붉은 점으로 명시했고, 탱크 표지의 손상된 기호는 화물 정체성을 의도적으로 지웠다는 의심을 키운다.",
+      "because_block_ids": [
+        "20:43",
+        "20:45",
+        "20:52"
+      ],
+      "because_invalid_ids": [
+        "20:43",
+        "20:45",
+        "20:52"
+      ],
+      "rejected_stance": "a",
+      "rejected_malformed": false,
+      "utterance_chars": 31,
+      "inner_note_chars": 178
+    },
+    {
+      "arm": "baseline",
+      "slot": 8,
+      "template": "v0.5",
+      "model": "claude-haiku-4-5-20251001",
+      "model_reported": "claude-haiku-4-5-20251001",
+      "temperament_id": "tank-base",
+      "latency_s": 7.176,
+      "stop_reason": "tool_use",
+      "foreign_tool_uses": 0,
+      "schema_retries": 0,
+      "payload": {
+        "inner_note": "문서상 품명은 '산업용 세정액'이지만, 탱크 표지 두 칸이 긁혀 있고 '물결 모양 윗획'과 '검은 테두리'만 남아 있다는 것은 원래 표시된 유해 표지가 지워졌다는 뜻이다. 적하목록 표지 칸에 'W'와 '부식'이 따로 남아 있다는 것도 실제 화물이 단순 세정액이 아닐 가능성을 가리킨다. 야간 요율표에서 'W/부식' 조합이 할증과 통행 제한 표시를 받은 것은 이 조합이 통상적 위험으로 등록되어 있다는 의미다. 물 접촉 뒤 기체가 짙어질 수 있는 반응이 우려된다.",
+        "stance": "b",
+        "because_referent": "탱크 표지가 의도적으로 손상되었고, 적하목록 표지와 실제 표지 표시가 불일치하며, 유해물질 조합이 통행 제한 대상으로 등록되어 있기 때문이다.",
+        "because_block_ids": [
+          "20:43",
+          "20:45",
+          "20:52"
+        ],
+        "rejected_stance": "a",
+        "rejected_reason": "신고자 진술과 서면상 품명만으로 단순 세정액이라 결론 내렸을 때, 물 희석은 '물결 모양'과 '부식' 표지가 함께 있는 물질과의 반응을 놓칠 수 있다. 작업자 위치와 무관하게 기체 발생 위험이 크다.",
+        "utterance": "새는 지점 통제. 사람 뒤로 뺀다. 밸브 잠금과 계량 확인부터 진행해라."
+      },
+      "problems": [
+        "because_block_ids unknown: 20:43,20:45,20:52"
+      ],
+      "stance": "b",
+      "because_referent": "탱크 표지가 의도적으로 손상되었고, 적하목록 표지와 실제 표지 표시가 불일치하며, 유해물질 조합이 통행 제한 대상으로 등록되어 있기 때문이다.",
+      "because_block_ids": [
+        "20:43",
+        "20:45",
+        "20:52"
+      ],
+      "because_invalid_ids": [
+        "20:43",
+        "20:45",
+        "20:52"
+      ],
+      "rejected_stance": "a",
+      "rejected_malformed": false,
+      "utterance_chars": 40,
+      "inner_note_chars": 258
+    },
+    {
+      "arm": "baseline",
+      "slot": 9,
+      "template": "v0.5",
+      "model": "claude-haiku-4-5-20251001",
+      "model_reported": "claude-haiku-4-5-20251001",
+      "temperament_id": "tank-base",
+      "latency_s": 6.294,
+      "stop_reason": "tool_use",
+      "foreign_tool_uses": 0,
+      "schema_retries": 0,
+      "payload": {
+        "stance": "c",
+        "inner_note": "적하목록 품명과 실제 표지 기호가 맞지 않는다. 물결(W)과 부식이 남아 있다는 것은 문서와 현장이 다르다는 신호다. 유재승의 말과 남기표의 말은 각각 다른 근거에서 나온 것이고, 둘 다 문서를 기반으로 한다. 물 접촉 뒤 기체가 짙어질 가능성을 배제할 수 없다. 지금 당장 필요한 것은 판단이 아니라 확인이다.",
+        "because_referent": "탱크 표지가 부식 기호를 남기고 있고, 적하목록 행에도 부식이 표시되어 있으나, 품명 설명이 이것과 일치하지 않는다. 물을 먼저 대면 확인할 기회를 잃는다.",
+        "because_block_ids": [
+          "표지-물결-부식",
+          "적하목록-W-부식",
+          "품명-산업용세정액",
+          "유재승-물로밀기",
+          "요율표-할증-제한"
+        ],
+        "rejected_stance": "a",
+        "rejected_reason": "문서 품명만으로 처치를 정하면, 표지와의 불일치를 무시하는 것이다. 낮은 위험 절차를 선호하되, 확인되지 않은 상태에서 물 접촉은 돌이킬 수 없다.",
+        "utterance": "현장 사람 뒤로. 밸브 잠금 확인 먼저 진행해. 계량 상태도 재차 확인."
+      },
+      "problems": [
+        "because_block_ids unknown: 표지-물결-부식,적하목록-W-부식,품명-산업용세정액,유재승-물로밀기,요율표-할증-제한"
+      ],
+      "stance": "c",
+      "because_referent": "탱크 표지가 부식 기호를 남기고 있고, 적하목록 행에도 부식이 표시되어 있으나, 품명 설명이 이것과 일치하지 않는다. 물을 먼저 대면 확인할 기회를 잃는다.",
+      "because_block_ids": [
+        "표지-물결-부식",
+        "적하목록-W-부식",
+        "품명-산업용세정액",
+        "유재승-물로밀기",
+        "요율표-할증-제한"
+      ],
+      "because_invalid_ids": [
+        "표지-물결-부식",
+        "적하목록-W-부식",
+        "품명-산업용세정액",
+        "유재승-물로밀기",
+        "요율표-할증-제한"
+      ],
+      "rejected_stance": "a",
+      "rejected_malformed": false,
+      "utterance_chars": 40,
+      "inner_note_chars": 174
+    },
+    {
+      "arm": "baseline",
+      "slot": 10,
+      "template": "v0.5",
+      "model": "claude-haiku-4-5-20251001",
+      "model_reported": "claude-haiku-4-5-20251001",
+      "temperament_id": "tank-base",
+      "latency_s": 4.908,
+      "stop_reason": "tool_use",
+      "foreign_tool_uses": 0,
+      "schema_retries": 0,
+      "payload": {
+        "stance": "b",
+        "inner_note": "적하목록은 세정액이지만 탱크 표지 두 칸이 손상돼 있다. 한 칸은 물결 모양만, 다른 칸은 검은 테두리만 남았다. 야간 요율표에서 W/부식 조합이 할증과 제한 표지를 받고 있다. 문서와 현장이 맞지 않는다. 물 접촉 뒤 기체가 짙어질 수 있다는 신호다.",
+        "because_referent": "탱크 표지의 손상과 요율표의 할증 표지가 함께 말한다",
+        "because_block_ids": [
+          "20:43",
+          "20:52"
+        ],
+        "rejected_stance": "a",
+        "rejected_reason": "물로 희석하는 것은 현장 표지가 손상된 상황에서 위험하다. 문서상 세정액이라는 이유만으로는 표지 손상을 설명할 수 없다.",
+        "utterance": "마른 재료로 밸브 주변 차단. 물 사용 금지. 인원 후퇴 지시."
+      },
+      "problems": [
+        "because_block_ids unknown: 20:43,20:52"
+      ],
+      "stance": "b",
+      "because_referent": "탱크 표지의 손상과 요율표의 할증 표지가 함께 말한다",
+      "because_block_ids": [
+        "20:43",
+        "20:52"
+      ],
+      "because_invalid_ids": [
+        "20:43",
+        "20:52"
+      ],
+      "rejected_stance": "a",
+      "rejected_malformed": false,
+      "utterance_chars": 35,
+      "inner_note_chars": 141
+    }
+  ],
+  "sequence": "c,c,b,c,c,c,c,b,c,b",
+  "distribution": {
+    "c": 7,
+    "b": 3
+  },
+  "coverage": {
+    "status": "sampled",
+    "offered": [
+      "a",
+      "b",
+      "c"
+    ],
+    "selected": [
+      "b",
+      "c"
+    ],
+    "unobserved": [
+      "a"
+    ]
+  },
+  "advisory_logs": {
+    "state_variable_shadow": null,
+    "mineability": null
+  },
+  "latency": {
+    "calls": 10,
+    "mean_s": 5.766,
+    "min_s": 4.908,
+    "max_s": 7.176
+  },
+  "compliance": {
+    "discarded_total": 0,
+    "failed_total": 0,
+    "schema_retries_total": 0,
+    "foreign_tool_uses_total": 0,
+    "because_invalid_id_total": 31
+  }
+}

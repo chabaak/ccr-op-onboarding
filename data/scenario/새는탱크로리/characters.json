@@ -1,0 +1,120 @@
+{
+  "characters": [
+    {
+      "id": "c1",
+      "name": "남기표",
+      "age": 46,
+      "role": "터미널 야간반장",
+      "interest": "자기 야적장에서 난 일을 작은 유출로 묶어 야간 운영 중단과 사후 문책을 피하려 한다.",
+      "knows": [
+        "배수로가 공사 뒤 어디로 빠지는지",
+        "시설대장과 도면이 어긋난다는 것"
+      ],
+      "doesnt_know": [
+        "탱크 안 실제 화물",
+        "물 반응성"
+      ],
+      "meters": [
+        {
+          "id": "m1",
+          "label": "축소",
+          "variable": "supervisor_minimization",
+          "initial": 60
+        },
+        {
+          "id": "m2",
+          "label": "보호",
+          "variable": "supervisor_protection",
+          "initial": 35
+        }
+      ],
+      "strands": {
+        "truth_ids": [
+          "tr1",
+          "tr3"
+        ],
+        "gate_ids": [
+          "G1"
+        ]
+      }
+    },
+    {
+      "id": "c2",
+      "name": "유재승",
+      "age": 52,
+      "role": "탱크로리 운전기사",
+      "interest": "요율과 통행 제한을 피하려고 낮은 분류로 신고한 일을 숨기려 한다.",
+      "knows": [
+        "실제 화물",
+        "출하지",
+        "낮춘 신고의 이유"
+      ],
+      "doesnt_know": [
+        "야적장 밖 배수로 종착지",
+        "하단빌라의 밤 인원"
+      ],
+      "meters": [
+        {
+          "id": "m1",
+          "label": "은폐",
+          "variable": "driver_concealment",
+          "initial": 70
+        },
+        {
+          "id": "m2",
+          "label": "버팀",
+          "variable": "driver_resistance",
+          "initial": 60
+        }
+      ],
+      "strands": {
+        "truth_ids": [
+          "tr1",
+          "tr2"
+        ],
+        "gate_ids": [
+          "G2"
+        ]
+      }
+    },
+    {
+      "id": "c3",
+      "name": "배수현",
+      "age": 58,
+      "role": "하단빌라 통장",
+      "interest": "잠든 주민을 깨우고 낮은 층을 비우게 해야 한다.",
+      "knows": [
+        "누가 집에 있는지",
+        "맨홀에서 무엇이 올라오는지",
+        "지하층 현관 상태"
+      ],
+      "doesnt_know": [
+        "화학 이름",
+        "탱크 화물"
+      ],
+      "meters": [
+        {
+          "id": "m1",
+          "label": "감각",
+          "variable": "resident_signal",
+          "initial": 50
+        },
+        {
+          "id": "m2",
+          "label": "완강함",
+          "variable": "resident_persistence",
+          "initial": 65
+        }
+      ],
+      "strands": {
+        "truth_ids": [
+          "tr2",
+          "tr3"
+        ],
+        "gate_ids": [
+          "G3"
+        ]
+      }
+    }
+  ]
+}

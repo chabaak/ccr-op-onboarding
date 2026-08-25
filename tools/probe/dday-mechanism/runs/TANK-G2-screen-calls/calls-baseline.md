@@ -1,0 +1,285 @@
+# TANK-G2-screen — arm `baseline`
+
+| field | value |
+|---|---|
+| call type | judgment |
+| channel | C-BLOCK |
+| template | v0.5 |
+| model | `claude-haiku-4-5-20251001` |
+| transport | anthropic |
+| temperament | tank-base |
+| N planned | 10 |
+| N kept | 10 |
+
+## Pre-registration
+
+- **Hypothesis:** G2는 no-block baseline에서 기본 stance a가 살아 있고, 물 접촉 누출 처치 full key를 받은 live arm에서 stance b로 움직일 것이다. 단 frozen record가 이미 key carrier를 담기 때문에 baseline이 stance b에 포화될 위험이 있으며, 그 경우 이 gate는 handover가 더할 headroom이 없는 것으로 판정한다.
+- **Drop condition:** baseline에서 default가 0/10이면 skill §3 rule 4에 따라 broken gate다. baseline이 live 기대 stance b를 9/10 이상 고르면 saturated baseline으로 headroom 없음이다. live가 b를 6/10 이하로 고르면 movement failure이고, 7/10 또는 8/10은 n=10 boundary라 definitive result로 보지 않는다. Positive screen은 baseline default 9/10 이상, baseline live stance 1/10 이하, live b 9/10 이상일 때만 기록한다.
+- **Contingency:** baseline이 default를 전혀 고르지 않으면 질문이나 stance label이 기본 독해를 잃은 것이다.
+- **Contingency:** baseline이 stance b에 포화되면 frozen record만으로 이미 live 판단이 나오는 것이므로 handover screen에는 headroom이 없다.
+- **Contingency:** live가 stance b로 충분히 움직이지 않으면 key block wording이 약하거나 default attraction이 지나치게 강하다.
+- **Contingency:** because_block_ids가 live arm에서 제공하지 않은 block id를 꾸며내면 fabricated block id로 따로 보고한다.
+
+## Calls (verbatim)
+
+### 01
+
+latency 4.428s · stop_reason `tool_use` · schema_retries 0 · foreign_tool_uses 0
+
+problems: because_block_ids unknown: 21:03,21:06,21:12
+
+```json
+{
+  "stance": "b",
+  "inner_note": "적하목록과 표지가 맞지 않고, 물 접촉 후 기체 변화와 유해물질 경고가 함께 들어왔다. 초동 세척이 회색 연기로 짙어지는 현장 변화가 나타났다. 물로 밀기는 위험하다.",
+  "because_referent": "유해물질 조회 화면이 물 접촉 시 유독 기체 발생을 경고했고, 초동 세척수가 새는 줄에 닿자 흰 김이 회색으로 짙어졌다. 배수현이 독한 냄새와 눈 자극을 보고했다.",
+  "because_block_ids": [
+    "21:03",
+    "21:06",
+    "21:12"
+  ],
+  "rejected_stance": "a",
+  "rejected_reason": "물로 밀어내면 물 접촉 시 유독 기체 발생 경고를 무시하는 것이다. 초동 세척 때 이미 회색 연기로 짙어진 현장 변화가 일어났다.",
+  "utterance": "흡착재로 묶어라. 호스 회수. 야적장 통제 확대. 배수로 차단 준비."
+}
+```
+
+### 02
+
+latency 4.153s · stop_reason `tool_use` · schema_retries 0 · foreign_tool_uses 0
+
+problems: because_block_ids unknown: 20:43,20:45,20:52,21:03,21:06
+
+```json
+{
+  "stance": "b",
+  "because_block_ids": [
+    "20:43",
+    "20:45",
+    "20:52",
+    "21:03",
+    "21:06"
+  ],
+  "because_referent": "물 접촉 시 유독 기체를 발생시키는 물질이다.",
+  "inner_note": "처음엔 세정액으로 보였지만, 닳은 표지와 출하지 조회가 일치하고, 유해물질 경고가 명시했다. 물로 씻은 순간 흰 김이 회색으로 짙어지며 기체가 발생했다. 이미 야적장에서 피해가 시작됐다.",
+  "rejected_stance": "a",
+  "rejected_reason": "호스로 물을 더하면 기체 발생이 가속된다. 현장에서 이미 확인됐다.",
+  "utterance": "흡착재로 격리한다. 호스 중단. 유해물질 경보 발령하고 야적장 통제 범위를 확대해라. 배수 차단과 맨홀 점검도 병행한다."
+}
+```
+
+### 03
+
+latency 3.993s · stop_reason `tool_use` · schema_retries 0 · foreign_tool_uses 0
+
+problems: because_block_ids unknown: 21:03,21:06,21:12
+
+```json
+{
+  "stance": "b",
+  "inner_note": "물 접촉 시 유독 기체 발생 경고가 명시됐다. 21:06 세척수 접촉 후 흰 김이 회색으로 짙어진 것은 화학 반응 진행 중을 보여준다. 21:12 배수 경로에서 이미 유해물질이 확인됐다.",
+  "because_referent": "유해물질 조회 결과와 현장의 물 접촉 후 변화",
+  "because_block_ids": [
+    "21:03",
+    "21:06",
+    "21:12"
+  ],
+  "rejected_stance": "a",
+  "rejected_reason": "호스 세척은 유해물질 조회 경고인 물 접촉 시 유독 기체 발생을 직접 유발한다. 현장에서 이미 진행 중인 세척이 기체 짙어짐을 초래했다.",
+  "utterance": "흡착재 투입. 세척 중단하고 배수반 요청. 환기 강화."
+}
+```
+
+### 04
+
+latency 3.788s · stop_reason `tool_use` · schema_retries 0 · foreign_tool_uses 0
+
+problems: because_block_ids unknown: 21:03,21:06,21:12
+
+```json
+{
+  "stance": "b",
+  "utterance": "흡착재 투입. 야적장 전면 통제.",
+  "inner_note": "물 접촉 시 유독 기체 발생. 초동 세척수가 이미 기체 색깔을 회색으로 짙게 했다. 배수 경로로 흘러내려 빗물받이까지 영향을 주고 있다. 더 이상 물을 써서는 안 된다.",
+  "because_referent": "21:03 유해물질 조회 경고와 21:06 초동 세척 뒤의 기체 변화가 함께 말한다.",
+  "because_block_ids": [
+    "21:03",
+    "21:06",
+    "21:12"
+  ],
+  "rejected_stance": "a",
+  "rejected_reason": "호스로 밀어내는 것은 물 접촉을 계속 늘린다. 이미 유독 기체가 발생하고 있는 상황에서 세척은 확산을 악화시킨다."
+}
+```
+
+### 05
+
+latency 4.954s · stop_reason `tool_use` · schema_retries 0 · foreign_tool_uses 0
+
+problems: because_block_ids unknown: 20:43,21:03,21:06
+
+```json
+{
+  "stance": "b",
+  "inner_note": "초기 적하목록은 산업용 세정액으로 보였으나, 닳은 위험 표지 조합(W+부식)과 물 접촉 시 유독 기체 발생 경고가 함께 들어왔다. 21:06의 현장 변화—흰 김이 회색으로 짙어지는 것—가 화학 반응을 강하게 시사한다. 배수 경로 아래에서 락스 냄새와 눈 자극 증상까지 확인되었다. 물로 밀어내면 더 빠른 반응과 확산을 초래할 위험이 크다.",
+  "because_referent": "닳은 위험 표지와 유해물질 조회 경고, 그리고 물 접촉 후 기체 변화가 함께 가리키는 방향.",
+  "because_block_ids": [
+    "20:43",
+    "21:03",
+    "21:06"
+  ],
+  "rejected_stance": "a",
+  "rejected_reason": "호스로 밀어냄은 물 접촉이다. 21:06에서 이미 초동 세척수가 닿았을 때 낮게 깔린 흰 김이 회색으로 짙어졌다. 같은 방법을 반복하면 기체 발생과 확산을 가속화할 것이다.",
+  "utterance": "흡착재 투입. 호스 사용 금지. 유해물질 경고 상태 재확인."
+}
+```
+
+### 06
+
+latency 4.71s · stop_reason `tool_use` · schema_retries 0 · foreign_tool_uses 0
+
+problems: because_block_ids unknown: 21:03,21:06
+
+```json
+{
+  "stance": "b",
+  "because_referent": "물 접촉 시 유독 기체 발생 경고와 현장에서 물이 닿은 뒤 깔린 기체가 회색으로 짙어지는 변화",
+  "because_block_ids": [
+    "21:03",
+    "21:06"
+  ],
+  "inner_note": "초반에는 적하목록 세정액과 신고자 진술로 낮은 위험으로 봤다. 하지만 닳은 표지, 출하 전표 불일치, 유해물질 경고, 그리고 눈앞의 물 접촉 후 기체 변화가 함께 들어왔다. 현장 변화가 경고와 맞다.",
+  "rejected_stance": "a",
+  "rejected_reason": "호스 세척은 물 접촉으로 유독 기체를 발생시킨다. 이미 초동 세척수가 닿은 뒤 흰 김이 회색으로 짙어졌고 배수에서 독한 냄새와 눈 자극이 보고됐다. 세척 계속은 위험을 키운다.",
+  "utterance": "흡착재 투입. 물 사용 중지. 유해물질 대응으로 전환한다."
+}
+```
+
+### 07
+
+latency 4.254s · stop_reason `tool_use` · schema_retries 0 · foreign_tool_uses 0
+
+problems: because_block_ids unknown: 21:03,21:06,21:12
+
+```json
+{
+  "inner_note": "물 접촉 시 유독 기체 발생 경고가 명확하다. 21:00의 물방울 접촉 후 하얀 것이 회색으로 짙어지는 변화, 21:06의 세척수 접촉 후 흰 김이 회색으로 짙어지고 밀려나가는 현상, 배수현의 독한 냄새와 눈 자극까지 함께 들어왔다. 이미 물 반응이 현장에서 일어나고 있다.",
+  "stance": "b",
+  "because_referent": "물 접촉 시 유독 기체 발생 경고와 현장에서 관찰된 물 반응 현상이 지시한다.",
+  "because_block_ids": [
+    "21:03",
+    "21:06",
+    "21:12"
+  ],
+  "rejected_stance": "a",
+  "rejected_reason": "호스로 밀어내는 것은 물 접촉을 더하는 선택이다. 이미 물 반응으로 유독 기체가 발생하고 있는 상황에서 추가 세척은 가스 발생을 증가시킨다.",
+  "utterance": "흡착재 투입 지시. 물 접근 차단. 현장 인력 호흡 보호 확인."
+}
+```
+
+### 08
+
+latency 5.266s · stop_reason `tool_use` · schema_retries 0 · foreign_tool_uses 0
+
+problems: because_block_ids unknown: 20:43,20:50,20:52,21:03,21:06,21:12
+
+```json
+{
+  "inner_note": "초기에는 세정액 신고와 적하목록이 일치해 보였으나, 위험 표지 불일치, 출하 정보 모순, 물 접촉 시 유독 기체 경고, 현장의 화학 반응(하얀 끓음, 회색 김, 독한 냄새)이 연쇄로 들어왔다. 이미 물이 닿자 상황이 변했다.",
+  "stance": "b",
+  "because_referent": "21:03 유해물질 조회가 물 접촉 시 유독 기체 발생을 경고했고, 21:06 세척수가 닿자 흰 김이 회색으로 짙어지며 작업등 아래로 밀렸다. 배수현이 독한 냄새와 눈 자극을 보고했다.",
+  "because_block_ids": [
+    "20:43",
+    "20:50",
+    "20:52",
+    "21:03",
+    "21:06",
+    "21:12"
+  ],
+  "rejected_stance": "a",
+  "rejected_reason": "물 접촉이 유독 기체를 발생시킨다는 경고와 현장 증거(회색 김, 냄새, 눈 자극)가 함께 들어왔다. 추가 세척은 기체 발생을 가중시킨다.",
+  "utterance": "흡착재 투입. 물 사용 중단. 야적장 통제 확대. 인원 후퇴."
+}
+```
+
+### 09
+
+latency 5.606s · stop_reason `tool_use` · schema_retries 0 · foreign_tool_uses 0
+
+problems: because_block_ids unknown: 20:43,20:52,21:03,21:06,21:12
+
+```json
+{
+  "stance": "b",
+  "inner_note": "처음에는 적하목록의 '산업용 세정액'과 신고자의 말을 믿고 낮은 위험으로 봤다. 하지만 물 접촉 뒤 상황이 바뀐다. 닳은 위험 표지, 출하지 불일치, 유해물질 조회의 '물 접촉 시 유독 기체 발생' 경고, 그리고 지금 눈앞에서 벌어지는 현장 변화 — 물방울 가장자리의 하얀 반응, 세척수 닿은 뒤 하얀 김이 회색으로 짙어지고, 배수구에서 올라오는 락스 냄새와 눈 자극. 이것들이 모두 같은 방향을 가리킨다. 더 이상 세정액이 아니다.",
+  "because_referent": "물과 만나면 유독 기체를 낸다. 지금 물로 밀면 더 위험해진다.",
+  "because_block_ids": [
+    "20:43",
+    "20:52",
+    "21:03",
+    "21:06",
+    "21:12"
+  ],
+  "rejected_stance": "a",
+  "rejected_reason": "호스로 밀어내는 것은 현장의 물리적 변화와 유해물질 경고를 무시한다. 이미 초동 세척수가 새는 줄에 닿아 흰 김이 회색으로 짙어지는 것을 봤다. 더 물을 더하면 유독 기체 발생이 더 심해진다.",
+  "utterance": "흡착재로 묶음. 호스 중단. 유해물질 담당 호출."
+}
+```
+
+### 10
+
+latency 5.453s · stop_reason `tool_use` · schema_retries 0 · foreign_tool_uses 0
+
+problems: because_block_ids unknown: 21:03,21:06
+
+```json
+{
+  "inner_note": "20시40분 신고부터 21시12분까지의 기록을 보면, 초기에는 적하목록상 산업용 세정액으로 보였으나, 물 접촉 후 현장 변화가 급격하다. 21시00분 물을 뿌린 순간 바닥이 하얗게 끓어올랐고, 21시03분 유해물질 조회가 명확히 경고했다. 21시06분 세척수가 닿자 흰 김이 회색으로 짙어지며 기체가 발생했다. 배수현의 증언까지 겹친다. 상황이 일반 유출이 아니다.",
+  "stance": "b",
+  "because_referent": "물 접촉 시 유독 기체 발생 경고와 현장에서 확인된 기체 진행이 일치한다. 이미 세척이 시작된 뒤 기체 농도가 높아지고 있다.",
+  "because_block_ids": [
+    "21:03",
+    "21:06"
+  ],
+  "rejected_stance": "a",
+  "rejected_reason": "추가 물 접촉은 기체 발생을 더 촉진한다. 현장의 짙어진 기체와 배수 경로 오염이 이미 진행 중이다.",
+  "utterance": "호스 중단. 흡착재로 제한 격리 전환한다. 유해물질 조회 결과 물 접촉 시 유독 기체 발생 확인. 야적장 통제 강화. 배수 경로 차단 준비."
+}
+```
+
+## Arm table
+
+| # | stance | rejected_stance | because_referent | because_block_ids |
+|---|---|---|---|---|
+| 01 | b | a | 유해물질 조회 화면이 물 접촉 시 유독 기체 발생을 경고했고, 초동 세척수가 새는 줄에 닿자 흰 김이 회색으로 짙어졌다. 배수현이 독한 냄새와 눈 자극을 보고했다. | 21:03 21:06 21:12 |
+| 02 | b | a | 물 접촉 시 유독 기체를 발생시키는 물질이다. | 20:43 20:45 20:52 21:03 21:06 |
+| 03 | b | a | 유해물질 조회 결과와 현장의 물 접촉 후 변화 | 21:03 21:06 21:12 |
+| 04 | b | a | 21:03 유해물질 조회 경고와 21:06 초동 세척 뒤의 기체 변화가 함께 말한다. | 21:03 21:06 21:12 |
+| 05 | b | a | 닳은 위험 표지와 유해물질 조회 경고, 그리고 물 접촉 후 기체 변화가 함께 가리키는 방향. | 20:43 21:03 21:06 |
+| 06 | b | a | 물 접촉 시 유독 기체 발생 경고와 현장에서 물이 닿은 뒤 깔린 기체가 회색으로 짙어지는 변화 | 21:03 21:06 |
+| 07 | b | a | 물 접촉 시 유독 기체 발생 경고와 현장에서 관찰된 물 반응 현상이 지시한다. | 21:03 21:06 21:12 |
+| 08 | b | a | 21:03 유해물질 조회가 물 접촉 시 유독 기체 발생을 경고했고, 21:06 세척수가 닿자 흰 김이 회색으로 짙어지며 작업등 아래로 밀렸다. 배수현이 독한 냄새와 눈 자극을 보고했다. | 20:43 20:50 20:52 21:03 21:06 21:12 |
+| 09 | b | a | 물과 만나면 유독 기체를 낸다. 지금 물로 밀면 더 위험해진다. | 20:43 20:52 21:03 21:06 21:12 |
+| 10 | b | a | 물 접촉 시 유독 기체 발생 경고와 현장에서 확인된 기체 진행이 일치한다. 이미 세척이 시작된 뒤 기체 농도가 높아지고 있다. | 21:03 21:06 |
+
+**Sequence (kept calls):** `b,b,b,b,b,b,b,b,b,b`
+
+**Stance coverage (sampled diagnostic):** offered `a`, `b` · unobserved in this arm: `a`
+
+> Diagnostic only — absence at this N is not a dead delta row. The architecture spec §3.1 write test is a static check on the delta table plus the reachability audit (§5.2 B1); a stance unobserved across every arm is a lead for that check, not a failure verdict. Carried to the verdict card (§9.2) as a diagnostic.
+
+## Advisory logs (§5.3)
+
+_Operator-written. Observation only — these never affect distributions,
+boundary laws, or pass/drop judgments._
+
+**State-variable shadow log** — which candidate variables (architecture spec
+§3.1 pool) would this run have moved, and which payload symptom mapped to which?
+
+**Mineability log** — would `utterance` / `inner_note` survive as mining
+material? Block count, specificity (names, quantities, referents), and whether
+it says anything the payload did not already say.
+
+## Pairing verdict
+
+_Operator writes this against the other arms. Sequences, not rates (§9.2)._
