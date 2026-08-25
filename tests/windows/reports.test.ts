@@ -774,6 +774,26 @@ describe('[w2] a sitting accumulates its rounds into one document', () => {
     // simply no break rather than a break in the wrong place.
     expect(three.report_body.map((x) => x.id)).toEqual(['b1', 'b2', 'b3', 'b4', 'b5'])
   })
+
+  it('(h) source: an empty report sentence is refused before a row reaches the DOM', () => {
+    const src = scannedSources().find((s) => s.file.endsWith('components/report-view.ts'))
+    expect(src, 'the REPORTS view is not in the scanned set').toBeTruthy()
+    const row = /function reportRow\([\s\S]*?\n {2}\}/.exec(src!.text)?.[0] ?? ''
+    expect(row, 'reportRow is gone').not.toBe('')
+    expect(row, 'blank report text can still build an empty row').toMatch(/sentence\.text\.trim\(\)\.length === 0/)
+    expect(row, 'the blank-row guard must refuse before the anchor is registered').toMatch(
+      /sentence\.text\.trim\(\)\.length === 0[\s\S]*?return null[\s\S]*?anchors\.push/,
+    )
+  })
+
+  it('(i) source: unreached replay rows are hidden instead of spacing sentences apart', () => {
+    const src = scannedSources().find((s) => s.file.endsWith('components/report-view.ts'))
+    expect(src, 'the REPORTS view is not in the scanned set').toBeTruthy()
+    const paint = /function paint\([\s\S]*?\n {2}\}/.exec(src!.text)?.[0] ?? ''
+    expect(paint, 'paint is gone').not.toBe('')
+    expect(paint, 'future replay rows can still stand on the sheet as blank rows').toMatch(/row\.hidden = !visible/)
+    expect(paint, 'the current row should not appear until it has real text').toMatch(/current && cursor\.chars > 0/)
+  })
 })
 
 /* ══ [x6] the 검인 chop — REMOVED (민서, 08-10) ══════════════════════════
