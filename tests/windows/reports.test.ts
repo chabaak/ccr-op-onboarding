@@ -982,6 +982,20 @@ describe('[x10] mining is held while the handover is typing itself out', () => {
     expect(text, 'a held gesture is remembered instead of refused').not.toMatch(/setTimeout[^\n]*onMine|pendingMine/)
   })
 
+  it('(d2) source: the feed-printing hold is refused visibly in the same onMine gate', () => {
+    const win = scannedSources().find((s) => s.file.endsWith('windows/reports.ts'))
+    expect(win, 'the REPORTS window is not in the scanned set').toBeTruthy()
+    const text = win!.text
+    const pending = text.indexOf('feedPending() > 0')
+    const held = text.indexOf('if (mineHeld())')
+    const flash = text.indexOf('view.flash(id)', held)
+    const minted = text.indexOf('mine(id, m)')
+    expect(pending, 'the REPORTS mine gate does not read the LIVE FEED drain state').toBeGreaterThan(-1)
+    expect(held, 'the single mine hold branch is gone').toBeGreaterThan(-1)
+    expect(flash, 'a feed-held mine is swallowed instead of visibly refused').toBeGreaterThan(held)
+    expect(flash, 'the refusal flash must happen before any mine op can be minted').toBeLessThan(minted)
+  })
+
   it('(e) source: the hold is READ off the board — no body class, no second copy of the fact', () => {
     const win = scannedSources().find((s) => s.file.endsWith('windows/reports.ts'))
     const text = win!.text

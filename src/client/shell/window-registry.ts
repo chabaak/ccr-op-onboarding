@@ -71,7 +71,7 @@ export const WINDOW_REGISTRY: readonly WindowDef[] = [
     key: 'rep',
     id: 'w-rep',
     en: 'REPORTS',
-    caption: 'REPORTS · 기록 · 수신 즉시 채굴',
+    caption: 'REPORTS · 기록',
     mount: mountReports,
   },
 ]
