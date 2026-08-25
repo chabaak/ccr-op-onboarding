@@ -15,9 +15,9 @@
 //
 //   the rect  — this module owns no cached geometry. A mark holds a SELECTOR and
 //               never an element, and every measure pass re-resolves it and
-//               re-measures from scratch, exactly as `shell/thread-layer.ts`
-//               does: every desk signal collapses into one dirty flag and one
-//               animation frame, and the next frame simply tells the truth. It
+//               re-measures from scratch: every desk signal collapses into one
+//               dirty flag and one animation frame, and the next frame simply
+//               tells the truth. It
 //               has to be that way — REPORTS repaints its sentences on every
 //               typewriter tick and the AGENT FILE rebuilds its whole page on
 //               `turn()`, so an element captured once is stale within a frame.
@@ -125,8 +125,7 @@ const SAYS_ID = 'coachSays'
 
 const SVG_NS = 'http://www.w3.org/2000/svg'
 
-// The same three names `thread-layer.ts` asks the desk by. A target inside a
-// window the operator has shut is not on the screen, whatever its rect says.
+// The three names that answer whether a target's window is on screen.
 const WIN = '.win'
 const WIN_BODY = '.win-body'
 const HIDDEN = 'hidden'
@@ -214,10 +213,9 @@ function boxPath(r: Rect): string {
  * Two ways a step can lose its target outright, and both are answered here
  * rather than in the caller, so a step can never strand the walk: the selector
  * resolves to nothing, or it resolves inside a window the operator has shut or
- * folded, which is the question `thread-layer.ts`'s `bodyRect()` asks in these
- * same three class names. A target scrolled clean out of the `.win-body` that
- * clips it is still returned, because `reveal()` needs that node before the
- * clipped-visibility test can fairly decide whether the mark has a target.
+ * folded. A target scrolled clean out of the `.win-body` that clips it is still
+ * returned, because `reveal()` needs that node before the clipped-visibility
+ * test can fairly decide whether the mark has a target.
  */
 function resolveTarget(selector: string): Found | null {
   const node = document.querySelector(selector)
@@ -478,11 +476,11 @@ export function createCoach(app: HTMLElement): CoachHandle {
     })
   }
 
-  // Every desk signal collapses into the same dirty flag, exactly as
-  // `thread-layer.ts` collects them: window geometry and window state are
-  // `style` / `class` writes (the window manager's), a grip drag or a re-layout
-  // resizes the bodies, a scrolled body moves its anchors, and a re-render moves
-  // everything. Our own writes into the layer are ignored, or the mark would
+  // Every desk signal collapses into the same dirty flag: window geometry and
+  // window state are `style` / `class` writes (the window manager's), a grip
+  // drag or a re-layout resizes the bodies, a scrolled body moves its anchors,
+  // and a re-render moves everything. Our own writes into the layer are ignored,
+  // or the mark would
   // re-arm itself every frame forever. No timer takes part in this: the shell is
   // allowed exactly one `setInterval` and it is the driver pump in `boot.ts`.
   const mutations = new MutationObserver((records) => {

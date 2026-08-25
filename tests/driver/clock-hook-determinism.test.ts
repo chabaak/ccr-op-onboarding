@@ -186,7 +186,7 @@ describe('[u11#c11] inv 11 — the hook is DEV/TEST only at the source', () => {
     expect(source).toMatch(/__shell/)
     const strays = [...source.matchAll(/window\.(__[a-zA-Z]+)\s*=/g)]
       .map((m) => m[1]!)
-      .filter((name) => !['__shell', '__threads', '__feed', '__tally', '__agentFile', '__debug'].includes(name))
+      .filter((name) => !['__shell', '__feed', '__tally', '__agentFile', '__debug'].includes(name))
     expect(strays, 'the clock hook minted a new global instead of riding window.__shell').toEqual([])
   })
 

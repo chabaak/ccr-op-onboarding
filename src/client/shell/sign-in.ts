@@ -41,7 +41,7 @@ import { button, el } from './dom.ts'
 import { sfxKeyTick, sfxLoginStatic } from './radio-sfx.ts'
 import { PORTAL, SIGN_IN } from './portal-identity.ts'
 
-/** SVG namespace — the crest is drawn, not marked up (cf. thread-layer.ts). */
+/** SVG namespace — the crest is drawn, not marked up. */
 const SVG_NS = 'http://www.w3.org/2000/svg'
 
 /**

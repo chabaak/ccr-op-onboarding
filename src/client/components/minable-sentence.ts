@@ -3,8 +3,8 @@
 // A report sentence arrives pre-segmented and pre-classified from the driver
 // (§5.2). This module never re-splits it, never decides what kind of sentence
 // it is, and never reads what it says: identity is the AUTHORED id and nothing
-// else, which is what makes mining, archive highlighting and u8's red thread
-// agree with each other across a run switch.
+// else, which is what makes mining and archive marks agree with each other
+// across a run switch.
 //
 // Ported from docs/design/phase2-ui/app.js `minSpan()` / `mine()` /
 // `markReportSlots()` (lines 495, 541, 562). The reference kept the marks in a
@@ -101,8 +101,8 @@ export function sentenceClass(state: MinableState): string {
 }
 
 /**
- * The anchor contract u8 threads against, plus the a11y contract §4 requires.
- * Every value is derived from the authored id — no attribute ever carries the
+ * The sentence identity contract, plus the a11y contract §4 requires. Every
+ * value is derived from the authored id — no attribute ever carries the
  * sentence's screen text ([u6#c6] b).
  */
 export function sentenceAttrs(sentence: Sentence): Readonly<Record<string, string>> {

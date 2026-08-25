@@ -244,7 +244,7 @@ test.describe('a11y — landmarks and roles', () => {
   })
 
   test('a11y — decorative chrome is hidden from assistive tech', async ({ page }) => {
-    for (const id of ['#wallpaper', '#threads', '#grain', '#vignette', '#sweep']) {
+    for (const id of ['#wallpaper', '#grain', '#vignette', '#sweep']) {
       const node = page.locator(id)
       if ((await node.count()) === 0) continue
       await expect(node).toHaveAttribute('aria-hidden', 'true')
@@ -405,7 +405,7 @@ test.describe('a11y — keyboard reach', () => {
     await hideDebugPane(page)
     // The reload restarts the boot, and under a loaded worker pool `__shell`
     // can lag the first paint — draining before it exists threw, intermittently.
-    // Same wait idiom as red-thread's boot(): gate on the handle, then drive.
+    // Gate on the handle, then drive.
     await page.waitForFunction(
       () => (window as unknown as { __shell?: unknown }).__shell !== undefined,
     )

@@ -7,9 +7,9 @@
 // markup; ours are built at boot, so the class comes off when their entry
 // animation has finished and their boxes are final.
 //
-// Everything else in the dressing — wallpaper, grain, vignette, sweep, the
-// thread and toast hosts — is static markup in index.html and pure CSS. u8
-// draws into those hosts; nothing here touches them.
+// Everything else in the dressing — wallpaper, grain, vignette, sweep and the
+// toast host — is static markup in index.html and pure CSS. Nothing here
+// touches them.
 
 /** Puts the desk under the boot sweep. Call before the windows are built. */
 export function holdDesk(body: HTMLElement): void {

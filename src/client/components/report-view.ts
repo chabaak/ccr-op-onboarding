@@ -237,7 +237,6 @@ export function createReportView(options: ReportViewOptions): ReportView {
     const cell = el('span', 'rep-s')
     cell.append(node)
     row.append(el('span', 'rep-stamp', tag), cell)
-    row.classList.toggle('is-mined', sentenceState(sentence.id, marks) === 'mined')
     anchors.push({ sentence, node, row })
     return { row, node }
   }
@@ -375,7 +374,6 @@ export function createReportView(options: ReportViewOptions): ReportView {
       for (const anchor of anchors) {
         const state = sentenceState(anchor.sentence.id, marks)
         applyState(anchor.node, state)
-        anchor.row.classList.toggle('is-mined', state === 'mined')
       }
       tally(marks)
     },

@@ -4,7 +4,7 @@
 // window in one page session, and a selector typo in item 9 must not read as a
 // shell defect in item 3. Nothing here is new markup — every id/class below is
 // already asserted by a unit spec (u3 shell, u4 file, u5 feed, u6 reports,
-// u7 tally, u8 threads, u9d pane); u11 only re-uses them (design D3).
+// u7 tally, u9d pane); u11 only re-uses them (design D3).
 export const WINDOWS = {
   feed: '#w-feed',
   file: '#w-file',
@@ -26,7 +26,6 @@ export const CHROME = {
   runNum: '#runNum',
   ddayNum: '#ddayNum',
   clockDigits: '#clockDigits',
-  threads: '#threads',
 } as const
 
 /* ── window chrome ops (item 9) ──────────────────────────────────────────── */

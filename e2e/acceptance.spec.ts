@@ -543,45 +543,6 @@ test.describe('acceptance 9-12', () => {
     }
   })
 
-  test('#10 red threads connect every filled slot by authored id and re-draw during a drag', async ({ page }) => {
-    await boot(page, { reduced: true })
-    // RE-AIMED (08-08, W4): a thread needs a FILLED slot, and the window in
-    // which a slot can be filled is the one the close opens — the press that
-    // used to open it now commits the file instead.
-    await drain(page)
-
-    await mineFirst(page)
-
-    const filled = await page.locator(FILE.filled).count()
-    expect(filled, 'no slot was filled, so no thread can be measured').toBeGreaterThan(0)
-
-    const threads = () =>
-      page.evaluate(() => {
-        const handle = (window as unknown as { __threads?: { count(): number; redraw(): void } }).__threads
-        if (!handle) throw new Error('window.__threads is not exposed by the shell boot')
-        return handle.count()
-      })
-    await expect.poll(threads, { message: 'the thread layer drew nothing for a filled slot' }).toBe(filled)
-
-    const geometry = () =>
-      page.locator(`${CHROME.threads} path, ${CHROME.threads} line`).evaluateAll((nodes) =>
-        nodes.map((n) => n.getAttribute('d') ?? `${n.getAttribute('x1')},${n.getAttribute('y1')}`),
-      )
-    const before = await geometry()
-    expect(before.length, 'the thread layer painted no geometry').toBeGreaterThan(0)
-
-    const box = (await page.locator(WINDOWS.file).boundingBox())!
-    await page.locator(`${WINDOWS.file} ${WIN.bar}`).hover()
-    await page.mouse.down()
-    await page.mouse.move(box.x - 40, box.y + 30, { steps: 10 })
-    await page.mouse.up()
-
-    await expect
-      .poll(geometry, { message: 'the threads did not re-draw during the drag' })
-      .not.toEqual(before)
-    expect(await threads(), 'the drag lost a thread').toBe(filled)
-  })
-
   test('#11 the webfonts are self-hosted and the page makes no third-party request', async ({ page, baseURL }) => {
     const wire = watchWire(page, baseURL!)
     await boot(page)

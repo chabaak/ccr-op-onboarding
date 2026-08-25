@@ -9,7 +9,6 @@
 //   • `window.__shell`     u3 — `{ frame(), drain() }`, the driver undecorated.
 //   • `window.__feed`      u5 — `{ count(), kinds(), stamps(), seek(at), rate(r) }`.
 //   • `window.__agentFile` u4 — `{ slots(), place(), clear(), deployed(), phase(), meta(), … }`.
-//   • `window.__threads`   u8 — `{ redraw(), count(), destroy() }`.
 //   • `window.__debug`     u9d — `{ noteOp(op), refresh() }` (flag-on only).
 import { expect, test } from 'playwright/test'
 import type { Page, Request } from 'playwright/test'

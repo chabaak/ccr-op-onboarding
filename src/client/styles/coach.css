@@ -50,11 +50,11 @@
 #coach:not(.coach-up){display:none}
 
 /* ─── the scrim and the leader — one SVG, two paths and a stroke ─────────── */
-/* `width`/`height` as well as `inset`, unlike `#threads`: an outermost `<svg>`
-   is a replaced element, and a fixed box with `inset:0` and auto sizing leaves
-   its extent to the intrinsic-ratio rules. The viewBox is written per frame from
-   the real viewport, so the element it maps onto must be the whole viewport and
-   not nearly. */
+/* `width`/`height` as well as `inset`: an outermost `<svg>` is a replaced
+   element, and a fixed box with `inset:0` and auto sizing leaves its extent to
+   the intrinsic-ratio rules. The viewBox is written per frame from the real
+   viewport, so the element it maps onto must be the whole viewport and not
+   nearly. */
 .coach-cut{position:fixed;inset:0;width:100%;height:100%;pointer-events:none}
 /* Even-odd is what makes the second subpath a HOLE rather than a second box:
    the viewport rect is filled, the target's rect is cut back out of it. */

@@ -226,11 +226,6 @@
 .scenario-file i{font-style:normal;font-size:var(--fs-8);line-height:1.2;color:var(--txt-7);
   letter-spacing:.14em}
 body.booting .scenario-file{visibility:hidden}
-/* red string is laid ON TOP of the documents — corkboard, not wallpaper */
-#threads{position:fixed;inset:0;z-index:460;pointer-events:none}
-#threads path{fill:none;stroke:var(--evidence-thread);stroke-width:1.1;opacity:.6;
-  stroke-dasharray:3 3;filter:drop-shadow(0 0 3px var(--evidence-thread-a55))}
-#threads circle{fill:var(--evidence-thread);filter:drop-shadow(0 0 4px var(--evidence-thread-a8))}
 
 /* ═══ WINDOW SHELL ════════════════════════════════════════════════════════ */
 .win{position:fixed;left:var(--x);top:var(--y);width:var(--w);height:var(--h);

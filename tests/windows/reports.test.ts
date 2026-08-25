@@ -436,7 +436,7 @@ describe('[u6#c6] sentence anchors expose data-sentence-id', () => {
     expect(attrs['tabindex']).toBe('0')
   })
 
-  it('(d) ids are unique within a report, so u8 can thread one anchor per sentence', async () => {
+  it('(d) ids are unique within a report, so each sentence has one authored anchor', async () => {
     for (const report of await fixtureReports()) {
       const ids = [...report.facts, ...report.report_body].map((s) => s.id)
       expect(new Set(ids).size, `duplicate sentence id in ${report.fixture} round ${report.round}`).toBe(ids.length)
