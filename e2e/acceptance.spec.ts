@@ -205,10 +205,10 @@ test.describe('acceptance 1-7', () => {
       .evaluateAll((nodes) => nodes.map((n) => n.textContent ?? '').filter((t) => /\d/.test(t)))
     expect(digits, 'a digit reached an NPC line (inv 2)').toEqual([])
 
-    // (d) symptom lines are visible again under #130, but still never split
-    // into the handoff's separate 신체/정체 kinds.
+    // (d) symptom lines stay on the stream for Call 2 state, but do not print
+    // on the LIVE FEED paper.
     expect(perBeat.some((n) => n > 0), 'the round produced no symptom at all — (d) is vacuous').toBe(true)
-    expect(await page.locator('#w-feed .fl-symptom').count(), 'no symptom line reached the paper').toBeGreaterThan(0)
+    await expect(page.locator('#w-feed .fl-symptom')).toHaveCount(0)
     await expect(page.locator(FEED.list)).not.toContainText('(변화 없음)')
   })
 
@@ -254,8 +254,8 @@ test.describe('acceptance 1-7', () => {
 
     // The player pane sees the judgment as PROSE — the agent's own radio line.
     //
-    // #130 reopens symptom lines as quiet 요원 rows. The radio line remains the
-    // direct gate prose, and symptoms remain non-minable state.
+    // Symptom lines remain stream state for Call 2, but the radio line is the
+    // only gate prose that reaches the player pane here.
     //
     // What is deliberately NOT asserted here: that the radio line carries no
     // digit. Inv 2 scopes to the NPC channel, and the agent's own speech is
@@ -270,7 +270,7 @@ test.describe('acceptance 1-7', () => {
       (e) => e.type === 'feed' && (e as { line?: { kind?: string } }).line?.kind === 'symptom',
     )
     expect(symptoms.length, 'the round produced no symptom — the next assert is vacuous').toBeGreaterThan(0)
-    expect(await page.locator('#w-feed .fl-symptom').count(), 'no symptom reached the player pane').toBeGreaterThan(0)
+    await expect(page.locator('#w-feed .fl-symptom')).toHaveCount(0)
   })
 
   test("#4 the round report renders exactly once, after the round's last beat", async ({ page }) => {

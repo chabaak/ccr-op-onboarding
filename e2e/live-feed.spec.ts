@@ -48,7 +48,7 @@ const LIST = '#w-feed #feedList'
 const SCROLL = '#w-feed #feedScroll'
 
 /**
- * The fixed kind tags as they must reach the middle column. `npc` fills this
+ * The fixed kind tags as they project through the model. `npc` fills this
  * column from the line's speaker, and fallback visually prints the prototype's
  * glyph while its row data still says 오류.
  */
@@ -66,13 +66,14 @@ const TAGS: Record<string, string | null> = {
  * Kinds the seam carries that the fanfold does NOT print, so a stream/DOM
  * comparison has to subtract them before it can mean anything.
  *
- * `wait` since x6 (the waiting marker was removed outright) is dropped in
- * `run-feed.ts`'s `appendLine`, before a node is ever built.
+ * `wait` since x6 (the waiting marker was removed outright) and `symptom`
+ * since x8 are dropped in `run-feed.ts`'s `appendLine`, before a node is ever
+ * built.
  *
  * `(변화 없음)` used to be named here too, as the copy a symptom-free beat
  * printed. Nothing mints it any longer.
  */
-const UNDRAWN_KINDS = ['wait']
+const UNDRAWN_KINDS = ['wait', 'symptom']
 
 interface StreamLine {
   kind: string
@@ -376,14 +377,13 @@ test.describe('round renders in order', () => {
     expect(overloaded).toEqual([])
   })
 
-  test('round renders in order — symptom lines print as 요원 state, not a split kind', async ({ page }) => {
+  test('round renders in order — symptom lines stay on the stream, not the paper', async ({ page }) => {
     const produced = (await streamLines(page)).filter((l) => l.kind === 'symptom')
     expect(produced.length, 'the round produced no symptom — the assert is vacuous').toBeGreaterThan(0)
 
     const lines = await domLines(page)
     const symptoms = lines.filter((l) => l.kind === 'symptom')
-    expect(symptoms.length).toBe(produced.length)
-    expect(symptoms.every((l) => l.tag === '요원' && l.tagText === '요원')).toBe(true)
+    expect(symptoms).toEqual([])
     expect(lines.filter((l) => l.text.includes('(변화 없음)'))).toEqual([])
   })
 
@@ -864,9 +864,8 @@ test.describe('the day’s end drains', () => {
 
     // …and it is a drain and not a stall: the paper continues on its own, with
     // no flush, no seek and nothing else touching it. The full seven-round tail
-    // is intentionally minutes of real paper now that symptom rows print too,
-    // so this bounded check proves progress without turning the spec into a
-    // stopwatch for every sentence in the day.
+    // is intentionally long real paper, so this bounded check proves progress
+    // without turning the spec into a stopwatch for every sentence in the day.
     await expect
       .poll(async () => streamRendered(await domLines(page)).length, { timeout: 60_000 })
       .toBeGreaterThan(straightAfter)

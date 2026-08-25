@@ -101,7 +101,7 @@ const DIGIT = /\d/
 const KINDS: FeedKind[] = ['event', 'radio', 'npc', 'symptom', 'wait', 'fallback', 'mark']
 
 /**
- * The kinds the fanfold DROPS — x6 took `wait`.
+ * The kinds the fanfold DROPS — x6 took `wait`, x8 took `symptom`.
  *
  * At module scope since x11, because two blocks need it: `[u5#c1] (n)`/`(o)`
  * hold the drop shut, and the pacing block below has to know which queued
@@ -109,7 +109,7 @@ const KINDS: FeedKind[] = ['event', 'radio', 'npc', 'symptom', 'wait', 'fallback
  * anything. The source-side owner of the same list is `run-feed.ts`'s
  * `isUndrawn`, and `(o)` is what ties the two together.
  */
-const UNDRAWN_KINDS: FeedKind[] = ['wait']
+const UNDRAWN_KINDS: FeedKind[] = ['wait', 'symptom']
 
 /** Feed kind tags owned by the live-feed component. */
 const EXPECTED_TAGS: Record<FeedKind, string | null> = {
@@ -304,10 +304,10 @@ describe('[u5#c1] seven kinds map 1:1', () => {
     }
   })
 
-  // `wait` remains the only undrawn kind; `symptom` is a row again.
+  // `wait` and `symptom` are both undrawn; the seam still carries both.
   const UNDRAWN = UNDRAWN_KINDS
 
-  it('(n) u1 skin selectors exist for all six DRAWN kinds — the port has somewhere to land', () => {
+  it('(n) u1 skin selectors exist for all DRAWN kinds — the port has somewhere to land', () => {
     const css = code('src/client/styles/win-live-feed.css')
     for (const kind of KINDS.filter((k) => !UNDRAWN.includes(k))) expect(css).toContain(`.fl-${kind}`)
     for (const kind of UNDRAWN) {
@@ -327,7 +327,7 @@ describe('[u5#c1] seven kinds map 1:1', () => {
   // belongs to `e2e/run-loop.spec.ts` (`latency`), which reads `#feedList` on a
   // real desk and holds it at zero. What is provable here is that neither door
   // reaches `append`.
-  it('(o) wait draws no line, symptom draws, and a `waiting` event lands nothing', () => {
+  it('(o) wait and symptom draw no line, and a `waiting` event lands nothing', () => {
     const source = code('src/client/components/run-feed.ts')
 
     // Door 1: `appendLine` returns before it can build a node for every
@@ -346,8 +346,6 @@ describe('[u5#c1] seven kinds map 1:1', () => {
         new RegExp(`line\\.kind\\s*===\\s*'${kind}'`),
       )
     }
-    expect(rule, 'symptom is still being treated as undrawn').not.toMatch(/'symptom'/)
-
     const drop = new RegExp(`if\\s*\\(\\s*${ownerName}\\(line\\)\\s*\\)\\s*\\{([^}]*)\\}`).exec(source)
     expect(drop, 'nothing short-circuits on the undrawn kinds before `append` any more').toBeTruthy()
     const body = drop?.[1] ?? ''
@@ -360,9 +358,9 @@ describe('[u5#c1] seven kinds map 1:1', () => {
     // reaches 21:04 and the 집계 line inherited the stale stamp. The guard is
     // cheap and the failure is silent, which is exactly when to pin it.
     //
-    // x11 gives it a second job: it is why a symptom stays in the reveal QUEUE
-    // instead of being filtered out at `receive`. The pump consumes it for free
-    // and this line is what it is consumed FOR.
+    // x11 gives it a second job: it is why an undrawn line stays in the reveal
+    // QUEUE instead of being filtered out at `receive`. The pump consumes it
+    // for free and this line is what it is consumed FOR.
     expect(body, 'a dropped line no longer advances the desk clock').toMatch(/advanceStamp\s*\(/)
 
     // The second reader of the same owner — the pump. If these ever part
@@ -432,7 +430,10 @@ describe('x11 the reveal pump charges time for lines, never for events', () => {
     const free = EVENTS.filter((e) => !printsFeedLine(e))
     const kinds = [...new Set(free.map((e) => e.type))].sort()
     expect(kinds, 'the stream stopped carrying non-printing events').not.toEqual([])
-    expect(free.some((e) => e.type === 'feed'), 'a feed line is still being dropped').toBe(false)
+    expect(
+      free.some((e) => e.type === 'feed' && e.line.kind === 'symptom'),
+      'symptom feed lines are not being dropped',
+    ).toBe(true)
     expect(kinds).toContain('waiting')
     expect(kinds).toContain('beat_start')
     expect(kinds).toContain('beat_end')
@@ -534,10 +535,10 @@ describe('x11 the reveal pump charges time for lines, never for events', () => {
       const to = hhmm(open + gap)
       expect(feedGapMs('08:00', to, policy), `${gap} minute gap`).toBe(expected)
     }
-    expect(paperCost(EVENTS, policy)).toBe(140772)
+    expect(paperCost(EVENTS, policy)).toBe(128168)
   })
 
-  it('(d4) symptom rows land whole so supporting state does not slow the report gate', () => {
+  it('(d4) a directly projected symptom lands whole, though the fanfold drops it', () => {
     expect(typesOut('symptom')).toBe(false)
     expect(typesOut('npc')).toBe(true)
     expect(typesOut('radio')).toBe(true)

@@ -14,7 +14,7 @@
 | a radio line is revealed | `feed:radio` | `radio-open` | `radio-squelch-open` | 0.13 s | 0.6 | 80 ms |
 | 260 ms later — the channel closes | `feed:radio-end` | `radio-close` | `radio-squelch-close` | 0.09 s | 0.45 | 80 ms |
 | an NPC line is revealed | `feed:npc` | `npc` | `npc-handset` | 0.22 s | 0.5 | 120 ms |
-| a symptom line is revealed — temperament leaking | `feed:symptom` | `symptom` | `symptom-chime` | 0.75 s | 0.18 | 2200 ms |
+| a symptom line is revealed — temperament leaking | `feed:symptom` | — | *silent* | | | |
 | a mark line is revealed | `feed:mark` | `mark` | `pen-mark` | 0.12 s | 0.5 | 120 ms |
 | the fallback notice line is revealed | `feed:fallback` | — | *silent* | | | |
 | a waiting marker is revealed | `feed:wait` | — | *silent* | | | |

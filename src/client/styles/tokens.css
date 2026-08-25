@@ -146,7 +146,7 @@
   --npc:#93a6c6;
   /* x8 — `--symptom` / `--symptom-mark` are gone, the way `--feed-wait` went in
      x7: the symptom line no longer reaches the DOM, so nothing consumed them.
-     See `win-live-feed.css`'s header for the removal. */
+     See `win-live-feed.css`'s header for the undrawn row contract. */
   --band-1:#0a0e16;
   --band-2:#0a0e16;
 }
