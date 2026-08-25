@@ -20,7 +20,7 @@ import { animationsFrozen, registerAnimation } from '../driver/index.ts'
 import type { Sentence } from '../driver/index.ts'
 import { el } from '../shell/dom.ts'
 import { callsignOf } from './dossier.ts'
-import type { MarkSets } from './minable-sentence.ts'
+import type { MarkSets, MinableState } from './minable-sentence.ts'
 import { applyState, isMineKey, sentenceNode, sentenceState } from './minable-sentence.ts'
 
 /** The `report` event as this window holds it (§5.2). */
@@ -163,6 +163,21 @@ const BODY_TITLE = '무전 기록'
 const FOOT_LEAD = '기록 중 주요 사항을 선정하여 다음 요원에게 인수인계 하십시오 · '
 const FOOT_TAIL = '건 채굴됨'
 
+const ROW_STATE_CLASSES = ['is-mined', 'is-slotted', 'is-carried'] as const
+
+function rowStateClass(state: MinableState): (typeof ROW_STATE_CLASSES)[number] | null {
+  if (state === 'mined') return 'is-mined'
+  if (state === 'slotted') return 'is-slotted'
+  if (state === 'carried') return 'is-carried'
+  return null
+}
+
+function applyRowState(row: HTMLElement, state: MinableState): void {
+  row.classList.remove(...ROW_STATE_CLASSES)
+  const cls = rowStateClass(state)
+  if (cls !== null) row.classList.add(cls)
+}
+
 export function createReportView(options: ReportViewOptions): ReportView {
   const facts = el('section', 'rep-group rep-facts')
   facts.id = 'factsList'
@@ -212,8 +227,10 @@ export function createReportView(options: ReportViewOptions): ReportView {
   const caret = el('span', 'caret')
   caret.setAttribute('aria-hidden', 'true')
 
-  function bind(sentence: Sentence, marks: MarkSets): HTMLElement {
-    const node = sentenceNode(sentence, sentenceState(sentence.id, marks))
+  /** One tagged report row: [source tag] [sentence]. */
+  function reportRow(sentence: Sentence, tag: string, marks: MarkSets): { row: HTMLElement; node: HTMLElement } {
+    const state = sentenceState(sentence.id, marks)
+    const node = sentenceNode(sentence, state)
     node.addEventListener('click', () => {
       options.onMine(sentence.id)
     })
@@ -222,13 +239,8 @@ export function createReportView(options: ReportViewOptions): ReportView {
       event.preventDefault()
       options.onMine(sentence.id)
     })
-    return node
-  }
-
-  /** One tagged report row: [source tag] [sentence]. */
-  function reportRow(sentence: Sentence, tag: string, marks: MarkSets): { row: HTMLElement; node: HTMLElement } {
-    const node = bind(sentence, marks)
     const row = el('div', 'rep-row')
+    applyRowState(row, state)
     row.addEventListener('click', (event: MouseEvent) => {
       const target = event.target
       if (target instanceof Node && node.contains(target)) return
@@ -374,6 +386,7 @@ export function createReportView(options: ReportViewOptions): ReportView {
       for (const anchor of anchors) {
         const state = sentenceState(anchor.sentence.id, marks)
         applyState(anchor.node, state)
+        applyRowState(anchor.row, state)
       }
       tally(marks)
     },

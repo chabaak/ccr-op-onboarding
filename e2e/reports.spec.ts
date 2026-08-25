@@ -884,15 +884,19 @@ test.describe('slotting from the report (T1)', () => {
           const textStyle = getComputedStyle(node as HTMLElement)
           const rowStyle = getComputedStyle(node.closest('.rep-row') as HTMLElement)
           return {
-            textBackground: textStyle.backgroundImage,
+            textBackgroundColor: textStyle.backgroundColor,
             textOutline: textStyle.outlineStyle,
+            rowBackgroundColor: rowStyle.backgroundColor,
+            rowBorderColor: rowStyle.borderTopColor,
             rowOutline: rowStyle.outlineStyle,
           }
         }),
       )
       .toEqual({
-        textBackground: 'none',
-        textOutline: 'solid',
+        textBackgroundColor: 'rgba(0, 0, 0, 0)',
+        textOutline: 'none',
+        rowBackgroundColor: 'rgba(143, 208, 255, 0.05)',
+        rowBorderColor: 'rgb(143, 208, 255)',
         rowOutline: 'none',
       })
   })

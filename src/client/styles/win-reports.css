@@ -30,6 +30,9 @@
   border:1px solid transparent;border-bottom-color:var(--ink-line);cursor:pointer;
   transition:background .15s,border-color .15s}
 .rep-row:hover{background:var(--scan-a1)}
+.rep-row.is-mined,.rep-row:has(.min.mined){background:var(--band-1);border-color:var(--blueprint)}
+.rep-row.is-slotted{background:var(--scan-a05);border-color:var(--signal)}
+.rep-row.is-slotted,.rep-row.is-carried{cursor:default}
 .rep-stamp{font-family:var(--mono);font-size:var(--fs-9-5);line-height:1.7;
   letter-spacing:.1em;color:var(--surface-muted-2);white-space:nowrap;font-variant-numeric:tabular-nums}
 .rep-facts .rep-stamp{color:var(--warning)}
@@ -46,7 +49,7 @@
 .min{cursor:pointer;position:relative;text-decoration:none}
 .min.mined{color:var(--surface-muted-2);cursor:pointer;text-decoration:none}
 .min.mined::after{content:none}
-.min.slotted{background:var(--band-1);outline:1px solid var(--blueprint);cursor:default}
+.min.slotted{cursor:default}
 .min.slotted::after{content:'배치';font-family:var(--mono);font-size:var(--fs-7);letter-spacing:.1em;
   color:var(--slotted-ink);vertical-align:super;margin-left:var(--space-4);white-space:nowrap}
 /* A line the operator deployed on an EARLIER day. The rail keeps every past
