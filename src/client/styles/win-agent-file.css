@@ -134,39 +134,39 @@
    `tests/styles/token-lint.test.ts` only checks used→declared, so it will not
    fail either way. Left for a token pass to decide. */
 
-/* 인수인계 사항 — four prototype slot rows, one document section. */
-.slots{margin-top:var(--space-8);display:flex;flex-direction:column;gap:var(--space-8);
-  font-family:var(--prose);font-size:var(--fs-12);line-height:1.45;color:var(--surface-text);
-  text-align:left;word-break:keep-all}
+/* 인수인계 사항 — four stable slot addresses, one paragraph on the page. */
+.slots{margin-top:var(--space-8);font-family:var(--prose);font-size:var(--fs-12);
+  line-height:1.72;color:var(--surface-text);text-align:left;word-break:keep-all}
 
-.slot{position:relative;display:flex;align-items:flex-start;gap:var(--space-9);
-  min-height:42px;padding:var(--space-8) var(--space-12);
-  border:1px solid var(--line-2);background:var(--ink-2);transition:background .18s,border-color .18s}
-.slot::before{content:attr(data-label);flex:0 0 46px;font-family:var(--mono);
-  font-size:var(--fs-10);line-height:1.55;letter-spacing:.16em;color:var(--surface-muted-2);
-  white-space:nowrap}
-.slot .bcard{display:block;flex:1 1 auto;min-width:0;padding:0;background:transparent;border:0}
-.slot .bc-text{display:block;font-family:inherit;font-size:inherit;line-height:inherit;
+.handover-para{min-height:74px;padding:var(--space-9) var(--space-12);
+  border-left:2px solid var(--surface-rule);background:var(--ink-2)}
+.handover-empty{display:block;font-family:var(--mono);font-size:var(--fs-10-5);
+  line-height:1.7;letter-spacing:.08em;color:var(--surface-muted-2);text-align:left}
+
+.slot{position:relative;transition:background .18s,border-color .18s}
+.slot.filled{display:inline;color:inherit}
+.slot .bcard{display:inline;padding:0;background:transparent;border:0}
+.slot .bc-text{display:inline;font-family:inherit;font-size:inherit;line-height:inherit;
   color:inherit;text-align:inherit}
-.slot-pin{flex:0 0 auto;align-self:center;width:7px;height:7px;border-radius:50%;
-  background:radial-gradient(circle at 35% 30%,var(--pin-hi),var(--warning-strong));
+.slot-pin{display:inline-block;width:6px;height:6px;margin:0 var(--space-5);
+  border-radius:50%;background:radial-gradient(circle at 35% 30%,var(--pin-hi),var(--warning-strong));
   box-shadow:0 0 6px var(--warning-a55)}
-.slot-unset{flex:0 0 auto;align-self:flex-start;font-family:var(--mono);font-size:var(--fs-8);
-  letter-spacing:.14em;color:var(--surface-muted);padding:0 var(--space-5);
-  border:1px solid var(--surface-rule);border-radius:0;background:var(--surface);
-  transition:.14s;white-space:nowrap}
+.slot-unset{display:inline-block;vertical-align:baseline;font-family:var(--mono);
+  font-size:var(--fs-8);line-height:1.35;letter-spacing:.14em;color:var(--surface-muted);
+  margin-left:var(--space-4);padding:0 var(--space-5);border:1px solid var(--surface-rule);
+  border-radius:0;background:var(--surface);transition:.14s;white-space:nowrap}
 .slot-unset:hover{border-color:var(--warning);color:var(--warning-strong);background:var(--warning-wash)}
-.slots[data-state="locked"] .slot{opacity:.6;pointer-events:none}
-.slots[data-state="locked"] .slot::before{color:var(--surface-muted)}
+.slots[data-state="locked"] .handover-para{opacity:.72}
+.slots[data-state="locked"] .slot{pointer-events:none}
 .slot.locked .slot-unset{display:none}
 
-.slot-blank{border-color:var(--chrome-focus);background:var(--surface)}
-.slot-blank::before{color:var(--surface-muted-2)}
-.slot-blank .slot-empty{flex:1 1 auto;min-width:0;padding:0;background:transparent;border:0;
-  font-family:var(--mono);font-size:var(--fs-10-5);line-height:1.55;letter-spacing:.08em;
-  color:var(--surface-muted-2);text-align:left;word-break:keep-all}
+.slot-blank{display:inline-block;width:4px;height:4px;vertical-align:baseline}
+.slot-blank .slot-empty{display:block;width:4px;min-width:0;height:4px;padding:0;
+  background:transparent;border:1px dashed transparent;line-height:0}
 .slot-blank .slot-target{cursor:pointer}
-.slot-blank.droppable{border-color:var(--signal);background:var(--ink-3)}
+.slot-blank .slot-target:focus-visible{border-color:var(--warning);outline:1px solid var(--warning)}
+.slots.droppable .handover-para{border-left-color:var(--signal);background:var(--ink-3)}
+.slot-blank.droppable .slot-empty{border-color:var(--signal);background:var(--ink-3)}
 
 .deploy-zone{margin-top:var(--space-10);margin-bottom:var(--space-10);
   padding-top:var(--space-8);border-top:1px solid var(--surface-rule);

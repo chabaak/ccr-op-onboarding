@@ -310,6 +310,7 @@ test.describe('acceptance 1-7', () => {
     await drain(page)
 
     const id = await mineFirst(page)
+    const firstText = await page.locator(`${REPORTS.sentence}[data-sentence-id="${id}"]`).first().textContent()
 
     // store — the card is keyed by the sentence's own authored id.
     expect((await frame(page)).store.mined, 'the mined id never reached the seam').toContain(id)
@@ -317,6 +318,17 @@ test.describe('acceptance 1-7', () => {
     // slot — the same id seats on the board, off the same gesture (08-08).
     await expect(page.locator(`${FILE.board} [data-block-id="${id}"]`).first()).toBeVisible()
     expect(Object.values((await frame(page)).store.slots)).toContain(id)
+
+    const second = page.locator(`${REPORTS.mineable}:not(.slotted):not(.carried)`).first()
+    await expect(second, 'no second mineable sentence is on the REPORTS pane').toBeVisible()
+    const secondId = await second.getAttribute('data-sentence-id')
+    const secondText = await second.textContent()
+    expect(secondId, 'the second mineable sentence carries no data-sentence-id').toBeTruthy()
+    await second.focus()
+    await page.keyboard.press('Enter')
+
+    await expect(page.locator(`${FILE.board} .handover-para`)).toHaveCount(1)
+    await expect(page.locator(`${FILE.board} .handover-para .bc-text`)).toHaveText([firstText!, secondText!])
 
     // deploy — the op carries the canonical id, unchanged.
     await page.locator(FILE.deploy).click()

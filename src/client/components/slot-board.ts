@@ -21,10 +21,10 @@ import { blockCardModel, buildBlockCard, pad2, pickedBlockId, setPickedBlockId }
 /** spec-client §9 dev value, not a guess. */
 export const SLOT_CAP = 4
 
-/** The blank's own copy, printed once in each empty slot row. */
-const EMPTY_HINT = '— 비어 있음'
-/** …and what the blank says once the file is committed and nothing went in. */
-const LOCKED_HINT = '인수인계 사항 없음 — 잠김'
+/** The sheet's own copy, printed once when no handover sentence has been written. */
+const EMPTY_HINT = '아직 작성된 인수인계 사항이 없습니다.'
+/** …and what the sheet says once the file is committed and nothing went in. */
+const LOCKED_HINT = '작성된 인수인계 사항 없음 — 잠김'
 
 export interface SlotCell {
   slot: number
@@ -304,11 +304,11 @@ export function createSlotBoard(options: SlotBoardOptions): SlotBoard {
    *
    * Every attribute the membrane census, tests and tutorial reach for survives
    * (`data-slot`, `data-no`, `data-block-id`, `.slot-pin`, `[data-op=unslot]`).
-   * The visible number comes from the skin via `data-label`, so the semantic
-   * slot number remains stable for callers that already read `data-no`.
+   * The node is now a paragraph span rather than a row: the slot number stays a
+   * machine-readable address for ops, while the operator reads one handover.
    */
   function buildSeat(cell: SlotCell, blockId: string, chars?: number): HTMLElement {
-    const node = el('div', 'slot filled')
+    const node = el('span', 'slot filled')
     const no = pad2(cell.slot + 1)
     node.dataset.slot = String(cell.slot)
     node.dataset.no = no
@@ -359,9 +359,9 @@ export function createSlotBoard(options: SlotBoardOptions): SlotBoard {
     return node
   }
 
-  /** One empty slot row. Unlocked blanks are buttons so keyboard slotting remains complete. */
+  /** One empty slot address. Unlocked blanks are buttons so keyboard slotting remains complete. */
   function buildBlank(cell: SlotCell, inert = false): HTMLElement {
-    const node = el('div', 'slot slot-blank')
+    const node = el('span', 'slot slot-blank')
     const no = pad2(cell.slot + 1)
     node.dataset.slot = String(cell.slot)
     node.dataset.no = no
@@ -369,11 +369,13 @@ export function createSlotBoard(options: SlotBoardOptions): SlotBoard {
 
     if (deployed || inert) {
       node.classList.add('locked')
-      node.append(el('div', 'slot-empty', deployed ? LOCKED_HINT : EMPTY_HINT))
+      node.append(el('span', 'slot-empty'))
       return node
     }
 
-    const target = button('slot-empty slot-target', `슬롯 ${no}에 배치`, EMPTY_HINT)
+    const target = button('slot-empty slot-target', `슬롯 ${no}에 배치`, '')
+    target.tabIndex = -1
+    target.setAttribute('aria-hidden', 'true')
     // The `slot` op's control, marked for the PRD §4 membrane census.
     target.dataset.op = 'slot'
     node.append(target)
@@ -399,6 +401,11 @@ export function createSlotBoard(options: SlotBoardOptions): SlotBoard {
     return node
   }
 
+  function firstOpenSlot(): number | null {
+    const slot = slots.findIndex((blockId) => blockId === null)
+    return slot < 0 ? null : slot
+  }
+
   function render(): void {
     root.dataset.state = boardState(slots, deployed)
     const cells = slotCells(slots)
@@ -410,19 +417,51 @@ export function createSlotBoard(options: SlotBoardOptions): SlotBoard {
     const visibleFilled = reveal === null ? filled : filled.slice(0, reveal.row + 1)
     const visibleBySlot = new Map(visibleFilled.map(({ cell, blockId }, index) => [cell.slot, { blockId, index }]))
 
-    root.replaceChildren(
-      ...cells.map((cell) => {
-        if (reveal !== null) {
-          const visible = visibleBySlot.get(cell.slot)
-          if (visible === undefined) return buildBlank(cell, true)
-          return visible.index === reveal.row
-            ? buildSeat(cell, visible.blockId, reveal.chars)
-            : buildSeat(cell, visible.blockId)
+    const paragraph = el('div', 'handover-para')
+    if (filled.length === 0) paragraph.append(el('span', 'handover-empty', deployed ? LOCKED_HINT : EMPTY_HINT))
+
+    for (const cell of cells) {
+      if (reveal !== null) {
+        const visible = visibleBySlot.get(cell.slot)
+        if (visible === undefined) {
+          paragraph.append(buildBlank(cell, true))
+          continue
         }
-        return cell.blockId === null ? buildBlank(cell) : buildSeat(cell, cell.blockId)
-      }),
-    )
+        paragraph.append(
+          visible.index === reveal.row
+            ? buildSeat(cell, visible.blockId, reveal.chars)
+            : buildSeat(cell, visible.blockId),
+        )
+        continue
+      }
+      if (cell.blockId === null) {
+        paragraph.append(buildBlank(cell))
+        continue
+      }
+      paragraph.append(buildSeat(cell, cell.blockId))
+    }
+
+    root.replaceChildren(paragraph)
   }
+
+  root.addEventListener('dragover', (event) => {
+    if (deployed || firstOpenSlot() === null) return
+    event.preventDefault()
+    root.classList.add('droppable')
+  })
+  root.addEventListener('dragleave', (event) => {
+    if (event.relatedTarget instanceof Node && root.contains(event.relatedTarget)) return
+    root.classList.remove('droppable')
+  })
+  root.addEventListener('drop', (event) => {
+    event.preventDefault()
+    root.classList.remove('droppable')
+    if (deployed) return
+    const slot = firstOpenSlot()
+    if (slot === null) return
+    const dropped = event.dataTransfer?.getData('text/plain') ?? ''
+    if (dropped.length > 0) apply({ kind: 'place', blockId: dropped, slot })
+  })
 
   /**
    * H3 — the reveal's own state, and it is DRAWING state, never membrane state.
