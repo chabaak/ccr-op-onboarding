@@ -47,7 +47,7 @@ export const PORTAL: PortalIdentity = {
 }
 
 /** The taskbar's standing hint — the reference's `.tb-hint`. */
-export const TASKBAR_HINT = '창을 끌어 배치 · 제목 표시줄에서 방향키로 이동'
+export const TASKBAR_HINT = '창을 끌어 배치 · 캡션에서 방향키로 이동'
 
 /**
  * The card the door TYPES ITSELF as the operator presses keys (`shell/sign-in.ts`).

@@ -17,7 +17,7 @@ export interface WindowDef {
   /** DOM id, always `w-<key>`. */
   id: string
   /**
-   * Title-bar and taskbar name — and, since x5, the ONLY name either carries.
+   * Window and taskbar name — and, since x5, the ONLY short name either carries.
    *
    * The reference gave every window a short Korean name for the taskbar (`ko`)
    * and a long Korean subtitle for the title bar (`sub`): `무전` / `실시간 무전
@@ -34,11 +34,12 @@ export interface WindowDef {
    * chips print `en`), so once the element went the field was a REQUIRED label on
    * the registry that nothing rendered, which is worse than an absent one — a
    * fourth window would have had to invent a code for a surface that does not
-   * exist. `en` is now the one and only name a window carries.
+   * exist. `en` is now the one short name the taskbar and region label share;
+   * `caption` is the specimen-style detail line printed inside the pane.
    */
   en: string
-  /** Whether the window carries the live dot (LIVE FEED does). */
-  live?: boolean
+  /** Specimen caption printed as the pane's visible chrome line. */
+  caption: string
   /**
    * A fixed sheet: no corner grip, no Shift+arrow resize. Absent means
    * resizable, so only the window that opts out says so. The AGENT FILE does —
@@ -51,7 +52,26 @@ export interface WindowDef {
 }
 
 export const WINDOW_REGISTRY: readonly WindowDef[] = [
-  { key: 'feed', id: 'w-feed', en: 'LIVE FEED', live: true, mount: mountLiveFeed },
-  { key: 'file', id: 'w-file', en: 'AGENT FILE', resizable: false, mount: mountAgentFile },
-  { key: 'rep', id: 'w-rep', en: 'REPORTS', mount: mountReports },
+  {
+    key: 'feed',
+    id: 'w-feed',
+    en: 'LIVE FEED',
+    caption: 'LIVE FEED · ECHO-1 · 열람 전용',
+    mount: mountLiveFeed,
+  },
+  {
+    key: 'file',
+    id: 'w-file',
+    en: 'AGENT FILE',
+    caption: 'AGENT FILE · ECHO-2 · 문서번호 ERR-2/AF/02',
+    resizable: false,
+    mount: mountAgentFile,
+  },
+  {
+    key: 'rep',
+    id: 'w-rep',
+    en: 'REPORTS',
+    caption: 'REPORTS · 기록 · 수신 즉시 채굴',
+    mount: mountReports,
+  },
 ]

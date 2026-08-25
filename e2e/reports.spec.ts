@@ -115,7 +115,7 @@ async function boot(page: Page, opts: { reduced: boolean }): Promise<void> {
   await page.goto('./')
   await expect(page.locator(REP)).toBeVisible()
   await turnToAgent(page)
-  await page.locator(`${REP} .win-bar`).click()
+  await page.locator(`${REP} .win-caption`).click()
 }
 
 function reportsOf(f: Frame): ReportEvent[] {
@@ -162,7 +162,7 @@ async function fileAnotherRun(page: Page): Promise<void> {
     timeout: 30_000,
   })
   await drain(page)
-  await page.locator(`${REP} .win-bar`).click()
+  await page.locator(`${REP} .win-caption`).click()
 }
 
 function metaOf(f: Frame): MetaEvent | null {
@@ -341,7 +341,7 @@ test.describe('report renders once after the last beat', () => {
       }
     })
     expect(metrics, 'REPORTS row-height metrics were not measurable').not.toBeNull()
-    expect(Math.round(metrics!.rep)).toBe(306)
+    expect(Math.round(metrics!.rep)).toBe(296)
     expect(metrics!.file, 'AGENT FILE remains the taller right-column pane').toBeGreaterThan(metrics!.rep)
     expect(metrics!.feed, 'LIVE FEED keeps the full-height priority column').toBeGreaterThan(metrics!.file)
     expect(metrics!.grid / metrics!.row, 'REPORTS should show four rows before scroll').toBeGreaterThanOrEqual(4)

@@ -137,7 +137,7 @@ test.describe('window ops', () => {
       const node = win(page, w.id)
       // RE-AIMED (C17, x10 08-10), never deleted — 1 → 0, and it is still an
       // assert about this window's chrome. The frame used to print a `.win-tab`
-      // above every title bar: a clipped trapezoid with a two-letter code in it
+      // above every caption: a clipped trapezoid with a two-letter code in it
       // (`LF` · `AF` · `RP`). 민서 asked for those off the windows (08-10) — the
       // code had shrunk to the initials of the name printed 23 px below it, so
       // the tab named the window a second time in a shorter alphabet, which is
@@ -150,8 +150,9 @@ test.describe('window ops', () => {
       // counted per window below rather than summed. Dropping the line would
       // leave nothing to notice a tab quietly coming back on one window.
       await expect(node.locator('.win-tab')).toHaveCount(0)
-      await expect(node.locator('.win-bar')).toHaveCount(1)
-      await expect(node.locator('.win-bar h2')).toHaveCount(1)
+      await expect(node.locator('.win-bar')).toHaveCount(0)
+      await expect(node.locator('.win-caption')).toHaveCount(1)
+      await expect(node.locator('.win-caption-label')).toHaveCount(1)
       await expect(node.locator('.win-ctl .wc-min')).toHaveCount(1)
       await expect(node.locator('.win-ctl .wc-close')).toHaveCount(1)
       await expect(node.locator('.win-body')).toHaveCount(1)
@@ -164,11 +165,11 @@ test.describe('window ops', () => {
     }
   })
 
-  test('window ops — every window drags by its title bar', async ({ page }) => {
+  test('window ops — every window drags by its caption', async ({ page }) => {
     for (const w of WINDOWS) {
       const node = win(page, w.id)
       const before = await box(node)
-      await dragFrom(page, await box(node.locator('.win-bar')), 40, 30)
+      await dragFrom(page, await box(node.locator('.win-caption')), 40, 30)
       const after = await box(node)
       expect(Math.round(after.x - before.x)).toBe(40)
       expect(Math.round(after.y - before.y)).toBe(30)
@@ -214,7 +215,7 @@ test.describe('window ops', () => {
     expect(after.height).toBeGreaterThan(0)
   })
 
-  test('window ops — `—` collapses to the title bar and restores', async ({ page }) => {
+  test('window ops — `—` collapses to the caption and restores', async ({ page }) => {
     for (const w of WINDOWS) {
       const node = win(page, w.id)
       const open = await box(node)
@@ -223,7 +224,7 @@ test.describe('window ops', () => {
       await expect(node.locator('.win-body')).toBeHidden()
       const collapsed = await box(node)
       expect(collapsed.height).toBeLessThan(open.height)
-      await expect(node.locator('.win-bar')).toBeVisible()
+      await expect(node.locator('.win-caption')).toBeVisible()
 
       await node.locator('.wc-min').click()
       await expect(node).not.toHaveClass(/\bcollapsed\b/)
@@ -272,7 +273,7 @@ test.describe('window ops', () => {
     const task = page.locator('.task[data-win="feed"]')
 
     // Focus something else, so LIVE FEED is open but not focused.
-    await win(page, 'w-file').locator('.win-bar').click()
+    await win(page, 'w-file').locator('.win-caption').click()
     await expect(store).not.toHaveClass(/\bfocused\b/)
 
     // First click raises …
@@ -300,7 +301,7 @@ test.describe('window ops', () => {
 
   test('window ops — a dragged window survives a collapse/expand round trip', async ({ page }) => {
     const node = win(page, 'w-feed')
-    await dragFrom(page, await box(node.locator('.win-bar')), 60, 20)
+    await dragFrom(page, await box(node.locator('.win-caption')), 60, 20)
     const moved = await box(node)
     await node.locator('.wc-min').click()
     await node.locator('.wc-min').click()
@@ -732,11 +733,11 @@ test.describe('single stacking context', () => {
     // Park AGENT FILE on top of REPORTS so the two genuinely overlap.
     //
     // RE-AIMED (08-25). REPORTS now sits top-right above AGENT FILE. Move the
-    // file up just far enough that its title bar and REPORTS overlap at the
-    // probe point, while the lower strip of that same title bar remains below
+    // file up just far enough that its caption and REPORTS overlap at the
+    // probe point, while the lower strip of that same caption remains below
     // REPORTS and can still be clicked after REPORTS is raised.
     const repBox = await box(rep)
-    const fileBar = await box(file.locator('.win-bar'))
+    const fileBar = await box(file.locator('.win-caption'))
     const fileBox = await box(file)
     // Overlap REPORTS' right edge rather than covering it: the file's own title
     // bar has to stay reachable AFTER REPORTS is raised over it, or the second
@@ -755,14 +756,14 @@ test.describe('single stacking context', () => {
         probe,
       )
 
-    await rep.locator('.win-bar').click({ position: { x: 20, y: 8 } })
+    await rep.locator('.win-caption').click({ position: { x: 20, y: 8 } })
     expect(await topAt()).toBe('w-rep')
 
-    // ...at a lower strip of AGENT FILE's title bar, below REPORTS' bottom edge.
-    await file.locator('.win-bar').click({ position: { x: 200, y: fileBar.height - 8 } })
+    // ...at a lower strip of AGENT FILE's caption, below REPORTS' bottom edge.
+    await file.locator('.win-caption').click({ position: { x: 200, y: fileBar.height - 8 } })
     expect(await topAt()).toBe('w-file')
 
-    await rep.locator('.win-bar').click({ position: { x: 20, y: 8 } })
+    await rep.locator('.win-caption').click({ position: { x: 20, y: 8 } })
     expect(await topAt()).toBe('w-rep')
   })
 
@@ -774,7 +775,7 @@ test.describe('single stacking context', () => {
       )
 
     const raised = 'w-rep'
-    await win(page, raised).locator('.win-bar').click({ position: { x: 20, y: 8 } })
+    await win(page, raised).locator('.win-caption').click({ position: { x: 20, y: 8 } })
     const raisedZ = await zOf(raised)
     for (const w of WINDOWS.filter((x) => x.id !== raised)) {
       expect(await zOf(w.id)).toBeLessThan(raisedZ)
@@ -784,7 +785,7 @@ test.describe('single stacking context', () => {
 
   test('single stacking context — a pointer press anywhere in a window raises it', async ({ page }) => {
     const feed = win(page, 'w-feed')
-    await win(page, 'w-file').locator('.win-bar').click({ position: { x: 20, y: 8 } })
+    await win(page, 'w-file').locator('.win-caption').click({ position: { x: 20, y: 8 } })
     await expect(feed).not.toHaveClass(/\bfocused\b/)
 
     const b = await box(feed)
@@ -842,9 +843,9 @@ test.describe('a11y', () => {
     }
   })
 
-  test('a11y — the title bar move handle is focusable and moves with the arrow keys', async ({ page }) => {
+  test('a11y — the caption move handle is focusable and moves with the arrow keys', async ({ page }) => {
     const node = win(page, 'w-feed')
-    const bar = node.locator('.win-bar')
+    const bar = node.locator('.win-caption')
     await expect(bar).toHaveAttribute('tabindex', '0')
 
     const before = await box(node)
@@ -883,7 +884,7 @@ test.describe('a11y', () => {
       const heldByPhase: string[] = []
       // `.snd-btn` stands where `.rate-btn` did (W4 retired the transport) — the
       // row still has a control in it, so the sweep still visits one.
-      const targets = [...document.querySelectorAll<HTMLElement>('.snd-btn, .task, .wc, .win-bar')]
+      const targets = [...document.querySelectorAll<HTMLElement>('.snd-btn, .task, .wc, .win-caption')]
       for (const el of targets) {
         // C15 / C17 / [u11#c12] — RE-AIMED (08-04): a control with no layout box
         // cannot take focus, so `el.focus()` is a no-op and the snapshot could

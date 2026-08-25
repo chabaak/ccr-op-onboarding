@@ -49,8 +49,8 @@ button{font:inherit;color:inherit;background:none;border:0;cursor:pointer}
      working must still look like it is working.
 
      x6 — there were three. `.fl-wait .dots i` was the feed's breathing wait
-     marker, and the marker itself is gone (민서, 08-09: a wait draws nothing),
-     so there is no dot left to hold visible. */
-  .win-dot.live{opacity:1}
+     marker, and the marker itself is gone (민서, 08-09: a wait draws nothing).
+     x12 removed the live window dot with the per-pane title bars, so only the
+     caret remains here. */
   .caret{opacity:1}
 }
