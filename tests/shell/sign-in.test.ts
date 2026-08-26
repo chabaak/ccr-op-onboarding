@@ -45,6 +45,11 @@ function press(key: string, mods: Partial<Record<'ctrlKey' | 'metaKey' | 'altKey
 }
 
 describe('[x9] the card the door types', () => {
+  it('(portal) the door names the renamed facility and keeps the ERR-2 code', () => {
+    expect(PORTAL.portal).toBe('중앙 상황 제어실')
+    expect(PORTAL.portalCode).toBe('ERR-2')
+  })
+
   it('(a) the id is the operator badge, and it is seven presses long', () => {
     expect(SIGN_IN.userId).toBe('OP-2291')
     expect(SIGN_IN.userId).toBe(PORTAL.operatorId)

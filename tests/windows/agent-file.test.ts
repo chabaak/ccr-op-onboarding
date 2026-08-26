@@ -60,11 +60,12 @@ interface ScenarioMetaFile {
   callsign_series: string
 }
 
-function fixtureTankerMeta(): ScenarioMetaFile {
+function tankerMeta(): ScenarioMetaFile {
   const index = JSON.parse(read(path.join(SCENARIO_DIR, 'index.json'))) as ScenarioIndexFile
-  const fixture = index.packs.find((pack) => pack.role === 'fixture')
-  expect(fixture?.display_name).toBe('새는 탱크로리')
-  return JSON.parse(read(path.join(SCENARIO_DIR, fixture!.slug, 'meta.json'))) as ScenarioMetaFile
+  const tanker = index.packs.find((pack) => pack.slug === '새는탱크로리')
+  expect(tanker?.display_name).toBe('새는 탱크로리')
+  expect(tanker?.role).toBe('practice')
+  return JSON.parse(read(path.join(SCENARIO_DIR, tanker!.slug, 'meta.json'))) as ScenarioMetaFile
 }
 /**
  * u2's inv-12 enforcement point. It is the ONE client source that may name a
@@ -453,7 +454,7 @@ describe('[u4#c2] §3 기질 is sealed by construction', () => {
       [
         '20XX년 XX월 XX일 18시 38분,',
         '폭설이 내리던 날, 한내시립스포츠돔에서 천장 가운데가 처진다는 신고가 접수된다.',
-        '긴급상황대응실 본부는 즉시 현장에 요원 ECHO를 파견하여 상황 파악을 시작했다.',
+        '중앙 상황 제어실 본부는 즉시 현장에 요원 ECHO를 파견하여 상황 파악을 시작했다.',
       ].join('\n'),
     )
     expect(cover[1]!.body).toBe('파견된 현장 위기 대응실에서 긴급 상황의 정체를 파악하고, 인명 피해를 최소화한다.')
@@ -487,12 +488,12 @@ describe('[u4#c2] §3 기질 is sealed by construction', () => {
     expect(callsignOf(2, 'TANGO')).toBe('TANGO-1')
   })
 
-  it('(f2) the tank fixture pack still carries the TANGO series outside the browser path', async () => {
+  it('(f2) the tank practice pack carries the TANGO series now covered by the browser path', async () => {
     const { callsignOf } = await loadDossier()
-    const meta = fixtureTankerMeta()
+    const meta = tankerMeta()
 
-    // 새는탱크로리 is role:fixture, so the scenario desktop cannot start it; if
-    // it becomes practice later, `e2e/callsign.spec.ts` should cover this path.
+    // 새는탱크로리 is role:practice, so `e2e/callsign.spec.ts` starts it in a
+    // real browser. This node check keeps the shared callsign arithmetic pinned.
     expect(meta.callsign_series).toBe('TANGO')
     expect(callsignOf(1, meta.callsign_series)).toBe('TANGO')
     expect(callsignOf(2, meta.callsign_series)).toBe('TANGO-1')

@@ -170,7 +170,7 @@ const FILED_NOTE = '파견 종료. 열람 전용'
 const incidentNote = (series: string): string =>
   `※ 본 시뮬레이션은 당시 ${series}의 현장 무전 기록을 토대로 재구성되었습니다.`
 const incidentDispatch = (series: string): string =>
-  `긴급상황대응실 본부는 즉시 현장에 요원 ${series}를 파견하여 상황 파악을 시작했다.`
+  `중앙 상황 제어실 본부는 즉시 현장에 요원 ${series}를 파견하여 상황 파악을 시작했다.`
 const MISSION = '파견된 현장 위기 대응실에서 긴급 상황의 정체를 파악하고, 인명 피해를 최소화한다.'
 
 /**

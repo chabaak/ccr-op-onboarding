@@ -28,7 +28,7 @@ export interface PortalIdentity {
  * pins.
  */
 export const PORTAL: PortalIdentity = {
-  portal: '긴급상황대응실',
+  portal: '중앙 상황 제어실',
   portalCode: 'ERR-2',
   // x5 — the operator is the PLAYER, and the player is not 박민서. A Korean
   // personal name on the chrome reads as one more character in the fiction, and

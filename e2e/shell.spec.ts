@@ -473,6 +473,9 @@ test.describe('topbar', () => {
     for (const id of ['#portalName', '#portalCode', '#opName', '#caseName']) {
       await expect(bar.locator(id)).not.toBeEmpty()
     }
+    await expect(page).toHaveTitle('중앙 상황 제어실 · ERR-2 — 운영자 단말')
+    await expect(bar.locator('#portalName')).toHaveText('중앙 상황 제어실')
+    await expect(bar.locator('#portalCode')).toHaveText('ERR-2')
     // The case comes from the shipped scenario pack, not from a fixture. A
     // literal, not an import: nothing under `e2e/` reaches into `src/`, and the
     // point of this line is that the CHROME printed the pack's name — reading
@@ -696,6 +699,10 @@ test.describe('topbar', () => {
     await expect(page.locator('.scenario-file')).toHaveCount(SCENARIO_SLUGS.length)
     await expect(page.locator('.scenario-file:not([disabled])')).toHaveCount(PLAYABLE_SCENARIO_SLUGS.length)
     await expect(page.locator('.scenario-file.is-open')).toHaveCount(PLAYABLE_SCENARIO_SLUGS.length)
+    await expect(page.locator('.scenario-file[data-scenario-slug="새는탱크로리"]')).toBeEnabled()
+    await expect(
+      page.locator('.scenario-file[data-scenario-slug="새는탱크로리"] .scenario-file-status'),
+    ).toHaveText('배치 가능')
     await expect(page.locator('.scenario-file[disabled]')).toHaveCount(
       SCENARIO_SLUGS.length - PLAYABLE_SCENARIO_SLUGS.length,
     )
@@ -738,6 +745,9 @@ test.describe('topbar', () => {
       if (TUTORIAL_SCENARIO_SLUGS.includes(pack.slug)) {
         await expect(file).toBeEnabled()
         await expect(file.locator('.scenario-file-status')).toHaveText('배치 가능')
+      } else if (pack.slug === '새는탱크로리') {
+        await expect(file).toBeDisabled()
+        await expect(file.locator('.scenario-file-status')).toHaveText('미개방')
       } else {
         await expect(file).toBeDisabled()
         await expect(file.locator('.scenario-file-status')).toHaveText('미개방')
