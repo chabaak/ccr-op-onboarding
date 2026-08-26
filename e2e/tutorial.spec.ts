@@ -93,6 +93,8 @@ const PLATE_MS = 30_000
  * missing report cannot inherit a timeout tuned for a removed condition.
  */
 const DAY_MS = 60_000
+const SELECTED_SCENARIO_KEY = 'ndsp:scenario:selected:v1'
+const PRACTICE_SLUG = '병원연기'
 
 test.use({ viewport: { width: 1280, height: 800 } })
 
@@ -111,6 +113,27 @@ async function atTheDesk(page: Page, url = WALK): Promise<void> {
   await page.goto(url)
   await page.waitForFunction(() => Boolean((window as { __shell?: unknown }).__shell))
   await settled(page)
+}
+
+async function makePlayerBrowser(page: Page): Promise<void> {
+  await page.addInitScript(() => {
+    for (const target of [navigator, Object.getPrototypeOf(navigator)]) {
+      try {
+        Object.defineProperty(target, 'webdriver', {
+          configurable: true,
+          get: () => false,
+        })
+      } catch {
+        // Chromium exposes this differently across modes; one successful override is enough.
+      }
+    }
+  })
+}
+
+async function selectScenario(page: Page, slug: string): Promise<void> {
+  await page.addInitScript(({ key, selected }) => {
+    window.sessionStorage.setItem(key, selected)
+  }, { key: SELECTED_SCENARIO_KEY, selected: slug })
 }
 
 /** The line the plate that is up is printing. */
@@ -273,6 +296,36 @@ test.describe('[x3] the walk is opt-in for every lane but its own', () => {
     await expect(page.locator(PLATE)).toBeVisible({ timeout: DAY_MS })
     await expect(says(page)).toHaveText(SAID[0]!)
     await expect(page.locator(SKIP)).toBeFocused()
+  })
+
+  test('[issue 213] the tutorial pack gets the walk by default for a player browser', async ({ page }) => {
+    await makePlayerBrowser(page)
+    await atTheDesk(page, './?signin=skip')
+
+    await expect(page.locator('#caseName')).toContainText('멈춘 회전문')
+    await expect(page.locator(LAYER)).toHaveCount(1)
+    await expect(page.locator(PLATE)).toHaveCount(0)
+  })
+
+  test('[issue 213] 병원연기 gets no walk by default for a player browser', async ({ page }) => {
+    await makePlayerBrowser(page)
+    await selectScenario(page, PRACTICE_SLUG)
+    await atTheDesk(page, './?signin=skip')
+
+    await expect(page.locator('#caseName')).toContainText('병원 연기')
+    await page.waitForTimeout(1_500)
+    await expect(page.locator(PLATE)).toHaveCount(0)
+    await expect(page.locator(LAYER)).toHaveCount(0)
+  })
+
+  test('[issue 213] ?tutorial=show forces the walk outside the tutorial pack', async ({ page }) => {
+    await makePlayerBrowser(page)
+    await selectScenario(page, PRACTICE_SLUG)
+    await atTheDesk(page, './?signin=skip&tutorial=show')
+
+    await expect(page.locator('#caseName')).toContainText('병원 연기')
+    await expect(page.locator(LAYER)).toHaveCount(1)
+    await expect(page.locator(PLATE)).toHaveCount(0)
   })
 })
 

@@ -137,11 +137,31 @@ const TUTORIAL_ANCHOR_BY_SELECTOR = new Map<string, TutorialAnchor>(
  * coin toss. `e2e/tutorial.spec.ts` is the one lane that asks for it, and it
  * asks by name — the same shape `shell/sign-in.ts` uses for the door.
  */
-export function tutorialSkipped(host: Window): boolean {
+export interface TutorialWalkState {
+  flag: string | null
+  tutorialPack: boolean
+  webdriver: boolean
+}
+
+export interface TutorialInstallOptions {
+  tutorialPack: boolean
+}
+
+export function shouldRunTutorialWalk(state: TutorialWalkState): boolean {
+  if (state.flag === 'show') return true
+  if (state.flag === 'skip') return false
+  if (!state.tutorialPack) return false
+  if (state.webdriver) return false
+  return true
+}
+
+export function tutorialSkipped(host: Window, options: TutorialInstallOptions): boolean {
   const flag = new URLSearchParams(host.location.search).get('tutorial')
-  if (flag === 'show') return false
-  if (flag === 'skip') return true
-  return host.navigator.webdriver === true
+  return !shouldRunTutorialWalk({
+    flag,
+    tutorialPack: options.tutorialPack,
+    webdriver: host.navigator.webdriver === true,
+  })
 }
 
 /* ── the primitives a gate is built from ─────────────────────────────────── */
@@ -456,8 +476,8 @@ export async function runTutorial(ports: TutorialPorts): Promise<void> {
  * a walk that throws must not take the desk with it. Nothing downstream of this
  * call depends on it having run.
  */
-export function installTutorial(host: Window, ports: TutorialPorts): void {
-  if (tutorialSkipped(host)) return
+export function installTutorial(host: Window, ports: TutorialPorts, options: TutorialInstallOptions): void {
+  if (tutorialSkipped(host, options)) return
   void runTutorial(ports).catch((cause) => {
     console.error('the onboarding walk stopped early', cause)
   })

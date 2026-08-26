@@ -21,7 +21,13 @@ import { installEnding } from './ending.ts'
 import { openManual } from './manual.ts'
 import { openSignIn } from './sign-in.ts'
 import { installTutorial } from './tutorial.ts'
-import { fetchScenarioEndings, fetchScenarioIdentity, fetchScenarioIndex, fetchScenarioScore } from './pack.ts'
+import {
+  fetchScenarioEndings,
+  fetchScenarioIdentity,
+  fetchScenarioIndex,
+  fetchScenarioScore,
+  tutorialScenarioPack,
+} from './pack.ts'
 import type { ScenarioIdentity } from './pack.ts'
 import { installScenarioDesktop } from './scenario-desktop.ts'
 import {
@@ -442,7 +448,9 @@ export async function bootShell(): Promise<void> {
   // that the walk's first mark would land on a window still held at
   // `visibility:hidden` by `body.booting`. The eye needs the curtain up; the
   // ear does not.
-  installTutorial(window, { driver, deskReady: revealed })
+  installTutorial(window, { driver, deskReady: revealed }, {
+    tutorialPack: selectedPack.slug === tutorialScenarioPack(scenarioIndex).slug,
+  })
 
   // 8 — the two endings (x6). Mounted on the same terms as the walk above it,
   // for the same reason: it is an observer over the §5.2 stream and the DOM, it
