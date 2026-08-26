@@ -30,6 +30,7 @@ export const SCENARIO_ENDING_LOAD_FAILURE_NOTICE = '종료 자료를 확인할 �
 export const SCENARIO_PICKER_NOTE =
   '사건 개요는 배치 후 회선에서만 열람할 수 있습니다. 아래 표시되는 것은 난이도와 시행 횟수뿐입니다. 배치된 사건은 시행을 모두 소진할 때까지 교체할 수 없습니다.'
 export const SCENARIO_PICKER_FOOT = '시행을 모두 소진하면 동일 사건으로 재평가가 편성됩니다.'
+export const SCENARIO_CONFIRM_NOTE = '배치된 사건은 시행을 모두 소진할 때까지 교체할 수 없습니다.'
 
 interface StoragePort {
   getItem(key: string): string | null
@@ -160,11 +161,12 @@ export function incidentBriefCopy(
   entry: ScenarioPackEntry,
   brief: ScenarioIncidentBrief,
 ): ConfirmCopy {
+  void brief
   return {
     head: entry.displayName,
-    meta: '사건 개요',
-    body: brief.lead,
-    note: brief.body.join('\n'),
+    meta: '사건 배치',
+    body: `${entry.displayName} 사건을 진행하시겠습니까?`,
+    note: SCENARIO_CONFIRM_NOTE,
     yes: '열기',
     no: '취소',
   }
