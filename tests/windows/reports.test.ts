@@ -808,6 +808,25 @@ describe('[w2] a sitting accumulates its rounds into one document', () => {
     expect(paint, 'future replay rows can still stand on the sheet as blank rows').toMatch(/row\.hidden = !visible/)
     expect(paint, 'the current row should not appear until it has real text').toMatch(/current && cursor\.chars > 0/)
   })
+
+  it('(k) source: interrupting a replay completes it before append or redraw', () => {
+    const src = scannedSources().find((s) => s.file.endsWith('components/report-view.ts'))
+    expect(src, 'the REPORTS view is not in the scanned set').toBeTruthy()
+    const text = src!.text
+    const finish = text.indexOf('function finishReplay()')
+    expect(finish, 'the replay has no completion-on-cancel path').toBeGreaterThan(-1)
+    expect(text.slice(finish), 'cancel does not paint the interrupted targets whole').toMatch(
+      /paint\(\s*\{\s*sentence:\s*replay\.lengths\.length,\s*chars:\s*0,\s*done:\s*true\s*\}/,
+    )
+    const append = text.indexOf('append(slice:')
+    const render = text.indexOf('render(model:')
+    const appendFinish = text.indexOf('finishReplay()', append)
+    const renderFinish = text.indexOf('finishReplay()', render)
+    expect(appendFinish, 'append still cancels by unregistering only').toBeGreaterThan(append)
+    expect(appendFinish, 'append must settle before it grows the next round').toBeLessThan(text.indexOf('current = whole', append))
+    expect(renderFinish, 'render still cancels by unregistering only').toBeGreaterThan(render)
+    expect(renderFinish, 'render must settle before replacing report rows').toBeLessThan(text.indexOf('rows.replaceChildren()', render))
+  })
 })
 
 /* ══ [x6] the 검인 chop — REMOVED (민서, 08-10) ══════════════════════════
