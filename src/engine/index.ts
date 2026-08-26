@@ -197,6 +197,26 @@ function usableReporter(response: ReporterResponse | null): ReporterResponse | n
   return segmentReportBody(response.report_body).length > 0 ? response : null
 }
 
+const TIMELINE_REPLAY_MIN_LENGTH = 10
+
+/** Matches the proxy's narration replay guard; this is the final render boundary. */
+function normalizeTimelineText(text: string): string {
+  return text.trim().replace(/\s+/g, ' ')
+}
+
+function repeatsTimelineTail(entry: string, tail: readonly string[]): boolean {
+  const normalizedEntry = normalizeTimelineText(entry)
+  if (normalizedEntry.length < TIMELINE_REPLAY_MIN_LENGTH) return false
+  return tail.some((line) => {
+    const normalizedLine = normalizeTimelineText(line)
+    return (
+      normalizedEntry === normalizedLine ||
+      normalizedEntry.includes(normalizedLine) ||
+      normalizedLine.includes(normalizedEntry)
+    )
+  })
+}
+
 /** The state core, as the beat driver's `StateCorePort` sees it, over `./state`'s pure functions. */
 function createStateCore(
   symptomsPack: Symptoms,
@@ -462,9 +482,14 @@ export function createEngine(deps: EngineDeps): EngineHandle {
         npc_lines: [],
       }
       const eventLines = repairEventLines(record.scriptLines ?? [], narration.event_lines)
+      // The proxy rejects a replay and gives the model a corrective retry. This
+      // second guard keeps a stale/alternate transport from turning one bad
+      // entry into a new timestamped event, without discarding the whole beat.
+      const tail = beats.beatView().TIMELINE_TAIL
+      const timelineEntries = narration.timeline_entries.filter((entry) => !repeatsTimelineTail(entry, tail))
       record.narration = {
         event_lines: eventLines,
-        timeline_entries: narration.timeline_entries,
+        timeline_entries: timelineEntries,
         npc_lines: narration.npc_lines,
       }
       for (const eventLine of eventLines) {
@@ -475,7 +500,7 @@ export function createEngine(deps: EngineDeps): EngineHandle {
           sentence_id: eventLine.id,
         })
       }
-      for (const entry of narration.timeline_entries) {
+      for (const entry of timelineEntries) {
         lines.push({ kind: 'event', clock: nextStamp(beat), text: entry, sentence_id: ids.next('n') })
       }
       const { kept } = classifyNpcLines(narration.npc_lines, { present, utterance })

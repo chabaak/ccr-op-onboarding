@@ -60,6 +60,27 @@ const bad = (message: string) =>
 const isFilled = (v: unknown): boolean =>
   typeof v === "string" && v.trim().length > 0;
 
+const TIMELINE_REPLAY_MIN_LENGTH = 10;
+
+/**
+ * A replay is prose, not an id: normalize only presentation whitespace before
+ * comparing it with the prompt's already-rendered timeline window.
+ */
+const normalizeTimelineText = (text: string): string => text.trim().replace(/\s+/g, " ");
+
+const repeatsTimelineTail = (entry: string, tail: readonly string[]): boolean => {
+  const normalizedEntry = normalizeTimelineText(entry);
+  if (normalizedEntry.length < TIMELINE_REPLAY_MIN_LENGTH) return false;
+  return tail.some((line) => {
+    const normalizedLine = normalizeTimelineText(line);
+    return (
+      normalizedEntry === normalizedLine ||
+      normalizedEntry.includes(normalizedLine) ||
+      normalizedLine.includes(normalizedEntry)
+    );
+  });
+};
+
 /**
  * No fixed event is visible in this beat on this run.
  *
@@ -278,8 +299,26 @@ const narration: CallSpec = {
       problems.push("timeline_entries not an array");
     } else if (!value.timeline_entries.length && !noReaction) {
       problems.push("timeline_entries empty");
-    } else if (value.timeline_entries.some((e) => !isFilled(e))) {
-      problems.push("timeline_entries has an empty entry");
+    } else {
+      if (value.timeline_entries.some((entry) => !isFilled(entry))) {
+        problems.push("timeline_entries has an empty entry");
+      }
+
+      const tail = Array.isArray(slots.TIMELINE_TAIL)
+        ? slots.TIMELINE_TAIL.filter((line): line is string => typeof line === "string")
+        : [];
+      const seen = new Set<string>();
+      for (const entry of value.timeline_entries) {
+        if (typeof entry !== "string") continue;
+        const normalized = normalizeTimelineText(entry);
+        if (repeatsTimelineTail(entry, tail)) {
+          problems.push("timeline_entries repeats the timeline tail");
+        }
+        if (seen.has(normalized)) {
+          problems.push("timeline_entries has a duplicate entry");
+        }
+        seen.add(normalized);
+      }
     }
 
     if (!Array.isArray(value.npc_lines)) {

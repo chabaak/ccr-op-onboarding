@@ -53,9 +53,13 @@ function buildNarration(request: CallRequest<'narration'>, override?: NarrationR
     request.slots.PRESENT_NPCS.length > 0
       ? request.slots.PRESENT_NPCS.map((npc) => `${npc.id}: 고정 픽스처 대사.`)
       : ['npc-fixture: 고정 픽스처 대사.']
+  // A fixture response must be deterministic without pretending each later
+  // beat is the previous beat again. Production now drops that replay at the
+  // engine boundary, so key this synthetic texture to this beat's authored ids.
+  const fixtureSubject = eventLines.map((line) => line.id).join(',') || 'quiet'
   return {
     event_lines: eventLines,
-    timeline_entries: [...request.slots.SCENE_SYMPTOMS, '고정 픽스처 서술.'],
+    timeline_entries: [...request.slots.SCENE_SYMPTOMS, `${fixtureSubject} 고정 픽스처 서술.`],
     npc_lines: npcLines,
   }
 }

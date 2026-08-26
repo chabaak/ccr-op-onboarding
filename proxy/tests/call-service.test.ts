@@ -1,7 +1,9 @@
 import { describe, expect, it } from "vitest";
 
 import { CallService, FallbackError } from "../src/call-service.js";
+import { DEFAULT_PROMPT } from "../src/default-prompt.js";
 import { PublicError } from "../src/errors.js";
+import { renderCall } from "../src/prompt.js";
 import type { CallProvider, ProviderResult } from "../src/provider.js";
 import type { CallRequest } from "../src/types.js";
 import { judgmentSlots, validConfig } from "./fixtures.js";
@@ -20,6 +22,24 @@ const request: CallRequest = {
   call_type: "judgment",
   template_version: "v0.5",
   slots: judgmentSlots,
+};
+
+const narrationRequest: CallRequest = {
+  call_type: "narration",
+  template_version: "v0.5",
+  slots: {
+    TIMELINE_TAIL: ["외래 대기홀의 줄이 임시 처치구역 앞에서 무너진다."],
+    AGENT_UTTERANCE: "",
+    FIXED_NPC_ACTION: "",
+    SCENE_SYMPTOMS: ["복도 끝 연기가 짙어진다."],
+    PRESENT_NPCS: [],
+  },
+};
+
+const NARRATION_OK = {
+  event_lines: [],
+  timeline_entries: ["창밖의 경광등이 젖은 유리에 번진다."],
+  npc_lines: [],
 };
 
 const usage = { inputTokens: 10, outputTokens: 5, totalTokens: 15 };
@@ -66,6 +86,33 @@ describe("CallService validation retry budget", () => {
     expect(handled.telemetry.attempts).toBe(2);
     expect(handled.telemetry.usage).toEqual({ inputTokens: 20, outputTokens: 10, totalTokens: 30 });
     expect(handled.response).toEqual(JUDGMENT_OK);
+  });
+
+  it("keeps attempt one byte-identical and gives attempt two its rejection reason", async () => {
+    const users: string[] = [];
+    const provider: CallProvider = {
+      async generate(_request, rendered) {
+        users.push(rendered.user);
+        return result(
+          users.length === 1
+            ? {
+                ...NARRATION_OK,
+                timeline_entries: ["외래 대기홀의 줄이 임시 처치구역 앞에서 무너진다."],
+              }
+            : NARRATION_OK,
+        );
+      },
+    };
+    const service = new CallService(validConfig, provider);
+
+    const handled = await service.handle(narrationRequest);
+
+    expect(handled.telemetry.attempts).toBe(2);
+    expect(users[0]).toBe(
+      renderCall(narrationRequest, DEFAULT_PROMPT as unknown as Record<string, unknown>).user,
+    );
+    expect(users[1]).toContain("[재시도 — 직전 응답은 거부되었다]");
+    expect(users[1]).toContain("timeline_entries repeats the timeline tail");
   });
 
   it("falls back with invalid_model_output after all three attempts fail validation", async () => {

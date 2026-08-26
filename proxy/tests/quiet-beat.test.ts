@@ -64,6 +64,17 @@ const shippedFirstBeatSlots = {
 
 const narration = CALL_SPECS.narration;
 
+const replaySlots = {
+  ...reactionSlots,
+  TIMELINE_TAIL: ["외래 대기홀의 줄이 임시 처치구역 앞에서 무너진다."],
+};
+
+const narrationResponse = (timeline_entries: string[]) => ({
+  event_lines: [{ id: "t1", text: "천장 가운데가 내려오고 있다." }],
+  timeline_entries,
+  npc_lines: [],
+});
+
 const descriptionOf = (slots: Record<string, unknown>): string => {
   const tool = narration.buildTool(slots) as unknown as {
     inputSchema: { properties: { timeline_entries: { description: string } } };
@@ -176,5 +187,47 @@ describe("a quiet beat is sayable, and answerable with nothing", () => {
     expect(
       narration.validate({ event_lines: [], timeline_entries: ["  "], npc_lines: [] }, quietSlots),
     ).toContain("timeline_entries has an empty entry");
+  });
+
+  it("rejects an entry that repeats the prior timeline", () => {
+    expect(
+      narration.validate(
+        narrationResponse(["  외래  대기홀의 줄이 임시 처치구역 앞에서 무너진다.  "]),
+        replaySlots,
+      ),
+    ).toContain("timeline_entries repeats the timeline tail");
+  });
+
+  it("rejects entries that split a prior timeline line", () => {
+    const tail = "외래 대기홀의 줄이 임시 처치구역 앞에서 무너지고, 접수대 대기열이 출입문까지 밀린다.";
+    const problems = narration.validate(
+      narrationResponse(["외래 대기홀의 줄이 임시 처치구역 앞에서 무너지고,", "접수대 대기열이 출입문까지 밀린다."]),
+      { ...replaySlots, TIMELINE_TAIL: [tail] },
+    );
+    expect(problems.filter((problem) => problem === "timeline_entries repeats the timeline tail")).toHaveLength(2);
+  });
+
+  it("keeps a new entry that is unrelated to the timeline tail", () => {
+    expect(
+      narration.validate(narrationResponse(["창밖의 경광등이 젖은 유리에 번진다."]), replaySlots),
+    ).toEqual([]);
+  });
+
+  it("rejects duplicate entries within one response", () => {
+    expect(
+      narration.validate(
+        narrationResponse(["창밖의 경광등이 젖은 유리에 번진다.", "창밖의 경광등이 젖은 유리에 번진다."]),
+        replaySlots,
+      ),
+    ).toContain("timeline_entries has a duplicate entry");
+  });
+
+  it("does not compare a short entry against the timeline tail", () => {
+    expect(
+      narration.validate(
+        narrationResponse(["연기가 짙다."]),
+        { ...replaySlots, TIMELINE_TAIL: ["연기가 짙다."] },
+      ),
+    ).toEqual([]);
   });
 });

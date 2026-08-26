@@ -450,9 +450,10 @@ describe('A20 — D3 prompt byte-parity inputs stay frozen', () => {
   // rests on: the two renderers, the templates they read, and the generated
   // bundle between them. What this guard is for is the ⚠️ in §10 — the probe
   // keeps its own renderer, and if the two drift the measurements stop
-  // describing the deployed system. `proxy/src/{types,handler,call-service}.ts`
-  // are none of those; a per-scenario default prompt reaches Call 1 through a
-  // route this guard was never watching.
+  // describing the deployed system. `proxy/src/calls.ts` owns response
+  // validation as well as the schema, so its validator may harden without
+  // changing any rendered bytes; `types`, `handler`, and `call-service` are
+  // likewise outside this guard.
   //
   // Two things make the narrowing safe rather than convenient. The direct check
   // exists: `proxy/tests/prompt-parity.test.ts` composes a suite through both
@@ -464,7 +465,6 @@ describe('A20 — D3 prompt byte-parity inputs stay frozen', () => {
     'proxy/prompts',
     'proxy/src/prompt.ts',
     'proxy/src/prompt-bundle.generated.ts',
-    'proxy/src/calls.ts',
     'tools/lib/compose.mjs',
     'tools/lib/calls.mjs',
   ]
