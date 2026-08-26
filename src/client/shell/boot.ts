@@ -39,7 +39,7 @@ import {
   scenarioPackInPlay,
 } from './pack-session.ts'
 import type { EntryState } from './pack-session.ts'
-import { PORTAL, TASKBAR_HINT } from './portal-identity.ts'
+import { PORTAL, TASKBAR_HINT_SPACER } from './portal-identity.ts'
 import { clearRunState } from './run-state.ts'
 import { WINDOW_REGISTRY } from './window-registry.ts'
 import { createWindowManager } from './window-manager.ts'
@@ -307,7 +307,7 @@ export async function bootShell(): Promise<void> {
     taskbar: must('#taskbar'),
     registry: WINDOW_REGISTRY,
     driver,
-    hint: TASKBAR_HINT,
+    hintSpacer: TASKBAR_HINT_SPACER,
   })
   const scenarioDesktop = installScenarioDesktop({
     app,

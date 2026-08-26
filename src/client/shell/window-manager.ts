@@ -49,8 +49,8 @@ interface Deps {
   taskbar: HTMLElement
   registry: readonly WindowDef[]
   driver: FixtureDriver
-  /** Taskbar footer hint — the reference's `.tb-hint`. */
-  hint: string
+  /** Invisible wide-desktop spacer that preserves the original taskbar geometry. */
+  hintSpacer: string
 }
 
 const setPx = (node: HTMLElement, prop: string, value: number): void => {
@@ -227,7 +227,9 @@ export function createWindowManager(deps: Deps): WindowManager {
       tasks.set(def.key, task)
       deps.taskbar.append(task)
     }
-    deps.taskbar.append(el('div', 'tb-hint', deps.hint))
+    const spacer = el('div', 'tb-hint', deps.hintSpacer)
+    spacer.setAttribute('aria-hidden', 'true')
+    deps.taskbar.append(spacer)
   }
 
   function place(frame: WindowFrame, rect: WinRect): void {
