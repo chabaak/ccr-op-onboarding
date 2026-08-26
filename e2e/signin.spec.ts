@@ -82,6 +82,7 @@ async function chooseFirstScenario(page: Page): Promise<void> {
 }
 
 async function closeManual(page: Page): Promise<void> {
+  await expect(page.locator('#manual'), 'the desk manual did not wait for the desk').toBeVisible()
   for (let count = 0; count < 4 && (await page.locator('#manual').count()) > 0; count += 1) {
     await page.locator('#manualGo').evaluate((node) => {
       const button = node as HTMLButtonElement
