@@ -11,7 +11,7 @@ export const ABORT_MISSION_COPY: ConfirmCopy = {
   head: '시행 중단',
   meta: '현재 시행 폐기',
   body: '현재 사건 진행을 중단하고 사건 선택 데스크톱으로 돌아갑니다.',
-  note: '잔여 시행 횟수, 채굴한 블록, 인수인계, 멤브레인 상태가 모두 저장되지 않고 사라집니다.',
+  note: '사건 진행 상황이 초기화됩니다.',
   yes: '중단',
   no: '취소',
 }

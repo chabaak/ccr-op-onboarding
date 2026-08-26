@@ -663,10 +663,7 @@ test.describe('topbar', () => {
     await expect(page.locator('#confirm .notice-body')).toHaveCount(1)
     await expect(page.locator('#confirm .notice-foot')).toHaveCount(1)
     await expect(page.locator('#cf-body')).toContainText('사건 선택 데스크톱')
-    await expect(page.locator('#confirm .cf-note')).toContainText('시행')
-    await expect(page.locator('#confirm .cf-note')).toContainText('블록')
-    await expect(page.locator('#confirm .cf-note')).toContainText('인수인계')
-    await expect(page.locator('#confirm .cf-note')).toContainText('멤브레인')
+    await expect(page.locator('#confirm .cf-note')).toHaveText('사건 진행 상황이 초기화됩니다.')
 
     await page.locator('#confirmNo').click()
     await expect(page.locator('#confirm')).toHaveCount(0)
@@ -726,6 +723,13 @@ test.describe('topbar', () => {
 
     const files = page.locator('.scenario-file')
     await expect(files).toHaveCount(SCENARIO_SLUGS.length)
+    await expect(page.locator('.scenario-picker-note')).toContainText(
+      '개방된 시나리오를 선택하여 진행할 수 있습니다.',
+    )
+    await expect(page.locator('.scenario-picker-note')).toContainText(
+      '다른 시나리오를 진행 중이었다면 진행도가 초기화되므로 주의하시길 바랍니다.',
+    )
+    await expect(page.locator('.scenario-picker-note br')).toHaveCount(1)
     await expect(files.locator('.scenario-file-name')).toHaveText(SCENARIO_PACKS.map((pack) => pack.display_name))
     for (const pack of SCENARIO_PACKS) {
       const file = page.locator(`.scenario-file[data-scenario-slug="${pack.slug}"]`)
