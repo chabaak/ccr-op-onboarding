@@ -21,11 +21,14 @@ import { describe, expect, it } from 'vitest'
 import { existsSync, readFileSync, readdirSync } from 'node:fs'
 import path from 'node:path'
 import {
+  publishedContentOf,
   publishedDataFiles,
   stripCharacterNotes,
   stripDesignNotes,
   stripScoreNotes,
 } from '../../vite.config.ts'
+import { buildSchedule, SUBSTITUTE_BASELINE_UTTERANCE } from '../../src/engine/beat/schedule.ts'
+import type { Gates, Timeline } from '../../src/shared/datapack.ts'
 import { TUTORIAL_SLUG } from '../helpers/scenario.ts'
 
 const REPO = path.resolve(import.meta.dirname, '../..')
@@ -261,6 +264,46 @@ describe('published data — the allowlist tracks what the client fetches', () =
       consumers,
       `a seam now reads a stripped score field: ${consumers.join(' | ')} — reconsider the strip`,
     ).toEqual([])
+  })
+
+  it('(j) empty baseline lines cannot publish a stance label onto the player paper', () => {
+    // `baseline_utterance` is optional authoring data, but the compiled run
+    // always prints a baseline line when an empty handover skips Call 1. If the
+    // fallback is a stance label, `STANCE_SET` leaks through LIVE FEED/REPORTS.
+    const index = JSON.parse(read('data/scenario/index.json')) as { packs: { slug: string }[] }
+    let checked = 0
+
+    for (const pack of index.packs) {
+      const gates = JSON.parse(
+        publishedContentOf(
+          `scenario/${pack.slug}/gates.json`,
+          read(`data/scenario/${pack.slug}/gates.json`),
+        ),
+      ) as Gates
+      const timeline = JSON.parse(
+        publishedContentOf(
+          `scenario/${pack.slug}/timeline.json`,
+          read(`data/scenario/${pack.slug}/timeline.json`),
+        ),
+      ) as Timeline
+      const schedule = buildSchedule(timeline, gates)
+      for (const gate of schedule.flatMap((beat) => (beat.gate === null ? [] : [beat.gate]))) {
+        const source = gates.gates.find((entry) => entry.gate === gate.id)
+        const authoredLine = (source?.baseline_utterance ?? '').trim()
+        if (authoredLine !== '') continue
+        checked += 1
+        expect(gate.baselineUtterance, `${pack.slug}/${gate.id} baseline substitute drifted`).toBe(
+          SUBSTITUTE_BASELINE_UTTERANCE,
+        )
+        for (const stance of source?.stances ?? []) {
+          expect(gate.baselineUtterance, `${pack.slug}/${gate.id} fell back to a stance label`).not.toBe(
+            stance.label,
+          )
+        }
+      }
+    }
+
+    expect(checked, 'no published gate exercised the empty-baseline fallback').toBeGreaterThan(0)
   })
 
   it('(f) every pack on disk is covered, so a new scenario cannot ship unlisted', () => {

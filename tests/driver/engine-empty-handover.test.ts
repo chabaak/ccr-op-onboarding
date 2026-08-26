@@ -21,7 +21,7 @@
 import { describe, expect, it } from 'vitest'
 
 import { BASELINE_CALL1_CAUSE, FALLBACK_CALL1_CAUSE } from '../../src/engine/beat/index.ts'
-import { buildSchedule } from '../../src/engine/beat/schedule.ts'
+import { buildSchedule, SUBSTITUTE_BASELINE_UTTERANCE } from '../../src/engine/beat/schedule.ts'
 import { createEngine } from '../../src/engine/index.ts'
 import type { ViewEvent } from '../../src/shared/view-driver.ts'
 import { drain, makeRig, spyOn } from './engine-fixtures/rig.ts'
@@ -36,7 +36,7 @@ const radioLines = (events: ViewEvent[]): string[] =>
     event.type === 'feed' && event.line.kind === 'radio' ? [event.line.text] : [],
   )
 
-/** The pack's own answer for the first gate: default stance → its label. */
+/** The pack's own answer for the first gate: default stance plus baseline line. */
 function authoredBaseline(pack = scriptedRound()): { stance: string; line: string } {
   const gate = buildSchedule(pack.timeline, pack.gates).find((beat) => beat.gate !== null)?.gate
   if (gate === undefined || gate === null) throw new Error('the fixture pack authors no gate')
@@ -188,15 +188,16 @@ describe('[x14#C] the journal separates “never asked” from “asked and fail
 /* ══ the resolution rule itself ═════════════════════════════════════════════ */
 
 describe('[x14#D] a gate always has a baseline line to speak', () => {
-  it('(a) absent an authored one, it is the DEFAULT stance’s label — not another’s', () => {
+  it('(a) absent an authored one, it is neutral substitute text — not any stance label', () => {
     const pack = scriptedRound()
     const authored = pack.gates.gates[0]!
     const gate = buildSchedule(pack.timeline, pack.gates).find((b) => b.gate !== null)!.gate!
-    const chosen = authored.stances.find((stance) => stance.id === authored.default_stance)
-    expect(gate.baselineUtterance).toBe(chosen?.label)
-    // The other stances' labels are what a wrong lookup would return.
+    expect(gate.baselineUtterance).toBe(SUBSTITUTE_BASELINE_UTTERANCE)
+    // Stance labels are Call-1 selection material. The baseline path prints its
+    // line on LIVE FEED and REPORTS, so none of them may be used as a fallback.
+    expect(authored.stances.some((stance) => stance.id === authored.default_stance)).toBe(true)
     for (const stance of authored.stances) {
-      if (stance.id !== authored.default_stance) expect(gate.baselineUtterance).not.toBe(stance.label)
+      expect(gate.baselineUtterance).not.toBe(stance.label)
     }
   })
 
@@ -214,11 +215,13 @@ describe('[x14#D] a gate always has a baseline line to speak', () => {
     for (const blank of ['', '   ', null]) {
       const gates = { gates: pack.gates.gates.map((gate) => ({ ...gate, baseline_utterance: blank })) }
       const gate = buildSchedule(pack.timeline, gates).find((b) => b.gate !== null)!.gate!
-      expect(gate.baselineUtterance, `baseline_utterance=${JSON.stringify(blank)}`).not.toBe('')
+      expect(gate.baselineUtterance, `baseline_utterance=${JSON.stringify(blank)}`).toBe(
+        SUBSTITUTE_BASELINE_UTTERANCE,
+      )
     }
   })
 
-  it('(d) the SHIPPED pack answers for every gate it authors', async () => {
+  it('(d) every shipped pack answers for empty baselines without printing stance labels', async () => {
     const fs = await import('node:fs')
     const path = await import('node:path')
     const url = await import('node:url')
@@ -226,16 +229,26 @@ describe('[x14#D] a gate always has a baseline line to speak', () => {
     const manifest = JSON.parse(
       fs.readFileSync(path.join(repo, 'data/scenario/index.json'), 'utf8'),
     ) as { packs: { slug: string; role: string }[] }
-    const packSlug = manifest.packs.find((pack) => pack.role === 'tutorial')!.slug
-    const read = (name: string): never =>
+    const read = (slug: string, name: string): never =>
       JSON.parse(
-        fs.readFileSync(path.join(repo, 'data/scenario', packSlug, `${name}.json`), 'utf8'),
+        fs.readFileSync(path.join(repo, 'data/scenario', slug, `${name}.json`), 'utf8'),
       ) as never
-    const schedule = buildSchedule(read('timeline'), read('gates'))
-    const gates = schedule.flatMap((beat) => (beat.gate === null ? [] : [beat.gate]))
-    expect(gates.length).toBeGreaterThan(0)
-    for (const gate of gates) {
-      expect(gate.baselineUtterance, `${gate.id} has no line for an unshaped agent`).not.toBe('')
+    for (const pack of manifest.packs) {
+      const authored = read(pack.slug, 'gates') as { gates: { gate: string; baseline_utterance?: string | null; stances: { label: string }[] }[] }
+      const schedule = buildSchedule(read(pack.slug, 'timeline'), authored as never)
+      const gates = schedule.flatMap((beat) => (beat.gate === null ? [] : [beat.gate]))
+      expect(gates.length, `${pack.slug} authors no gates`).toBeGreaterThan(0)
+      for (const gate of gates) {
+        expect(gate.baselineUtterance, `${pack.slug}/${gate.id} has no line for an unshaped agent`).not.toBe('')
+        const source = authored.gates.find((entry) => entry.gate === gate.id)
+        const authoredLine = (source?.baseline_utterance ?? '').trim()
+        if (authoredLine !== '') continue
+        for (const stance of source?.stances ?? []) {
+          expect(gate.baselineUtterance, `${pack.slug}/${gate.id} fell back to a stance label`).not.toBe(
+            stance.label,
+          )
+        }
+      }
     }
   })
 })
