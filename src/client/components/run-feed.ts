@@ -54,7 +54,7 @@ import { publishFeedMounted, publishFeedReached } from '../shell/feed-reach.ts'
 import { callsignOf } from './dossier.ts'
 import { FALLBACK_CLASS, fallbackNoticeLine } from './fallback-notice.ts'
 import type { FallbackClass } from './fallback-notice.ts'
-import { tallyLineText } from './tally-line.ts'
+import { createScoreTally } from './score-tally.ts'
 import { TYPE_START, typeCursor } from './typewriter.ts'
 import type { TypePace } from './typewriter.ts'
 import {
@@ -456,6 +456,7 @@ const FOLLOW_SLACK_RATIO = 0.25
  * it against a FAMILY rather than against a list.
  */
 const behindLabel = (missed: number): string => `▾ 미열람 ${missed}줄`
+const RERUN_MARK = '요원이 재파견되었습니다. 시나리오가 재실행됩니다.'
 
 /** The handle the e2e suite reads the landed lines back through. */
 export interface RunFeed {
@@ -614,6 +615,16 @@ export function createRunFeed(host: HTMLElement, driver: FixtureDriver): RunFeed
   scroll.id = 'feedScroll'
   scroll.append(head, list, tail)
 
+  const tallyHost = el('article', 'feed-tally')
+  tallyHost.setAttribute('aria-label', '시행 결과')
+  const scoreTally = createScoreTally({
+    host: tallyHost,
+    onFinal: () => {
+      const tallyRun = Number(tallyHost.dataset.tallyRun ?? run)
+      window.dispatchEvent(new CustomEvent('score-tally:final', { detail: { run: tallyRun } }))
+    },
+  })
+
   // The behind-indicator. It sits OUTSIDE the scrolling box on purpose: it is
   // chrome pinned to the window's foot, not a line of the record — the fanfold
   // holds nothing but what the run printed ([u5#c7]). Hidden from the a11y tree
@@ -624,7 +635,7 @@ export function createRunFeed(host: HTMLElement, driver: FixtureDriver): RunFeed
   behind.hidden = true
   behind.setAttribute('aria-hidden', 'true')
 
-  host.append(left, right, scroll, behind)
+  host.append(left, right, scroll, tallyHost, behind)
 
   // Instance state: the green band alternates down the page (app.js:434).
   //
@@ -685,6 +696,7 @@ export function createRunFeed(host: HTMLElement, driver: FixtureDriver): RunFeed
      `missed` is what the run printed while they were reading further up. */
   let attached = true
   let missed = 0
+  let programmaticScroll = false
   /**
    * Has the box been scrolled at all since `follow` last pinned it?
    *
@@ -722,8 +734,12 @@ export function createRunFeed(host: HTMLElement, driver: FixtureDriver): RunFeed
     // is still in flight when the next line lands, and every frame of it sits
     // short of the tail — which is exactly what `atTail` reads as a hand coming
     // down on the paper. The feed would let go of itself.
+    programmaticScroll = true
     scroll.scrollTo({ top: scroll.scrollHeight, behavior: 'instant' })
     scrolledSincePin = false
+    requestAnimationFrame(() => {
+      programmaticScroll = false
+    })
   }
 
   /**
@@ -754,6 +770,10 @@ export function createRunFeed(host: HTMLElement, driver: FixtureDriver): RunFeed
   scroll.addEventListener(
     'scroll',
     () => {
+      if (programmaticScroll) {
+        scrolledSincePin = false
+        return
+      }
       scrolledSincePin = true
       reread()
     },
@@ -929,6 +949,7 @@ export function createRunFeed(host: HTMLElement, driver: FixtureDriver): RunFeed
         // run itself, and one guard is one place that can drift.
         // x12 — the sitting every cue below is stamped with. See `run`.
         run = event.run
+        scoreTally.reset()
         syncCallsign()
         return false
       case 'feed':
@@ -950,22 +971,16 @@ export function createRunFeed(host: HTMLElement, driver: FixtureDriver): RunFeed
       case 'waiting':
         return false
       case 'score': {
-        // The day's count, from the ledger the run actually scored — see
-        // `tally-line.ts` for why it is not a timeline event any more. It reuses
-        // the last stamp the same way an opening wait marker does: the seam's
-        // `score` carries no clock, and the day is over, so the line belongs to
-        // the minute the run closed on rather than to one of its own.
+        // The score now lives in the feed's fixed tally well. The fanfold still
+        // prints a boundary at the same cue so REPORTS can gate the count-up on
+        // the paper, and so the next sitting is visually separated from this
+        // one without duplicating the ledger's total in the line flow.
         const printed = append({
-          ...envelope('event', '', [{ p: 'text', text: tallyLineText(event) }]),
-          stamp,
+          ...envelope('mark', '', [{ p: 'span', text: RERUN_MARK }]),
+          classes: ['fl', 'fl-mark', 'fl-rerun'],
         })
-        // x12 — and the terminal record's count-up waits for this. The ledger's
-        // headline and this 집계 line are two printings of ONE count (the same
-        // pairing `shell/ending.ts` reasons about when it waits for the tail),
-        // so the record rolling to the day's number while the paper had not yet
-        // said it was the outcome arriving ahead of its own last line.
-        // Published AFTER the append, so the line is on the page — it is still
-        // typing, which is right: the two now count up together.
+        // Published AFTER the divider lands, so the bottom tally cannot start
+        // while the run boundary that owns it is still absent from the paper.
         publishFeedReached({ at: 'score', run })
         return printed
       }
@@ -1186,6 +1201,7 @@ export function createRunFeed(host: HTMLElement, driver: FixtureDriver): RunFeed
   resized.observe(list)
   resized.observe(scroll)
   resized.observe(tail)
+  resized.observe(tallyHost)
 
   const lines = (): HTMLLIElement[] => [...list.querySelectorAll('li')]
 

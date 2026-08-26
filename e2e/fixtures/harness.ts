@@ -112,8 +112,8 @@ export async function frame(page: Page): Promise<Frame> {
  * (design #7 — the record does not own the screen, and nothing re-steals
  * focus). What every caller of the old `awaitTallyReveal` actually needed was
  * a point past which the day's results are settled and readable; that point
- * is now the terminal record reaching `final`, since REPORTS mounts it under
- * the active filed document once the closed-day phase begins.
+ * is now the terminal record reaching `final`, since LIVE FEED mounts it under
+ * the fanfold and REPORTS drives it once the paper reaches the score boundary.
  */
 export async function awaitRecordFinal(page: Page): Promise<void> {
   // THE BUDGET IS DECLARED HERE BECAUSE THE WAIT IS DECLARED HERE (08-09).
@@ -131,7 +131,7 @@ export async function awaitRecordFinal(page: Page): Promise<void> {
   // wall-clock time (`components/score-tally.ts`'s PACE), so a tighter assertion
   // would just move the flake rather than remove it.
   test.setTimeout(90_000)
-  await expect(page.locator('#w-rep .terminal-record')).toHaveAttribute('data-tally-state', 'final', {
+  await expect(page.locator('#w-feed .feed-tally')).toHaveAttribute('data-tally-state', 'final', {
     timeout: 40_000,
   })
 }
@@ -150,9 +150,9 @@ export async function awaitRecordFinal(page: Page): Promise<void> {
  *
  * x12 — AND SO THE PAPER IS SETTLED HERE, because the result now waits for it
  * (민서, 08-10). The terminal record's count-up holds until the fanfold has
- * printed its way to the same `score` it mints the 집계 line from
- * (`shell/feed-reach.ts`), so `awaitRecordFinal` below is now a wait on the
- * PAPER as much as on the ledger — and this helper releases a whole day's stream
+ * printed its way to the same `score` boundary (`shell/feed-reach.ts`), so
+ * `awaitRecordFinal` below is now a wait on the PAPER as much as on the ledger
+ * — and this helper releases a whole day's stream
  * in a single call, which is a thing no player can do. On a lane whose day is
  * actually RUNNING (anything that pressed 배치 first — `deployFile`, and `newRun`
  * under W4's one press) that left ~78 s of reading-paced paper standing between
@@ -236,8 +236,8 @@ export async function tallyPhase(page: Page): Promise<string> {
  */
 export async function tallyState(page: Page): Promise<string> {
   return page.evaluate(() => {
-    const node = document.querySelector('#w-rep .terminal-record')
-    if (!node) throw new Error('#w-rep .terminal-record is not on the desk')
+    const node = document.querySelector('#w-feed .feed-tally')
+    if (!node) throw new Error('#w-feed .feed-tally is not on the desk')
     return node.getAttribute('data-tally-state') ?? ''
   })
 }

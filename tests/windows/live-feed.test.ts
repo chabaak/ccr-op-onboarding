@@ -355,7 +355,7 @@ describe('[u5#c1] seven kinds map 1:1', () => {
     // minute the run reached, and the first cut of the symptom removal proved
     // what happens without this: the demo day's last minute belongs to a beat
     // whose only line is a symptom, so the top bar froze at 21:00 on a run that
-    // reaches 21:04 and the 집계 line inherited the stale stamp. The guard is
+    // reaches 21:04 and the final score boundary inherited the stale stamp. The guard is
     // cheap and the failure is silent, which is exactly when to pin it.
     //
     // x11 gives it a second job: it is why an undrawn line stays in the reveal
@@ -813,10 +813,10 @@ describe('[u5#c6] lines land on the driver clock, not on a timer of their own', 
     }
   })
 
-  it('(b) three rAF in run-feed — prefill catch-up + the U1 settle watchdog pair', () => {
+  it('(b) four rAF in run-feed — prefill, self-scroll suppression, and the U1 settle watchdog pair', () => {
     for (const file of SOURCES) {
       const hits = (code(file).match(/requestAnimationFrame/g) ?? []).length
-      const allowed = file.endsWith('run-feed.ts') ? 3 : 0
+      const allowed = file.endsWith('run-feed.ts') ? 4 : 0
       expect(`${file}: ${hits} rAF (max ${allowed})`).toBe(
         `${file}: ${Math.min(hits, allowed)} rAF (max ${allowed})`,
       )
@@ -950,6 +950,10 @@ describe('[u5#c9] the window renders, never authors', () => {
       // instead of authoring one here.
       '요원',
       '오류',
+      // issue 228's run boundary. Chrome minted from `score`, not run-authored text:
+      // it divides sittings while the bottom tally carries the actual numbers.
+      '요원이 재파견되었습니다. 시나리오가 재실행됩니다.',
+      '시행 결과',
       // U2's behind-indicator. Chrome about the VIEWPORT — it counts lines the
       // window has already printed and authors nothing about the run itself.
       '▾ 미열람 ${missed}줄',

@@ -131,8 +131,7 @@ export interface ScoredRow {
  * in `endings.json`, so this rule stays general without hard-coding a case.
  *
  * `deathsOf` is the pack's own rule, borrowed rather than restated
- * (`shared/predicates.ts`, and `components/tally-line.ts` reads the same tally
- * through it): a value counts one death when its outcome word is 사망, so
+ * (`shared/predicates.ts`): a value counts one death when its outcome word is 사망, so
  * `사망 · 집결지 세 번째 명단` counts and `생존 · 발목이 부러진 채 북측으로 걸어
  * 나온다` does not. Writing a second copy of that test here is how the desk's
  * two readings of one row would eventually disagree.
@@ -621,9 +620,8 @@ async function walkEnding(host: Window, ports: EndingPorts): Promise<void> {
   // keeps the beat's meaning by widening what "finished" covers: the record has
   // landed, the paper has caught up, and only then does the desk get its pause.
   //
-  // The feed's own 집계 line is inside this wait, which is the neatest statement
-  // of why it exists — the ledger's headline and the fanfold's closing line are
-  // two printings of one count, and covering the paper before the second one
+  // The feed's own run divider is inside this wait, which is the neatest
+  // statement of why it exists: covering the paper before the score boundary
   // lands would tear the day's last sentence in half.
   //
   // NO CEILING on it, and that is a decision rather than an oversight. A timeout

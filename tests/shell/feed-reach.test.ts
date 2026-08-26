@@ -385,18 +385,17 @@ describe('[x12] the arriving document waits for the paper', () => {
   })
 
   it('(b) the terminal record opens on the event and COUNTS on the paper', () => {
-    // The record identity and visible tally host are both reconciled through
-    // REPORTS the moment the day closes. `open()` leaves it `pending`, and the
-    // count-up runs when the fanfold reaches the same `score` it mints the 집계
-    // line from. The two are one count, printed twice.
+    // The visible tally host is mounted by LIVE FEED, but REPORTS still owns the
+    // `score` event's model and the paper gate. `open()` leaves it `pending`,
+    // and the count-up runs when the fanfold reaches the same `score` boundary.
     const src = code(REPORTS_TS)
     const scored = /if \(event\.type === 'score'\) \{[\s\S]*?\n {6}return\n {4}\}/.exec(src)
     expect(scored, 'the score branch is gone — re-aim this guard').not.toBeNull()
-    expect(scored![0], 'REPORTS no longer owns the visible score tally').toMatch(/createScoreTally\(\{/)
-    expect(scored![0], 'the tally no longer mounts through the terminal record').toMatch(/host: node/)
-    expect(scored![0], 'the record no longer opens when the day closes').toMatch(/tally\.open\(\)/)
+    expect(scored![0], 'REPORTS stopped using the live score tally').toMatch(/getScoreTally\(\)/)
+    expect(code(RUN_FEED_TS), 'LIVE FEED no longer owns the visible score tally').toMatch(/createScoreTally\(\{/)
+    expect(scored![0], 'the record no longer opens when the day closes').toMatch(/tally\?\.open\(\)/)
     expect(scored![0], 'the count-up no longer waits for the paper').toMatch(
-      /afterPaper\(\{ at: 'score'[\s\S]*?tally\.run\(/,
+      /afterPaper\(\{ at: 'score'[\s\S]*?getScoreTally\(\)\?\.run\(/,
     )
     // The MODEL is built on the event. By the time the paper catches up the desk
     // may be on the next sitting, and a model read late would score this day's
@@ -410,7 +409,7 @@ describe('[x12] the arriving document waits for the paper', () => {
     // the gate protects is the ORDER two surfaces say a thing in, and a document
     // being re-read has no order left to protect.
     const src = code(REPORTS_TS)
-    for (const owner of ['function drawDocument', 'function sync', 'function mountRecord']) {
+    for (const owner of ['function drawDocument', 'function sync']) {
       const body = new RegExp(`${owner}[\\s\\S]*?\\n {2}\\}`).exec(src)?.[0] ?? ''
       expect(body, `${owner} is gone`).not.toBe('')
       expect(body, `${owner} now queues behind the fanfold`).not.toMatch(/afterPaper|feedReached/)
@@ -420,9 +419,9 @@ describe('[x12] the arriving document waits for the paper', () => {
     expect(select, 'selecting a past day now waits on the paper').not.toMatch(/afterPaper|feedReached/)
   })
 
-  it('(d) AGENT FILE releases from the REPORTS count-up, not a second timer', () => {
-    // REPORTS already holds `tally.run(record)` until the paper reaches the
-    // score and now owns the visible host. AGENT FILE only listens for the
+  it('(d) AGENT FILE releases from the visible count-up, not a second timer', () => {
+    // REPORTS already holds `run(record)` until the paper reaches the score,
+    // while LIVE FEED owns the visible host. AGENT FILE only listens for the
     // visible tally's final event; deriving `counted` from another
     // `feedReached` + timeout here would be a second clock that could drift
     // from the count-up it is meant to describe.

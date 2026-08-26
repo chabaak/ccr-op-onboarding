@@ -26,7 +26,8 @@
    that particular shrink is gone — the rule is NOT: any line rewrapping above
    the reader moves the same offset, and anchoring has nothing to add to a log
    pinned at its foot. */
-.feed-scroll{position:absolute;inset:0;padding:0 var(--space-26);overflow-y:auto;
+.win-feed .win-body{display:flex;flex-direction:column;container-type:size}
+.feed-scroll{position:relative;flex:1;min-height:0;padding:0 var(--space-26);overflow-y:auto;
   scroll-behavior:smooth;overflow-anchor:none}
 .feed-scroll::-webkit-scrollbar{width:8px}
 .feed-scroll::-webkit-scrollbar-track{background:var(--sh-06)}
@@ -94,6 +95,8 @@
 .fl-mark .fl-c span{background:var(--surface);padding:0 var(--space-12);position:relative;z-index:1}
 .fl-mark .fl-c::after{content:'';position:absolute;left:0;right:0;top:50%;
   border-top:1px dashed var(--sh-35)}
+.fl-rerun .fl-c{font-size:var(--fs-10);font-weight:800;letter-spacing:.14em;color:var(--warning)}
+.fl-rerun .fl-c span{padding:0 var(--space-14)}
 /* The tail spacer — air under the last line, so the newest thing printed is not
    flush against the window's bottom edge.
 
@@ -109,8 +112,29 @@
    `vh` — the viewport is not what changed. `.win-body` takes a definite height
    from `.win`'s own `--h`, so it can carry the size container without
    circularity. */
-.win-feed .win-body{container-type:size}
 .feed-tail{height:25cqh}
+
+.feed-tally{flex:0 0 auto;margin:0 var(--space-26) var(--space-10);min-height:82px;
+  border-top:1px solid var(--ink-line);background:var(--surface-inset);
+  box-shadow:0 -8px 18px var(--sh-13)}
+.feed-tally[data-tally-state="pending"] .tly-doc,
+.feed-tally[data-tally-state="pending"] .tly-lines{display:none}
+.feed-tally .tly-doc{font-size:var(--fs-8);letter-spacing:.2em;color:var(--surface-muted);
+  padding:var(--space-8) var(--space-12) var(--space-5)}
+.feed-tally .tly-lines{list-style:none}
+.feed-tally .tly-line{display:grid;grid-template-columns:46px minmax(0,1fr);gap:var(--space-12);
+  padding:var(--space-8) var(--space-12);box-sizing:border-box;
+  border:1px solid transparent;border-bottom-color:var(--ink-line);align-items:start}
+.feed-tally .tl-s{grid-column:2;font-family:var(--prose);font-size:var(--fs-12-5);line-height:1.65;
+  font-weight:700;color:var(--warning-strong);word-break:keep-all}
+.feed-tally .tl-open .tl-s{letter-spacing:.04em}
+.feed-tally .tl-close{border-bottom:2px solid var(--warning-a4)}
+.feed-tally .tl-close .tl-s{font-weight:800}
+.feed-tally .tl-close .tl-unit{font-family:var(--prose)}
+.feed-tally #tlyBig{font-variant-numeric:tabular-nums}
+.feed-tally .tly-line{opacity:0;transform:translateY(6px)}
+.feed-tally .tly-line.in{animation:rowIn .5s cubic-bezier(.2,.9,.3,1) both}
+@keyframes rowIn{to{opacity:1;transform:none}}
 
 /* The behind-indicator (U2). Chrome pinned to the window's foot, above the
    fanfold rather than on it — the paper carries only what the run printed.

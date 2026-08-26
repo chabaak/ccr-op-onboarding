@@ -33,10 +33,10 @@
 // The count-up survives, moved onto the closing line's number and given only
 // the time that line actually has (`countMs`) — see the cadence note below.
 //
-// x13 moves the host again: the visible record sits under AGENT FILE's DEPLOY
-// row, while REPORTS still opens and runs it from the `score` event so the
-// paper gate and event-local model stay there. The component remains the same
-// record printer; only the mount owner changed.
+// x13 moved the host under AGENT FILE's DEPLOY row; issue 228 moves it again under
+// LIVE FEED's paper, while REPORTS still opens and runs it from the `score`
+// event so the paper gate and event-local model stay there. The component
+// remains the same record printer; only the mount owner changed.
 //
 // Two things are deliberately NOT the reference's:
 //
@@ -201,9 +201,8 @@ const TOTAL_JOIN = ' '
  *
  * The unit rides a NUMBER and nothing else. That is not a guess about the
  * scenario: `contract-datapack` §3.6 has authoring write a body count as a
- * number and every other outcome as a word, which is the same predicate
- * `components/tally-line.ts` sums the feed's closing line by. So a counted axis
- * reads `터널에서 나오지 못한 사람: 59명` and a qualitative one reads
+ * number and every other outcome as a word. So a counted axis reads
+ * `터널에서 나오지 못한 사람: 59명` and a qualitative one reads
  * `차우진: 사망 · 하행 4.2km 갓길` — with no unit invented for it.
  */
 export function lineOf(row: TallyRowModel, unit: string): string {
@@ -324,6 +323,7 @@ export function createScoreTally(options: ScoreTallyOptions): ScoreTally {
   function reset(): void {
     stop()
     lines.replaceChildren()
+    delete root.dataset.tallyRun
     openLine.classList.remove('in')
     closeLine.classList.remove('in')
     big.textContent = String(0)
@@ -332,6 +332,7 @@ export function createScoreTally(options: ScoreTallyOptions): ScoreTally {
 
   function run(model: TallyModel): void {
     stop()
+    root.dataset.tallyRun = String(model.run)
     doc.textContent = model.doc
     openText.textContent = model.title
     totalCaption.textContent = `${model.headline.label}${TOTAL_JOIN}`

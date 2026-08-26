@@ -108,7 +108,7 @@ describe('[u2f#c6] the score event is scenario-backed (D3 row 4 / A4)', () => {
     // `총계` is the sum of the NUMERIC values (`src/driver/scorer.ts` `totalOf`),
     // so a row that is not a body count has to be a word or it joins the
     // headline. All three were numbers against a total of 7 — 200 + 7 + 19
-    // summing to 226 — until the feed's closing 집계 line began printing the
+    // summing to 226 — until the visible score record began printing the
     // breakdown beside the headline and the two had to agree.
     const rows = scoreEvents()[0]?.rows ?? []
     expect(rows.map((r) => nfc(r.label))).toEqual(['진입', '사망', '부상'])

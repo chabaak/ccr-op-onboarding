@@ -108,15 +108,15 @@ export const FILE = {
   state: '#w-file #deployState',
 } as const
 
-/* ── terminal record (#185, mounted under REPORTS) ───────────────────────── */
+/* ── terminal record (issue 228, mounted under LIVE FEED) ────────────────── */
 export const RECORD = {
-  root: '#w-rep .terminal-record',
-  ledger: '#w-rep .terminal-record[data-tally-state]',
+  root: '#w-feed .feed-tally',
+  ledger: '#w-feed .feed-tally[data-tally-state]',
   /* x4 — the AXIS lines only. The record's opening (`…시점 집계`) and closing
      (`총 사망자 수 …`) lines are its own head and foot, not scored rows, so a
      caller comparing this against `score.rows.length` must not see them. */
-  rows: '#w-rep .terminal-record .tly-line:not(.tl-open):not(.tl-close)',
-  big: '#w-rep .terminal-record #tlyBig',
+  rows: '#w-feed .feed-tally .tly-line:not(.tl-open):not(.tl-close)',
+  big: '#w-feed .feed-tally #tlyBig',
   control: '#w-file #btnDeploy',
 } as const
 

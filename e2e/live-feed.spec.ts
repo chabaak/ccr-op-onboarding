@@ -210,16 +210,15 @@ async function domLines(page: Page): Promise<DomLine[]> {
 
 /**
  * Rendered lines that came off the stream — the client's own states removed.
- * The 21:04 집계 line is one of them: minted from the `score` event
- * (`tally-line.ts`, #183), not a stream line; run-loop.spec asserts it on
- * its own.
+ * The run divider is minted from the `score` event, not a stream line;
+ * run-loop.spec asserts it on its own.
  *
  * x8 — the `!l.empty` clause went with the `(변화 없음)` line, the only node
  * that ever carried `data-empty` (민서, 08-10). The client mints exactly one
  * kind of line of its own now, and this filter names it.
  */
 const streamRendered = (lines: DomLine[]): DomLine[] =>
-  lines.filter((l) => !l.text.startsWith('집계. '))
+  lines.filter((l) => !l.text.startsWith('요원이 재파견되었습니다.'))
 
 /* ══ the day opens on the press, never before it ══════════════════════════ */
 

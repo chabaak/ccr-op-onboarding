@@ -601,8 +601,7 @@ describe('[u7#c2] count-up pacing is ~9 s and absorbs the report call', () => {
 
   // The unit is `contract-datapack` §3.6's own predicate, not a guess about the
   // scenario: authoring writes a body count as a NUMBER and every other outcome
-  // as a word. `components/tally-line.ts` sums the feed's closing line by the
-  // same rule.
+  // as a word. The visible record lines use the same rule.
   it('(p) a record line units a number and never a word', async () => {
     const t = await scoreTally()
     expect(t.lineOf({ label: '터널에서 나오지 못한 사람', value: 59 }, '명')).toBe(
@@ -755,12 +754,12 @@ describe('[u7#c9] run-wide hard constraints hold in this unit', () => {
     expect(offenders(/\.style\.[A-Za-z]/)).toEqual([])
     expect(offenders(/['"]\.\.?\/[^'"]*\.css['"]/)).toEqual([])
 
-    const sheet = read(path.join(REPO, 'src/client/styles/win-reports.css'))
+    const sheet = read(path.join(REPO, 'src/client/styles/win-live-feed.css'))
     expect(sheet.length, 'u1 already shipped the tally skin — u7 must not need one').toBeGreaterThan(0)
     // x4 — the record's classes, not the retired sheet's. C11's claim is that
     // u7 writes NO css and finds its skin already on disk; the list is what
     // makes that claim non-vacuous, so it names what the record actually wears.
-    for (const cls of ['.terminal-record', '.tly-doc', '.tly-lines', '.tly-line', '.tl-s']) {
+    for (const cls of ['.feed-tally', '.tly-doc', '.tly-lines', '.tly-line', '.tl-s']) {
       expect(sheet, `${cls} is missing from the shipped skin`).toContain(cls)
     }
   })
