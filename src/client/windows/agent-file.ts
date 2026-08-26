@@ -22,6 +22,7 @@ import { animationsFrozen } from '../driver/index.ts'
 import { button, el, must } from '../shell/dom.ts'
 import { deployCopy, openConfirm } from '../shell/confirm.ts'
 import { announce } from '../shell/announcer.ts'
+import { feedDrained, feedPending } from '../shell/feed-drain.ts'
 import { fetchScenarioInPlay } from '../shell/pack-session.ts'
 import { createRunState, hasFiledReport } from '../shell/run-state.ts'
 import type { RunPhase, RunState } from '../shell/run-state.ts'
@@ -79,6 +80,7 @@ const SPENT = '잔여 시행 없음 — 마지막 집계입니다'
 const SAY_HOLD_TAIL = ' 집계 대기 · 보고서 정리 중'
 const SAY_FILED_TAIL = ' 집계 완료 · 다음 시행을 시작할 수 있습니다'
 const SAY_LAPSED_TAIL = ' 보고서가 도착하지 않았습니다 · 다음 시행을 시작할 수 있습니다'
+const PAPER_PENDING_NOTE = '현장 기록 인쇄 중 — 인쇄 완료 후 다음 시행을 시작할 수 있습니다'
 
 /** The dev/test handle, exactly as `shell/boot.ts` exposes `window.__shell`. */
 export interface AgentFileHandle {
@@ -230,15 +232,16 @@ export function mount(host: HTMLElement, driver: FixtureDriver): void {
   let spent = false
   let hold: ReturnType<typeof setTimeout> | null = null
   /**
-   * The control's note while the day is closed — blank across the hold since
-   * x6b, then FILED_NOTE/LAPSED_TAIL/SPENT on the release. `deployView` cannot
-   * derive it purely (design #5), so
+   * The control's note while the day is closed — paper-pending while the feed is
+   * still visibly printing, then FILED_NOTE/LAPSED_TAIL/SPENT on the release.
+   * `deployView` cannot derive it purely (design #5), so
    * `sync()` re-applies it on every render instead of relying on caller order.
    * `sync()` runs from more triggers than the settle wiring alone (the
    * identity fetch's own `.then()` below is one), and any of them landing
    * AFTER a direct `noteEl.textContent` write would silently blank it again.
    */
   let settleNote = ''
+  let paperWatch = false
 
   const board = createSlotBoard({
     emit: (op) => driver.send(op).ok,
@@ -343,6 +346,7 @@ export function mount(host: HTMLElement, driver: FixtureDriver): void {
   }
 
   function sync(): void {
+    const paperPending = closed && feedPending() > 0
     const view = deployView({
       slots: board.cells(),
       deployed: board.isLocked(),
@@ -351,6 +355,7 @@ export function mount(host: HTMLElement, driver: FixtureDriver): void {
       at: committedAt ?? opensAt,
       closed,
       releasable: settled,
+      paperPending,
       spent,
       nextAt: opensAt,
     })
@@ -360,10 +365,22 @@ export function mount(host: HTMLElement, driver: FixtureDriver): void {
     // Applied AFTER `zone.render()`, every time: `deployView`'s own note is
     // blank once the day is closed, so this is what actually carries the
     // settle text, immune to how many other things call `sync()` meanwhile.
-    if (closed) noteEl.textContent = settleNote
+    if (closed) noteEl.textContent = paperPending ? PAPER_PENDING_NOTE : settleNote
     // x10 — …and after it for the same reason: `zone.render()` is what sets the
     // control's `disabled`, and the cue reads that.
     paintCue()
+    watchPaper()
+  }
+
+  function watchPaper(): void {
+    if (!closed || paperWatch || feedPending() === 0) return
+    paperWatch = true
+    void feedDrained().then(() => {
+      paperWatch = false
+      if (!closed) return
+      settle()
+      sync()
+    })
   }
 
   /**
