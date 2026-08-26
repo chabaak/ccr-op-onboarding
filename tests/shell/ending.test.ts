@@ -491,7 +491,7 @@ describe('[x6] the ending is an observer', () => {
     expect(src).toMatch(/cf-body notice-body/)
     expect(src).toMatch(/cf-ask notice-lead/)
     expect(src).toMatch(/cf-note notice-line/)
-    expect(src).toMatch(/notice-footnote/)
+    expect(src).not.toMatch(/notice-footnote/)
     expect(src).toMatch(/notice-actions/)
     expect(src).toMatch(/notice-btn notice-primary/)
     expect(src).not.toMatch(/notice-accent/)

@@ -29,13 +29,19 @@ function noticeWarningSelectors(): string[] {
     .map((m) => m[1]!.replace(/\s+/g, ' ').trim())
 }
 
+function noticeFootBlock(source: string): string {
+  const match = /const foot = el\('div', 'cf-foot notice-foot'\)[\s\S]*?plate\.append/.exec(source)
+  expect(match, 'source does not build a notice foot').not.toBeNull()
+  return match![0]!
+}
+
 describe('[issue 133] the notice object has one reusable class family', () => {
   it('(a) confirm, manual, and ending apply the notice classes while keeping compatibility hooks', () => {
     expect(read(CONFIRM_TS)).toMatch(/cf-plate notice-plate/)
     expect(read(CONFIRM_TS)).toMatch(/cf-plate-hd notice-head/)
     expect(read(CONFIRM_TS)).toMatch(/cf-body notice-body/)
     expect(read(CONFIRM_TS)).toMatch(/cf-ask notice-lead/)
-    expect(read(CONFIRM_TS)).toMatch(/cf-note notice-footnote/)
+    expect(read(CONFIRM_TS)).toMatch(/cf-note notice-line/)
     expect(read(CONFIRM_TS)).toMatch(/cf-btn cf-yes notice-btn notice-primary/)
 
     expect(read(MANUAL_TS)).toMatch(/cf-plate notice-plate man-plate/)
@@ -96,14 +102,29 @@ describe('[issue 133] the notice object has one reusable class family', () => {
     expect(scannable(read(WIN_ENDING_CSS))).not.toMatch(/var\(--warning|var\(--alert|var\(--good/)
   })
 
-  it('[issue 192] the footer yields note width before action width', () => {
+  it('[issue 192] the footer wraps without breaking button labels', () => {
     expect(decl(CONFIRM_CSS, '.notice-foot', 'flex-wrap')).toBe('wrap')
     expect(decl(CONFIRM_CSS, '.notice-foot', 'gap')).toBe('var(--space-7) var(--space-10)')
 
-    expect(decl(CONFIRM_CSS, '.notice-footnote', 'min-width')).toBe('0')
     expect(decl(CONFIRM_CSS, '.notice-actions', 'flex')).toBe('0 0 auto')
 
     expect(decl(CONFIRM_CSS, '.notice-btn', 'flex')).toBe('0 0 auto')
     expect(decl(CONFIRM_CSS, '.notice-btn', 'white-space')).toBe('nowrap')
+  })
+
+  it('[issue 205] the notice footer has no text-bearing children', () => {
+    const offenders: string[] = []
+    for (const [family, source] of [
+      ['confirm', read(CONFIRM_TS)],
+      ['manual', read(MANUAL_TS)],
+      ['ending', read(ENDING_TS)],
+    ] as const) {
+      const foot = noticeFootBlock(source)
+      if (/cf-note|notice-line|notice-footnote/.test(foot)) offenders.push(`${family}: notice text node`)
+      if (/copy\.note/.test(foot)) offenders.push(`${family}: copy.note`)
+    }
+
+    if (/footnote\.textContent/.test(read(ENDING_TS))) offenders.push('ending: changing footer text')
+    expect(offenders).toEqual([])
   })
 })

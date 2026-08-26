@@ -955,6 +955,16 @@ async function clockFrame(page: Page): Promise<{ minute: number; rate: number }>
   })
 }
 
+async function textLineFragments(locator: Locator): Promise<number> {
+  return locator.evaluate((node) => {
+    const range = document.createRange()
+    range.selectNodeContents(node)
+    const rects = [...range.getClientRects()].filter((rect) => rect.width > 0 && rect.height > 0)
+    range.detach()
+    return rects.length
+  })
+}
+
 test.describe('[x2] DEPLOY asks before it commits', () => {
   test('[x2] (a) the press raises a centred plate that is not a window', async ({ page }) => {
     await boot(page)
@@ -997,7 +1007,8 @@ test.describe('[x2] DEPLOY asks before it commits', () => {
     // the plate now states. The plate also names the agent it is about to send.
     await expect(page.locator('#confirmNo')).toHaveText('취소')
     await expect(page.locator('#confirmYes')).toHaveText('파견')
-    await expect(page.locator('#cf-body')).toHaveText('인수 인계를 완료하여 현장에 파견합니다.')
+    await expect(page.locator('#cf-body')).toContainText('인수 인계를 완료하여 현장에 파견합니다.')
+    await expect(page.locator('#cf-body')).toContainText('현장 파견 시 더 이상 요원과 소통할 수 없습니다.')
     await expect(page.locator('#cf-body'), 'the plate named an agent again').not.toContainText('ECHO')
     // 취소 holds the focus: the reflex keystroke on an irreversible act must
     // not be the one that confirms it.
@@ -1005,6 +1016,30 @@ test.describe('[x2] DEPLOY asks before it commits', () => {
     // The desk behind it cannot be reached while the question is up.
     await expect(page.locator('#desktop')).toHaveAttribute('inert', '')
     await expect(page.locator('#topbar')).toHaveAttribute('inert', '')
+  })
+
+  test('[issue 205] 360px keeps each deploy answer on one line', async ({ page }) => {
+    await page.setViewportSize({ width: 360, height: 720 })
+    await boot(page)
+    await page.locator(`${FILE} .pg-nav .pg-turn`).last().evaluate((node) => {
+      const button = node as HTMLButtonElement
+      button.click()
+    })
+    await expect(page.locator('#slotBoard')).toBeAttached()
+    await page.locator('#btnDeploy').evaluate((node) => {
+      const button = node as HTMLButtonElement
+      button.click()
+    })
+
+    await expect(page.locator(PLATE)).toBeVisible()
+    await expect(page.locator('#confirmNo')).toHaveText('취소')
+    await expect(page.locator('#confirmYes')).toHaveText('파견')
+    await expect(page.locator('#confirm .notice-foot')).not.toContainText('현장 파견')
+    await expect(page.locator('#cf-body')).toContainText('현장 파견 시 더 이상 요원과 소통할 수 없습니다.')
+    await expect(page.locator('#confirmNo')).toHaveCSS('white-space', 'nowrap')
+    await expect(page.locator('#confirmYes')).toHaveCSS('white-space', 'nowrap')
+    expect(await textLineFragments(page.locator('#confirmNo')), '취소 wrapped at 360px').toBe(1)
+    expect(await textLineFragments(page.locator('#confirmYes')), '파견 wrapped at 360px').toBe(1)
   })
 
   test('[x2] (c) 아니오 closes the plate and commits nothing', async ({ page }) => {
