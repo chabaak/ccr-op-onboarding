@@ -28,9 +28,9 @@ export const SCENARIO_UNLOCK_NOTICE = '다른 사건도 해결해보십시오.'
 export const SCENARIO_UNPLAYABLE_NOTICE = '이 사건은 아직 종료 자료가 없어 시작할 수 없습니다.'
 export const SCENARIO_ENDING_LOAD_FAILURE_NOTICE = '종료 자료를 확인할 수 없어 이 사건을 시작할 수 없습니다.'
 export const SCENARIO_PICKER_NOTE =
-  '사건 개요는 배치 후 회선에서만 열람할 수 있습니다. 아래 표시되는 것은 사건명, 난이도와 시행 횟수뿐입니다. 배치된 사건은 시행을 모두 소진할 때까지 교체할 수 없습니다.'
+  '개방된 시나리오를 선택하여 진행할 수 있습니다.\n다른 시나리오를 진행 중이었다면 진행도가 초기화되므로 주의하시길 바랍니다.'
 export const SCENARIO_PICKER_FOOT = '시행을 모두 소진하면 동일 사건으로 재평가가 편성됩니다.'
-export const SCENARIO_CONFIRM_NOTE = '배치된 사건은 시행을 모두 소진할 때까지 교체할 수 없습니다.'
+export const SCENARIO_CONFIRM_NOTE = '진행 중인 사건이 있었다면 초기화됩니다.'
 
 interface StoragePort {
   getItem(key: string): string | null
@@ -199,6 +199,16 @@ export function restartScenario(
   options.reload()
 }
 
+function scenarioPickerNote(): HTMLElement {
+  const note = el('p', 'scenario-picker-note')
+  const lines = SCENARIO_PICKER_NOTE.split('\n')
+  lines.forEach((line, index) => {
+    if (index > 0) note.append(el('br'))
+    note.append(document.createTextNode(line))
+  })
+  return note
+}
+
 export function installScenarioDesktop(deps: ScenarioDesktopDeps): ScenarioDesktopHandle {
   const localStorage = storageOf(deps.localStorage)
   const sessionStorage = deps.sessionStorage
@@ -226,7 +236,7 @@ export function installScenarioDesktop(deps: ScenarioDesktopDeps): ScenarioDeskt
     grid = el('div', 'scenario-grid')
     picker.append(
       head,
-      el('p', 'scenario-picker-note', SCENARIO_PICKER_NOTE),
+      scenarioPickerNote(),
       grid,
       el('div', 'scenario-picker-foot', SCENARIO_PICKER_FOOT),
     )

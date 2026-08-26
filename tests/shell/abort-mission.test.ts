@@ -12,15 +12,13 @@ const CONFIRM_TS = path.join(SHELL_DIR, 'confirm.ts')
 const CONFIRM_CSS = path.join(CLIENT, 'styles/confirm.css')
 
 describe('abort mission control', () => {
-  it('(a) asks in plain language what the abort discards', () => {
+  it('(a) asks in plain language that abort resets case progress', () => {
     expect(ABORT_MISSION_COPY.head).toBe('시행 중단')
     expect(ABORT_MISSION_COPY.meta).toBe('현재 시행 폐기')
     expect(ABORT_MISSION_COPY.yes).toBe('중단')
     expect(ABORT_MISSION_COPY.no).toBe('취소')
     expect(`${ABORT_MISSION_COPY.body}\n${ABORT_MISSION_COPY.note}`).toContain('사건 선택 데스크톱')
-    for (const word of ['시행', '블록', '인수인계', '멤브레인']) {
-      expect(ABORT_MISSION_COPY.note).toContain(word)
-    }
+    expect(ABORT_MISSION_COPY.note).toBe('사건 진행 상황이 초기화됩니다.')
   })
 
   it('(b) confirming returns through the provided desktop path exactly once', async () => {

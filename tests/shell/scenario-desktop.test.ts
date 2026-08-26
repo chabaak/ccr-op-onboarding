@@ -129,6 +129,7 @@ describe('scenario desktop replay files', () => {
       no: '취소',
     })
     const visible = Object.values(copy).join('\n')
+    expect(copy.note).toBe('진행 중인 사건이 있었다면 초기화됩니다.')
     expect(visible).not.toContain(brief.lead)
     for (const line of brief.body) expect(visible).not.toContain(line)
   })
@@ -147,8 +148,10 @@ describe('scenario desktop replay files', () => {
       enabled: true,
     })
     expect(model.name).toBe(entry.displayName)
-    expect(SCENARIO_PICKER_NOTE).toContain('사건 개요는 배치 후 회선에서만 열람')
-    expect(SCENARIO_PICKER_NOTE).toContain('사건명, 난이도와 시행 횟수')
+    expect(SCENARIO_PICKER_NOTE.split('\n')).toEqual([
+      '개방된 시나리오를 선택하여 진행할 수 있습니다.',
+      '다른 시나리오를 진행 중이었다면 진행도가 초기화되므로 주의하시길 바랍니다.',
+    ])
   })
 
   it('(h) locked picker cards expose status without becoming playable', () => {
