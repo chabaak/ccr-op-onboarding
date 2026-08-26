@@ -47,6 +47,7 @@ const VIEWPORT = { width: 1280, height: 800 }
 interface ScenarioIndexFixture {
   packs: readonly {
     slug: string
+    display_name: string
     role: string
     order: number
   }[]
@@ -60,13 +61,19 @@ const SCENARIO_SLUGS = SCENARIO_INDEX.packs
   .slice()
   .sort((a, b) => a.order - b.order)
   .map((pack) => pack.slug)
+const SCENARIO_PACKS = SCENARIO_INDEX.packs.slice().sort((a, b) => a.order - b.order)
 const PLAYABLE_SCENARIO_SLUGS = SCENARIO_INDEX.packs
   .filter((pack) => pack.role === 'tutorial' || pack.role === 'practice')
+  .sort((a, b) => a.order - b.order)
+  .map((pack) => pack.slug)
+const TUTORIAL_SCENARIO_SLUGS = SCENARIO_INDEX.packs
+  .filter((pack) => pack.role === 'tutorial')
   .sort((a, b) => a.order - b.order)
   .map((pack) => pack.slug)
 
 if (SCENARIO_SLUGS.length === 0) throw new Error('scenario index has no packs')
 if (PLAYABLE_SCENARIO_SLUGS.length === 0) throw new Error('scenario index has no playable packs')
+if (TUTORIAL_SCENARIO_SLUGS.length !== 1) throw new Error('scenario index must have exactly one tutorial pack')
 
 interface Rect {
   x: number
@@ -703,6 +710,34 @@ test.describe('topbar', () => {
     expect(stored['ndsp:meta:v1']).not.toBe('stale')
     expect(stored[`dday.meta.${selectedSlug}`]).not.toBe('stale')
     expect(stored[`dday.meta.stamp.${selectedSlug}`]).not.toBe('stale')
+  })
+
+  test('topbar — the scenario desktop opens with only the tutorial unlocked and every file named', async ({
+    page,
+  }) => {
+    await page.addInitScript(() => {
+      window.localStorage.removeItem('ndsp:scenario:unlocked:v1')
+      window.sessionStorage.setItem('ndsp:scenario:return-desktop:v1', '1')
+    })
+    await page.goto('./')
+    await page.waitForFunction(() => !document.body.classList.contains('booting'), undefined, { timeout: 20_000 })
+    await hideDebugPane(page)
+
+    const files = page.locator('.scenario-file')
+    await expect(files).toHaveCount(SCENARIO_SLUGS.length)
+    await expect(files.locator('.scenario-file-name')).toHaveText(SCENARIO_PACKS.map((pack) => pack.display_name))
+    for (const pack of SCENARIO_PACKS) {
+      const file = page.locator(`.scenario-file[data-scenario-slug="${pack.slug}"]`)
+      await expect(file).toContainText(pack.display_name)
+      await expect(file).toHaveAttribute('aria-label', new RegExp(pack.display_name))
+      if (TUTORIAL_SCENARIO_SLUGS.includes(pack.slug)) {
+        await expect(file).toBeEnabled()
+        await expect(file.locator('.scenario-file-status')).toHaveText('배치 가능')
+      } else {
+        await expect(file).toBeDisabled()
+        await expect(file.locator('.scenario-file-status')).toHaveText('미개방')
+      }
+    }
   })
 
   test('topbar — desktop dressing and live-region hosts are present', async ({ page }) => {

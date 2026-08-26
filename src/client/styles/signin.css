@@ -152,6 +152,8 @@ body.signin #blueprint{filter:brightness(.35) contrast(1.05)}
   font-family:var(--mono);font-size:var(--fs-10);font-style:normal}
 .scenario-file-top{letter-spacing:.2em;color:var(--signal)}
 .scenario-file-status{text-align:right;letter-spacing:.16em;color:var(--surface-muted-2)}
+.scenario-file-name{grid-column:1 / -1;font-family:var(--prose);font-size:var(--fs-16);
+  font-weight:700;line-height:1.25;color:var(--surface-text)}
 .scenario-file-field{letter-spacing:.18em;color:var(--surface-muted-2)}
 .scenario-file b{font-family:var(--prose);font-size:var(--fs-15);font-weight:600;line-height:1.35;color:var(--surface-text)}
 .scenario-file i{letter-spacing:.12em;color:var(--surface-text)}
@@ -160,6 +162,7 @@ body.signin #blueprint{filter:brightness(.35) contrast(1.05)}
 .scenario-file-pips span.is-current{background:var(--signal)}
 .scenario-file[disabled] .scenario-file-top,
 .scenario-file[disabled] .scenario-file-status,
+.scenario-file[disabled] .scenario-file-name,
 .scenario-file[disabled] .scenario-file-field,
 .scenario-file[disabled] b,
 .scenario-file[disabled] i{color:var(--txt-8)}
