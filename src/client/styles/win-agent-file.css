@@ -307,10 +307,12 @@
    the bottom with the page it turns — a document you cannot leave. The sheet
    scrolls; the strip under it does not. */
 .win-file .win-body{display:flex;flex-direction:column;overflow:hidden}
-.file-sheet{flex:1;min-height:0;overflow-y:auto;overflow-x:hidden}
-.file-sheet::-webkit-scrollbar{width:9px}
-.file-sheet::-webkit-scrollbar-track{background:var(--sh-07)}
-.file-sheet::-webkit-scrollbar-thumb{background:var(--sh-24);border:2px solid transparent;background-clip:content-box}
+.file-sheet{flex:1;min-height:0;overflow-y:auto;overflow-x:hidden;
+  scrollbar-width:thin;scrollbar-color:var(--surface-muted) var(--surface-rule);scrollbar-gutter:stable}
+.file-sheet::-webkit-scrollbar{width:1px}
+.file-sheet::-webkit-scrollbar-track{background:var(--surface-rule)}
+.file-sheet::-webkit-scrollbar-thumb{background:var(--surface-muted)}
+.file-sheet::-webkit-scrollbar-thumb:hover{background:var(--signal)}
 .file-agent-rail{flex:0 0 auto;margin:calc(var(--space-18) * -1) calc(var(--space-22) * -1) var(--space-8);
   border-top:1px solid var(--ink-line);border-bottom:1px solid var(--ink-line);
   padding:var(--space-5) var(--space-14) var(--space-4);max-width:none}
