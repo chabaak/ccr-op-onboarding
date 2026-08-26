@@ -94,6 +94,8 @@ async function closeManual(page: Page): Promise<void> {
 test.describe('[x9] the door opens locked', () => {
   test('(a) both wells are empty and LOGIN is disabled on the first frame', async ({ page }) => {
     await openDoor(page)
+    await expect(page).toHaveTitle('중앙 상황 제어실 · ERR-2 — 운영자 단말')
+    await expect(page.locator('#signin .si-title')).toHaveText('중앙 상황 제어실')
     await expect(idValue(page)).toHaveText('')
     await expect(maskValue(page)).toHaveText('')
     await expect(login(page)).toBeDisabled()

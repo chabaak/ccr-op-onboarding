@@ -33,8 +33,9 @@ const CASES = [...INDEX.packs]
     role: pack.role,
     series: readJson<Meta>(`data/scenario/${pack.slug}/meta.json`).callsign_series,
   }))
-// Fixture packs are visible on the scenario desktop but are not startable:
-// `scenario-desktop.ts` disables them even when their slug is unlocked.
+// Browser cases are the startable packs. A future fixture role remains visible
+// on the scenario desktop, but `scenario-desktop.ts` correctly leaves it out of
+// this loop because it cannot boot into the live browser path.
 const BROWSER_CASES = CASES.filter((scenario) => scenario.role !== 'fixture')
 const UNLOCKED_SLUGS = INDEX.packs.map((pack) => pack.slug)
 

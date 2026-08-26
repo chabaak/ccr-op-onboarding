@@ -95,7 +95,7 @@ export interface ManualStep {
 export const MANUAL_STEPS: readonly ManualStep[] = [
   {
     head: '신규 운영자 안내',
-    lead: '긴급상황대응실 운영자 임용을 축하합니다.',
+    lead: '중앙 상황 제어실 운영자 임용을 축하합니다.',
     body: [
       '긴급상황 발생 시 본부는 현장 요원을 파견합니다.',
       '운영자는 직접 출동하지 않으며, 대응실에서 현장 요원의 교신을 받습니다.',
