@@ -176,6 +176,7 @@ export function createRunLoopDriver(
   return {
     clock,
     feedGapClocks: () => inner.feedGapClocks?.() ?? [],
+    callsignSeries: () => inner.callsignSeries(),
 
     subscribe(listener: ViewListener) {
       listeners.add(listener)

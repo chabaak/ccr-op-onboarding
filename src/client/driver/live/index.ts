@@ -179,6 +179,7 @@ export async function createLiveRunDriver(deps: LiveRunDeps): Promise<FixtureDri
 
   return createLiveAdapter({
     first,
+    callsignSeries: pack.callsignSeries,
     feedGapClocks,
     canOpenNext,
     closeRun,

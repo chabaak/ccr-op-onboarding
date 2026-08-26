@@ -46,6 +46,26 @@ const SLOT_BOARD_TS = path.join(COMPONENTS, 'slot-board.ts')
 const DOSSIER_TS = path.join(COMPONENTS, 'dossier.ts')
 const DEPLOY_BUTTON_TS = path.join(COMPONENTS, 'deploy-button.ts')
 const AGENT_FILE_TS = path.join(CLIENT, 'windows/agent-file.ts')
+const SCENARIO_DIR = path.join(REPO, 'data/scenario')
+
+interface ScenarioIndexFile {
+  packs: {
+    slug: string
+    display_name: string
+    role: 'tutorial' | 'practice' | 'fixture'
+  }[]
+}
+
+interface ScenarioMetaFile {
+  callsign_series: string
+}
+
+function fixtureTankerMeta(): ScenarioMetaFile {
+  const index = JSON.parse(read(path.join(SCENARIO_DIR, 'index.json'))) as ScenarioIndexFile
+  const fixture = index.packs.find((pack) => pack.role === 'fixture')
+  expect(fixture?.display_name).toBe('새는 탱크로리')
+  return JSON.parse(read(path.join(SCENARIO_DIR, fixture!.slug, 'meta.json'))) as ScenarioMetaFile
+}
 /**
  * u2's inv-12 enforcement point. It is the ONE client source that may name a
  * banned key: `BANNED_EXACT` lists `temperament` precisely so the driver can
@@ -166,6 +186,7 @@ interface DossierSection {
 
 interface AgentFileCoverCopy {
   incident: string
+  callsignSeries: string
 }
 
 interface DossierModule {
@@ -174,11 +195,12 @@ interface DossierModule {
   // x5 — `deployed` left `FiledInput` with the count that used to be printed
   // from it. The page's own paragraph is where a past sitting's size is read.
   filedModel(input: { callsign: string }): DossierSection[]
-  // x7 — the ECHO series is document art this module mints (D4). `deploy-button`,
-  // `report-archive`, `reports` and `announcer` all read it, so the mapping is
-  // pinned here, at its one source, rather than in each caller's suite.
-  callsignOf(run: number): string
-  nextCallsignOf(run: number): string
+  // x7 — the series is pack-owned and the numbering is document art this module
+  // mints. `deploy-button`, `report-archive`, `reports` and `announcer` all read
+  // it, so the mapping is pinned here, at its one source, rather than in each
+  // caller's suite.
+  callsignOf(run: number, series: string): string
+  nextCallsignOf(run: number, series: string): string
   buildDossier: unknown
 }
 
@@ -199,6 +221,7 @@ interface DeployButtonModule {
     slots: readonly (string | null)[]
     deployed: boolean
     run: number
+    callsignSeries: string
     at: string
     closed?: boolean
     releasable?: boolean
@@ -225,6 +248,7 @@ function incidentCover(slug = '멈춘회전문'): AgentFileCoverCopy {
   }
   return {
     incident: raw.incident.body.join('\n'),
+    callsignSeries: 'ECHO',
   }
 }
 
@@ -445,20 +469,33 @@ describe('[u4#c2] §3 기질 is sealed by construction', () => {
   it('(f) callsignOf mints ECHO first and numbers from the second sitting', async () => {
     const { callsignOf } = await loadDossier()
 
-    expect(callsignOf(1)).toBe('ECHO')
-    expect(callsignOf(2)).toBe('ECHO-1')
-    expect(callsignOf(3)).toBe('ECHO-2')
-    expect(callsignOf(4)).toBe('ECHO-3')
+    expect(callsignOf(1, 'ECHO')).toBe('ECHO')
+    expect(callsignOf(2, 'ECHO')).toBe('ECHO-1')
+    expect(callsignOf(3, 'ECHO')).toBe('ECHO-2')
+    expect(callsignOf(4, 'ECHO')).toBe('ECHO-3')
 
     // The pre-first-press desk sits at run 0 (`windows/agent-file.ts` boots held
     // there). It used to be caught by a `Math.max(1, run)` fallback that existed
     // only to keep `ECHO-0` off the page; the unnumbered first name answers it
     // now, and there is no second spelling of "not yet shaped" left to drift.
-    expect(callsignOf(0)).toBe('ECHO')
+    expect(callsignOf(0, 'ECHO')).toBe('ECHO')
 
     // No number is ever suffixed to the first agent, and none is ever 0.
-    expect(callsignOf(1)).not.toMatch(/-/)
-    for (const run of [1, 2, 3, 4, 10, 99]) expect(callsignOf(run)).not.toBe('ECHO-0')
+    expect(callsignOf(1, 'ECHO')).not.toMatch(/-/)
+    for (const run of [1, 2, 3, 4, 10, 99]) expect(callsignOf(run, 'ECHO')).not.toBe('ECHO-0')
+
+    expect(callsignOf(2, 'TANGO')).toBe('TANGO-1')
+  })
+
+  it('(f2) the tank fixture pack still carries the TANGO series outside the browser path', async () => {
+    const { callsignOf } = await loadDossier()
+    const meta = fixtureTankerMeta()
+
+    // 새는탱크로리 is role:fixture, so the scenario desktop cannot start it; if
+    // it becomes practice later, `e2e/callsign.spec.ts` should cover this path.
+    expect(meta.callsign_series).toBe('TANGO')
+    expect(callsignOf(1, meta.callsign_series)).toBe('TANGO')
+    expect(callsignOf(2, meta.callsign_series)).toBe('TANGO-1')
   })
 
   it('(g) nextCallsignOf composes across the ECHO → ECHO-1 boundary', async () => {
@@ -468,12 +505,14 @@ describe('[u4#c2] §3 기질 is sealed by construction', () => {
     // n → n+1 inside the numbered run and a stray ±1 shows up as an obviously
     // wrong number; at the boundary a wrong answer is still a well-formed
     // callsign. After ECHO comes ECHO-1 — not ECHO-2, and not ECHO again.
-    expect(nextCallsignOf(1)).toBe('ECHO-1')
-    expect(nextCallsignOf(0)).toBe('ECHO')
+    expect(nextCallsignOf(1, 'ECHO')).toBe('ECHO-1')
+    expect(nextCallsignOf(0, 'ECHO')).toBe('ECHO')
 
     // And it stays a COMPOSITION, never a second copy of the arithmetic: if
     // someone re-derives the suffix inside `nextCallsignOf` this diverges.
-    for (const run of [0, 1, 2, 3, 9, 41]) expect(nextCallsignOf(run)).toBe(callsignOf(run + 1))
+    for (const run of [0, 1, 2, 3, 9, 41]) {
+      expect(nextCallsignOf(run, 'SIERRA')).toBe(callsignOf(run + 1, 'SIERRA'))
+    }
   })
 })
 
@@ -758,7 +797,7 @@ describe('[u4#c4] deployView states — empty · partial · full · locked', () 
 
   it('(a) an empty board is ready, and says an empty file still deploys', async () => {
     const { deployView } = await loadDeployButton()
-    const v = deployView({ slots: [null, null, null, null], deployed: false, run: 3, at })
+    const v = deployView({ slots: [null, null, null, null], deployed: false, run: 3, callsignSeries: 'ECHO', at })
     expect(v.used).toBe(0)
     expect(v.cap).toBe(4)
     expect(v.count).toBe('0 / 4')
@@ -770,7 +809,13 @@ describe('[u4#c4] deployView states — empty · partial · full · locked', () 
 
   it('(b) a partly filled board counts what is used', async () => {
     const { deployView } = await loadDeployButton()
-    const v = deployView({ slots: ['b-r2-f03', null, 'b-r2-b03', null], deployed: false, run: 3, at })
+    const v = deployView({
+      slots: ['b-r2-f03', null, 'b-r2-b03', null],
+      deployed: false,
+      run: 3,
+      callsignSeries: 'ECHO',
+      at,
+    })
     expect(v.used).toBe(2)
     expect(v.count).toBe('2 / 4')
     expect(v.note).toBe('편성 중 — 배치를 기다립니다')
@@ -780,7 +825,7 @@ describe('[u4#c4] deployView states — empty · partial · full · locked', () 
 
   it('(c) a full board reads full and still deploys', async () => {
     const { deployView } = await loadDeployButton()
-    const v = deployView({ slots: ['a', 'b', 'c', 'd'], deployed: false, run: 3, at })
+    const v = deployView({ slots: ['a', 'b', 'c', 'd'], deployed: false, run: 3, callsignSeries: 'ECHO', at })
     expect(v.boardState).toBe('full')
     expect(v.count).toBe('4 / 4')
     expect(v.buttonState).toBe('ready')
@@ -788,7 +833,7 @@ describe('[u4#c4] deployView states — empty · partial · full · locked', () 
 
   it('(d) a deployed file is locked, stamped and dated from the run it deployed for', async () => {
     const { deployView } = await loadDeployButton()
-    const v = deployView({ slots: ['a', 'b', null, null], deployed: true, run: 3, at })
+    const v = deployView({ slots: ['a', 'b', null, null], deployed: true, run: 3, callsignSeries: 'ECHO', at })
     expect(v.boardState).toBe('locked')
     expect(v.buttonState).toBe('deployed')
     expect(v.note).toBe('배치됨 — 이번 시행에서 잠김')
@@ -805,8 +850,12 @@ describe('[u4#c4] deployView states — empty · partial · full · locked', () 
     // is the case a `/ECHO-\d+/` stamp regex would have missed. The stamp reads
     // the same `callsignOf` the file's own 식별 row does, so the plate on the
     // deploy zone and the name at the top of the page cannot disagree.
-    expect(deployView({ slots: [], deployed: true, run: 1, at: '13:05' }).stampLine).toBe('ECHO · 13:05')
-    expect(deployView({ slots: [], deployed: true, run: 10, at: '13:05' }).stampLine).toBe('ECHO-9 · 13:05')
+    expect(deployView({ slots: [], deployed: true, run: 1, callsignSeries: 'ECHO', at: '13:05' }).stampLine).toBe(
+      'ECHO · 13:05',
+    )
+    expect(deployView({ slots: [], deployed: true, run: 10, callsignSeries: 'TANGO', at: '13:05' }).stampLine).toBe(
+      'TANGO-9 · 13:05',
+    )
   })
 
   it('(f) a released tally stays settling while the live feed still owes paper', async () => {
@@ -816,6 +865,7 @@ describe('[u4#c4] deployView states — empty · partial · full · locked', () 
       slots: [],
       deployed: false,
       run: 2,
+      callsignSeries: 'ECHO',
       at,
       closed: true,
       releasable: true,
@@ -828,6 +878,7 @@ describe('[u4#c4] deployView states — empty · partial · full · locked', () 
       slots: [],
       deployed: false,
       run: 2,
+      callsignSeries: 'ECHO',
       at,
       closed: true,
       releasable: true,

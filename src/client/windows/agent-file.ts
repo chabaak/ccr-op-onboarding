@@ -107,14 +107,16 @@ declare global {
 /** U5.3 — what a past page says when that sitting went out with an empty file. */
 const FILED_EMPTY = '배치된 문장 없음'
 
-const COVER_PENDING: AgentFileCoverCopy = {
-  incident: '사건 개요를 불러오는 중입니다.',
-}
+const COVER_PENDING_INCIDENT = '사건 개요를 불러오는 중입니다.'
 
 const isRecord = (value: unknown): value is Record<string, unknown> =>
   typeof value === 'object' && value !== null
 
-function readIncidentCover(raw: unknown): AgentFileCoverCopy {
+interface IncidentCoverFactCopy {
+  incident: string
+}
+
+function readIncidentCover(raw: unknown): IncidentCoverFactCopy {
   if (!isRecord(raw) || !isRecord(raw.incident) || !Array.isArray(raw.incident.body)) {
     throw new Error('scenario pack: incidentCover.json has no incident body')
   }
@@ -127,7 +129,7 @@ function readIncidentCover(raw: unknown): AgentFileCoverCopy {
   }
 }
 
-async function fetchIncidentCover(slug: string): Promise<AgentFileCoverCopy> {
+async function fetchIncidentCover(slug: string): Promise<IncidentCoverFactCopy> {
   const url = new URL(`data/scenario/${slug}/incidentCover.json`, document.baseURI)
   const response = await fetch(url)
   if (!response.ok) {
@@ -152,7 +154,8 @@ export function mount(host: HTMLElement, driver: FixtureDriver): void {
   const filed = new Map<number, string[]>()
   let run = 0
   let opensAt = driver.clock.at()
-  let coverCopy = COVER_PENDING
+  let callsignSeries = driver.callsignSeries()
+  let coverCopy: AgentFileCoverCopy = { incident: COVER_PENDING_INCIDENT, callsignSeries }
   let committedRun: number | null = null
   let committedAt: string | null = null
   let committedIncoming = false
@@ -183,7 +186,7 @@ export function mount(host: HTMLElement, driver: FixtureDriver): void {
    * (`typeCallsign`, from `sendNewRun`). `nextCallsignOf` is still what answers
    * it there, at the one moment the operator has committed to the send.
    */
-  const onDesk = (): string => (incoming ? typedCallsign : callsignOf(run))
+  const onDesk = (): string => (incoming ? typedCallsign : callsignOf(run, callsignSeries))
 
   /**
    * What the incoming page's 호출부호 row currently shows — `''` until the
@@ -265,7 +268,7 @@ export function mount(host: HTMLElement, driver: FixtureDriver): void {
     },
   })
 
-  let currentView = deployView({ slots: board.cells(), deployed: false, run, at: opensAt })
+  let currentView = deployView({ slots: board.cells(), deployed: false, run, callsignSeries, at: opensAt })
 
   /* ══ x10 — THE CUE ON THE SECOND PAGE'S DEPLOY ═══════════════════════════ */
 
@@ -351,6 +354,7 @@ export function mount(host: HTMLElement, driver: FixtureDriver): void {
       slots: board.cells(),
       deployed: board.isLocked(),
       run: committedRun ?? run,
+      callsignSeries,
       incoming: committedRun === null ? incoming : committedIncoming,
       at: committedAt ?? opensAt,
       closed,
@@ -731,23 +735,15 @@ export function mount(host: HTMLElement, driver: FixtureDriver): void {
    * the desk: nothing else on the cover types, and the two surfaces never share
    * a screen.
    *
-   * It sums to 19.3 s for the whole cover — 19,296 ms of scheduled waits, over
-   * the 319 characters (70 of them spaces) that `components/dossier.ts`'s
-   * `coverModel()` prints as 12 text runs across 10 rows. That is deliberate and
-   * it is also exactly why 건너뛰기 exists.
-   *
-   * The total is a measurement of whichever cover the active pack supplies, not
-   * a contract this module can derive now that the incident body is pack data.
+   * The total is deliberately long enough that 건너뛰기 exists. It is a
+   * measurement of whichever cover the active pack supplies, not a contract this
+   * module can derive now that the incident body is pack data.
    * The rates themselves do not move when a pack edits its prose; the page does.
    *
-   * x10 — THE FIGURE IS RECOMPUTED, because it had gone stale and a stale total
-   * is worse than none. This paragraph said "roughly a quarter-minute", which
-   * was true of the rates it was written against (11.6 s at 22/45) and stopped
-   * being true the moment x7 doubled them — at 45/130 the same page took 22.5 s
-   * and the comment still claimed fifteen. So the rule this leaves behind: a
-   * comment that states a TOTAL is a function of the constants under it and has
-   * to be recomputed with them, or it becomes a number the next reader trusts
-   * and measures nothing against.
+   * x10 — DO NOT STATE A FIXED TOTAL here. The old paragraph went stale when
+   * rates moved, and pack-authored incident copy now changes the character count
+   * too. A fixed total becomes a number the next reader trusts and measures
+   * nothing against.
    */
   // SLOWED (x7, 민서 08-09, measured on the built page): 22 → 45 per character
   // and 45 → 130 per word. At 22 ms a clause fanned out faster than it could be
@@ -1072,7 +1068,7 @@ export function mount(host: HTMLElement, driver: FixtureDriver): void {
     for (const flown of [...filed.keys()].sort((a, b) => a - b)) {
       const ids = filed.get(flown) ?? []
       const page = el('div', 'file-page')
-      page.append(buildDossier(filedModel({ callsign: callsignOf(flown) }), filedHost(ids)))
+      page.append(buildDossier(filedModel({ callsign: callsignOf(flown, callsignSeries) }), filedHost(ids)))
       past.push(page)
     }
 
@@ -1208,7 +1204,7 @@ export function mount(host: HTMLElement, driver: FixtureDriver): void {
       // `typeCallsign` is why: the progression is never hostage to an animation).
       board.revealHandover()
     }
-    const who = callsignOf(store.get().meta.run)
+    const who = callsignOf(store.get().meta.run, callsignSeries)
     if (release === 'filed') {
       settleNote = FILED_NOTE
       sync()
@@ -1225,18 +1221,18 @@ export function mount(host: HTMLElement, driver: FixtureDriver): void {
   /**
    * H3 — the press names the agent, on the page it has been holding blank.
    *
-   * `nextCallsignOf(run)` is safe HERE in a way it was not on the settle: the
+   * `nextCallsignOf(run, series)` is safe HERE in a way it was not on the settle: the
    * operator has committed the file and the op is going out, so the agent this
    * types is the one being sent. It is document art either way (the pack
-   * carries no callsign — D4), so no number of the authority's is derived; the
-   * seam's own `meta` arrives moments later and `callsignOf(run)` takes over
+   * series is pack-owned, so no number of the authority's is derived; the
+   * seam's own `meta` arrives moments later and `callsignOf(run, series)` takes over
    * with the identical string, which is why the row does not flicker across it.
    *
    * The row is already red — `.rd-code` is `--warning-strong` on every page — so the
    * red the operator sees is the callsign's own ink arriving, not a highlight.
    */
   function typeCallsign(onDone: () => void): void {
-    const full = nextCallsignOf(run)
+    const full = nextCallsignOf(run, callsignSeries)
     if (motionless()) {
       typedCallsign = full
       turn('last')
@@ -1347,7 +1343,7 @@ export function mount(host: HTMLElement, driver: FixtureDriver): void {
       // (`shell/announcer.ts`'s `run_end` handler) — a second write here would
       // replace it before anything reads it. `PACE.OPEN_DELAY` later the two
       // lines queue (R2 on the pre-U3 `windows/tally.ts:135`, ported).
-      const who = callsignOf(store.get().meta.run)
+      const who = callsignOf(store.get().meta.run, callsignSeries)
       setTimeout(() => {
         if (!settled) announce(`${who}${SAY_HOLD_TAIL}`)
       }, PACE.OPEN_DELAY)
@@ -1439,7 +1435,8 @@ export function mount(host: HTMLElement, driver: FixtureDriver): void {
     .then(async (identity) => {
       const nextCover = await fetchIncidentCover(identity.slug)
       opensAt = identity.start
-      coverCopy = nextCover
+      callsignSeries = identity.callsignSeries
+      coverCopy = { ...nextCover, callsignSeries }
       host.dataset.coverReady = 'true'
       turn()
       sync()

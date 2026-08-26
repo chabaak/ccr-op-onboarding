@@ -103,6 +103,7 @@ export function mount(host: HTMLElement, driver: FixtureDriver): void {
   let run = 0
   let slug = ''
   let title = ''
+  let callsignSeries = driver.callsignSeries()
   const records = new Map<number, ReturnType<typeof createScoreTally>>()
 
   const marks = (): MarkSets => deriveMarks(driver.store(), carried)
@@ -142,8 +143,8 @@ export function mount(host: HTMLElement, driver: FixtureDriver): void {
   /**
    * Is the desk holding the tear right now?
    *
-   * x10 (민서, 08-10) — mining is unavailable while the previous ECHO's 인수인계
-   * 사항 is typing itself onto the incoming agent's page. The reveal happens in
+   * x10 (민서, 08-10) — mining is unavailable while the previous agent's
+   * 인수인계 사항 is typing itself onto the incoming agent's page. The reveal happens in
    * the AGENT FILE and mining happens here, so the fact has to cross a window
    * boundary; it crosses the way this window ALREADY reaches the board a dozen
    * lines below, through `getSlotBoard()`'s singleton.
@@ -169,6 +170,7 @@ export function mount(host: HTMLElement, driver: FixtureDriver): void {
   const mineHeld = (): boolean => (getSlotBoard()?.isRevealing() ?? false) || feedPending() > 0
 
   const rail = createArchiveRail({
+    callsignSeries,
     onSelect: (run: number) => {
       active = run
       drawDocument()
@@ -178,6 +180,7 @@ export function mount(host: HTMLElement, driver: FixtureDriver): void {
   const view = createReportView({
     host,
     rail: rail.root,
+    callsignSeries,
     onMine: (id: string) => {
       const m = marks()
       const state = sentenceState(id, m)
@@ -266,7 +269,7 @@ export function mount(host: HTMLElement, driver: FixtureDriver): void {
     // 무전 기록's subtitle are that sitting's agent — not the desk's current
     // one. This is the only place both facts are known at once, which is why
     // the `meta` handler no longer brands (E1).
-    view.brand(callsignOf(active))
+    view.brand(callsignOf(active, callsignSeries))
     const model = filed.get(active) ?? { round: active, facts: [], report_body: [] }
     // W2 — the replay key is `sitting:round`, not the round alone: two
     // sittings both have a round 1, and the second one's arrival must not read
@@ -464,8 +467,11 @@ export function mount(host: HTMLElement, driver: FixtureDriver): void {
   void fetchScenarioInPlay()
     .then((identity) => {
       slug = identity.slug
+      callsignSeries = identity.callsignSeries
+      rail.setCallsignSeries(callsignSeries)
       const [hour, minute] = identity.end.split(':')
       title = `${hour ?? ''}${TITLE_AT}${minute ?? ''}${TITLE_TAIL}`
+      drawDocument()
     })
     .catch(() => undefined)
 

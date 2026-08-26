@@ -18,6 +18,7 @@
 import type { ClockRate, FixtureDriver } from '../driver/index.ts'
 import { createRunFeed } from '../components/run-feed.ts'
 import type { RunFeed } from '../components/run-feed.ts'
+import { fetchScenarioInPlay } from '../shell/pack-session.ts'
 
 /**
  * The dev/test handle, the feed's counterpart to the shell's `window.__shell`:
@@ -70,6 +71,9 @@ function seek(driver: FixtureDriver, at: string): void {
 /** Mounts this window's contents into the frame body the shell built. */
 export function mount(host: HTMLElement, driver: FixtureDriver): void {
   const feed = createRunFeed(host, driver)
+  void fetchScenarioInPlay()
+    .then((identity) => feed.setCallsignSeries(identity.callsignSeries))
+    .catch(() => undefined)
   // DEV/TEST only, on the same rule `shell/boot.ts` applies to `window.__shell`:
   // a surface that exists to test the desk does not ship with the desk (inv 11).
   // `import.meta.env.DEV` is a constant the bundler folds, so the player build
@@ -81,6 +85,7 @@ export function mount(host: HTMLElement, driver: FixtureDriver): void {
       count: () => feed.count(),
       kinds: () => feed.kinds(),
       stamps: () => feed.stamps(),
+      setCallsignSeries: (series: string) => feed.setCallsignSeries(series),
       seek: (at: string) => {
         seek(driver, at)
         feed.flush()

@@ -38,6 +38,7 @@ export function placeholderBootRun(identity: ScenarioIdentity): FixtureRun {
     id: 'placeholder-boot',
     start: OPENS_AT,
     end: identity.end,
+    callsignSeries: identity.callsignSeries,
     events: [{ type: 'meta', run: RUN, runs_left: RUNS_LEFT, carried: [], archive: [] }],
     responses: {
       slot: { ok: true },

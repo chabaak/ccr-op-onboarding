@@ -462,6 +462,8 @@ export interface RunFeed {
   count(): number
   kinds(): string[]
   stamps(): string[]
+  /** Rebinds the header to the active pack when a fallback driver boots first. */
+  setCallsignSeries(series: string): void
   /**
    * Applies everything still queued — the reveal never outlives a seek (U1) —
    * AND settles the line that is typing. x11: `flush()` is a promise that
@@ -583,6 +585,7 @@ function lineElement(
 }
 
 export function createRunFeed(host: HTMLElement, driver: FixtureDriver): RunFeed {
+  let callsignSeries = driver.callsignSeries()
   const gapPolicy =
     driver.feedGapClocks === undefined
       ? LIVE_FEED_DEFAULT_GAP_POLICY
@@ -643,9 +646,9 @@ export function createRunFeed(host: HTMLElement, driver: FixtureDriver): RunFeed
   // watching — the day the series was renumbered so the unshaped first agent is
   // plain `ECHO`, 식별 on the AGENT FILE said `ECHO` while a copied `ECHO-1`
   // here would have gone on saying otherwise: same agent, same desk, same
-  // minute, two names. The pack carries no callsign at all (D4), so there is
-  // exactly one owner of it and this window borrows.
-  let callsign = callsignOf(1)
+  // minute, two names. The pack owns the series, and this module owns only the
+  // x7 numbering over that series.
+  let callsign = callsignOf(1, callsignSeries)
   /**
    * The sitting the paper is printing, off the `meta` it has APPLIED (x12).
    *
@@ -661,6 +664,16 @@ export function createRunFeed(host: HTMLElement, driver: FixtureDriver): RunFeed
    */
   let run = 0
   let pending: { cls: FallbackClass; code: string } | null = null
+
+  function syncCallsign(): void {
+    callsign = callsignOf(run, callsignSeries)
+    heading.textContent = HEAD_TITLE + HEAD_SEP + callsign
+  }
+
+  function setCallsignSeries(series: string): void {
+    callsignSeries = series
+    syncCallsign()
+  }
 
   const motionless = (): boolean => {
     if (animationsFrozen()) return true
@@ -914,10 +927,9 @@ export function createRunFeed(host: HTMLElement, driver: FixtureDriver): RunFeed
         // window's to compose. The `Math.max(1, …)` that used to guard run 0 off
         // `ECHO-0` went with the literal: `callsignOf` answers a pre-first-press
         // run itself, and one guard is one place that can drift.
-        callsign = callsignOf(event.run)
         // x12 — the sitting every cue below is stamped with. See `run`.
         run = event.run
-        heading.textContent = HEAD_TITLE + HEAD_SEP + callsign
+        syncCallsign()
         return false
       case 'feed':
         return appendLine(event.line)
@@ -1181,6 +1193,7 @@ export function createRunFeed(host: HTMLElement, driver: FixtureDriver): RunFeed
     count: () => lines().length,
     kinds: () => lines().map((li) => (/\bfl-([a-z]+)\b/.exec(li.className) ?? [, ''])[1] ?? ''),
     stamps: () => lines().map((li) => li.querySelector('.fl-t')?.textContent ?? ''),
+    setCallsignSeries,
     flush,
     following: () => attached,
   }

@@ -162,6 +162,8 @@ export interface ReportViewOptions {
   host: HTMLElement
   /** The archive rail, built by `report-archive.ts` and mounted above the grid. */
   rail: HTMLElement
+  /** Callsign series issued by the active pack. */
+  callsignSeries: string
   /** Called with the authored id when the operator tears a sentence out. */
   onMine(id: string): void
 }
@@ -241,7 +243,7 @@ export function createReportView(options: ReportViewOptions): ReportView {
   // that assumption once already (see `components/dossier.ts`). The name has one
   // owner (D4 — the pack carries none); this window borrows it, unsigned sheet
   // included.
-  const sigLine = el('span', 'sig-line', callsignOf(1))
+  const sigLine = el('span', 'sig-line', callsignOf(1, options.callsignSeries))
   sig.append(sigLine)
 
   const grid = el('div', 'rep-grid')

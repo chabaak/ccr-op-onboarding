@@ -50,6 +50,7 @@ describe('the live adapter refuses `new_run` the way the fixture loop does', () 
   it('(a) a spent allotment is refused IN THE ACK, not after the promise settles', async () => {
     const adapter = createLiveAdapter({
       first: stubRun(1, []),
+      callsignSeries: 'ECHO',
       canOpenNext: () => false,
       closeRun: () => {},
       next: async () => null,
@@ -65,6 +66,7 @@ describe('the live adapter refuses `new_run` the way the fixture loop does', () 
   it('(b) a day that CAN open is acked, and the run actually turns', async () => {
     const adapter = createLiveAdapter({
       first: stubRun(1, []),
+      callsignSeries: 'ECHO',
       canOpenNext: () => true,
       closeRun: () => {},
       next: async () => stubRun(2, []),
@@ -79,6 +81,7 @@ describe('the live adapter refuses `new_run` the way the fixture loop does', () 
     let opened = 0
     const adapter = createLiveAdapter({
       first: stubRun(1, []),
+      callsignSeries: 'ECHO',
       canOpenNext: () => true,
       closeRun: () => {},
       next: async () => {
@@ -100,6 +103,7 @@ describe('the live adapter refuses `new_run` the way the fixture loop does', () 
     const closes: RunClose[] = []
     const adapter = createLiveAdapter({
       first: stubRun(1, [B1]),
+      callsignSeries: 'ECHO',
       canOpenNext: () => false,
       next: async () => null,
       closeRun: (close) => closes.push(close),
@@ -126,6 +130,7 @@ describe('the store the desk shows is the store the new run has', () => {
   it('(d) a new run clears the board and deals exactly the carried deck', async () => {
     const adapter = createLiveAdapter({
       first: stubRun(1, [B1, B2]),
+      callsignSeries: 'ECHO',
       canOpenNext: () => true,
       closeRun: () => {},
       // Only B1 was deployed, so only B1 is seeded into the next run.
@@ -160,6 +165,7 @@ describe('the store the desk shows is the store the new run has', () => {
     let seen: RunClose | null = null
     const adapter = createLiveAdapter({
       first: stubRun(1, [B1, B2]),
+      callsignSeries: 'ECHO',
       canOpenNext: () => true,
       closeRun: () => {},
       next: async (close) => {
@@ -190,6 +196,7 @@ describe('the store the desk shows is the store the new run has', () => {
     const sent: unknown[] = []
     const adapter = createLiveAdapter({
       first: stubRun(1, [B1, B2]),
+      callsignSeries: 'ECHO',
       canOpenNext: () => true,
       closeRun: () => {},
       next: async () => stubRun(2, [B1, B2], sent),

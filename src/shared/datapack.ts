@@ -21,6 +21,8 @@ export type Meta = {
   title: string;
   /** 초안 §1 로그라인 원문 */
   logline: string;
+  /** 이 시나리오가 발급하는 현장 요원 호출부호 시리즈. 첫 시행은 이 값을 그대로 쓰고, 이후 시행은 -1, -2를 붙인다 */
+  callsign_series: string;
   /** 시나리오 시계 — 고정 타임라인의 첫 사건과 종료 시계 */
   clock: {
     start: string;

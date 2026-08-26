@@ -38,6 +38,7 @@ const packFile = (part: string): unknown => readJson(`data/scenario/${PACK_SLUG}
 /** The authored shapes this file measures against — read, never restated. */
 interface Meta {
   slug: string
+  callsign_series: string
   clock: { start: string; end: string }
 }
 interface Timeline {
@@ -60,6 +61,7 @@ const SCORE = packFile('score') as Score
 // not an `undefined` surfacing halfway through the run.
 const PACK: LivePack = {
   slug: PACK_SLUG,
+  callsignSeries: META.callsign_series,
   timeline: TIMELINE,
   gates: GATES,
   characters: packFile('characters'),
@@ -145,6 +147,7 @@ async function pump(driver: FixtureDriver, done: () => boolean, frames = 40_000)
 async function playOneRun(): Promise<ViewEvent[]> {
   const adapter = createLiveAdapter({
     first: realRun(1),
+    callsignSeries: 'ECHO',
     canOpenNext: () => true,
     closeRun: () => {},
     next: async () => null,

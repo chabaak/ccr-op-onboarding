@@ -36,6 +36,8 @@ export interface FixtureDriver {
   readonly clock: Clock
   /** Optional feed schedule, supplied by the active pack or fixture run. */
   readonly feedGapClocks?: () => readonly string[]
+  /** Callsign series issued by the active pack before x7 run numbering is applied. */
+  readonly callsignSeries: () => string
   subscribe(listener: ViewListener): () => void
   start(): void
   /** Pumps real elapsed milliseconds through clock, animations and stream. */
@@ -56,6 +58,9 @@ function stampOf(event: ViewEvent): string | null {
 
 export function createFixtureDriver(run: FixtureRun): FixtureDriver {
   const clock = createClock({ start: run.start, end: run.end })
+  // Synthetic fixture runs are not always backed by scenario meta; the legacy
+  // dev fixtures model the tutorial dossier series.
+  const callsignSeries = run.callsignSeries ?? 'ECHO'
   const startMinute = mm(run.start)
   const feedGapClocks = run.events.flatMap((event) => {
     const stamp = stampOf(event)
@@ -123,6 +128,7 @@ export function createFixtureDriver(run: FixtureRun): FixtureDriver {
   return {
     clock,
     feedGapClocks: () => feedGapClocks,
+    callsignSeries: () => callsignSeries,
 
     subscribe(listener: ViewListener) {
       listeners.add(listener)

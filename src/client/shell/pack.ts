@@ -15,6 +15,8 @@
 export interface ScenarioIdentity {
   slug: string
   displayName: string
+  /** The callsign series this scenario issues before run numbering is applied. */
+  callsignSeries: string
   /** `"HH:MM"` the scenario opens on. */
   start: string
   /** `"HH:MM"` the scenario closes on. */
@@ -87,9 +89,13 @@ function readIdentity(raw: unknown, entry: Pick<ScenarioPackEntry, 'slug' | 'dis
   if (slug !== entry.slug) {
     throw new Error(`scenario pack: meta.json declares slug ${JSON.stringify(slug)}`)
   }
+  if (typeof raw.callsign_series !== 'string' || !/^[A-Z]+$/.test(raw.callsign_series)) {
+    throw new Error("scenario pack: meta.json 'callsign_series' is not an uppercase callsign series")
+  }
   return {
     slug,
     displayName: entry.displayName,
+    callsignSeries: raw.callsign_series,
     start: stamp(raw.clock.start, 'clock.start'),
     end: stamp(raw.clock.end, 'clock.end'),
   }

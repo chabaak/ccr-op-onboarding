@@ -49,6 +49,10 @@ const REPO = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '../..')
 const SLUG = TUTORIAL_SLUG
 
 const readJson = (rel: string): unknown => JSON.parse(fs.readFileSync(path.join(REPO, rel), 'utf8'))
+const META = readJson(`data/scenario/${SLUG}/meta.json`) as {
+  callsign_series: string
+  clock: { start: string; end: string }
+}
 
 // Asserted to the SAME types the production loader asserts to (`pack.ts:82`),
 // not to `never`: the shape is what this file is measuring against, so the pack
@@ -56,6 +60,7 @@ const readJson = (rel: string): unknown => JSON.parse(fs.readFileSync(path.join(
 // only surfaces as a failed assertion halfway through a 19-beat run.
 const PACK: LivePack = {
   slug: SLUG,
+  callsignSeries: META.callsign_series,
   timeline: readJson(`data/scenario/${SLUG}/timeline.json`),
   gates: readJson(`data/scenario/${SLUG}/gates.json`),
   characters: readJson(`data/scenario/${SLUG}/characters.json`),
@@ -65,7 +70,6 @@ const PACK: LivePack = {
   // a scorer over it and the day closes on what it resolves.
   score: readJson(`data/scenario/${SLUG}/score.json`),
 } as LivePack
-const META = readJson(`data/scenario/${SLUG}/meta.json`) as { clock: { start: string; end: string } }
 
 const GUIDANCE = readJson('data/policy/report-guidance.json') as ReportGuidance
 
@@ -231,6 +235,7 @@ describe('(A) the live desk plays its day to the end', () => {
   it('the run reaches run_end with every beat and every round behind it', async () => {
     const adapter = createLiveAdapter({
       first: realRun(1),
+      callsignSeries: 'ECHO',
       canOpenNext: () => true,
       closeRun: () => {},
       next: async () => null,
@@ -297,6 +302,7 @@ describe('(B) the driver pumps the animations the desk registers', () => {
     try {
       const adapter = createLiveAdapter({
         first: realRun(1),
+        callsignSeries: 'ECHO',
         canOpenNext: () => true,
         closeRun: () => {},
         next: async () => null,
@@ -318,6 +324,7 @@ describe('(B) the driver pumps the animations the desk registers', () => {
     try {
       const adapter = createLiveAdapter({
         first: realRun(1),
+        callsignSeries: 'ECHO',
         canOpenNext: () => true,
         closeRun: () => {},
         next: async () => null,
@@ -398,6 +405,7 @@ describe('(D) the deck is a set — a repeated MINE deals one card', () => {
   it('mining one sentence twice leaves one id in the store', async () => {
     const adapter = createLiveAdapter({
       first: realRun(1),
+      callsignSeries: 'ECHO',
       canOpenNext: () => true,
       closeRun: () => {},
       next: async () => null,
@@ -430,6 +438,7 @@ describe('(E) the clock gutter prints a time, and `21:04+` is not one', () => {
   it('the stamps the run emits still include the authored `+` on the seam', async () => {
     const adapter = createLiveAdapter({
       first: realRun(1),
+      callsignSeries: 'ECHO',
       canOpenNext: () => true,
       next: async () => null,
       closeRun: () => {},

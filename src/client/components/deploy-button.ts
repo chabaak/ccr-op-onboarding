@@ -58,7 +58,7 @@ export interface DeployView {
   /** What `#deployState` prints — blank once the day has closed (see header). */
   note: string
   stampOn: boolean
-  /** `"ECHO-3 · HH:MM"` — the sitting the file was committed for. */
+  /** `"SERIES-3 · HH:MM"` — the sitting the file was committed for. */
   stampLine: string
   boardState: BoardState
   buttonState: 'ready' | 'deployed'
@@ -72,6 +72,8 @@ export interface DeployView {
 export interface DeployState {
   slots: readonly (string | null)[]
   deployed: boolean
+  /** Callsign series issued by the active pack. */
+  callsignSeries: string
   /** The run the file deployed for (`meta`), never a literal. */
   run: number
   /**
@@ -117,7 +119,7 @@ export function deployView(state: DeployState): DeployView {
     count: `${used} / ${SLOT_CAP}`,
     note: mode === 'deploy' ? (state.deployed ? NOTE_LOCKED : used > 0 ? NOTE_PARTIAL : NOTE_EMPTY) : '',
     stampOn: state.deployed,
-    stampLine: `${(state.incoming ?? false) ? nextCallsignOf(state.run) : callsignOf(state.run)} · ${state.at}`,
+    stampLine: `${(state.incoming ?? false) ? nextCallsignOf(state.run, state.callsignSeries) : callsignOf(state.run, state.callsignSeries)} · ${state.at}`,
     boardState: boardState(state.slots, state.deployed),
     buttonState: state.deployed ? 'deployed' : 'ready',
     mode,
