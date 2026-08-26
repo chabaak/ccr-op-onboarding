@@ -2,10 +2,13 @@ import { afterEach, describe, expect, it, vi } from 'vitest'
 
 import { META_KEY } from '../../src/client/shell/run-state.ts'
 import {
-  SCENARIO_DESKTOP_RETURN_KEY,
+  DESK_MANUAL_PENDING_KEY,
+  SIGNIN_SESSION_KEY,
   SELECTED_SCENARIO_KEY,
-  consumeScenarioDesktopReturn,
   hasScenarioPackSelection,
+  hasSignInSession,
+  markSignInComplete,
+  consumeDeskManualPending,
   resetScenarioSession,
   returnToScenarioDesktop,
   scenarioPackInPlay,
@@ -133,7 +136,7 @@ describe('runtime scenario pack selection', () => {
     )
   })
 
-  it('(h) abort return clears the selected pack through the shared reset and marks one desktop reload', () => {
+  it('(h) abort return clears only the selected pack through the shared reset', () => {
     const storage = new FakeStorage()
     let reloaded = false
     const chosen = PLAYABLE_MANIFEST.packs.find((pack) => pack.role === 'practice')!
@@ -154,8 +157,21 @@ describe('runtime scenario pack selection', () => {
 
     expect(reloaded).toBe(true)
     expect(storage.getItem(SELECTED_SCENARIO_KEY)).toBeNull()
-    expect(storage.keys()).toEqual([SCENARIO_DESKTOP_RETURN_KEY])
-    expect(consumeScenarioDesktopReturn({ storage })).toBe(true)
-    expect(storage.keys()).toEqual([])
+    expect(storage.keys()).toEqual([SIGNIN_SESSION_KEY])
+  })
+
+  it('(i) login state and the pending desk manual have their own one-shot marker', () => {
+    const storage = new FakeStorage()
+    expect(hasSignInSession({ storage })).toBe(false)
+    expect(consumeDeskManualPending({ storage })).toBe(false)
+
+    markSignInComplete({ storage })
+
+    expect(hasSignInSession({ storage })).toBe(true)
+    expect(storage.keys()).toEqual([SIGNIN_SESSION_KEY, DESK_MANUAL_PENDING_KEY])
+    expect(consumeDeskManualPending({ storage })).toBe(true)
+    expect(consumeDeskManualPending({ storage })).toBe(false)
+    expect(hasSignInSession({ storage })).toBe(true)
+    expect(storage.keys()).toEqual([SIGNIN_SESSION_KEY])
   })
 })

@@ -706,7 +706,7 @@ test.describe('topbar', () => {
 
     const stored = await page.evaluate(() => Object.fromEntries(Object.entries(window.sessionStorage)))
     expect(stored['ndsp:scenario:selected:v1']).toBeUndefined()
-    expect(stored['ndsp:scenario:return-desktop:v1']).toBeUndefined()
+    expect(stored['ndsp:signin:complete:v1']).toBe('1')
     expect(stored['ndsp:meta:v1']).not.toBe('stale')
     expect(stored[`dday.meta.${selectedSlug}`]).not.toBe('stale')
     expect(stored[`dday.meta.stamp.${selectedSlug}`]).not.toBe('stale')
@@ -717,7 +717,8 @@ test.describe('topbar', () => {
   }) => {
     await page.addInitScript(() => {
       window.localStorage.removeItem('ndsp:scenario:unlocked:v1')
-      window.sessionStorage.setItem('ndsp:scenario:return-desktop:v1', '1')
+      window.sessionStorage.removeItem('ndsp:scenario:selected:v1')
+      window.sessionStorage.setItem('ndsp:signin:complete:v1', '1')
     })
     await page.goto('./')
     await page.waitForFunction(() => !document.body.classList.contains('booting'), undefined, { timeout: 20_000 })

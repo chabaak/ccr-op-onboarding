@@ -1,5 +1,7 @@
 import { expect, test, type Page } from 'playwright/test'
 
+const SELECTED_SCENARIO_KEY = 'ndsp:scenario:selected:v1'
+
 // [x9] the door types itself in — `shell/sign-in.ts` in a browser.
 //
 // THIS IS THE ONLY SPEC THAT SEES THE DOOR. Every other lane goes `page.goto('./')`
@@ -27,6 +29,31 @@ async function openDoor(page: Page, opts: { reduced?: boolean } = {}): Promise<v
   await expect(page.locator('#signin')).toBeVisible()
 }
 
+async function openNaturalDoor(page: Page): Promise<void> {
+  await makePlayerBrowser(page)
+  await page.goto('./')
+  await expect(page.locator('#signin')).toBeVisible()
+}
+
+async function makePlayerBrowser(page: Page): Promise<void> {
+  await page.addInitScript(() => {
+    for (const target of [navigator, Object.getPrototypeOf(navigator)]) {
+      try {
+        Object.defineProperty(target, 'webdriver', {
+          configurable: true,
+          get: () => false,
+        })
+      } catch {
+        // Chromium exposes this differently across modes; one successful override is enough.
+      }
+    }
+  })
+}
+
+async function waitForBoot(page: Page): Promise<void> {
+  await page.waitForFunction(() => !document.body.classList.contains('booting'), undefined, { timeout: 20_000 })
+}
+
 const idValue = (page: Page) => page.locator('#signin .si-field').nth(0).locator('.si-value')
 const maskValue = (page: Page) => page.locator('#signin .si-field').nth(1).locator('.si-value')
 const idCaret = (page: Page) => page.locator('#signin .si-field').nth(0).locator('.si-caret')
@@ -36,6 +63,32 @@ const login = (page: Page) => page.locator('#signin .si-login')
 /** `n` presses. The key is deliberately the same one every time — see (b). */
 async function press(page: Page, n: number, key = 'a'): Promise<void> {
   for (let i = 0; i < n; i += 1) await page.keyboard.press(key)
+}
+
+async function completeLogin(page: Page): Promise<void> {
+  await press(page, 15)
+  await login(page).click()
+  await expect(page.locator('#signin')).toHaveCount(0, { timeout: 15_000 })
+  await expect(page.locator('body.signin')).toHaveCount(0)
+}
+
+async function chooseFirstScenario(page: Page): Promise<void> {
+  await page.locator('.scenario-file.is-open').first().click()
+  await expect(page.locator('#confirm')).toBeVisible()
+  await Promise.all([
+    page.waitForLoadState('domcontentloaded'),
+    page.locator('#confirmYes').click(),
+  ])
+}
+
+async function closeManual(page: Page): Promise<void> {
+  for (let count = 0; count < 4 && (await page.locator('#manual').count()) > 0; count += 1) {
+    await page.locator('#manualGo').evaluate((node) => {
+      const button = node as HTMLButtonElement
+      button.click()
+    })
+  }
+  await expect(page.locator('#manual')).toHaveCount(0)
 }
 
 test.describe('[x9] the door opens locked', () => {
@@ -191,18 +244,18 @@ test.describe('[x9] which presses the door hears', () => {
   })
 })
 
-test.describe('[x9] and then the desk', () => {
-  test('(a) fifteen presses and one click hand the operator over', async ({ page }) => {
+test.describe('[x9] and then the scenario selection', () => {
+  test('(a) fifteen presses and one click hand the operator to case selection', async ({ page }) => {
     await openDoor(page)
-    await press(page, 15)
-    await login(page).click()
+    await completeLogin(page)
     // The readout runs its five lines and its tail (2.4 s) and the layer fades
-    // out over another 0.5 s. What is asserted is the hand-over itself: the
-    // curtain is gone, `body.signin` is off (which is what replays the top bar's
-    // drop), and the desk it was covering is there.
-    await expect(page.locator('#signin')).toHaveCount(0, { timeout: 15_000 })
-    await expect(page.locator('body.signin')).toHaveCount(0)
-    await expect(page.locator('.win')).toHaveCount(3)
+    // out over another 0.5 s. What is asserted is the hand-over itself: the door
+    // is gone, and the operator is choosing a case before the desk tutorial.
+    await expect(page.locator('.scenario-picker')).toBeVisible()
+    await expect(page.locator('.scenario-file')).toHaveCount(3)
+    await expect(page.locator('.scenario-file.is-open')).toHaveCount(1)
+    await expect(page.locator('.scenario-file.is-locked')).toHaveCount(2)
+    await expect(page.locator('#manual')).toHaveCount(0)
   })
 
   test('(b) reduced motion keeps the caret — it is the affordance now', async ({ page }) => {
@@ -219,5 +272,33 @@ test.describe('[x9] and then the desk', () => {
     // The mechanic still works with the motion off.
     await press(page, 15)
     await expect(login(page)).toBeEnabled()
+  })
+})
+
+test.describe('[issue 210] entry routing', () => {
+  test('login reaches case selection, case selection reaches the desk, and desk reload stays there', async ({ page }) => {
+    await openNaturalDoor(page)
+    await completeLogin(page)
+
+    await expect(page.locator('.scenario-picker')).toBeVisible()
+    await expect(page.locator('.scenario-file')).toHaveCount(3)
+    await expect(page.locator('.scenario-file.is-open')).toHaveCount(1)
+    await expect(page.locator('.scenario-file.is-locked')).toHaveCount(2)
+
+    await chooseFirstScenario(page)
+    await expect(page.locator('#manual'), 'the desk manual did not wait for the desk').toBeVisible()
+    await closeManual(page)
+    await waitForBoot(page)
+    await expect(page.locator('.win')).toHaveCount(3)
+    await expect
+      .poll(() => page.evaluate((key) => window.sessionStorage.getItem(key), SELECTED_SCENARIO_KEY))
+      .not.toBeNull()
+
+    await page.reload({ waitUntil: 'domcontentloaded' })
+    await waitForBoot(page)
+    await expect(page.locator('#signin')).toHaveCount(0)
+    await expect(page.locator('#manual')).toHaveCount(0)
+    await expect(page.locator('.scenario-picker')).toBeHidden()
+    await expect(page.locator('.win')).toHaveCount(3)
   })
 })

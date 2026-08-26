@@ -31,15 +31,18 @@ export interface ScenarioSwitchOptions extends ScenarioSessionOptions {
   reload?: () => void
 }
 
-export interface SignInDoorState {
+export type EntryState = 'door' | 'select' | 'desk'
+
+export interface EntryStateInput {
   signinFlag: string | null
   webdriver: boolean
-  returnToDesktop: boolean
+  signedIn: boolean
   scenarioPackSelected: boolean
 }
 
 export const SELECTED_SCENARIO_KEY = 'ndsp:scenario:selected:v1'
-export const SCENARIO_DESKTOP_RETURN_KEY = 'ndsp:scenario:return-desktop:v1'
+export const SIGNIN_SESSION_KEY = 'ndsp:signin:complete:v1'
+export const DESK_MANUAL_PENDING_KEY = 'ndsp:signin:manual-pending:v1'
 
 function defaultStorage(): StoragePort | null {
   try {
@@ -76,11 +79,30 @@ export function hasScenarioPackSelection(options: ScenarioSessionOptions = {}): 
   return storageOf(options)?.getItem(SELECTED_SCENARIO_KEY) !== null
 }
 
-export function shouldOpenSignInDoor(state: SignInDoorState): boolean {
-  if (state.signinFlag === 'skip') return false
-  if (state.signinFlag === 'show') return true
-  if (state.returnToDesktop || state.scenarioPackSelected) return false
-  return !state.webdriver
+export function hasSignInSession(options: ScenarioSessionOptions = {}): boolean {
+  return storageOf(options)?.getItem(SIGNIN_SESSION_KEY) === '1'
+}
+
+export function markSignInComplete(options: ScenarioSessionOptions = {}): void {
+  const storage = storageOf(options)
+  storage?.setItem(SIGNIN_SESSION_KEY, '1')
+  storage?.setItem(DESK_MANUAL_PENDING_KEY, '1')
+}
+
+export function consumeDeskManualPending(options: ScenarioSessionOptions = {}): boolean {
+  const storage = storageOf(options)
+  if (storage?.getItem(DESK_MANUAL_PENDING_KEY) !== '1') return false
+  storage.removeItem(DESK_MANUAL_PENDING_KEY)
+  return true
+}
+
+export function entryStateOf(state: EntryStateInput): EntryState {
+  if (state.signinFlag === 'skip') return 'desk'
+  if (state.signinFlag === 'show') return 'door'
+  if (state.webdriver && !state.signedIn) return 'desk'
+  if (!state.signedIn) return 'door'
+  if (!state.scenarioPackSelected) return 'select'
+  return 'desk'
 }
 
 /**
@@ -125,18 +147,9 @@ export function returnToScenarioDesktop(
   const storage = storageOf(options)
   resetScenarioSession(index, { storage })
   storage?.removeItem(SELECTED_SCENARIO_KEY)
-  storage?.setItem(SCENARIO_DESKTOP_RETURN_KEY, '1')
+  storage?.setItem(SIGNIN_SESSION_KEY, '1')
   if (options.reload === undefined) defaultReload()
   else options.reload()
-}
-
-export function consumeScenarioDesktopReturn(
-  options: ScenarioSessionOptions = {},
-): boolean {
-  const storage = storageOf(options)
-  if (storage?.getItem(SCENARIO_DESKTOP_RETURN_KEY) !== '1') return false
-  storage.removeItem(SCENARIO_DESKTOP_RETURN_KEY)
-  return true
 }
 
 export async function fetchScenarioInPlay(

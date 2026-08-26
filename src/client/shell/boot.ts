@@ -25,11 +25,14 @@ import { fetchScenarioEndings, fetchScenarioIdentity, fetchScenarioIndex, fetchS
 import type { ScenarioIdentity } from './pack.ts'
 import { installScenarioDesktop } from './scenario-desktop.ts'
 import {
-  consumeScenarioDesktopReturn,
+  consumeDeskManualPending,
+  entryStateOf,
   hasScenarioPackSelection,
+  hasSignInSession,
+  markSignInComplete,
   scenarioPackInPlay,
-  shouldOpenSignInDoor,
 } from './pack-session.ts'
+import type { EntryState } from './pack-session.ts'
 import { PORTAL, TASKBAR_HINT } from './portal-identity.ts'
 import { clearRunState } from './run-state.ts'
 import { WINDOW_REGISTRY } from './window-registry.ts'
@@ -198,23 +201,24 @@ export async function bootShell(): Promise<void> {
   const desktop = must('#desktop')
   holdDesk(body)
 
-  const returnToDesktop = consumeScenarioDesktopReturn({ storage: window.sessionStorage })
   const scenarioPackSelected = hasScenarioPackSelection({ storage: window.sessionStorage })
+  const signedIn = hasSignInSession({ storage: window.sessionStorage })
   const signinFlag = new URLSearchParams(window.location.search).get('signin')
+  const entryState = entryStateOf({
+    signinFlag,
+    webdriver: window.navigator.webdriver === true,
+    signedIn,
+    scenarioPackSelected,
+  })
 
   // 0 — the door (plan-playtest O1). Mounted BEFORE the pack fetch so the first
   // painted frame is the portal, not a bare wallpaper waiting on the network,
   // and so `body.signin` is on the element before the top bar's `barDrop` can
   // run. Everything below it proceeds at full speed behind the curtain: the
   // opening builds no second hold, it only defers the reveal at the bottom of
-  // this function. `shouldOpenSignInDoor` keeps that skip/show/state/webdriver
-  // priority explicit because `?signin=show` is the forced-door escape hatch.
-  const door = shouldOpenSignInDoor({
-    signinFlag,
-    webdriver: window.navigator.webdriver === true,
-    returnToDesktop,
-    scenarioPackSelected,
-  })
+  // this function. `entryStateOf` keeps the skip/show/session/selection priority
+  // explicit because `?signin=show` is the forced-door escape hatch.
+  const door = entryState === 'door'
     ? openSignIn(app, body)
     : null
 
@@ -303,7 +307,7 @@ export async function bootShell(): Promise<void> {
     app,
     desktop,
     index: scenarioIndex,
-    visible: returnToDesktop,
+    visible: false,
     localStorage: window.localStorage,
     sessionStorage: window.sessionStorage,
   })
@@ -387,13 +391,17 @@ export async function bootShell(): Promise<void> {
   }
 
   runPump(driver)
-  if (returnToDesktop) {
-    scenarioDesktop.show()
-    desk.closeAll()
-  } else {
+  let routedEntry: EntryState = entryState
+  const routeEntry = (state: EntryState): void => {
+    if (state === 'select') {
+      scenarioDesktop.show()
+      desk.closeAll()
+      return
+    }
     scenarioDesktop.hide()
     desk.focus('feed')
   }
+  if (entryState !== 'door') routeEntry(entryState)
 
   // 6 — the hand-over. Signed in, the operator gets one thing on the desk: the
   // sheet the portal issues with the terminal. Closing it uncovers the desk
@@ -401,6 +409,16 @@ export async function bootShell(): Promise<void> {
   // the SAME reveal the desk has always used, just released later.
   if (door !== null) {
     await door
+    markSignInComplete({ storage: window.sessionStorage })
+    routedEntry = entryStateOf({
+      signinFlag: null,
+      webdriver: false,
+      signedIn: true,
+      scenarioPackSelected: hasScenarioPackSelection({ storage: window.sessionStorage }),
+    })
+    routeEntry(routedEntry)
+  }
+  if (routedEntry === 'desk' && consumeDeskManualPending({ storage: window.sessionStorage })) {
     // x5b — the sheet is a centred plate now and places itself, so it no longer
     // takes the viewport it used to size a window against.
     await openManual(app)
