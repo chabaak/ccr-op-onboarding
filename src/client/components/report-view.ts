@@ -169,6 +169,12 @@ interface Anchor {
 
 interface ReplayTarget extends Anchor {}
 
+interface ActiveReplay {
+  unregister: () => void
+  targets: ReplayTarget[]
+  lengths: number[]
+}
+
 function reportRounds(model: ReportModel): readonly ReportRoundModel[] {
   return model.rounds ?? [{ round: model.round, facts: model.facts, report_body: model.report_body }]
 }
@@ -246,7 +252,7 @@ export function createReportView(options: ReportViewOptions): ReportView {
 
   let anchors: Anchor[] = []
   let current: ReportModel | null = null
-  let stopReplay: (() => void) | null = null
+  let activeReplay: ActiveReplay | null = null
   const caret = el('span', 'caret')
   caret.setAttribute('aria-hidden', 'true')
 
@@ -310,6 +316,14 @@ export function createReportView(options: ReportViewOptions): ReportView {
     targets[cursor.sentence]?.node.after(caret)
   }
 
+  function finishReplay(): void {
+    if (activeReplay === null) return
+    const replay = activeReplay
+    replay.unregister()
+    activeReplay = null
+    paint({ sentence: replay.lengths.length, chars: 0, done: true }, replay.targets)
+  }
+
   function replay(targets: ReplayTarget[], animate: boolean): void {
     const lengths = targets.map(({ sentence }) => sentence.text.length)
     // An empty document is not an unstamped one that will get there — it is a
@@ -333,9 +347,9 @@ export function createReportView(options: ReportViewOptions): ReportView {
       paint(cursor, targets)
       if (!cursor.done) return
       unregister()
-      if (stopReplay === unregister) stopReplay = null
+      if (activeReplay?.unregister === unregister) activeReplay = null
     })
-    stopReplay = unregister
+    activeReplay = { unregister, targets, lengths }
   }
 
   function tally(marks: MarkSets): void {
@@ -382,8 +396,7 @@ export function createReportView(options: ReportViewOptions): ReportView {
       // `refresh` still repaints every sentence the day has filed), `current`
       // becomes the WHOLE sitting (so the mined tally counts all of it), and
       // the replay runs over the new slice alone.
-      if (stopReplay !== null) stopReplay()
-      stopReplay = null
+      finishReplay()
       caret.remove()
       current = whole
       const grown = renderRound(slice, marks, {
@@ -397,8 +410,7 @@ export function createReportView(options: ReportViewOptions): ReportView {
     },
 
     render(model: ReportModel, marks: MarkSets, options?: RenderOptions): void {
-      if (stopReplay !== null) stopReplay()
-      stopReplay = null
+      finishReplay()
       caret.remove()
       anchors = []
       current = model
