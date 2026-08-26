@@ -132,7 +132,7 @@
       "time": "10:35",
       "surface": "document",
       "place_id": "p4",
-      "text": "공조 화면은 `B2-FD-4 열림`을 표시하지만, 점검표 사진에는 같은 손잡이가 붉은 끈으로 닫힘 위치에 묶여 있다.",
+      "text": "공조 화면은 `방화댐퍼 B2-FD-4 열림`을 표시하지만, 점검표 사진에는 같은 손잡이가 붉은 끈으로 닫힘 위치에 묶여 있다.",
       "exposure": {
         "visible_from": "10:35",
         "extra_condition": null
