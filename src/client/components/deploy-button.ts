@@ -90,6 +90,11 @@ export interface DeployState {
   closed?: boolean
   /** The hold has released, filed or lapsed — absent means false. */
   releasable?: boolean
+  /**
+   * The LIVE FEED still owes visible paper. The window reads this from
+   * `shell/feed-drain.ts`; the pure view only receives the fact.
+   */
+  paperPending?: boolean
   /** The allotment is spent — `new_run` was refused; absent means false. */
   spent?: boolean
   /** `"HH:MM"` the NEXT day opens on — absent means `''`. */
@@ -101,9 +106,10 @@ export function deployView(state: DeployState): DeployView {
   const used = usedIds(state.slots).length
   const closed = state.closed ?? false
   const releasable = state.releasable ?? false
+  const paperPending = state.paperPending ?? false
   const spent = state.spent ?? false
   const nextAt = state.nextAt ?? ''
-  const mode: DeployMode = spent ? 'spent' : closed ? (releasable ? 'next' : 'settling') : 'deploy'
+  const mode: DeployMode = spent ? 'spent' : closed ? (releasable && !paperPending ? 'next' : 'settling') : 'deploy'
 
   return {
     used,

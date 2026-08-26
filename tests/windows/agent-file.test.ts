@@ -191,10 +191,21 @@ interface DeployView {
   stampLine: string
   boardState: 'empty' | 'partial' | 'full' | 'locked'
   buttonState: 'ready' | 'deployed'
+  mode: 'deploy' | 'settling' | 'next' | 'spent'
 }
 
 interface DeployButtonModule {
-  deployView(s: { slots: readonly (string | null)[]; deployed: boolean; run: number; at: string }): DeployView
+  deployView(s: {
+    slots: readonly (string | null)[]
+    deployed: boolean
+    run: number
+    at: string
+    closed?: boolean
+    releasable?: boolean
+    paperPending?: boolean
+    spent?: boolean
+    nextAt?: string
+  }): DeployView
   buildDeployZone: unknown
   buildDeployStamp: unknown
 }
@@ -796,6 +807,34 @@ describe('[u4#c4] deployView states — empty · partial · full · locked', () 
     // deploy zone and the name at the top of the page cannot disagree.
     expect(deployView({ slots: [], deployed: true, run: 1, at: '13:05' }).stampLine).toBe('ECHO · 13:05')
     expect(deployView({ slots: [], deployed: true, run: 10, at: '13:05' }).stampLine).toBe('ECHO-9 · 13:05')
+  })
+
+  it('(f) a released tally stays settling while the live feed still owes paper', async () => {
+    const { deployView } = await loadDeployButton()
+
+    const waiting = deployView({
+      slots: [],
+      deployed: false,
+      run: 2,
+      at,
+      closed: true,
+      releasable: true,
+      paperPending: true,
+      nextAt: '09:10',
+    })
+    expect(waiting.mode).toBe('settling')
+
+    const ready = deployView({
+      slots: [],
+      deployed: false,
+      run: 2,
+      at,
+      closed: true,
+      releasable: true,
+      paperPending: false,
+      nextAt: '09:10',
+    })
+    expect(ready.mode).toBe('next')
   })
 })
 

@@ -23,7 +23,7 @@
 // Titles are load-bearing — [u9#c5]'s verification runs this whole file, and
 // `-g` filters in later units may target these describe names.
 import { expect, test } from 'playwright/test'
-import { awaitRecordFinal, drain, raiseWindow, turnToAgent } from './fixtures/harness.ts'
+import { awaitRecordFinal, deployFile, drain, flushFeed, raiseWindow, turnToAgent } from './fixtures/harness.ts'
 import type { Page } from 'playwright/test'
 import { hideDebugPane } from './fixtures/dev-surface.ts'
 
@@ -313,22 +313,28 @@ test.describe('a11y — landmarks and roles', () => {
     // C1 — `#deployState` and `#btnDeploy` are on the agent's page; the file
     // opens on its cover. This test drives the desk by URL, not through boot().
     await turnToAgent(page)
+    await deployFile(page)
 
-    // Drive the day to its close; the terminal record counts up on its own
-    // ~9 s cadence, unrelated to whether the report has filed. The harness
-    // `drain` waits it out to `final`.
-    await drain(page)
+    // Drive the day to its close WITHOUT the harness feed flush. This drill owns
+    // the paper-pending gate: the hold ceiling may lapse before the fanfold has
+    // printed the visible tail of the day.
+    await page.evaluate(() => {
+      const handle = (window as unknown as { __shell?: { drain(): void } }).__shell
+      if (!handle) throw new Error('window.__shell is not exposed by the shell boot')
+      handle.drain()
+    })
 
     // (1) the hold is a fact an operator can HEAR — and, since x6b, ONLY hear.
     // The control's printed wait line is gone (it was the fanfold's removed
     // marker mechanism mounted in this window), so the live region is no longer
     // the redundant half of the pair: it is the only channel that carries the
     // hold at all. That makes this assertion load-bearing rather than belt-and-
-    // braces, which is why the empty-note check sits right under it.
+    // braces. x15 — the printed note is back only for the operator-visible
+    // paper gate: a disabled control has to say why it is disabled.
     await expect(toast, 'the desk closed the run and held it in silence').toContainText('보고서 정리 중', {
       timeout: 20_000,
     })
-    await expect(wait, 'the control printed a wait line again').toHaveText('')
+    await expect(wait, 'the control did not explain the paper gate').toContainText('현장 기록 인쇄 중')
     await expect(newRun, 'NEW RUN is offered while the hold is still up').toBeDisabled()
 
     // (2) …and so is the release. The control's note changing to the opposite
@@ -338,6 +344,10 @@ test.describe('a11y — landmarks and roles', () => {
       '보고서가 도착하지 않았습니다',
       { timeout: 60_000 },
     )
+    await expect(wait, 'the lapsed hold enabled NEW RUN before the fanfold drained').toContainText('현장 기록 인쇄 중')
+    await expect(newRun, 'candidate B regressed: HOLD_CEIL enabled NEW RUN while paper was pending').toBeDisabled()
+
+    await flushFeed(page)
     await expect(wait).toContainText('보고서는 아직 부검 창에 없습니다')
     await expect(newRun, 'the day was never handed back').toBeEnabled()
   })
