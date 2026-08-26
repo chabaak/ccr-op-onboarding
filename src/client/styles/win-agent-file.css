@@ -311,6 +311,16 @@
 .file-sheet::-webkit-scrollbar{width:9px}
 .file-sheet::-webkit-scrollbar-track{background:var(--sh-07)}
 .file-sheet::-webkit-scrollbar-thumb{background:var(--sh-24);border:2px solid transparent;background-clip:content-box}
+.file-agent-rail{flex:0 0 auto;margin:calc(var(--space-18) * -1) calc(var(--space-22) * -1) var(--space-8);
+  border-top:1px solid var(--ink-line);border-bottom:1px solid var(--ink-line);
+  padding:var(--space-5) var(--space-14) var(--space-4);max-width:none}
+.file-agent-rail[hidden]{display:none}
+.file-agent-tab{font-family:var(--mono);font-weight:700}
+.file-agent-note{font-size:var(--fs-9);letter-spacing:.18em}
+@media (max-width:420px){
+  .file-agent-rail{padding-right:var(--space-10);padding-left:var(--space-10)}
+  .file-agent-note{display:none}
+}
 .pg-nav{flex:0 0 auto}
 .pg-nav{display:flex;align-items:center;justify-content:center;gap:var(--space-10);
   padding:var(--space-6) 0 var(--space-2);border-top:1px solid var(--sh-28)}
