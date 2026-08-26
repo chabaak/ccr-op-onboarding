@@ -395,6 +395,42 @@ test.describe('report renders once after the last beat', () => {
 /* ══ [u6#c2] typewriter is replay ═══════════════════════════════════════ */
 
 test.describe('typewriter is replay', () => {
+  test('typewriter is replay — the death-count line waits for the paper score cue', async ({
+    page,
+  }) => {
+    await boot(page, { reduced: false })
+    await deployFile(page)
+    await page.locator(`${REP} .win-caption`).click()
+    expect(await page.locator(`${REP} .report-score`).count(), 'REPORTS already had a score before the day ran').toBe(0)
+    const startEvents = (await frame(page)).events.length
+
+    const beforePaper = await page.evaluate((from) => {
+      const handle = (window as unknown as { __shell?: { drain(): void; frame(): Frame } }).__shell
+      if (!handle) throw new Error('window.__shell is not exposed by the shell boot')
+      handle.drain()
+      const afterDrain = document.querySelectorAll('#w-rep .report-score').length
+      document.querySelector<HTMLElement>('#w-rep .arch-rail [role="option"][aria-selected="true"]')?.click()
+      const emitted = handle.frame().events.slice(from)
+      return {
+        scored: emitted.some((event) => event.type === 'score'),
+        afterDrain,
+        afterRedraw: document.querySelectorAll('#w-rep .report-score').length,
+      }
+    }, startEvents)
+    expect(beforePaper.scored, 'the stream never reached score').toBe(true)
+    expect(
+      beforePaper.afterDrain,
+      'REPORTS printed the death-count line as soon as the score event arrived',
+    ).toBe(0)
+    expect(
+      beforePaper.afterRedraw,
+      'REPORTS printed the death-count line before the paper reached score',
+    ).toBe(0)
+
+    await flushFeed(page)
+    await expect(page.locator(`${REP} .report-score`)).toContainText('사망자 수')
+  })
+
   test('typewriter is replay — with motion reduced the first paint is already the whole body', async ({
     page,
   }) => {
@@ -693,6 +729,48 @@ test.describe('typewriter is replay', () => {
   })
 })
 
+/* ══ score-only days ══════════════════════════════════════════════════════ */
+
+test.describe('score-only report days', () => {
+  test('score-only report days — tally-lapse remains selectable after the next run opens', async ({
+    page,
+  }) => {
+    await page.goto('./?drill=tally-lapse')
+    await page.waitForFunction(() => Boolean((window as { __shell?: unknown }).__shell))
+    await expect(page.locator(REP)).toBeVisible()
+    await turnToAgent(page)
+    await deployFile(page)
+    await page.locator(`${REP} .win-caption`).click()
+
+    await page.evaluate(() => {
+      const handle = (window as unknown as { __shell?: { drain(): void } }).__shell
+      if (!handle) throw new Error('window.__shell is not exposed by the shell boot')
+      handle.drain()
+    })
+    await flushFeed(page)
+    await awaitRecordFinal(page)
+
+    const lapsed = metaOf(await frame(page))?.run
+    expect(lapsed, 'the lapse run has no meta identity').toBeTruthy()
+    expect(reportsOf(await frame(page)), 'the lapse drill unexpectedly filed a report').toEqual([])
+    await expect(tabFor(page, lapsed!), 'the score-only lapse run never reached the rail').toHaveCount(1)
+
+    const control = page.locator('#w-file #btnDeploy')
+    await expect(control, 'the lapse day never unlocked NEW RUN').toHaveAttribute('data-op', 'new_run', {
+      timeout: 30_000,
+    })
+    await expect(control, 'the lapse day never unlocked NEW RUN').toBeEnabled({ timeout: 30_000 })
+    await control.click()
+    await confirmDeploy(page)
+    await expect(control, 'the next run did not open').toHaveAttribute('data-op', 'deploy', { timeout: 30_000 })
+
+    await page.locator(`${REP} .win-caption`).click()
+    await expect(tabFor(page, lapsed!), 'the completed score-only lapse run fell off the rail').toHaveCount(1)
+    await tabFor(page, lapsed!).click()
+    expect(await activeRun(page)).toBe(lapsed)
+  })
+})
+
 /* ══ [u6#c4] archive segmentation and selection marks ═══════════════════ */
 
 test.describe('archive segmentation and selection marks', () => {
@@ -804,6 +882,22 @@ test.describe('archive segmentation and selection marks', () => {
       expect(await anchorIds(page.locator(`${BODY} .sent`))).toEqual(report.report_body.map((s) => s.id))
       expect(await anchorIds(page.locator(`${FACTS} .min`))).toEqual(report.facts.map((s) => s.id))
     }
+  })
+
+  test('archive segmentation and selection marks — rereading a completed run shows its death count immediately', async ({
+    page,
+  }) => {
+    const completed = await activeRun(page)
+    await expect(page.locator(`${REP} .report-score`)).toContainText('사망자 수')
+
+    await fileAnotherRun(page)
+    expect(await activeRun(page), 'the helper did not advance to another run').not.toBe(completed)
+
+    await tabFor(page, completed).click()
+    expect(await activeRun(page)).toBe(completed)
+    const scores = page.locator(`${REP} .report-score`)
+    expect(await scores.count()).toBe(1)
+    expect(await scores.first().innerText()).toContain('사망자 수')
   })
 
   test('archive segmentation and selection marks — mined marks survive a run switch, keyed by id', async ({

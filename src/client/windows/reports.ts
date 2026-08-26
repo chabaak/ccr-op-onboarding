@@ -106,7 +106,8 @@ export function mount(host: HTMLElement, driver: FixtureDriver): void {
   let slug = ''
   let title = ''
   let callsignSeries = driver.callsignSeries()
-  const scores = new Map<number, number>()
+  const scored = new Set<number>()
+  const visibleScores = new Map<number, number>()
   type ReportEvent = Extract<ViewEvent, { type: 'report' }>
   type PendingReport = { sitting: number; event: ReportEvent }
   const openedRounds = new Map<number, Set<number>>()
@@ -295,7 +296,7 @@ export function mount(host: HTMLElement, driver: FixtureDriver): void {
     const first = model.report_body.length > 0 && !replayed.has(key)
     if (first) replayed.add(key)
     view.render(model, marks(), { replay: first, follow: first })
-    view.score(scores.get(active) ?? null)
+    view.score(visibleScores.get(active) ?? null)
   }
 
   /**
@@ -314,7 +315,7 @@ export function mount(host: HTMLElement, driver: FixtureDriver): void {
     // played. `run` is 0 only before the first `meta`, and a rail entry for run
     // 0 would be a sitting that does not exist.
     const live = run > 0 ? [run] : []
-    const entries = railEntries(archive, [...new Set([...filed.keys(), ...scores.keys(), ...live])])
+    const entries = railEntries(archive, [...new Set([...filed.keys(), ...scored, ...live])])
     if (entries.length === 0) return
     if (active === null || !entries.some((entry) => entry.run === active)) {
       active = entries[entries.length - 1]?.run ?? null
@@ -423,12 +424,12 @@ export function mount(host: HTMLElement, driver: FixtureDriver): void {
     }
     if (event.type === 'score') {
       // REPORTS keeps the event-local model and paper gate, but not the full
-      // visible ledger. The selected sitting still carries one final death
-      // count here so archive rereads can answer how that run ended without
-      // duplicating the LIVE FEED tally lines.
+      // visible ledger. `scored` is only rail identity; `visibleScores` is the
+      // document's permission to render the final death count after the paper
+      // has reached the same boundary.
       const sitting = run
       const tally = getScoreTally()
-      scores.set(sitting, event.total)
+      scored.add(sitting)
       releasePendingReportsAtScore(sitting)
       // The scored day takes the rail and the record mounts under it. Going
       // through `sync()` rather than straight to `mountRecord()` is what covers
@@ -442,7 +443,6 @@ export function mount(host: HTMLElement, driver: FixtureDriver): void {
       // mid-sentence (`e2e/reports.spec.ts:334`). The rail still reconciles, so
       // a day that filed no report still takes its identity.
       sync(false)
-      view.score(event.total)
       tally?.open()
       // x12 — THE RECORD IS ON THE DESK NOW; THE NUMBER IS NOT. `open()` leaves
       // it `pending` — the article mounted, blank, waiting — and the count-up
@@ -456,7 +456,11 @@ export function mount(host: HTMLElement, driver: FixtureDriver): void {
       // the desk may be on the next sitting; a model read late would be the same
       // event scored against whatever `run` had become.
       const record = scoreModel(event)
-      afterPaper({ at: 'score', run: sitting }, () => getScoreTally()?.run(record))
+      afterPaper({ at: 'score', run: sitting }, () => {
+        visibleScores.set(sitting, event.total)
+        if (active === sitting) view.score(event.total)
+        getScoreTally()?.run(record)
+      })
       return
     }
     if (event.type !== 'report') return
@@ -479,7 +483,7 @@ export function mount(host: HTMLElement, driver: FixtureDriver): void {
     const nextGate = event.round + 1
     if (hasGateOpened(sitting, nextGate)) {
       releasePendingReport(sitting, event.round, { at: 'gate', run: sitting, round: nextGate })
-    } else if (scores.has(sitting)) {
+    } else if (scored.has(sitting)) {
       releasePendingReport(sitting, event.round, { at: 'score', run: sitting })
     }
   })
