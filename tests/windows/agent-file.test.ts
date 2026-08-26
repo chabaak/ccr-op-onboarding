@@ -46,6 +46,26 @@ const SLOT_BOARD_TS = path.join(COMPONENTS, 'slot-board.ts')
 const DOSSIER_TS = path.join(COMPONENTS, 'dossier.ts')
 const DEPLOY_BUTTON_TS = path.join(COMPONENTS, 'deploy-button.ts')
 const AGENT_FILE_TS = path.join(CLIENT, 'windows/agent-file.ts')
+const SCENARIO_DIR = path.join(REPO, 'data/scenario')
+
+interface ScenarioIndexFile {
+  packs: {
+    slug: string
+    display_name: string
+    role: 'tutorial' | 'practice' | 'fixture'
+  }[]
+}
+
+interface ScenarioMetaFile {
+  callsign_series: string
+}
+
+function fixtureTankerMeta(): ScenarioMetaFile {
+  const index = JSON.parse(read(path.join(SCENARIO_DIR, 'index.json'))) as ScenarioIndexFile
+  const fixture = index.packs.find((pack) => pack.role === 'fixture')
+  expect(fixture?.display_name).toBe('새는 탱크로리')
+  return JSON.parse(read(path.join(SCENARIO_DIR, fixture!.slug, 'meta.json'))) as ScenarioMetaFile
+}
 /**
  * u2's inv-12 enforcement point. It is the ONE client source that may name a
  * banned key: `BANNED_EXACT` lists `temperament` precisely so the driver can
@@ -465,6 +485,17 @@ describe('[u4#c2] §3 기질 is sealed by construction', () => {
     for (const run of [1, 2, 3, 4, 10, 99]) expect(callsignOf(run, 'ECHO')).not.toBe('ECHO-0')
 
     expect(callsignOf(2, 'TANGO')).toBe('TANGO-1')
+  })
+
+  it('(f2) the tank fixture pack still carries the TANGO series outside the browser path', async () => {
+    const { callsignOf } = await loadDossier()
+    const meta = fixtureTankerMeta()
+
+    // 새는탱크로리 is role:fixture, so the scenario desktop cannot start it; if
+    // it becomes practice later, `e2e/callsign.spec.ts` should cover this path.
+    expect(meta.callsign_series).toBe('TANGO')
+    expect(callsignOf(1, meta.callsign_series)).toBe('TANGO')
+    expect(callsignOf(2, meta.callsign_series)).toBe('TANGO-1')
   })
 
   it('(g) nextCallsignOf composes across the ECHO → ECHO-1 boundary', async () => {

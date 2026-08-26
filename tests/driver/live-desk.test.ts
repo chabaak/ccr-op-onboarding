@@ -235,6 +235,7 @@ describe('(A) the live desk plays its day to the end', () => {
   it('the run reaches run_end with every beat and every round behind it', async () => {
     const adapter = createLiveAdapter({
       first: realRun(1),
+      callsignSeries: 'ECHO',
       canOpenNext: () => true,
       closeRun: () => {},
       next: async () => null,
@@ -301,6 +302,7 @@ describe('(B) the driver pumps the animations the desk registers', () => {
     try {
       const adapter = createLiveAdapter({
         first: realRun(1),
+        callsignSeries: 'ECHO',
         canOpenNext: () => true,
         closeRun: () => {},
         next: async () => null,
@@ -322,6 +324,7 @@ describe('(B) the driver pumps the animations the desk registers', () => {
     try {
       const adapter = createLiveAdapter({
         first: realRun(1),
+        callsignSeries: 'ECHO',
         canOpenNext: () => true,
         closeRun: () => {},
         next: async () => null,
@@ -402,6 +405,7 @@ describe('(D) the deck is a set — a repeated MINE deals one card', () => {
   it('mining one sentence twice leaves one id in the store', async () => {
     const adapter = createLiveAdapter({
       first: realRun(1),
+      callsignSeries: 'ECHO',
       canOpenNext: () => true,
       closeRun: () => {},
       next: async () => null,
@@ -434,6 +438,7 @@ describe('(E) the clock gutter prints a time, and `21:04+` is not one', () => {
   it('the stamps the run emits still include the authored `+` on the seam', async () => {
     const adapter = createLiveAdapter({
       first: realRun(1),
+      callsignSeries: 'ECHO',
       canOpenNext: () => true,
       next: async () => null,
       closeRun: () => {},

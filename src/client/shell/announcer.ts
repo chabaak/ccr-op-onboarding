@@ -63,7 +63,7 @@ export function announce(text: string): void {
 }
 
 /** The line an event is worth saying out loud, or `null` for the ones that are not. */
-export function announcementOf(event: ViewEvent, callsignSeries = 'ECHO'): string | null {
+export function announcementOf(event: ViewEvent, callsignSeries: string): string | null {
   switch (event.type) {
     case 'meta':
       return RUN_OPENED(event.run, callsignSeries)

@@ -179,6 +179,7 @@ describe('the BUILD hold — the live adapter', () => {
     const first = stubRun(1)
     const adapter = createLiveAdapter({
       first,
+      callsignSeries: 'ECHO',
       canOpenNext: () => true,
       closeRun: () => {},
       next: async () => null,
@@ -197,6 +198,7 @@ describe('the BUILD hold — the live adapter', () => {
     const first = stubRun(1)
     const adapter = createLiveAdapter({
       first,
+      callsignSeries: 'ECHO',
       canOpenNext: () => true,
       closeRun: () => {},
       next: async () => null,

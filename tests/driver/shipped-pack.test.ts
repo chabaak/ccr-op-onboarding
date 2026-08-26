@@ -147,6 +147,7 @@ async function pump(driver: FixtureDriver, done: () => boolean, frames = 40_000)
 async function playOneRun(): Promise<ViewEvent[]> {
   const adapter = createLiveAdapter({
     first: realRun(1),
+    callsignSeries: 'ECHO',
     canOpenNext: () => true,
     closeRun: () => {},
     next: async () => null,

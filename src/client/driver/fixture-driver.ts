@@ -58,6 +58,8 @@ function stampOf(event: ViewEvent): string | null {
 
 export function createFixtureDriver(run: FixtureRun): FixtureDriver {
   const clock = createClock({ start: run.start, end: run.end })
+  // Synthetic fixture runs are not always backed by scenario meta; the legacy
+  // dev fixtures model the tutorial dossier series.
   const callsignSeries = run.callsignSeries ?? 'ECHO'
   const startMinute = mm(run.start)
   const feedGapClocks = run.events.flatMap((event) => {

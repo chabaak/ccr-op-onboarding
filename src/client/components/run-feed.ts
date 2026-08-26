@@ -666,7 +666,7 @@ export function createRunFeed(host: HTMLElement, driver: FixtureDriver): RunFeed
   let pending: { cls: FallbackClass; code: string } | null = null
 
   function syncCallsign(): void {
-    callsign = callsignOf(run <= 0 ? 1 : run, callsignSeries)
+    callsign = callsignOf(run, callsignSeries)
     heading.textContent = HEAD_TITLE + HEAD_SEP + callsign
   }
 

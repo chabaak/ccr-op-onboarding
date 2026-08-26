@@ -735,23 +735,15 @@ export function mount(host: HTMLElement, driver: FixtureDriver): void {
    * the desk: nothing else on the cover types, and the two surfaces never share
    * a screen.
    *
-   * It sums to 19.3 s for the whole cover — 19,296 ms of scheduled waits, over
-   * the 319 characters (70 of them spaces) that `components/dossier.ts`'s
-   * `coverModel()` prints as 12 text runs across 10 rows. That is deliberate and
-   * it is also exactly why 건너뛰기 exists.
-   *
-   * The total is a measurement of whichever cover the active pack supplies, not
-   * a contract this module can derive now that the incident body is pack data.
+   * The total is deliberately long enough that 건너뛰기 exists. It is a
+   * measurement of whichever cover the active pack supplies, not a contract this
+   * module can derive now that the incident body is pack data.
    * The rates themselves do not move when a pack edits its prose; the page does.
    *
-   * x10 — THE FIGURE IS RECOMPUTED, because it had gone stale and a stale total
-   * is worse than none. This paragraph said "roughly a quarter-minute", which
-   * was true of the rates it was written against (11.6 s at 22/45) and stopped
-   * being true the moment x7 doubled them — at 45/130 the same page took 22.5 s
-   * and the comment still claimed fifteen. So the rule this leaves behind: a
-   * comment that states a TOTAL is a function of the constants under it and has
-   * to be recomputed with them, or it becomes a number the next reader trusts
-   * and measures nothing against.
+   * x10 — DO NOT STATE A FIXED TOTAL here. The old paragraph went stale when
+   * rates moved, and pack-authored incident copy now changes the character count
+   * too. A fixed total becomes a number the next reader trusts and measures
+   * nothing against.
    */
   // SLOWED (x7, 민서 08-09, measured on the built page): 22 → 45 per character
   // and 45 → 130 per word. At 22 ms a clause fanned out faster than it could be
