@@ -64,7 +64,7 @@ export const WINDOW_REGISTRY: readonly WindowDef[] = [
     key: 'file',
     id: 'w-file',
     en: 'AGENT FILE',
-    caption: 'AGENT FILE',
+    caption: 'AGENT FILE · 인수인계',
     resizable: false,
     mount: mountAgentFile,
   },

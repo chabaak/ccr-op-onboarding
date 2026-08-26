@@ -146,7 +146,7 @@ describe('[u3#c6] the registry is shell-owned', () => {
     const file = WINDOW_REGISTRY.find((entry) => entry.key === 'file')
 
     expect(feed?.caption).toBe('LIVE FEED · 열람 전용')
-    expect(file?.caption).toBe('AGENT FILE')
+    expect(file?.caption).toBe('AGENT FILE · 인수인계')
     for (const def of WINDOW_REGISTRY) {
       expect(def.caption).not.toMatch(/ECHO-\d/)
       expect(def.caption).not.toContain('문서번호')
