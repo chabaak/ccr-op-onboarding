@@ -220,43 +220,32 @@ test.describe('full loop back to BUILD', () => {
     expect(await digitsOf(page, BIG)).toBe(score!.total)
   })
 
-  test('full loop back to BUILD — the feed closes on a run divider and the tally holds the ledger count', async ({
+  test('full loop back to BUILD — score closes without a rerun divider and the tally holds the ledger count', async ({
     page,
   }) => {
     // The two surfaces used to disagree at the same 21:04. The count was
     // `timeline.json`'s `t19`, a FIXED event printed verbatim on every run
     // (`scriptLinesOf` reads no state), so a day that saved people still read
     // 사망 26 in the feed beside a ledger counting what it actually scored.
-    // The tally comes off the `score` event now, and the fanfold prints the
-    // run divider at the same cue, so the paper and the record cannot part
-    // company.
+    // The tally comes off the `score` event now, and the rerun divider waits for
+    // the confirmed next DEPLOY press. The score gate must stay here even though
+    // the visual boundary moved.
     await boot(page)
     await drainToFinal(page)
-    // x11 — the DIVIDER line is the last thing the day prints, so this is the
-    // one read in the file that cannot be taken while the paper is still
-    // arriving (see `flushFeed`). Unsettled, `.last()` would name whichever line
-    // the reveal had reached when the ledger happened to finish counting, and
-    // the failure would read about the wrong line rather than the final one.
     await flushFeed(page)
 
     const headline = await digitsOf(page, BIG)
     const f = await frame(page)
     const score = f.events.filter((e) => e.type === 'score').pop() as { total: number } | undefined
     expect(score, 'the run closed without a `score` event — the ledger has nothing to count').toBeTruthy()
-    // x11 — the CONTENT column, not the whole `<li>`. The typewriter gave every
-    // line a second, sr-only copy of its own text (`.fl-sr`), so an `innerText`
-    // of the row now returns the stamp and the sentence TWICE — a `toContain`
-    // that keeps passing while saying half of what it means to. The count the
-    // operator reads is the printed one, so that is the column asked.
-    const closing = await page.locator('#feedList li').last().locator('.fl-c').innerText()
-    expect(closing, 'the feed did not close on the run divider').toContain('요원이 재파견되었습니다')
+    await expect(page.locator('#feedList .fl-rerun'), 'score alone printed the rerun divider').toHaveCount(0)
     expect(headline, 'the feed tally did not count the ledger total').toBe(score!.total)
 
     // And it is not minable: a count is a conclusion, not a source document.
     // `t19` DID carry a `sentence_id`, so a player could mine 사망 26 and inject
     // it into a run that never had it.
-    const minable = await page.locator('#feedList li').last().locator('.min').count()
-    expect(minable, 'the closing count became a minable sentence').toBe(0)
+    const minable = await page.locator('#feedList .fl-rerun .min').count()
+    expect(minable, 'the rerun divider became a minable sentence').toBe(0)
   })
 
   test('full loop back to BUILD — NEW RUN returns the desk to BUILD and the control returns to deploy', async ({
@@ -270,7 +259,12 @@ test.describe('full loop back to BUILD', () => {
 
     await expect(page.locator(NEW_RUN)).toBeEnabled()
     await page.locator(NEW_RUN).click()
+    await expect(page.locator('#feedList .fl-rerun'), 'the unconfirmed plate printed the rerun divider').toHaveCount(0)
     await confirmDeploy(page)
+    const divider = page.locator('#feedList .fl-rerun')
+    await expect(divider, 'confirmed DEPLOY did not print the rerun divider').toHaveCount(1)
+    await expect(divider.locator('.fl-c')).toContainText('요원이 재파견되었습니다')
+    await expect(divider.locator('.min'), 'the rerun divider became a minable sentence').toHaveCount(0)
 
     // RE-AIMED (08-08, W4): the press now STARTS the day it opens, so `build`
     // is a phase the desk passes THROUGH — the first beat moves it to `run`,

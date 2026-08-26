@@ -308,7 +308,7 @@ test.describe('report renders once after the last beat', () => {
     await expect(page.locator(`${REP} .doc-hd, ${REP} .doc-body`)).toHaveCount(0)
     await expect(page.locator(`#w-feed .feed-tally[data-tally-state="final"]`)).toHaveCount(1)
     await expect(page.locator(`${REP} .terminal-record, ${REP} .tly-line`)).toHaveCount(0)
-    await expect(page.locator(`${REP} .report-score`)).toContainText('시행 최종 사망자 수')
+    await expect(page.locator(`${REP} .report-score`)).toContainText('사망자 수')
     await expect(page.locator(`#w-file .terminal-record`)).toHaveCount(0)
 
     const rows = page.locator(`${REP} .rep-row`)

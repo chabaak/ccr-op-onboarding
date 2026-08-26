@@ -210,7 +210,7 @@ async function domLines(page: Page): Promise<DomLine[]> {
 
 /**
  * Rendered lines that came off the stream — the client's own states removed.
- * The run divider is minted from the `score` event, not a stream line;
+ * The run divider is minted from the confirmed next DEPLOY, not a stream line;
  * run-loop.spec asserts it on its own.
  *
  * x8 — the `!l.empty` clause went with the `(변화 없음)` line, the only node

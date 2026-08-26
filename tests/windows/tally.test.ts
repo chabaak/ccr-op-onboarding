@@ -764,6 +764,21 @@ describe('[u7#c9] run-wide hard constraints hold in this unit', () => {
     }
   })
 
+  it('(d2) issue 234 reserves height from the shipped score row counts', () => {
+    const scenarioDir = path.join(REPO, 'data/scenario')
+    const rowCounts = fs.readdirSync(scenarioDir, { withFileTypes: true })
+      .filter((entry) => entry.isDirectory() && !entry.name.startsWith('_'))
+      .map((entry) => {
+        const score = JSON.parse(read(path.join(scenarioDir, entry.name, 'score.json'))) as { units?: unknown[] }
+        return Array.isArray(score.units) ? score.units.length : 0
+      })
+    expect(rowCounts.sort((a, b) => a - b)).toEqual([3, 3, 4])
+
+    const maxVisibleRows = 1 + Math.max(...rowCounts) + 1 + 1
+    expect(maxVisibleRows, 'caption + open + max units + close').toBe(7)
+    expect(read(path.join(REPO, 'src/client/styles/win-live-feed.css'))).toMatch(/\.feed-tally\{[^}]*min-height:280px/)
+  })
+
   it('(e) C13 — the shared modules are consumed, never touched', () => {
     expect(offenders(/\bsegmentReportBody\b/)).toEqual([])
     expect(offenders(/shared\/(?:segment|species)(\.ts)?['"]/)).toEqual([])

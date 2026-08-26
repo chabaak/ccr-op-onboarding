@@ -8,11 +8,12 @@
 //
 // U3 (playtest g3-1) — TALLY dissolves: this window also drives the day's
 // turn. `shell/run-state.ts`'s `'tally'` phase now means "the day is closed,
-// awaiting the turn", and its two surfaces are the tally under DEPLOY and this
-// window's merged deploy control. The hold/settle logic below is ported from
-// `windows/tally.ts` (deleted this unit) with its DOM targets retargeted from
-// the old wait line and its own new-run button onto the one control
-// `components/deploy-button.ts` now builds.
+// awaiting the turn"; the visible tally has since moved to LIVE FEED, but this
+// window still owns the merged deploy control and the settle release that
+// unlocks it. The hold/settle logic below is ported from `windows/tally.ts`
+// (deleted this unit) with its DOM targets retargeted from the old wait line
+// and its own new-run button onto the one control `components/deploy-button.ts`
+// now builds.
 //
 // Import-safe by contract (u3): no DOM at module scope, no stylesheet import,
 // no sibling window import, nothing from engine or composer (C8 / inv 12), and
@@ -22,6 +23,7 @@ import { animationsFrozen } from '../driver/index.ts'
 import { button, el, must } from '../shell/dom.ts'
 import { deployCopy, openConfirm } from '../shell/confirm.ts'
 import { announce } from '../shell/announcer.ts'
+import { publishFeedDeploy } from '../shell/feed-deploy.ts'
 import { feedDrained, feedPending } from '../shell/feed-drain.ts'
 import { fetchScenarioInPlay } from '../shell/pack-session.ts'
 import { createRunState, hasFiledReport } from '../shell/run-state.ts'
@@ -414,6 +416,7 @@ export function mount(host: HTMLElement, driver: FixtureDriver): void {
    * so nothing can move the control under the question it is asking.
    */
   function commitFile(mode: DeployMode): void {
+    publishFeedDeploy(mode === 'next' ? 'next' : 'deploy')
     // THE CLOCK GOES FIRST, and it is not a formality.
     //
     // The driver holds the run's own stream until this very `deploy` reaches it
