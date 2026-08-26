@@ -64,10 +64,10 @@ export async function boot(page: Page, opts: { reduced?: boolean } = {}): Promis
  * Turn the AGENT FILE to the agent's own page.
  *
  * C1 — the file is a DOCUMENT with pages now, and the desk opens on its cover:
- * 문서번호, the title, and the sections true of every agent. `#slotBoard` and
- * `#btnDeploy` live on the agent's page, so until it is turned to they are not
- * in the document at all — `pages()` re-parents them into whichever page is
- * built, and only the page being viewed is mounted.
+ * the sections true of every agent. `#slotBoard` and `#btnDeploy` live on the
+ * agent's page, so until it is turned to they are not in the document at all —
+ * `pages()` re-parents them into whichever page is built, and only the page
+ * being viewed is mounted.
  *
  * Every lane that drives the membrane therefore turns first. This is not a
  * workaround: it is the operator's own first gesture, and a suite that skipped

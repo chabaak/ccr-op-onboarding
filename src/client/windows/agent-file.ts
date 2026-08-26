@@ -1,7 +1,7 @@
 // [u4] AGENT FILE — 요원 파일 · 프롬프트 편성 (spec-client §4).
 //
-// The window assembles four components and owns nothing else: the ruled file
-// head, the §0–§5 dossier, the deploy zone and the stamp. The membrane state
+// The window assembles three components and owns nothing else: the dossier, the
+// deploy zone and the stamp. The membrane state
 // lives in the SlotBoard (one owner, `components/slot-board.ts`); the run state
 // this file keeps is the two things the seam tells it — the current run, and
 // the run it deployed for.
@@ -23,7 +23,6 @@ import { button, el, must } from '../shell/dom.ts'
 import { deployCopy, openConfirm } from '../shell/confirm.ts'
 import { announce } from '../shell/announcer.ts'
 import { fetchScenarioInPlay } from '../shell/pack-session.ts'
-import { PORTAL } from '../shell/portal-identity.ts'
 import { createRunState, hasFiledReport } from '../shell/run-state.ts'
 import type { RunPhase, RunState } from '../shell/run-state.ts'
 import { blockCardModel, setPickedBlockId } from '../components/block-card.ts'
@@ -103,11 +102,8 @@ declare global {
   }
 }
 
-const FILE_TITLE = '현장 요원 운용 파일'
 /** U5.3 — what a past page says when that sitting went out with an empty file. */
 const FILED_EMPTY = '배치된 문장 없음'
-/** What the file's own doc-number line is called (reference `fh-doc`). */
-const DOC_CAPTION = '문서번호 '
 
 const COVER_PENDING: AgentFileCoverCopy = {
   incident: '사건 개요를 불러오는 중입니다.',
@@ -153,7 +149,6 @@ export function mount(host: HTMLElement, driver: FixtureDriver): void {
    */
   const filed = new Map<number, string[]>()
   let run = 0
-  let slug = ''
   let opensAt = driver.clock.at()
   let coverCopy = COVER_PENDING
   let committedRun: number | null = null
@@ -244,19 +239,6 @@ export function mount(host: HTMLElement, driver: FixtureDriver): void {
    * AFTER a direct `noteEl.textContent` write would silently blank it again.
    */
   let settleNote = ''
-
-  /**
-   * The document's number, as EVERY page prints it.
-   *
-   * C1 — one document across every agent, so the number names the document and
-   * not the run. The run used to be its last segment.
-   *
-   * x7 — a function, not the one `.fh-doc` element it used to be. See
-   * `buildHead` below for why the head had to stop being a single node, and why
-   * this is the one place its text is composed: two heads printing two
-   * different numbers is the failure a second literal would buy.
-   */
-  const docText = (): string => `${DOC_CAPTION}${PORTAL.portalCode}/AF/${slug}`
 
   const board = createSlotBoard({
     emit: (op) => driver.send(op).ok,
@@ -361,16 +343,6 @@ export function mount(host: HTMLElement, driver: FixtureDriver): void {
   }
 
   function sync(): void {
-    // x7 — the head is on every page now, so the doc number is repainted on
-    // whichever page is MOUNTED rather than written into one long-lived
-    // element. It has to be repainted here and not left to `turn()`: `sync()`
-    // runs from triggers `turn()` does not (the board's own `onChange`, the
-    // store subscription, `sendNewRun`), and the pack identity that fills the
-    // slug in resolves asynchronously (`fetchScenarioInPlay` at the foot of
-    // this file) — a page mounted with an unresolved slug would keep printing
-    // `…/AF/` for ever if only a rebuild could correct it.
-    const doc = sheet.querySelector<HTMLElement>('.fh-doc')
-    if (doc !== null) doc.textContent = docText()
     const view = deployView({
       slots: board.cells(),
       deployed: board.isLocked(),
@@ -529,44 +501,10 @@ export function mount(host: HTMLElement, driver: FixtureDriver): void {
     settle()
   })
   // C1 — the file is a document with pages, and exactly one page is mounted.
-  // Page 0 is the cover: the document's own number and title, then everything
-  // true of every agent. Page 1 is the agent on the desk, and it is the last
-  // page, which is where the DEPLOY control lives — the last page is the agent
-  // who has not gone out yet. U5.3 appends a page per agent after this one; the
-  // only thing this unit owes it is that `pages` is a list.
-  /**
-   * A FRESH file head — the document's number, then the form's own name.
-   *
-   * x7 — a builder, and that is the whole point of it. The head was ONE element
-   * built once in this closure and appended to the cover, and a node has one
-   * parent: appending it to the filed pages and the agent's page as well would
-   * have MOVED it each time, so the last page `pages()` happened to build would
-   * take the head and every page before it would silently lose the one it had
-   * a moment ago. A document is headed on every page, so every page builds its
-   * own — and both this and `sync()`'s repaint read `docText()`, so no two of
-   * them can print different numbers.
-   */
-  function buildHead(options: { skip?: boolean } = {}): HTMLElement {
-    const head = el('div', 'file-head')
-    const left = el('div', 'fh-left')
-    left.append(el('div', 'fh-doc', docText()), el('div', 'fh-title', FILE_TITLE))
-    head.append(left)
-    // x7 — 건너뛰기 rides IN the head, in its right-hand corner (민서, 08-09).
-    //
-    // It was a block of its own between the head and the dossier, and the head
-    // is the only thing on this page that does not move while the cover prints.
-    // But a row of its own is a row that GOES: the control removes itself when
-    // the reveal lands, its block collapsed, and the whole document jumped up a
-    // line at the exact moment the reader reached the end of it.
-    //
-    // Inside the head it costs no row at all. `.file-head` is already a
-    // `space-between` flex with `align-items:flex-end`, so the button lands
-    // opposite 문서번호 · 현장 요원 운용 파일 and sits on the same baseline band;
-    // when it goes, the head keeps its height because `.fh-left` — the taller
-    // child — is what sets it. Nothing below it moves by a pixel.
-    if (options.skip === true) head.append(buildCoverSkip())
-    return head
-  }
+  // Page 0 is the cover: everything true of every agent. Page 1 is the agent on
+  // the desk, and it is the last page, which is where the DEPLOY control lives.
+  // U5.3 appends a page per agent after this one; the only thing this unit owes
+  // it is that `pages` is a list.
 
   const sheet = el('div', 'file-sheet')
   // Each leaf keeps `pg-turn` — that is the skin both share and what the sheet
@@ -756,10 +694,6 @@ export function mount(host: HTMLElement, driver: FixtureDriver): void {
    * another page is mounted, because a reveal that resumed mid-sentence on the
    * way back would be a document that had un-printed itself. A new day or a new
    * agent does not re-type it either: the cover is the same page all sitting.
-   *
-   * The title block never types. 문서번호 and 현장 요원 운용 파일 are printed on
-   * the form before anyone fills it in, so they are simply there — `collectCover`
-   * walks the dossier alone and never the head.
    *
    * NOTHING WAITS ON IT. The DEPLOY control is on the LAST page, so a reveal
    * running on page 1 gates no op the operator could want. That is the licence
@@ -1113,31 +1047,19 @@ export function mount(host: HTMLElement, driver: FixtureDriver): void {
    * its own page stays live to the end of the sitting.
    */
   function pages(): HTMLElement[] {
-    // x7 — EVERY page is headed. It is one document with a number on it, and a
-    // reader who turned past the cover was holding unheaded sheets: no
-    // 문서번호, no 현장 요원 운용 파일, nothing saying which file the page they
-    // are reading belongs to. `buildHead()` is a builder for exactly this
-    // reason — see its note on the node that a single head would have been.
-    // …and the cover's head carries 건너뛰기 in its corner while there is
-    // something to skip. In the head rather than under it, so that landing the
-    // reveal costs no row and the document does not jump — see `buildHead`.
     const cover = el('div', 'file-page')
-    cover.append(buildHead({ skip: !coverDone && !motionless() }))
+    if (!coverDone && !motionless()) cover.append(buildCoverSkip())
     cover.append(buildDossier(coverModel(coverCopy), board.root))
 
     const past: HTMLElement[] = []
     for (const flown of [...filed.keys()].sort((a, b) => a - b)) {
       const ids = filed.get(flown) ?? []
       const page = el('div', 'file-page')
-      page.append(
-        buildHead(),
-        buildDossier(filedModel({ callsign: callsignOf(flown) }), filedHost(ids)),
-      )
+      page.append(buildDossier(filedModel({ callsign: callsignOf(flown) }), filedHost(ids)))
       past.push(page)
     }
 
     const agent = el('div', 'file-page')
-    agent.append(buildHead())
     agent.append(buildDossier(agentModel({ slotCap: SLOT_CAP, callsign: onDesk() }), board.root))
     agent.append(zone.root)
 
@@ -1492,14 +1414,13 @@ export function mount(host: HTMLElement, driver: FixtureDriver): void {
   //
   // x6 — the clock band left with 임무's old body (a posting order does not
   // print the shift's hours), so what the cover reads from the active pack now
-  // is the doc number and incident-cover facts. The reconstruction note, mission
-  // sentence and ECHO dispatch line stay global portal copy: they explain the
-  // replay frame, document series and standing objective rather than an
-  // incident's venue, weather, clock, or cause.
+  // is the incident-cover facts. The reconstruction note, mission sentence and
+  // ECHO dispatch line stay global portal copy: they explain the replay frame,
+  // document series and standing objective rather than an incident's venue,
+  // weather, clock, or cause.
   void fetchScenarioInPlay()
     .then(async (identity) => {
       const nextCover = await fetchIncidentCover(identity.slug)
-      slug = identity.slug
       opensAt = identity.start
       coverCopy = nextCover
       host.dataset.coverReady = 'true'
