@@ -328,10 +328,20 @@ export function createReportView(options: ReportViewOptions): ReportView {
     attached = tail
   }
 
-  const followSheet = (behavior: ScrollBehavior): void => {
+  const followSheet = (): void => {
     if (!attached) return
-    grid.scrollTo({ top: grid.scrollHeight, behavior })
+    // Same reason as LIVE FEED's U2 tail rule: a smooth catch-up is still short
+    // of the tail when the next typed row lands, so the sheet reads its own
+    // programmatic scroll as the operator leaving the tail.
+    grid.classList.add('is-pinning')
+    grid.scrollTop = grid.scrollHeight
+    grid.classList.remove('is-pinning')
     scrolledSincePin = false
+  }
+
+  const followSheetAfterLayout = (): void => {
+    followSheet()
+    requestAnimationFrame(followSheet)
   }
 
   grid.addEventListener(
@@ -352,7 +362,7 @@ export function createReportView(options: ReportViewOptions): ReportView {
       else if (current) node.textContent = sentence.text.slice(0, cursor.chars)
       else node.textContent = ''
     })
-    if (follow) followSheet(motionless() ? 'instant' : 'smooth')
+    if (follow) followSheetAfterLayout()
     if (cursor.done || cursor.sentence >= targets.length) {
       caret.remove()
       return
@@ -376,10 +386,9 @@ export function createReportView(options: ReportViewOptions): ReportView {
     // Read off the SITTING (`current`), not off `sentences`: what replays here
     // is one round, and `append()` replays round 7 of a document that already
     // carries six. Both callers set `current` to the whole sitting first.
-    if (follow) rereadAttachment()
     if (!animate || motionless()) {
       paint({ sentence: lengths.length, chars: 0, done: true }, targets)
-      if (follow) followSheet('instant')
+      if (follow) followSheetAfterLayout()
       // The frozen-animation / reduced-motion sheet is whole on its first paint,
       // so it is TYPED the moment it is painted — but it is not certified until
       // the sitting has closed. The seal rule is the same on both paths.
@@ -445,6 +454,7 @@ export function createReportView(options: ReportViewOptions): ReportView {
       finishReplay()
       caret.remove()
       current = whole
+      rereadAttachment()
       const grown = renderRound(slice, marks, {
         breakBefore: rows.childElementCount > 0,
         factsAnchor: rows.querySelector('#factsList') === null,
@@ -461,6 +471,8 @@ export function createReportView(options: ReportViewOptions): ReportView {
       anchors = []
       current = model
 
+      const follow = options?.follow ?? false
+      if (follow) rereadAttachment()
       rows.replaceChildren()
       const replayTargets: ReplayTarget[] = []
       let factsAnchor = true
@@ -472,7 +484,7 @@ export function createReportView(options: ReportViewOptions): ReportView {
       })
 
       tally(marks)
-      replay(replayTargets, options?.replay ?? true, options?.follow ?? false)
+      replay(replayTargets, options?.replay ?? true, follow)
     },
 
     refresh(marks: MarkSets): void {
