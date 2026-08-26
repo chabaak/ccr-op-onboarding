@@ -333,11 +333,10 @@ export function openEnding(
 
   const go = button('cf-btn cf-yes notice-btn notice-primary end-go', ENDING_NEXT, ENDING_NEXT)
   go.id = 'endingGo'
-  const footnote = el('span', 'notice-footnote')
   const actions = el('span', 'notice-actions')
   actions.append(go)
   const foot = el('div', 'cf-foot notice-foot')
-  foot.append(footnote, actions)
+  foot.append(actions)
 
   const pips = el('div', 'end-pips')
   pips.setAttribute('aria-hidden', 'true')
@@ -357,7 +356,6 @@ export function openEnding(
 
     headLabel.textContent = step.head
     counter.textContent = step.corner
-    footnote.textContent = step.corner
     body.replaceChildren(
       el('p', 'cf-ask notice-lead', step.lead),
       ...step.body.map((line) => el('p', 'cf-note notice-line', line)),

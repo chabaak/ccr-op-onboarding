@@ -131,9 +131,10 @@ export function openConfirm(app: HTMLElement, copy: ConfirmCopy): Promise<boolea
   head.append(headLabel, el('i', 'notice-meta', copy.meta))
 
   const bodyText = el('p', 'cf-ask notice-lead', copy.body)
-  bodyText.id = 'cf-body'
+  const noteText = el('p', 'cf-note notice-line', copy.note)
   const body = el('div', 'cf-body notice-body')
-  body.append(bodyText)
+  body.id = 'cf-body'
+  body.append(bodyText, noteText)
 
   // 취소 is built first and focused first: the opening keystroke on an
   // irreversible act should not be able to confirm it by reflex.
@@ -144,7 +145,7 @@ export function openConfirm(app: HTMLElement, copy: ConfirmCopy): Promise<boolea
   const actions = el('span', 'notice-actions')
   actions.append(no, yes)
   const foot = el('div', 'cf-foot notice-foot')
-  foot.append(el('span', 'cf-note notice-footnote', copy.note), actions)
+  foot.append(actions)
 
   plate.append(head, body, foot)
   layer.append(plate)
