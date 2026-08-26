@@ -95,4 +95,15 @@ describe('[issue 133] the notice object has one reusable class family', () => {
     expect(decl(WIN_ENDING_CSS, '.end-plate .notice-meta', 'color')).toBe('var(--surface-muted-2)')
     expect(scannable(read(WIN_ENDING_CSS))).not.toMatch(/var\(--warning|var\(--alert|var\(--good/)
   })
+
+  it('[issue 192] the footer yields note width before action width', () => {
+    expect(decl(CONFIRM_CSS, '.notice-foot', 'flex-wrap')).toBe('wrap')
+    expect(decl(CONFIRM_CSS, '.notice-foot', 'gap')).toBe('var(--space-7) var(--space-10)')
+
+    expect(decl(CONFIRM_CSS, '.notice-footnote', 'min-width')).toBe('0')
+    expect(decl(CONFIRM_CSS, '.notice-actions', 'flex')).toBe('0 0 auto')
+
+    expect(decl(CONFIRM_CSS, '.notice-btn', 'flex')).toBe('0 0 auto')
+    expect(decl(CONFIRM_CSS, '.notice-btn', 'white-space')).toBe('nowrap')
+  })
 })
