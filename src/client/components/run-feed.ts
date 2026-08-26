@@ -33,10 +33,11 @@
 // same lag that made the ending wait made REPORTS arrive early: a `report`
 // typed the round's write-up while the fanfold was still printing the beats it
 // describes. So the pump publishes where it has GOT TO — `shell/feed-reach.ts`,
-// a cue per `report` and one for the `score` — and REPORTS holds its document
-// until the paper is there. This window is unchanged in what it prints and in
-// what it costs; it simply says so out loud. See `apply`, which is the only
-// publisher, and the pacing block below for the hold that went the other way.
+// a cue per opened gate, a legacy cue per `report`, and one for the `score`.
+// REPORTS holds each document until the next gate's paper cue, or the score for
+// the final round. This window is unchanged in what it prints and in what it
+// costs; it simply says so out loud. See `apply`, which is the only publisher,
+// and the pacing block below for the hold that went the other way.
 //
 // The line MODEL is kept apart from the DOM on purpose: `feedLineModel` is
 // pure, so inv 2's digit scan ([u5#c3]) runs in `environment: 'node'`.
@@ -933,8 +934,8 @@ export function createRunFeed(host: HTMLElement, driver: FixtureDriver): RunFeed
    *
    * x11 — the answer is the pump's whole accounting. Time is charged for a line,
    * never for an event: everything that lands nothing (`meta`, the `waiting`
-   * edges, a `fallback` arming its class, the beat boundaries, `report`,
-   * `run_end`, and a dropped `wait` line) is consumed for free. See
+   * edges, a `fallback` arming its class, the beat boundaries, `round_open`,
+   * `report`, `run_end`, and a dropped `wait` line) is consumed for free. See
    * `printsFeedLine`, which answers the same question one step earlier so the
    * pump can look at the head of the queue before it commits to a pause.
    *
@@ -976,6 +977,12 @@ export function createRunFeed(host: HTMLElement, driver: FixtureDriver): RunFeed
       // which is the same claim one layer down — `return false` is the pump
       // being told this event bought no paper.
       case 'waiting':
+        return false
+      case 'round_open':
+        // The A-side release cue: a report for round r becomes
+        // readable when the paper opens gate r+1. The final report has no next
+        // gate, so REPORTS releases that one on the score cue below.
+        publishFeedReached({ at: 'gate', run, round: event.round })
         return false
       case 'score': {
         // The score still belongs to the paper-progress gate. The visible rerun

@@ -83,7 +83,7 @@ describe('[x12] what the feed has reached', () => {
     //
     // Arriving early is a recoverable disappointment; never arriving is not, and
     // `feedDrained()` refuses the same hang for the same reason.
-    const waiting = watch(feedReached({ at: 'report', run: 3, round: 1 }))
+    const waiting = watch(feedReached({ at: 'gate', run: 3, round: 1 }))
     const scored = watch(feedReached({ at: 'score', run: 3 }))
     await flush()
     expect(waiting.settled(), 'a desk with no feed hung the day’s report').toBe(true)
@@ -92,22 +92,22 @@ describe('[x12] what the feed has reached', () => {
 
   it('(b) once a fanfold is on the desk, a cue is a real wait', async () => {
     publishFeedMounted()
-    const waiting = watch(feedReached({ at: 'report', run: 3, round: 1 }))
+    const waiting = watch(feedReached({ at: 'gate', run: 3, round: 1 }))
     await flush()
     expect(waiting.settled(), 'the report drew before the paper reached it').toBe(false)
-    expect(hasFeedReached({ at: 'report', run: 3, round: 1 })).toBe(false)
+    expect(hasFeedReached({ at: 'gate', run: 3, round: 1 })).toBe(false)
 
     // A DIFFERENT cue is not this one. The paper walking past round 2 says
     // nothing about round 1, and the day's score is not a round at all.
-    publishFeedReached({ at: 'report', run: 3, round: 2 })
+    publishFeedReached({ at: 'report', run: 3, round: 1 })
     publishFeedReached({ at: 'score', run: 3 })
     await flush()
     expect(waiting.settled(), 'another cue released this one').toBe(false)
 
-    publishFeedReached({ at: 'report', run: 3, round: 1 })
+    publishFeedReached({ at: 'gate', run: 3, round: 1 })
     await flush()
     expect(waiting.settled(), 'the report never landed').toBe(true)
-    expect(hasFeedReached({ at: 'report', run: 3, round: 1 })).toBe(true)
+    expect(hasFeedReached({ at: 'gate', run: 3, round: 1 })).toBe(true)
   })
 
   it('(c) the SITTING is part of the cue — yesterday’s round 1 does not release today’s', async () => {
@@ -118,27 +118,28 @@ describe('[x12] what the feed has reached', () => {
     // in the frame it arrived — the exact defect this module removes, restored
     // on every sitting after the first.
     publishFeedMounted()
-    publishFeedReached({ at: 'report', run: 3, round: 1 })
+    publishFeedReached({ at: 'gate', run: 3, round: 1 })
     publishFeedReached({ at: 'score', run: 3 })
 
-    const next = watch(feedReached({ at: 'report', run: 4, round: 1 }))
+    const next = watch(feedReached({ at: 'gate', run: 4, round: 1 }))
     const record = watch(feedReached({ at: 'score', run: 4 }))
     await flush()
     expect(next.settled(), 'a stale cue released the new day’s report').toBe(false)
     expect(record.settled(), 'a stale cue started the new day’s count-up').toBe(false)
 
-    publishFeedReached({ at: 'report', run: 4, round: 1 })
+    publishFeedReached({ at: 'gate', run: 4, round: 1 })
     await flush()
     expect(next.settled()).toBe(true)
     expect(record.settled(), 'the round released the day’s record').toBe(false)
   })
 
-  it('(d) a report cue and a score cue of one sitting are different places', async () => {
+  it('(d) a gate cue, a report cue and a score cue of one sitting are different places', async () => {
     // They are the same `run`, and the paper reaches them at different moments —
     // every report first, the score last. A key that collapsed them would start
     // the record's count-up on the day's first round.
     publishFeedMounted()
-    publishFeedReached({ at: 'report', run: 3, round: 1 })
+    publishFeedReached({ at: 'gate', run: 3, round: 1 })
+    expect(hasFeedReached({ at: 'report', run: 3, round: 1 })).toBe(false)
     expect(hasFeedReached({ at: 'score', run: 3 })).toBe(false)
     publishFeedReached({ at: 'score', run: 3 })
     expect(hasFeedReached({ at: 'score', run: 3 })).toBe(true)
@@ -178,18 +179,18 @@ describe('[x12] what the feed has reached', () => {
     publishFeedMounted()
     let second: { settled: () => boolean; count: () => number } | null = null
     const first = watch(
-      feedReached({ at: 'report', run: 3, round: 1 }).then(() => {
-        second = watch(feedReached({ at: 'report', run: 3, round: 2 }))
+      feedReached({ at: 'gate', run: 3, round: 1 }).then(() => {
+        second = watch(feedReached({ at: 'gate', run: 3, round: 2 }))
       }),
     )
 
-    publishFeedReached({ at: 'report', run: 3, round: 1 })
+    publishFeedReached({ at: 'gate', run: 3, round: 1 })
     await flush()
     expect(first.settled(), 'the first waiter never woke').toBe(true)
     expect(second, 'the continuation never ran').not.toBeNull()
     expect(second!.settled(), 'the re-armed waiter was resolved by the cue it chained off').toBe(false)
 
-    publishFeedReached({ at: 'report', run: 3, round: 2 })
+    publishFeedReached({ at: 'gate', run: 3, round: 2 })
     await flush()
     expect(second!.settled(), 'the re-armed waiter was dropped instead of kept').toBe(true)
     expect(second!.count()).toBe(1)
@@ -202,8 +203,8 @@ describe('[x12] what the feed has reached', () => {
     // call, so the feed is usually past the cue before the window that wants it
     // has come back round to ask.
     publishFeedMounted()
-    publishFeedReached({ at: 'report', run: 3, round: 1 })
-    const waiting = watch(feedReached({ at: 'report', run: 3, round: 1 }))
+    publishFeedReached({ at: 'gate', run: 3, round: 1 })
+    const waiting = watch(feedReached({ at: 'gate', run: 3, round: 1 }))
     await flush()
     expect(waiting.settled()).toBe(true)
   })
@@ -213,8 +214,8 @@ describe('[x12] what the feed has reached', () => {
     // order by an edit. A feed that published without announcing must not leave
     // the slot looking absent — that would answer every UNREACHED cue as reached
     // and release the very documents this gate holds.
-    publishFeedReached({ at: 'report', run: 3, round: 1 })
-    const later = watch(feedReached({ at: 'report', run: 3, round: 2 }))
+    publishFeedReached({ at: 'gate', run: 3, round: 1 })
+    const later = watch(feedReached({ at: 'gate', run: 3, round: 2 }))
     await flush()
     expect(later.settled(), 'a publishing feed was read as an absent one').toBe(false)
   })
@@ -226,9 +227,9 @@ describe('[x12] what the feed has reached', () => {
     // module is new, and within one page load the run in every cue is what keeps
     // two sittings apart — so a desk has nothing to reset.
     publishFeedMounted()
-    const waiting = watch(feedReached({ at: 'report', run: 3, round: 1 }))
+    const waiting = watch(feedReached({ at: 'gate', run: 3, round: 1 }))
     resetFeedReach()
-    publishFeedReached({ at: 'report', run: 3, round: 1 })
+    publishFeedReached({ at: 'gate', run: 3, round: 1 })
     await flush()
     expect(waiting.settled()).toBe(false)
   })
@@ -309,7 +310,7 @@ describe('[x12] the fanfold publishes where it has printed to', () => {
     const apply = block(src, 'const apply = ')
     const published = [...src.matchAll(/publishFeedReached\(/g)].length
     const inApply = [...apply.matchAll(/publishFeedReached\(/g)].length
-    expect(inApply, 'the cues are gone from `apply`').toBe(2)
+    expect(inApply, 'the cues are gone from `apply`').toBe(3)
     expect(published, 'a cue is published outside `apply` — some flush path will not release it').toBe(inApply)
     expect(block(src, 'const receive = '), 'the cue moved back onto arrival').not.toMatch(/publishFeedReached/)
     // …and the flush really does go through `apply`, rather than emptying the
@@ -317,8 +318,9 @@ describe('[x12] the fanfold publishes where it has printed to', () => {
     expect(block(src, 'const flush = '), 'the flush stopped applying what it drops').toMatch(/apply\(/)
   })
 
-  it('(b) both places the paper can be reached are published', () => {
+  it('(b) every place the paper can release a document is published', () => {
     const apply = block(code(RUN_FEED_TS), 'const apply = ')
+    expect(apply, 'the next-gate cue is no longer announced').toMatch(/at: 'gate'/)
     expect(apply, 'the round’s report is no longer announced').toMatch(/at: 'report'/)
     expect(apply, 'the day’s score is no longer announced').toMatch(/at: 'score'/)
     // Every cue carries the sitting — see the slot's own (c).
@@ -377,11 +379,20 @@ describe('[x12] the arriving document waits for the paper', () => {
     // inside the wait, not before it.
     const src = code(REPORTS_TS)
     expect(src, 'the arrival queue is gone').toMatch(/const afterPaper = /)
-    const gate = /afterPaper\(\{ at: 'report'[\s\S]*?\n {4}\}\)/.exec(src)
-    expect(gate, 'the arriving report is no longer gated on the paper').not.toBeNull()
+    expect(src, 'arriving reports are no longer held until a release cue').toMatch(/pendingReports\.set/)
+    expect(src, 'the next gate no longer releases the previous report').toMatch(
+      /releasePendingReport\(\s*sitting,\s*event\.round - 1,\s*\{ at: 'gate'/,
+    )
+    expect(src, 'the final report is not released at score').toMatch(/releasePendingReportsAtScore/)
+    const gate = /function fileReport[\s\S]*?sync\(\)\n {2}\}/.exec(src)
+    expect(gate, 'the report filing body is gone — re-aim this guard').not.toBeNull()
     for (const owned of ['rounds.set(', 'filed.set(', 'view.append(', 'sync()']) {
       expect(gate![0], `${owned} was lifted out of the wait`).toContain(owned)
     }
+    const release = /function releasePendingReport[\s\S]*?\n {2}\}/.exec(src)
+    expect(release, 'the pending report release path is gone').not.toBeNull()
+    expect(release![0], 'the arriving report is no longer gated on the paper').toMatch(/afterPaper\(\s*cue/)
+    expect(release![0], 'the gate no longer files the full report body').toMatch(/fileReport\(/)
   })
 
   it('(b) the terminal record opens on the event and COUNTS on the paper', () => {

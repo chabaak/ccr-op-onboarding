@@ -52,12 +52,13 @@
  * on this desk are a round's report and the day's record.
  */
 export type FeedCue =
+  | { at: 'gate'; run: number; round: number }
   | { at: 'report'; run: number; round: number }
   | { at: 'score'; run: number }
 
 /** One cue, as the reached set and the waiter map key it. */
 const keyOf = (cue: FeedCue): string =>
-  cue.at === 'report' ? `report:${cue.run}:${cue.round}` : `score:${cue.run}`
+  cue.at === 'score' ? `score:${cue.run}` : `${cue.at}:${cue.run}:${cue.round}`
 
 /**
  * Has a fanfold ever spoken? See `feedReached` — this is what keeps a desk with
