@@ -6,7 +6,7 @@ import type { Page } from 'playwright/test'
 
 const REPO = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..')
 const SELECTED_SCENARIO_KEY = 'ndsp:scenario:selected:v1'
-const SCENARIO_DESKTOP_RETURN_KEY = 'ndsp:scenario:return-desktop:v1'
+const SIGNIN_SESSION_KEY = 'ndsp:signin:complete:v1'
 const UNLOCKED_SCENARIOS_KEY = 'ndsp:scenario:unlocked:v1'
 
 const readJson = <T>(rel: string): T => JSON.parse(fs.readFileSync(path.join(REPO, rel), 'utf8')) as T
@@ -44,22 +44,22 @@ function callsignPattern(series: string): RegExp {
 
 async function showScenarioDesktop(page: Page): Promise<void> {
   await page.addInitScript(
-    ({ selectedKey, returnKey, unlockedKey, unlockedSlugs }) => {
+    ({ selectedKey, signinKey, unlockedKey, unlockedSlugs }) => {
       const initialized = 'ndsp:callsign-e2e:init:v1'
       if (window.sessionStorage.getItem(initialized) === '1') return
       window.sessionStorage.setItem(initialized, '1')
+      window.sessionStorage.setItem(signinKey, '1')
       window.sessionStorage.removeItem(selectedKey)
-      window.sessionStorage.setItem(returnKey, '1')
       window.localStorage.setItem(unlockedKey, JSON.stringify(unlockedSlugs))
     },
     {
       selectedKey: SELECTED_SCENARIO_KEY,
-      returnKey: SCENARIO_DESKTOP_RETURN_KEY,
+      signinKey: SIGNIN_SESSION_KEY,
       unlockedKey: UNLOCKED_SCENARIOS_KEY,
       unlockedSlugs: UNLOCKED_SLUGS,
     },
   )
-  await page.goto('./?signin=skip')
+  await page.goto('./')
   await page.waitForFunction(() => !document.body.classList.contains('booting'), undefined, { timeout: 20_000 })
   await expect(page.locator('.scenario-picker')).toBeVisible()
   await expect(page.locator('.scenario-file')).toHaveCount(CASES.length)
