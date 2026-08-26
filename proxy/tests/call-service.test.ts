@@ -88,6 +88,24 @@ describe("CallService validation retry budget", () => {
     expect(handled.response).toEqual(JUDGMENT_OK);
   });
 
+  it("keeps retry feedback generic for a judgment", async () => {
+    const users: string[] = [];
+    const provider: CallProvider = {
+      async generate(_request, rendered) {
+        users.push(rendered.user);
+        return result(users.length === 1 ? { ...JUDGMENT_OK, stance: "not-offered" } : JUDGMENT_OK);
+      },
+    };
+    const service = new CallService(validConfig, provider);
+
+    await service.handle(request);
+
+    expect(users[1]).toContain("[재시도 — 직전 응답은 거부되었다]");
+    expect(users[1]).toContain('stance "not-offered" not in stance set');
+    expect(users[1]).not.toContain("[직전 타임라인]");
+    expect(users[1]).not.toContain("빈 배열이 정답이다");
+  });
+
   it("keeps attempt one byte-identical and gives attempt two its rejection reason", async () => {
     const users: string[] = [];
     const provider: CallProvider = {
@@ -113,6 +131,22 @@ describe("CallService validation retry budget", () => {
     );
     expect(users[1]).toContain("[재시도 — 직전 응답은 거부되었다]");
     expect(users[1]).toContain("timeline_entries repeats the timeline tail");
+  });
+
+  it("keeps a terminal replay-only narration for the engine safety net", async () => {
+    const replay = "외래 대기홀의 줄이 임시 처치구역 앞에서 무너진다.";
+    const provider = sequenceProvider([
+      result({ ...NARRATION_OK, timeline_entries: [replay] }),
+      result({ ...NARRATION_OK, timeline_entries: [replay] }),
+      result({ ...NARRATION_OK, timeline_entries: [replay] }),
+    ]);
+    const service = new CallService(validConfig, provider);
+
+    const handled = await service.handle(narrationRequest);
+
+    expect(provider.attempts()).toBe(3);
+    expect(handled.telemetry).toMatchObject({ attempts: 3, fallback: false });
+    expect(handled.response).toEqual({ ...NARRATION_OK, timeline_entries: [replay] });
   });
 
   it("falls back with invalid_model_output after all three attempts fail validation", async () => {

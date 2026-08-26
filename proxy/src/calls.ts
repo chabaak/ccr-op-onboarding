@@ -61,6 +61,11 @@ const isFilled = (v: unknown): boolean =>
   typeof v === "string" && v.trim().length > 0;
 
 const TIMELINE_REPLAY_MIN_LENGTH = 10;
+export const TIMELINE_TAIL_REPLAY_PROBLEM = "timeline_entries repeats the timeline tail";
+
+/** A terminal narration replay is safe for the engine to drop entry-by-entry. */
+export const hasOnlyTimelineTailReplayProblems = (problems: readonly string[]): boolean =>
+  problems.length > 0 && problems.every((problem) => problem === TIMELINE_TAIL_REPLAY_PROBLEM);
 
 /**
  * A replay is prose, not an id: normalize only presentation whitespace before
@@ -312,7 +317,7 @@ const narration: CallSpec = {
         if (typeof entry !== "string") continue;
         const normalized = normalizeTimelineText(entry);
         if (repeatsTimelineTail(entry, tail)) {
-          problems.push("timeline_entries repeats the timeline tail");
+          problems.push(TIMELINE_TAIL_REPLAY_PROBLEM);
         }
         if (seen.has(normalized)) {
           problems.push("timeline_entries has a duplicate entry");

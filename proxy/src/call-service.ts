@@ -1,4 +1,4 @@
-import { CALL_SPECS } from "./calls.js";
+import { CALL_SPECS, hasOnlyTimelineTailReplayProblems } from "./calls.js";
 import type { RuntimeConfig } from "./config.js";
 import { defaultPromptFor } from "./default-prompt.js";
 import { errorCode, ProviderOutputError, PublicError } from "./errors.js";
@@ -35,10 +35,18 @@ export type CallResult = {
 const ROUTE_TIMEOUT_MS = 18_000;
 const MAX_ATTEMPTS = 3;
 
-function withRetryFeedback(rendered: RenderedCall, problems: readonly string[]): RenderedCall {
+function withRetryFeedback(
+  callType: CallRequest["call_type"],
+  rendered: RenderedCall,
+  problems: readonly string[],
+): RenderedCall {
+  const narrationRepair =
+    callType === "narration"
+      ? "\n[직전 타임라인]에 이미 있는 문장을 다시 쓰지 마라. 이번 비트에서 새로 일어난 것만 새 문장으로 써라. 새로 쓸 것이 없으면 빈 배열이 정답이다."
+      : "";
   return {
     ...rendered,
-    user: `${rendered.user}\n\n[재시도 — 직전 응답은 거부되었다]\n거부 사유: ${problems.join("; ")}\n[직전 타임라인]에 이미 있는 문장을 다시 쓰지 마라. 이번 비트에서 새로 일어난 것만 새 문장으로 써라. 새로 쓸 것이 없으면 빈 배열이 정답이다.`,
+    user: `${rendered.user}\n\n[재시도 — 직전 응답은 거부되었다]\n거부 사유: ${problems.join("; ")}${narrationRepair}`,
   };
 }
 
@@ -99,11 +107,34 @@ export class CallService {
         };
       }
 
+      const terminal = attempts >= MAX_ATTEMPTS || !this.canStartAnotherAttempt(startedAt);
+      // A replay is the one narration defect the engine can remove without
+      // sacrificing the beat. Preserve every valid sibling entry rather than
+      // turning a single copied line into a whole-call fallback.
+      if (
+        terminal &&
+        request.call_type === "narration" &&
+        hasOnlyTimelineTailReplayProblems(problems)
+      ) {
+        return {
+          response: result.payload,
+          telemetry: {
+            callType: request.call_type,
+            templateVersion: request.template_version,
+            modelId: this.config.modelId,
+            latencyMs: Math.round(this.now() - startedAt),
+            attempts,
+            fallback: false,
+            usage,
+          },
+        };
+      }
+
       const error = new ProviderOutputError(
         `Model output failed validation: ${problems.join("; ")}`,
         usage,
       );
-      if (attempts >= MAX_ATTEMPTS || !this.canStartAnotherAttempt(startedAt)) {
+      if (terminal) {
         throw asFallback(error, {
           attempts,
           latencyMs: Math.round(this.now() - startedAt),
@@ -113,7 +144,7 @@ export class CallService {
       // Attempt one must remain byte-for-byte the normal prompt. Later attempts
       // name the violated contract so a retry can correct this response instead
       // of sampling the same instruction again.
-      rendered = withRetryFeedback(initialRendered, problems);
+      rendered = withRetryFeedback(request.call_type, initialRendered, problems);
     }
 
     throw new Error("unreachable call retry loop state");
