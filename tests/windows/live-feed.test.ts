@@ -950,8 +950,9 @@ describe('[u5#c9] the window renders, never authors', () => {
       // instead of authoring one here.
       '요원',
       '오류',
-      // issue 228's run boundary. Chrome minted from `score`, not run-authored text:
-      // it divides sittings while the bottom tally carries the actual numbers.
+      // issue 234's run boundary. Chrome minted from the confirmed DEPLOY slot,
+      // not run-authored text: it divides sittings while the bottom tally
+      // carries the actual numbers.
       '요원이 재파견되었습니다. 시나리오가 재실행됩니다.',
       '시행 결과',
       // U2's behind-indicator. Chrome about the VIEWPORT — it counts lines the

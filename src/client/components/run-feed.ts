@@ -50,6 +50,7 @@ import { animationsFrozen, displayStamp, mm, registerAnimation } from '../driver
 import { el } from '../shell/dom.ts'
 import { publishFeedStamp } from '../shell/feed-clock.ts'
 import { publishFeedPending } from '../shell/feed-drain.ts'
+import { subscribeFeedDeploy } from '../shell/feed-deploy.ts'
 import { publishFeedMounted, publishFeedReached } from '../shell/feed-reach.ts'
 import { callsignOf } from './dossier.ts'
 import { FALLBACK_CLASS, fallbackNoticeLine } from './fallback-notice.ts'
@@ -921,6 +922,12 @@ export function createRunFeed(host: HTMLElement, driver: FixtureDriver): RunFeed
     return true
   }
 
+  const appendRerunMark = (): boolean =>
+    append({
+      ...envelope('mark', '', [{ p: 'span', text: RERUN_MARK }]),
+      classes: ['fl', 'fl-mark', 'fl-rerun'],
+    })
+
   /**
    * Applies one event, and answers WHETHER IT PUT A LINE ON THE PAPER.
    *
@@ -971,18 +978,11 @@ export function createRunFeed(host: HTMLElement, driver: FixtureDriver): RunFeed
       case 'waiting':
         return false
       case 'score': {
-        // The score now lives in the feed's fixed tally well. The fanfold still
-        // prints a boundary at the same cue so REPORTS can gate the count-up on
-        // the paper, and so the next sitting is visually separated from this
-        // one without duplicating the ledger's total in the line flow.
-        const printed = append({
-          ...envelope('mark', '', [{ p: 'span', text: RERUN_MARK }]),
-          classes: ['fl', 'fl-mark', 'fl-rerun'],
-        })
-        // Published AFTER the divider lands, so the bottom tally cannot start
-        // while the run boundary that owns it is still absent from the paper.
+        // The score still belongs to the paper-progress gate. The visible rerun
+        // divider moved to the confirmed DEPLOY press; moving this publication
+        // with it would let REPORTS start the count-up ahead of the paper.
         publishFeedReached({ at: 'score', run })
-        return printed
+        return false
       }
       case 'report':
         // Nothing is drawn and nothing is charged — the write-up is REPORTS's
@@ -1179,6 +1179,9 @@ export function createRunFeed(host: HTMLElement, driver: FixtureDriver): RunFeed
   flush()
   requestAnimationFrame(follow)
   driver.subscribe(receive)
+  subscribeFeedDeploy((mode) => {
+    if (mode === 'next') appendRerunMark()
+  })
 
   // Following the tail is a MEASUREMENT, not a schedule: the fanfold's own
   // height is watched, so the paper stays at its tail when the layout settles

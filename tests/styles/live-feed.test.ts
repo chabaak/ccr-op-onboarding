@@ -34,3 +34,16 @@ describe('[issue #130] LIVE FEED feed rows', () => {
     expect(content).not.toContain('var(--signal)')
   })
 })
+
+describe('[issue #234] LIVE FEED tally well', () => {
+  it('(a) stays close to the feed width and reserves the max final tally height', () => {
+    const tally = body(/^\.feed-tally$/)
+    expect(tally).toContain('margin:0var(--space-10)var(--space-10)')
+    expect(tally).toContain('min-height:280px')
+  })
+
+  it('(b) keeps the document caption visible while pending', () => {
+    expect(body(/^\.feed-tally\[data-tally-state="pending"\]\s+\.tly-lines$/)).toContain('display:none')
+    expect(css).not.toMatch(/\.feed-tally\[data-tally-state="pending"\]\s+\.tly-doc/)
+  })
+})

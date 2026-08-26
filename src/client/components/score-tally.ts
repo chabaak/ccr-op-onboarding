@@ -195,6 +195,7 @@ export function countUpAt(to: number, k: number): number {
 const AXIS_JOIN = ': '
 /** …and what separates the closing line's caption from its number. */
 const TOTAL_JOIN = ' '
+const DEFAULT_DOC = '집계표'
 
 /**
  * One axis, as a line.
@@ -264,6 +265,7 @@ export function createScoreTally(options: ScoreTallyOptions): ScoreTally {
   // whole: five blocks of sheet furniture that announced a second document
   // inside the first one.
   const doc = el('div', 'tly-doc')
+  doc.textContent = DEFAULT_DOC
 
   const openLine = el('li', 'tly-line tl-open')
   const openText = el('span', 'tl-s')
@@ -323,6 +325,7 @@ export function createScoreTally(options: ScoreTallyOptions): ScoreTally {
   function reset(): void {
     stop()
     lines.replaceChildren()
+    doc.textContent = DEFAULT_DOC
     delete root.dataset.tallyRun
     openLine.classList.remove('in')
     closeLine.classList.remove('in')

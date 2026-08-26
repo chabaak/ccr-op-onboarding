@@ -114,10 +114,9 @@
    circularity. */
 .feed-tail{height:25cqh}
 
-.feed-tally{flex:0 0 auto;margin:0 var(--space-26) var(--space-10);min-height:82px;
+.feed-tally{flex:0 0 auto;margin:0 var(--space-10) var(--space-10);min-height:280px;
   border-top:1px solid var(--ink-line);background:var(--surface-inset);
   box-shadow:0 -8px 18px var(--sh-13)}
-.feed-tally[data-tally-state="pending"] .tly-doc,
 .feed-tally[data-tally-state="pending"] .tly-lines{display:none}
 .feed-tally .tly-doc{font-size:var(--fs-8);letter-spacing:.2em;color:var(--surface-muted);
   padding:var(--space-8) var(--space-12) var(--space-5)}

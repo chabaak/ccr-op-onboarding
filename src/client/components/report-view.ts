@@ -203,7 +203,7 @@ const BODY_TITLE = '무전 기록'
  */
 const FOOT_LEAD = '기록 중 주요 사항을 선정하여 다음 요원에게 인수인계 하십시오 · '
 const FOOT_TAIL = '건 채굴됨'
-const SCORE_LABEL = '시행 최종 사망자 수'
+const SCORE_LABEL = '사망자 수'
 const SCORE_UNIT = '명'
 
 const ROW_STATE_CLASSES = ['is-mined', 'is-slotted', 'is-carried'] as const
