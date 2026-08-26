@@ -2,13 +2,6 @@
   "$schema-note": "Tracks third-party assets and their licenses, separate from our MIT-licensed code. One entry per external asset. Required before shipping any asset we did not create.",
   "assets": [
     {
-      "file": "public/favicon.svg",
-      "source": "Vite create-vite scaffold default favicon, matching the Vite 2026 logo asset shipped with the initial Vite + TypeScript scaffold",
-      "license": "MIT",
-      "license_source": "https://vite.dev/ — the Vite site states 'Vite is MIT Licensed...' and credits '© 2019-present VoidZero Inc. and Vite contributors' in its footer (checked 2026-08-22)",
-      "note": "Referenced from index.html and copied by Vite from public/ into the Pages build."
-    },
-    {
       "file": "public/assets/fonts/fonts.css",
       "tool": "tools/fonts/vendor-google-webfonts.mjs — generated static font-pack stylesheet from the vendored Google Fonts CSS2 response",
       "prompt": null,
@@ -479,6 +472,95 @@
       "license_source": "https://openai.com/policies/terms-of-use — 'Ownership of content. As between you and OpenAI, and to the extent permitted by applicable law, you (a) retain your ownership rights in Input and (b) own the Output.' (checked 2026-08-26)",
       "prompt": "A dense blizzard photographed against a pure black background: thick driving snow moving diagonally, heavy streaking and motion blur, layered depth from fine distant grain to large blurred foreground flakes, some areas thicker than others so the field is uneven rather than uniform. Cold neutral white. Pure solid black background with nothing else in frame: no landscape, no horizon, no structures, no light sources, no people, no text, no watermark. Only snow against black.",
       "note": "Snowfall layer for the Track 1 thumbnail: a wind-driven diagonal blizzard on pure black, composited over the plate with mix-blend-mode:screen so the black ground drops out."
+    },
+    {
+      "file": "public/assets/brand/ccr-emblem.tokenised.svg",
+      "tool": "OpenAI gpt-image-2, via the OpenAI API",
+      "prompt": "Emblem for CCR — Central Control Room, the authority above every scenario: a circular agency seal on near-black, pale blue linework, double outer rule, ring legend CENTRAL CONTROL ROOM on an arc, an inner tick ring, stencil CCR spanning the disc, a row of small site cells with one live marker, and three band markers at the foot. Domain-neutral — no cross, no door, no vehicle. No extra text, no watermark, no signature.",
+      "derived_from": "docs/brand/ccr-emblem-source-gpt-image.png",
+      "recipe": "hand-redrawn as SVG from the generated raster: geometry re-laid on a 0 0 100 100 viewBox (double rule r=48.6/46.2, ring text on an arc at r=40.5, tick ring r=35, CCR spanning x=24..75, five site cells, three band markers), ~5 KB instead of 1.2 MB",
+      "license": "generated for this project against the team's own OpenAI API key; OpenAI Terms of Use assign output ownership to the requesting account",
+      "license_source": "https://openai.com/policies/terms-of-use — 'Ownership of content. As between you and OpenAI, and to the extent permitted by applicable law, you (a) retain your ownership rights in Input and (b) own the Output.' (checked 2026-08-26)",
+      "note": "Sign-in crest. Strokes are var(--signal)/var(--warning)/var(--blueprint) with hex fallbacks; inlined into the DOM by shell/sign-in.ts because custom properties do not cross into a document a url() fetched."
+    },
+    {
+      "file": "public/assets/brand/ccr-emblem.svg",
+      "tool": "OpenAI gpt-image-2, via the OpenAI API",
+      "prompt": "Emblem for CCR — Central Control Room, the authority above every scenario: a circular agency seal on near-black, pale blue linework, double outer rule, ring legend CENTRAL CONTROL ROOM on an arc, an inner tick ring, stencil CCR spanning the disc, a row of small site cells with one live marker, and three band markers at the foot. Domain-neutral — no cross, no door, no vehicle. No extra text, no watermark, no signature.",
+      "derived_from": "docs/brand/ccr-emblem-source-gpt-image.png",
+      "recipe": "hand-redrawn as SVG from the generated raster: geometry re-laid on a 0 0 100 100 viewBox (double rule r=48.6/46.2, ring text on an arc at r=40.5, tick ring r=35, CCR spanning x=24..75, five site cells, three band markers), ~5 KB instead of 1.2 MB",
+      "license": "generated for this project against the team's own OpenAI API key; OpenAI Terms of Use assign output ownership to the requesting account",
+      "license_source": "https://openai.com/policies/terms-of-use — 'Ownership of content. As between you and OpenAI, and to the extent permitted by applicable law, you (a) retain your ownership rights in Input and (b) own the Output.' (checked 2026-08-26)",
+      "note": "Hex-hardcoded twin, for the call sites that load by URL: the wallpaper seal in styles/shell.css and the 512 raster below."
+    },
+    {
+      "file": "public/assets/brand/favicon-mark.svg",
+      "tool": "OpenAI gpt-image-2, via the OpenAI API",
+      "prompt": "Emblem for CCR — Central Control Room, the authority above every scenario: a circular agency seal on near-black, pale blue linework, double outer rule, ring legend CENTRAL CONTROL ROOM on an arc, an inner tick ring, stencil CCR spanning the disc, a row of small site cells with one live marker, and three band markers at the foot. Domain-neutral — no cross, no door, no vehicle. No extra text, no watermark, no signature.",
+      "derived_from": "docs/brand/ccr-emblem-source-gpt-image.png",
+      "recipe": "hand-redrawn as SVG from the generated raster: geometry re-laid on a 0 0 100 100 viewBox (double rule r=48.6/46.2, ring text on an arc at r=40.5, tick ring r=35, CCR spanning x=24..75, five site cells, three band markers), ~5 KB instead of 1.2 MB",
+      "license": "generated for this project against the team's own OpenAI API key; OpenAI Terms of Use assign output ownership to the requesting account",
+      "license_source": "https://openai.com/policies/terms-of-use — 'Ownership of content. As between you and OpenAI, and to the extent permitted by applicable law, you (a) retain your ownership rights in Input and (b) own the Output.' (checked 2026-08-26)",
+      "note": "Reduced mark — dark disc, one thin ring, oversized CCR. Source of truth for the favicon PNGs and the top-bar badge (styles/shell.css .seal-emblem). The full emblem's ring legend collapses at badge and tab size; the dark ground carries the contrast (9.7:1, against 1.27:1 for --signal on a light tab strip)."
+    },
+    {
+      "file": "public/assets/brand/favicon-16.png",
+      "tool": "OpenAI gpt-image-2, via the OpenAI API",
+      "prompt": "Emblem for CCR — Central Control Room, the authority above every scenario: a circular agency seal on near-black, pale blue linework, double outer rule, ring legend CENTRAL CONTROL ROOM on an arc, an inner tick ring, stencil CCR spanning the disc, a row of small site cells with one live marker, and three band markers at the foot. Domain-neutral — no cross, no door, no vehicle. No extra text, no watermark, no signature.",
+      "derived_from": "docs/brand/ccr-emblem-source-gpt-image.png",
+      "recipe": "rasterised from favicon-mark.svg, cropped to circle with alpha and resized with Pillow LANCZOS",
+      "license": "generated for this project against the team's own OpenAI API key; OpenAI Terms of Use assign output ownership to the requesting account",
+      "license_source": "https://openai.com/policies/terms-of-use — 'Ownership of content. As between you and OpenAI, and to the extent permitted by applicable law, you (a) retain your ownership rights in Input and (b) own the Output.' (checked 2026-08-26)",
+      "note": "Favicon 16x16."
+    },
+    {
+      "file": "public/assets/brand/favicon-32.png",
+      "tool": "OpenAI gpt-image-2, via the OpenAI API",
+      "prompt": "Emblem for CCR — Central Control Room, the authority above every scenario: a circular agency seal on near-black, pale blue linework, double outer rule, ring legend CENTRAL CONTROL ROOM on an arc, an inner tick ring, stencil CCR spanning the disc, a row of small site cells with one live marker, and three band markers at the foot. Domain-neutral — no cross, no door, no vehicle. No extra text, no watermark, no signature.",
+      "derived_from": "docs/brand/ccr-emblem-source-gpt-image.png",
+      "recipe": "rasterised from favicon-mark.svg, cropped to circle with alpha and resized with Pillow LANCZOS",
+      "license": "generated for this project against the team's own OpenAI API key; OpenAI Terms of Use assign output ownership to the requesting account",
+      "license_source": "https://openai.com/policies/terms-of-use — 'Ownership of content. As between you and OpenAI, and to the extent permitted by applicable law, you (a) retain your ownership rights in Input and (b) own the Output.' (checked 2026-08-26)",
+      "note": "Favicon 32x32."
+    },
+    {
+      "file": "public/assets/brand/favicon-48.png",
+      "tool": "OpenAI gpt-image-2, via the OpenAI API",
+      "prompt": "Emblem for CCR — Central Control Room, the authority above every scenario: a circular agency seal on near-black, pale blue linework, double outer rule, ring legend CENTRAL CONTROL ROOM on an arc, an inner tick ring, stencil CCR spanning the disc, a row of small site cells with one live marker, and three band markers at the foot. Domain-neutral — no cross, no door, no vehicle. No extra text, no watermark, no signature.",
+      "derived_from": "docs/brand/ccr-emblem-source-gpt-image.png",
+      "recipe": "rasterised from favicon-mark.svg, cropped to circle with alpha and resized with Pillow LANCZOS",
+      "license": "generated for this project against the team's own OpenAI API key; OpenAI Terms of Use assign output ownership to the requesting account",
+      "license_source": "https://openai.com/policies/terms-of-use — 'Ownership of content. As between you and OpenAI, and to the extent permitted by applicable law, you (a) retain your ownership rights in Input and (b) own the Output.' (checked 2026-08-26)",
+      "note": "Favicon 48x48."
+    },
+    {
+      "file": "public/assets/brand/apple-touch-icon.png",
+      "tool": "OpenAI gpt-image-2, via the OpenAI API",
+      "prompt": "Emblem for CCR — Central Control Room, the authority above every scenario: a circular agency seal on near-black, pale blue linework, double outer rule, ring legend CENTRAL CONTROL ROOM on an arc, an inner tick ring, stencil CCR spanning the disc, a row of small site cells with one live marker, and three band markers at the foot. Domain-neutral — no cross, no door, no vehicle. No extra text, no watermark, no signature.",
+      "derived_from": "docs/brand/ccr-emblem-source-gpt-image.png",
+      "recipe": "rasterised from ccr-emblem.svg, cropped to circle with alpha and resized with Pillow LANCZOS",
+      "license": "generated for this project against the team's own OpenAI API key; OpenAI Terms of Use assign output ownership to the requesting account",
+      "license_source": "https://openai.com/policies/terms-of-use — 'Ownership of content. As between you and OpenAI, and to the extent permitted by applicable law, you (a) retain your ownership rights in Input and (b) own the Output.' (checked 2026-08-26)",
+      "note": "180x180 touch icon, from the full emblem — at that size the ring legend is legible."
+    },
+    {
+      "file": "public/assets/brand/ccr-logo-512.png",
+      "tool": "OpenAI gpt-image-2, via the OpenAI API",
+      "prompt": "Emblem for CCR — Central Control Room, the authority above every scenario: a circular agency seal on near-black, pale blue linework, double outer rule, ring legend CENTRAL CONTROL ROOM on an arc, an inner tick ring, stencil CCR spanning the disc, a row of small site cells with one live marker, and three band markers at the foot. Domain-neutral — no cross, no door, no vehicle. No extra text, no watermark, no signature.",
+      "derived_from": "docs/brand/ccr-emblem-source-gpt-image.png",
+      "recipe": "rasterised from ccr-emblem.svg, cropped to circle with alpha and resized with Pillow LANCZOS",
+      "license": "generated for this project against the team's own OpenAI API key; OpenAI Terms of Use assign output ownership to the requesting account",
+      "license_source": "https://openai.com/policies/terms-of-use — 'Ownership of content. As between you and OpenAI, and to the extent permitted by applicable law, you (a) retain your ownership rights in Input and (b) own the Output.' (checked 2026-08-26)",
+      "note": "Submission, README and press use."
+    },
+    {
+      "file": "docs/brand/ccr-emblem-source-gpt-image.png",
+      "tool": "OpenAI gpt-image-2, via the OpenAI API",
+      "prompt": "Emblem for CCR — Central Control Room, the authority above every scenario: a circular agency seal on near-black, pale blue linework, double outer rule, ring legend CENTRAL CONTROL ROOM on an arc, an inner tick ring, stencil CCR spanning the disc, a row of small site cells with one live marker, and three band markers at the foot. Domain-neutral — no cross, no door, no vehicle. No extra text, no watermark, no signature.",
+      "recipe": "unmodified gpt-image-2 output",
+      "license": "generated for this project against the team's own OpenAI API key; OpenAI Terms of Use assign output ownership to the requesting account",
+      "license_source": "https://openai.com/policies/terms-of-use — 'Ownership of content. As between you and OpenAI, and to the extent permitted by applicable law, you (a) retain your ownership rights in Input and (b) own the Output.' (checked 2026-08-26)",
+      "note": "Generated original, kept as provenance for the hand-redrawn SVG. Not referenced by the client and deliberately outside public/, so Vite does not copy it into the shipped bundle."
     }
   ]
 }

@@ -42,6 +42,30 @@
   background:linear-gradient(to top,var(--horizon),transparent 70%);
   pointer-events:none}
 
+/* ═══ THE FACILITY SEAL ═══════════════════════════════════════════════════
+   The CCR mark sunk into the wall, the way an operations room hangs its own
+   seal behind the desks. It is dressing like everything else in `#wallpaper`,
+   and it is allowed here for the reason the note at the top of index.html
+   gives: it names the FACILITY, which the shell owns, and never a scenario,
+   which the pack owns. A wallpaper may say where you are; it may not say what
+   the case is.
+
+   `ccr-emblem.svg` and NOT the tokenised twin. A CSS `url()` fetches its own
+   document and a custom property does not cross that boundary — the tokenised
+   file would silently fall back to its hex and stop following the desk. The
+   hex variant exists for exactly this call site.
+
+   Sized in `vmin` so it reads as the same seal on a laptop and a wall display,
+   and capped so it cannot outgrow the desk it sits behind. The opacity is the
+   whole effect: at `.07` over near-black the pale blue becomes a watermark
+   pressed into the ground rather than a logo pasted on top, and the one
+   `--warning` cell survives as a single warm point. Raise it and the desk
+   starts competing with its own wallpaper. */
+#wallpaper::after{content:'';position:absolute;left:50%;top:50%;
+  width:min(58vmin,660px);aspect-ratio:1;transform:translate(-50%,-50%);
+  background:url('/assets/brand/ccr-emblem.svg') center/contain no-repeat;
+  opacity:.11;pointer-events:none}
+
 /* ═══ GRAIN · VIGNETTE · SWEEP ════════════════════════════════════════════ */
 #grain{position:fixed;inset:-50%;z-index:900;pointer-events:none;opacity:.16;
   mix-blend-mode:overlay;
@@ -99,10 +123,18 @@
 .tb-row-1{height:71px;padding:0 var(--space-14);gap:var(--space-12);align-items:center}
 
 .tb-identity{display:flex;align-items:center;gap:var(--space-12);min-width:0;overflow:hidden;flex:0 1 auto}
-.seal-emblem svg{width:39px;height:39px;display:block}
-.seal-emblem circle{fill:none;stroke:var(--warning);stroke-width:1.2;opacity:.85}
-.seal-emblem text{fill:var(--warning);font-weight:700;font-size:var(--fs-13);line-height:1;
-  font-family:var(--prose);opacity:.9}
+/* The facility badge. It carried a two-circle seal around a CJK stamp, drawn
+   inline in index.html and inked in `--warning`; the branding is English-only
+   now, so it wears the CCR mark instead and the markup is an empty span.
+
+   `favicon-mark.svg` and NOT the full emblem, for the reason the mark exists at
+   all: at badge size the emblem's ring legend and tick ring collapse into a grey
+   band. The reduced mark is the same brand — same disc, same palette, same
+   stencil CCR — drawn to survive being small, which is the job here and in the
+   browser tab both. Loaded by URL, so it takes the hex variant's colours; a
+   `var()` does not cross into a document a `url()` fetched. */
+.seal-emblem{width:39px;height:39px;flex:0 0 auto;
+  background:url('/assets/brand/favicon-mark.svg') center/contain no-repeat}
 .tb-portal{display:flex;flex-direction:column;line-height:1.15}
 .tb-portal b{font-family:var(--prose);font-weight:800;font-size:var(--fs-13);
   color:var(--txt-hi);letter-spacing:.02em}

@@ -40,9 +40,13 @@
 import { button, el } from './dom.ts'
 import { sfxKeyTick, sfxLoginStatic } from './radio-sfx.ts'
 import { PORTAL, SIGN_IN } from './portal-identity.ts'
+// The crest art itself, read from the committed asset rather than retyped, so the
+// file on disk stays the single source of truth. `?raw` inlines it at build time —
+// the tokenised variant must reach the DOM as real nodes, because a `var(--signal)`
+// stroke does not resolve inside an external `<img>`.
+import ccrEmblem from '../../../public/assets/brand/ccr-emblem.tokenised.svg?raw'
 
 /** SVG namespace — the crest is drawn, not marked up. */
-const SVG_NS = 'http://www.w3.org/2000/svg'
 
 /**
  * How long one authentication line waits behind the one above it.
@@ -186,33 +190,31 @@ export function signInSkipped(host: Window): boolean {
   return host.navigator.webdriver === true
 }
 
-function svg<K extends keyof SVGElementTagNameMap>(
-  tag: K,
-  attrs: Record<string, string>,
-): SVGElementTagNameMap[K] {
-  const node = document.createElementNS(SVG_NS, tag)
-  for (const [name, value] of Object.entries(attrs)) node.setAttribute(name, value)
-  return node
-}
 
-/** The 緊 seal the top bar wears, at the size a front door wants it. */
+/**
+ * The CCR emblem, at the size a front door wants it.
+ *
+ * The seal this replaced was a two-`svg` build — a `.si-ring` circle and a
+ * `.si-seal` glyph carrying a CJK stamp — and it went with the branding, which
+ * is English-only now.
+ * What stands here is the facility's own mark: CCR, the authority above every
+ * scenario, which is why the art carries no cross, no door and no vehicle.
+ *
+ * INLINED, not `<img>`. The tokenised variant strokes itself in `var(--signal)`
+ * / `var(--warning)` / `var(--blueprint)` with hex fallbacks, and a custom
+ * property does not cross into an external document — an `<img src>` would
+ * silently fall back to the hex and stop following the desk's tokens.
+ *
+ * `role="img"` and `aria-label` are stripped from the markup on the way in: the
+ * host is already `aria-hidden`, and a labelled image inside a hidden subtree is
+ * a node that contradicts itself.
+ */
 function crest(): HTMLElement {
   const host = el('div', 'si-crest')
   host.setAttribute('aria-hidden', 'true')
-
-  const ring = svg('svg', { viewBox: '0 0 100 100' })
-  ring.append(svg('circle', { class: 'si-ring', cx: '50', cy: '50', r: '47' }))
-
-  const seal = svg('svg', { viewBox: '0 0 100 100', class: 'si-seal' })
-  seal.append(
-    svg('circle', { cx: '50', cy: '50', r: '38' }),
-    svg('circle', { cx: '50', cy: '50', r: '31' }),
-  )
-  const glyph = svg('text', { x: '50', y: '62', 'text-anchor': 'middle' })
-  glyph.textContent = '緊'
-  seal.append(glyph)
-
-  host.append(ring, seal)
+  // `innerHTML` with a repo-committed static file and no interpolation — there is
+  // no untrusted substring anywhere in this string.
+  host.innerHTML = ccrEmblem.replace(/\s+role="img"/, '').replace(/\s+aria-label="[^"]*"/, '')
   return host
 }
 

@@ -74,13 +74,18 @@ describe('[issue #10] the manifest parses and keeps its submitted-game shape', (
     // The scope list is the submitted asset set, not a style rule — it widens when
     // the set does. `submission/` carries the Track 1 thumbnail's generated plates:
     // manifested under rule 7, but outside public/ so they never reach the build.
+    // `public/assets/brand/` is the CCR emblem set that replaced the Vite scaffold
+    // favicon — that row is gone with the file. `docs/brand/` holds the generated
+    // raster the emblem was redrawn from: manifested for the same rule, and kept
+    // out of public/ precisely so it never ships.
     const offScope = manifest()
       .assets.map(fileOf)
       .filter(
         (file) =>
-          file !== 'public/favicon.svg' &&
           !file.startsWith('public/assets/fonts/') &&
           !file.startsWith('public/assets/audio/') &&
+          !file.startsWith('public/assets/brand/') &&
+          !file.startsWith('docs/brand/') &&
           !file.startsWith('submission/'),
       )
     expect(offScope).toEqual([])
