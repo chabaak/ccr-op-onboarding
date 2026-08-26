@@ -99,8 +99,8 @@ export const WOODARI_TALLY: TallyRow[] = [
  * `total` is the sum of the numeric values (`src/driver/scorer.ts` `totalOf`),
  * so a row that is not a body count has to be a word or it joins the headline.
  * This fixture had all three as numbers against a `total` of 7 — 200 + 7 + 19
- * summing to 226 — which nothing read until the feed's closing 집계 line
- * started reporting the breakdown beside the headline.
+ * summing to 226 — which nothing read until the visible score record started
+ * reporting the breakdown beside the headline.
  */
 const DEAD = 7
 

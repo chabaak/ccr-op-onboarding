@@ -445,12 +445,11 @@ export function installAudio(deps: AudioDeps): AudioHandle {
     if (map === null) return
     for (const record of records) {
       if (record.type !== 'characterData') continue
-      // U3 dissolved the TALLY window into this one: the end-of-day record is
-      // an `article.terminal-record` appended INSIDE `doc-facts`, and its
-      // count-up rewrites text the same way the typewriter does. Those are not
-      // keystrokes — the ledger has its own `score:up`/`score:down` ticks, and
-      // letting both sound would double every row.
-      if (record.target.parentElement?.closest('.terminal-record')) continue
+      // The end-of-day record's count-up rewrites text the same way the
+      // typewriter does. Those are not keystrokes — the ledger has its own
+      // `score:up`/`score:down` ticks, and letting both sound would double
+      // every row.
+      if (record.target.parentElement?.closest('.feed-tally')) continue
       charAccumulator += 1
       if (charAccumulator < map.typing.everyChars) continue
       charAccumulator = 0

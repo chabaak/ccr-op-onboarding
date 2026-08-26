@@ -12,10 +12,11 @@
 // business), or touch engine/composer (C8 / inv 12).
 //
 // U3 (playtest g3-1) — TALLY dissolves: the day's results became a fourth
-// collaborator. x13 moves the visible tally under AGENT FILE's DEPLOY row, but
-// this window still owns the `score` event: it gives the rail a record identity,
-// builds the model from the event, and gates the count-up on the paper. The
-// record renders from the `score` event alone (inv 6 / inv 12) — no pack read.
+// collaborator. x13 moved the visible tally under AGENT FILE's DEPLOY row; issue 228
+// moves it again to LIVE FEED's foot. This window still owns the `score` event:
+// it gives the rail a record identity, builds the model from the event, and
+// gates the count-up on the paper. The record renders from the `score` event
+// alone (inv 6 / inv 12) — no pack read.
 //
 // x12 (민서, 08-10) — WHAT ARRIVES IS NOT WHAT IS SHOWN, and that is the one
 // structural change since. This window took the §5.2 stream literally: a
@@ -29,7 +30,8 @@
 // where the fanfold has got to, and `afterPaper` below holds each report until
 // the feed has walked past that round's `report` event — which is the round's
 // last beat printed. The record's count-up waits for the `score` the same way,
-// because the fanfold mints the 집계 line from it and the two are one count.
+// because the fanfold mints the run divider from it and the two surfaces mark
+// one boundary.
 //
 // NOTHING ELSE WAITS. A report already in the archive, one the operator picks
 // off the rail, a document redrawn because the rail reconciled — all of them
@@ -44,7 +46,6 @@ import { createArchiveRail } from '../components/report-archive.ts'
 import type { ArchiveEntry } from '../components/report-archive.ts'
 import { accumulated, createReportView } from '../components/report-view.ts'
 import type { ReportModel } from '../components/report-view.ts'
-import { el } from '../shell/dom.ts'
 import { feedPending } from '../shell/feed-drain.ts'
 import { feedReached } from '../shell/feed-reach.ts'
 import type { FeedCue } from '../shell/feed-reach.ts'
@@ -52,7 +53,7 @@ import { fetchScenarioInPlay } from '../shell/pack-session.ts'
 import { PORTAL } from '../shell/portal-identity.ts'
 import { pad2 } from '../components/block-card.ts'
 import { getSlotBoard, SLOT_CAP } from '../components/slot-board.ts'
-import { createScoreTally } from '../components/score-tally.ts'
+import { getScoreTally } from '../components/score-tally.ts'
 import type { TallyModel } from '../components/score-tally.ts'
 
 /** What the record is called, and what it grades against — relocated verbatim
@@ -97,14 +98,15 @@ export function mount(host: HTMLElement, driver: FixtureDriver): void {
   let rendered: ArchiveEntry[] = []
   let active: number | null = null
 
-  // U3 — the terminal record's own identity, tracked the same way `meta`
-  // already feeds the callsign below. W2 — one record per SITTING, stored with
-  // it; `mountRecord()` keeps exactly one of them on the page.
+// U3 — the terminal record's own identity, tracked the same way `meta`
+// already feeds the callsign below. W2 — one score per SITTING, stored with
+// it so REPORTS keeps the selected run's final death count after the full
+// ledger moves to LIVE FEED.
   let run = 0
   let slug = ''
   let title = ''
   let callsignSeries = driver.callsignSeries()
-  const records = new Map<number, ReturnType<typeof createScoreTally>>()
+  const scores = new Map<number, number>()
 
   const marks = (): MarkSets => deriveMarks(driver.store(), carried)
 
@@ -278,21 +280,7 @@ export function mount(host: HTMLElement, driver: FixtureDriver): void {
     const first = model.report_body.length > 0 && !replayed.has(key)
     if (first) replayed.add(key)
     view.render(model, marks(), { replay: first, follow: first })
-    mountRecord()
-  }
-
-  /** Exactly one record is on the page: the active sitting's, or none. */
-  function mountRecord(): void {
-    const docFacts = host.querySelector('article.doc-facts')
-    if (docFacts === null) return
-    for (const [sitting, record] of records) {
-      const node = record.root
-      if (sitting === active) {
-        if (node.parentElement !== docFacts) docFacts.append(node)
-      } else {
-        node.remove()
-      }
-    }
+    view.score(scores.get(active) ?? null)
   }
 
   /**
@@ -311,7 +299,7 @@ export function mount(host: HTMLElement, driver: FixtureDriver): void {
     // played. `run` is 0 only before the first `meta`, and a rail entry for run
     // 0 would be a sitting that does not exist.
     const live = run > 0 ? [run] : []
-    const entries = railEntries(archive, [...new Set([...filed.keys(), ...records.keys(), ...live])])
+    const entries = railEntries(archive, [...new Set([...filed.keys(), ...scores.keys(), ...live])])
     if (entries.length === 0) return
     if (active === null || !entries.some((entry) => entry.run === active)) {
       active = entries[entries.length - 1]?.run ?? null
@@ -368,27 +356,13 @@ export function mount(host: HTMLElement, driver: FixtureDriver): void {
       return
     }
     if (event.type === 'score') {
-      // Unmineable by construction: no `.min` node, no `sentence_id` — this
-      // is a terminal, autopsy-window record identity, not a source document.
-      //
-      // W2 — the record belongs to its SITTING and is stored with it. It used
-      // to be one element the next `score` replaced whole, so a past day's
-      // document was read under the latest day's 집계표. Exactly one is ever
-      // mounted: `mountRecord()` attaches the active sitting's and detaches
-      // every other.
-      const previous = records.get(run)
-      previous?.reset()
-      previous?.root.remove()
-      const node = el('article', 'terminal-record')
-      node.setAttribute('aria-label', '시행 결과')
+      // REPORTS keeps the event-local model and paper gate, but not the full
+      // visible ledger. The selected sitting still carries one final death
+      // count here so archive rereads can answer how that run ended without
+      // duplicating the LIVE FEED tally lines.
       const sitting = run
-      const tally = createScoreTally({
-        host: node,
-        onFinal: () => {
-          window.dispatchEvent(new CustomEvent('score-tally:final', { detail: { run: sitting } }))
-        },
-      })
-      records.set(run, tally)
+      const tally = getScoreTally()
+      scores.set(sitting, event.total)
       // The scored day takes the rail and the record mounts under it. Going
       // through `sync()` rather than straight to `mountRecord()` is what covers
       // a day that filed NO report (`?drill=tally-lapse`): without a rail
@@ -401,21 +375,21 @@ export function mount(host: HTMLElement, driver: FixtureDriver): void {
       // mid-sentence (`e2e/reports.spec.ts:334`). The rail still reconciles, so
       // a day that filed no report still takes its identity.
       sync(false)
-      mountRecord()
-      tally.open()
+      view.score(event.total)
+      tally?.open()
       // x12 — THE RECORD IS ON THE DESK NOW; THE NUMBER IS NOT. `open()` leaves
       // it `pending` — the article mounted, blank, waiting — and the count-up
       // runs when the fanfold has printed its way to this same `score`, which is
-      // where it mints the day's 집계 line. The record and that line are two
-      // printings of one count, and the ledger rolling to a total the paper had
-      // not reached yet was the outcome arriving ahead of its own last sentence.
+      // where it mints the run divider. The ledger rolling to a total before
+      // that boundary reached the paper would still put the outcome ahead of
+      // its own last sentence.
       //
       // The MODEL is built here and not in there. It is this day's — `run`,
       // `slug` and the event's own rows — and by the time the paper catches up
       // the desk may be on the next sitting; a model read late would be the same
       // event scored against whatever `run` had become.
       const record = scoreModel(event)
-      afterPaper({ at: 'score', run: sitting }, () => tally.run(record))
+      afterPaper({ at: 'score', run: sitting }, () => getScoreTally()?.run(record))
       return
     }
     if (event.type !== 'report') return

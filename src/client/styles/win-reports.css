@@ -43,6 +43,15 @@
   color:var(--surface-text);word-break:keep-all}
 .rep-s .min{display:block}
 .rep-break{height:var(--space-8);border-bottom:1px solid var(--surface-rule)}
+.doc-facts[hidden]{display:none}
+.report-score{display:grid;grid-template-columns:98px minmax(0,1fr);gap:var(--space-12);
+  padding:var(--space-10) var(--space-12);box-sizing:border-box;
+  border-top:1px solid var(--ink-line);border-bottom:1px solid var(--ink-line)}
+.report-score-label{font-family:var(--mono);font-size:var(--fs-9-5);line-height:1.7;
+  letter-spacing:.1em;color:var(--warning);white-space:nowrap}
+.report-score-value b{font-family:var(--mono);font-size:var(--fs-12-5);font-variant-numeric:tabular-nums}
+.report-score-value{font-family:var(--prose);font-size:var(--fs-13);line-height:1.7;
+  font-weight:700;color:var(--warning-strong);word-break:keep-all}
 .sig{display:flex;align-items:center;justify-content:flex-end;padding:var(--space-10) var(--space-12);
   border-top:1px solid var(--ink-line)}
 .sig-line{font-family:var(--mono);font-size:var(--fs-10);color:var(--surface-muted);
@@ -79,48 +88,3 @@
 @media (prefers-reduced-motion: reduce){
   .rep-grid{scroll-behavior:auto}
 }
-
-/* ===========================================================================
-   the terminal record (U3, re-skinned x4) — the day's 집계, in the same tagged
-   row geometry as the report above it.
-
-   U3 filed score-tally's ledger at the foot of this column and kept the TALLY
-   sheet's skin whole: a centred head, a 66px headline in a boxed row, a
-   zebra-striped table with a 기준 column. Two documents on one sheet, and the
-   second one shouted over the first. What replaces it is LINES: the same 98px
-   label column, the same divider, and the sentence starting on the same x, so
-   the day's outcome reads as the last few entries of the record rather than as
-   a report card stapled underneath it.
-
-   The one thing that separates them is INK: seal red and bold, because these
-   are the only lines in the column that are not something a person observed.
-   Nothing here is mineable and nothing carries a `sentence_id` — the mark is
-   read, never pressed.
-   =========================================================================== */
-.terminal-record{margin-top:var(--space-8);padding-top:var(--space-4);
-  border-top:1px solid var(--ink-line)}
-.terminal-record .tly-doc{font-size:var(--fs-8);letter-spacing:.2em;color:var(--surface-muted);
-  padding:var(--space-8) var(--space-12) var(--space-5)}
-
-.terminal-record .tly-lines{list-style:none}
-/* The `.rep-row` geometry verbatim: 98px label column and the sentence in the
-   second. The label column is left empty so the red line starts where every
-   report sentence starts. Change `.rep-row` and this must move with it. */
-.terminal-record .tly-line{display:grid;grid-template-columns:98px minmax(0,1fr);gap:var(--space-12);
-  padding:var(--space-10) var(--space-12);box-sizing:border-box;
-  border:1px solid transparent;border-bottom-color:var(--ink-line);align-items:start}
-.terminal-record .tl-s{grid-column:2;font-family:var(--prose);font-size:var(--fs-13);line-height:1.7;
-  font-weight:700;color:var(--warning-strong);word-break:keep-all}
-/* the opening line (`23시 12분 시점 집계`) and the closing one (`총 사망자 수
-   60명`) are the record's own head and foot — a shade heavier, and the close
-   keeps a rule under it so the day ends on a line rather than trailing off. */
-.terminal-record .tl-open .tl-s{letter-spacing:.04em}
-.terminal-record .tl-close{border-bottom:2px solid var(--warning-a4)}
-.terminal-record .tl-close .tl-s{font-weight:800}
-.terminal-record .tl-close .tl-unit{font-family:var(--prose)}
-/* tabular figures so the closing number does not jitter while it counts */
-.terminal-record #tlyBig{font-variant-numeric:tabular-nums}
-
-.terminal-record .tly-line{opacity:0;transform:translateY(6px)}
-.terminal-record .tly-line.in{animation:rowIn .5s cubic-bezier(.2,.9,.3,1) both}
-@keyframes rowIn{to{opacity:1;transform:none}}

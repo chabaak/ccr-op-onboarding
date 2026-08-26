@@ -155,6 +155,8 @@ export interface ReportView {
   round(): number | null
   /** Re-brands the callsign surface under the tagged record rows. */
   brand(callsign: string): void
+  /** Shows the selected run's final death count, or clears it while the run is open. */
+  score(total: number | null): void
 }
 
 export interface ReportViewOptions {
@@ -201,6 +203,8 @@ const BODY_TITLE = '무전 기록'
  */
 const FOOT_LEAD = '기록 중 주요 사항을 선정하여 다음 요원에게 인수인계 하십시오 · '
 const FOOT_TAIL = '건 채굴됨'
+const SCORE_LABEL = '시행 최종 사망자 수'
+const SCORE_UNIT = '명'
 
 const ROW_STATE_CLASSES = ['is-mined', 'is-slotted', 'is-carried'] as const
 const FOLLOW_SLACK_MAX_PX = 32
@@ -222,8 +226,8 @@ function applyRowState(row: HTMLElement, state: MinableState): void {
 
 export function createReportView(options: ReportViewOptions): ReportView {
   const rows = el('section', 'rep-rounds')
-  // Legacy mount target for the terminal record. Sentence rows are grouped by
-  // round above it, so tutorial anchors land on the first source groups.
+  // Score summary target. Sentence rows are grouped by round above it, so
+  // tutorial anchors land on the first source groups.
   const recordMount = el('article', 'doc-facts')
 
   const sig = el('div', 'sig')
@@ -411,6 +415,20 @@ export function createReportView(options: ReportViewOptions): ReportView {
     count.textContent = current === null ? '0' : String(minedCount(current, marks))
   }
 
+  function score(total: number | null): void {
+    recordMount.replaceChildren()
+    recordMount.hidden = total === null
+    if (total === null) return
+    const line = el('p', 'report-score')
+    const value = el('span', 'report-score-value')
+    line.append(
+      el('span', 'report-score-label', SCORE_LABEL),
+      value,
+    )
+    value.append(el('b', undefined, String(total)), document.createTextNode(SCORE_UNIT))
+    recordMount.append(line)
+  }
+
   function renderRound(
     round: ReportRoundModel,
     marks: MarkSets,
@@ -525,5 +543,7 @@ export function createReportView(options: ReportViewOptions): ReportView {
     brand(callsign: string): void {
       sigLine.textContent = callsign
     },
+
+    score,
   }
 }

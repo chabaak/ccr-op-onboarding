@@ -33,9 +33,9 @@ interface Frame {
   ended: boolean
 }
 
-/** U3 (playtest g3-1) — TALLY dissolves; #185 mounts the terminal record under
- * REPORTS, where the day's filed document already lives. */
-const RECORD = '#w-rep .terminal-record'
+/** U3 (playtest g3-1) — TALLY dissolves; issue 228 mounts the terminal record under
+ * LIVE FEED, where the day's running paper already lives. */
+const RECORD = '#w-feed .feed-tally'
 const LEDGER = `${RECORD}[data-tally-state]`
 const NEW_RUN = '#w-file #btnDeploy'
 const WAIT = '#w-file #deployState'
@@ -157,7 +157,7 @@ async function drainAndTime(page: Page): Promise<number> {
     feed.flush()
     await new Promise<void>((resolve) => {
       const step = (): void => {
-        if (document.querySelector('#w-rep .terminal-record[data-tally-state="final"]')) resolve()
+        if (document.querySelector('#w-feed .feed-tally[data-tally-state="final"]')) resolve()
         else requestAnimationFrame(step)
       }
       step()
@@ -174,7 +174,7 @@ async function drainAndTime(page: Page): Promise<number> {
  * drains at reading pace with `shell/ending.ts` waiting on it
  * (`shell/feed-drain.ts`). `drain()` still returns as soon as the ledger has
  * landed, so a read of the fanfold underneath it is a read of a day still
- * printing — and the tail, which is where the closing 집계 line is, is the last
+ * printing — and the tail, which is where the run divider lands, is the last
  * thing to arrive.
  *
  * `flush()` applies what is queued and finishes the line being typed. Nothing
@@ -194,10 +194,11 @@ async function drainToFinal(page: Page): Promise<void> {
 test.describe('full loop back to BUILD', () => {
   test.setTimeout(90_000)
 
-  test('full loop back to BUILD — the desk opens in BUILD with no record yet', async ({ page }) => {
+  test('full loop back to BUILD — the desk opens in BUILD with an empty record well', async ({ page }) => {
     await boot(page)
     expect(await phase(page)).toBe('build')
-    await expect(page.locator(RECORD)).toHaveCount(0)
+    await expect(page.locator(RECORD)).toHaveAttribute('data-tally-state', 'pending')
+    await expect(page.locator(`${RECORD} .tly-line`)).toHaveCount(0)
     await expect(page.locator(NEW_RUN)).toHaveAttribute('data-op', 'deploy')
     expect((await frame(page)).events.filter((e) => e.type === 'run_end')).toEqual([])
   })
@@ -219,36 +220,37 @@ test.describe('full loop back to BUILD', () => {
     expect(await digitsOf(page, BIG)).toBe(score!.total)
   })
 
-  test('full loop back to BUILD — the feed closes on the ledger’s own count, not a fixed one', async ({
+  test('full loop back to BUILD — the feed closes on a run divider and the tally holds the ledger count', async ({
     page,
   }) => {
     // The two surfaces used to disagree at the same 21:04. The count was
     // `timeline.json`'s `t19`, a FIXED event printed verbatim on every run
     // (`scriptLinesOf` reads no state), so a day that saved people still read
     // 사망 26 in the feed beside a ledger counting what it actually scored.
-    // The line comes off the `score` event now (`components/tally-line.ts`), so
-    // the fanfold and the record cannot part company.
+    // The tally comes off the `score` event now, and the fanfold prints the
+    // run divider at the same cue, so the paper and the record cannot part
+    // company.
     await boot(page)
     await drainToFinal(page)
-    // x11 — the CLOSING line is the last thing the day prints, so this is the
+    // x11 — the DIVIDER line is the last thing the day prints, so this is the
     // one read in the file that cannot be taken while the paper is still
     // arriving (see `flushFeed`). Unsettled, `.last()` would name whichever line
     // the reveal had reached when the ledger happened to finish counting, and
-    // the failure would read `the feed did not close on a 집계 line` about a feed
-    // that closes on one perfectly well.
+    // the failure would read about the wrong line rather than the final one.
     await flushFeed(page)
 
     const headline = await digitsOf(page, BIG)
+    const f = await frame(page)
+    const score = f.events.filter((e) => e.type === 'score').pop() as { total: number } | undefined
+    expect(score, 'the run closed without a `score` event — the ledger has nothing to count').toBeTruthy()
     // x11 — the CONTENT column, not the whole `<li>`. The typewriter gave every
     // line a second, sr-only copy of its own text (`.fl-sr`), so an `innerText`
     // of the row now returns the stamp and the sentence TWICE — a `toContain`
     // that keeps passing while saying half of what it means to. The count the
     // operator reads is the printed one, so that is the column asked.
     const closing = await page.locator('#feedList li').last().locator('.fl-c').innerText()
-    expect(closing, 'the feed did not close on a 집계 line').toContain('집계.')
-    expect(closing, `the feed closed on a count the ledger does not hold (${headline})`).toContain(
-      `사망 ${headline}`,
-    )
+    expect(closing, 'the feed did not close on the run divider').toContain('요원이 재파견되었습니다')
+    expect(headline, 'the feed tally did not count the ledger total').toBe(score!.total)
 
     // And it is not minable: a count is a conclusion, not a source document.
     // `t19` DID carry a `sentence_id`, so a player could mine 사망 26 and inject
@@ -276,13 +278,13 @@ test.describe('full loop back to BUILD', () => {
     // What the loop turning over means is that the desk left `tally`.
     await expect.poll(async () => phase(page), { timeout: 20_000 }).not.toBe('tally')
     await expect(page.locator(NEW_RUN)).toHaveAttribute('data-op', 'deploy')
-    // #185 — the visible tally belongs to the selected REPORTS sitting, while
-    // AGENT FILE keeps only the deploy control for the current day.
-    await expect(page.locator(RECORD)).toHaveCount(0)
+    // issue 228 — the visible tally well belongs to LIVE FEED and clears for the
+    // current day, while AGENT FILE keeps only the deploy control.
+    await expect(page.locator(RECORD)).toHaveAttribute('data-tally-state', 'pending')
+    await expect(page.locator(`${RECORD} .tly-line`)).toHaveCount(0)
     await expect(page.locator(`${FILE} .terminal-record`)).toHaveCount(0)
     await page.locator(OPTION, { hasText: scoredTab }).first().click()
-    await expect(page.locator(RECORD)).toHaveCount(1)
-    await expect(page.locator(`${RECORD} .tly-line`)).not.toHaveCount(0)
+    await expect(page.locator(`${REP} .report-score`)).not.toBeEmpty()
   })
 
   test('full loop back to BUILD — D-DAY decrements one place, and only off the `meta` event', async ({ page }) => {
@@ -346,7 +348,7 @@ test.describe('count-up pacing absorbs the report call', () => {
     // Immediately after 21:04 the desk is still settling: pending or counting,
     // never final, and the way out stays shut.
     const early = await page.evaluate(() => {
-      const node = document.querySelector('#w-rep .terminal-record')
+      const node = document.querySelector('#w-feed .feed-tally')
       return node?.getAttribute('data-tally-state') ?? null
     })
     expect(['pending', 'counting'], `the record reached ${early} before the cadence ran`).toContain(early)
@@ -384,7 +386,7 @@ test.describe('count-up pacing absorbs the report call', () => {
     // The report window is painted while the ledger is still counting.
     await expect(page.locator(`${REP} #bodyList .sent`)).not.toHaveCount(0, { timeout: 20_000 })
     const stateWhilePainted = await page.evaluate(
-      () => document.querySelector('#w-rep .terminal-record')?.getAttribute('data-tally-state') ?? null,
+      () => document.querySelector('#w-feed .feed-tally')?.getAttribute('data-tally-state') ?? null,
     )
     expect(stateWhilePainted).not.toBeNull()
 
