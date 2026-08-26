@@ -48,12 +48,9 @@ export type ScheduledGate = {
    * origin).
    *
    * Resolved once, here, and never empty. `compileGate` prefers the authored
-   * `baseline_utterance` and falls back to the DEFAULT STANCE'S OWN LABEL,
-   * which is not a degraded substitute: a label is already written in the
-   * agent's 해라체 as the action it takes and the reason it takes it. An agent
-   * reasoning from temperament alone says exactly that, so the authored field
-   * is an escape hatch for a
-   * label that reads badly aloud, not the normal path.
+   * `baseline_utterance` and otherwise uses a neutral substitute. It must not
+   * reuse the default stance label: labels are Call-1 selection material, and
+   * the baseline path prints this line directly on the player's paper.
    *
    * Resolved at BUILD time, unlike `availability` below, because nothing about
    * it can move during a run: the label and the default are both authored, and
@@ -78,6 +75,8 @@ export type ScheduledGate = {
    */
   availability: string
 }
+
+export const SUBSTITUTE_BASELINE_UTTERANCE = '요원은 현장 절차에 따라 기본 판단을 유지한다고 보고한다.'
 
 export type Beat = {
   index: number
@@ -140,19 +139,14 @@ function compileGate(authored: AuthoredGate): ScheduledGate {
     label: stance.label,
     desc: stance.desc,
   }))
-  // See `ScheduledGate.baselineUtterance`. The label is looked up rather than
-  // indexed: `default_stance` is a schema pattern (`^[a-z]$`) and nothing
-  // upstream promises it names a stance that exists, so a pack that mis-authors
-  // it gets an empty line here — never a crash, and never another stance's.
   const authoredBaseline = (authored.baseline_utterance ?? '').trim()
-  const defaultLabel = stances.find((stance) => stance.id === authored.default_stance)?.label ?? ''
   return {
     id: authored.gate,
     question: authored.question,
     scene: authored.scene ?? '',
     stances,
     defaultStance: authored.default_stance,
-    baselineUtterance: authoredBaseline !== '' ? authoredBaseline : defaultLabel,
+    baselineUtterance: authoredBaseline !== '' ? authoredBaseline : SUBSTITUTE_BASELINE_UTTERANCE,
     buckets: authored.buckets,
     edges: compileEdges(authored.edge_predicates),
     availability: authored.availability ?? '',
