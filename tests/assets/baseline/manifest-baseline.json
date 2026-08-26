@@ -5,7 +5,7 @@
     "$schema-note",
     "assets"
   ],
-  "entryCount": 44,
+  "entryCount": 46,
   "entries": [
     {
       "index": 0,
@@ -270,6 +270,18 @@
       "file": "public/assets/audio/ui-hover.m4a",
       "webfont": false,
       "sha256": "c6673f1b2ef57b5cbda8de6be8b9265dce34cf5a0bfd687bf2825147937b973d"
+    },
+    {
+      "index": 44,
+      "file": "submission/thumbnail/gen/a.png",
+      "webfont": false,
+      "sha256": "ce83c193bf765685324f0b8925ef92e883202788877b77c2affd3b2e6db207fb"
+    },
+    {
+      "index": 45,
+      "file": "submission/thumbnail/gen/snow-b.png",
+      "webfont": false,
+      "sha256": "cb733a81a852ba5ec67fea6d3c6e71e39927382c022b3cdeb7f6568ba0574021"
     }
   ]
 }

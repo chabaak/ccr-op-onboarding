@@ -71,13 +71,17 @@ describe('[issue #10] the manifest parses and keeps its submitted-game shape', (
   })
 
   it('(d) every entry is one of the submitted game asset rows', () => {
+    // The scope list is the submitted asset set, not a style rule — it widens when
+    // the set does. `submission/` carries the Track 1 thumbnail's generated plates:
+    // manifested under rule 7, but outside public/ so they never reach the build.
     const offScope = manifest()
       .assets.map(fileOf)
       .filter(
         (file) =>
           file !== 'public/favicon.svg' &&
           !file.startsWith('public/assets/fonts/') &&
-          !file.startsWith('public/assets/audio/'),
+          !file.startsWith('public/assets/audio/') &&
+          !file.startsWith('submission/'),
       )
     expect(offScope).toEqual([])
   })
