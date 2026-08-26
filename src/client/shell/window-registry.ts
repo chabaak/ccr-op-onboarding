@@ -34,8 +34,9 @@ export interface WindowDef {
    * chips print `en`), so once the element went the field was a REQUIRED label on
    * the registry that nothing rendered, which is worse than an absent one — a
    * fourth window would have had to invent a code for a surface that does not
-   * exist. `en` is now the one short name the taskbar and region label share;
-   * `caption` is the specimen-style detail line printed inside the pane.
+   * exist. `en` is now the one short name the taskbar and region label share.
+   * `caption` is the specimen-style detail line printed inside the pane; because
+   * this registry is static chrome, it cannot carry run-specific callsigns.
    */
   en: string
   /** Specimen caption printed as the pane's visible chrome line. */
@@ -56,14 +57,14 @@ export const WINDOW_REGISTRY: readonly WindowDef[] = [
     key: 'feed',
     id: 'w-feed',
     en: 'LIVE FEED',
-    caption: 'LIVE FEED · ECHO-1 · 열람 전용',
+    caption: 'LIVE FEED · 열람 전용',
     mount: mountLiveFeed,
   },
   {
     key: 'file',
     id: 'w-file',
     en: 'AGENT FILE',
-    caption: 'AGENT FILE · ECHO-2 · 문서번호 ERR-2/AF/02',
+    caption: 'AGENT FILE',
     resizable: false,
     mount: mountAgentFile,
   },

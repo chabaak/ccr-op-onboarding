@@ -140,6 +140,19 @@ describe('[u3#c6] the registry is shell-owned', () => {
     expect(reports?.caption).not.toContain('수신 즉시 채굴')
   })
 
+  it('(e3) static window captions do not claim run-specific callsigns or removed document numbers', async () => {
+    const { WINDOW_REGISTRY } = await loadRegistry()
+    const feed = WINDOW_REGISTRY.find((entry) => entry.key === 'feed')
+    const file = WINDOW_REGISTRY.find((entry) => entry.key === 'file')
+
+    expect(feed?.caption).toBe('LIVE FEED · 열람 전용')
+    expect(file?.caption).toBe('AGENT FILE')
+    for (const def of WINDOW_REGISTRY) {
+      expect(def.caption).not.toMatch(/ECHO-\d/)
+      expect(def.caption).not.toContain('문서번호')
+    }
+  })
+
   it('(f) the registry is the only module that imports windows/', () => {
     const offenders = clientSources()
       .filter((f) => path.resolve(f) !== path.resolve(REGISTRY_TS))
