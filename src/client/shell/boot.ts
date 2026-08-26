@@ -19,12 +19,17 @@ import { bindRadioSfx, sfxHandOver } from './radio-sfx.ts'
 import { must } from './dom.ts'
 import { installEnding } from './ending.ts'
 import { openManual } from './manual.ts'
-import { openSignIn, signInSkipped } from './sign-in.ts'
+import { openSignIn } from './sign-in.ts'
 import { installTutorial } from './tutorial.ts'
 import { fetchScenarioEndings, fetchScenarioIdentity, fetchScenarioIndex, fetchScenarioScore } from './pack.ts'
 import type { ScenarioIdentity } from './pack.ts'
 import { installScenarioDesktop } from './scenario-desktop.ts'
-import { consumeScenarioDesktopReturn, hasScenarioPackSelection, scenarioPackInPlay } from './pack-session.ts'
+import {
+  consumeScenarioDesktopReturn,
+  hasScenarioPackSelection,
+  scenarioPackInPlay,
+  shouldOpenSignInDoor,
+} from './pack-session.ts'
 import { PORTAL, TASKBAR_HINT } from './portal-identity.ts'
 import { clearRunState } from './run-state.ts'
 import { WINDOW_REGISTRY } from './window-registry.ts'
@@ -195,15 +200,23 @@ export async function bootShell(): Promise<void> {
 
   const returnToDesktop = consumeScenarioDesktopReturn({ storage: window.sessionStorage })
   const scenarioPackSelected = hasScenarioPackSelection({ storage: window.sessionStorage })
+  const signinFlag = new URLSearchParams(window.location.search).get('signin')
 
   // 0 — the door (plan-playtest O1). Mounted BEFORE the pack fetch so the first
   // painted frame is the portal, not a bare wallpaper waiting on the network,
   // and so `body.signin` is on the element before the top bar's `barDrop` can
   // run. Everything below it proceeds at full speed behind the curtain: the
   // opening builds no second hold, it only defers the reveal at the bottom of
-  // this function. `signInSkipped` is what keeps the e2e lane pointed at the
-  // desk (see its doc comment).
-  const door = signInSkipped(window) || returnToDesktop || scenarioPackSelected ? null : openSignIn(app, body)
+  // this function. `shouldOpenSignInDoor` keeps that skip/show/state/webdriver
+  // priority explicit because `?signin=show` is the forced-door escape hatch.
+  const door = shouldOpenSignInDoor({
+    signinFlag,
+    webdriver: window.navigator.webdriver === true,
+    returnToDesktop,
+    scenarioPackSelected,
+  })
+    ? openSignIn(app, body)
+    : null
 
   // Resolved at the hand-over (step 6), when the desk is what the player is
   // looking at — see 4c.
