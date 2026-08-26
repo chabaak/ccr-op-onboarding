@@ -31,6 +31,13 @@ export interface ScenarioSwitchOptions extends ScenarioSessionOptions {
   reload?: () => void
 }
 
+export interface SignInDoorState {
+  signinFlag: string | null
+  webdriver: boolean
+  returnToDesktop: boolean
+  scenarioPackSelected: boolean
+}
+
 export const SELECTED_SCENARIO_KEY = 'ndsp:scenario:selected:v1'
 export const SCENARIO_DESKTOP_RETURN_KEY = 'ndsp:scenario:return-desktop:v1'
 
@@ -63,6 +70,17 @@ export function scenarioPackInPlay(
     if (pack !== null && isScenarioPlayable(pack)) return pack
   }
   return tutorialScenarioPack(index)
+}
+
+export function hasScenarioPackSelection(options: ScenarioSessionOptions = {}): boolean {
+  return storageOf(options)?.getItem(SELECTED_SCENARIO_KEY) !== null
+}
+
+export function shouldOpenSignInDoor(state: SignInDoorState): boolean {
+  if (state.signinFlag === 'skip') return false
+  if (state.signinFlag === 'show') return true
+  if (state.returnToDesktop || state.scenarioPackSelected) return false
+  return !state.webdriver
 }
 
 /**

@@ -5,6 +5,7 @@ import {
   SCENARIO_DESKTOP_RETURN_KEY,
   SELECTED_SCENARIO_KEY,
   consumeScenarioDesktopReturn,
+  hasScenarioPackSelection,
   resetScenarioSession,
   returnToScenarioDesktop,
   scenarioPackInPlay,
@@ -59,6 +60,15 @@ describe('runtime scenario pack selection', () => {
     const chosen = PLAYABLE_MANIFEST.packs.find((pack) => pack.role === 'practice')!
     storage.setItem(SELECTED_SCENARIO_KEY, chosen.slug)
     expect(scenarioPackInPlay(PLAYABLE_MANIFEST, { storage }).slug).toBe(chosen.slug)
+  })
+
+  it('(b2) the shell can detect a selected pack before fetching the manifest', () => {
+    const storage = new FakeStorage()
+    expect(hasScenarioPackSelection({ storage })).toBe(false)
+
+    storage.setItem(SELECTED_SCENARIO_KEY, 'practice-pack')
+
+    expect(hasScenarioPackSelection({ storage })).toBe(true)
   })
 
   it('(c) switching clears shell/run-loop state and asks the host to reload', () => {
