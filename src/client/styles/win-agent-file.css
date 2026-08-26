@@ -1,28 +1,14 @@
 /* ===========================================================================
    win-agent-file.css — WINDOW 1 · AGENT FILE (desktop.css lines 270..349).
 
-   A personnel dossier: ruled form head, numbered sections, a redacted §3 기질,
-   the prompt slots the red thread pins into, and the deploy stamp.
+   A personnel dossier: numbered sections, the prompt slots the red thread pins
+   into, and the deploy stamp.
    =========================================================================== */
 
 .win-file{--delay:.28s}
 .win-file .win-body{padding:var(--space-18) var(--space-22) var(--space-24)}
 
-.file-head{display:flex;justify-content:space-between;align-items:flex-end;
-  border-bottom:2px solid var(--surface-text);padding-bottom:var(--space-7);
-  margin-bottom:var(--space-13);position:relative}
-.file-head::after{content:'';position:absolute;left:0;right:0;bottom:-4px;height:1px;
-  background:var(--surface-text);opacity:.5}
-.fh-doc{font-size:var(--fs-8-5);letter-spacing:.13em;color:var(--surface-muted)}
-/* x5 — the file's own name is a FIXED value, so it is machine print like the
-   document number above it. 명조 is reserved for what a person wrote, and
-   nobody wrote 현장 요원 운용 파일 — it is what the form is called. */
-.fh-title{font-family:var(--mono);font-weight:700;font-size:var(--fs-17);
-  letter-spacing:.06em;color:var(--surface-text-heading);margin-top:var(--space-2)}
-.fh-right{text-align:right}
-.fh-k{font-size:var(--fs-8);letter-spacing:.2em;color:var(--surface-muted)}
-.fh-v{font-size:var(--fs-14);font-weight:700;letter-spacing:.13em;color:var(--warning-strong)}
-
+.file-page{position:relative}
 .sect{margin-bottom:var(--space-13);position:relative}
 .sect-hd{display:flex;align-items:baseline;gap:var(--space-8);margin-bottom:var(--space-4)}
 /* …and so are the section titles: 임무 · 행동 원칙 · 기질 · 교신 지침 · 식별 ·
@@ -72,7 +58,7 @@
    §faces): 명조 is what a PERSON said or wrote, --mono is every FIXED value the
    desk prints. ECHO is a callsign — an identifier issued by 본부, not a word the
    author of this summary chose — so on the two surfaces that already print it as
-   a value it is already mono: `.sect-rows dd` sets the whole 식별 grid in it, and
+   a value it is already mono: `.sect-rows dd` sets the whole identity grid in it, and
    `.rd-code` right below is mono/800 for the 호출부호 row. This rule was the one
    place the same string was set in the other face, purely because the sentence
    around it is prose. Now the brief and the identity row agree on the face as
@@ -101,7 +87,7 @@
    the paragraph already had — no reflow, no baseline shift between the lines
    above and below it. `font-weight:800` resolves to the 700 face, which is the
    heaviest IBM Plex Mono `fonts.css` self-hosts; that is not a defect, it is the
-   same weight `.fh-title` and `.sect-hd h4` print at, and it is what `.rd-code`
+   same weight `.sect-hd h4` prints at, and it is what `.rd-code`
    has always resolved to for the identical declaration. */
 .rd-echo{font-family:var(--mono);color:var(--warning-strong);font-weight:800;letter-spacing:.06em}
 .sect-rows{display:grid;grid-template-columns:96px 1fr;gap:var(--space-2) var(--space-10);
@@ -438,24 +424,20 @@
    sheet is a printed thing — a stamped DEPLOY plate, a bracketed 해제, a ruled
    page arrow — and an escape from a reveal is none of those: it is not part of
    the document, it is a way out of watching it print. So it wears the one
-   affordance no form on this desk uses, sits under the last section rather than
-   over the page, and goes to the seal's red only on hover. It leaves the DOM
+   affordance no form on this desk uses and goes to the seal's red only on hover.
+   It leaves the DOM
    the moment the reveal lands (`windows/agent-file.ts`, `landCover`), so there
    is never a spent control on the page and never a dead tab stop.
 
-   It sits in the band under the ruled head, hard right, and it is the one
+   It sits over the cover, hard right, and it is the one
    element on this page whose box never moves: the cover grows downward as it
    prints, so anything below the text drifts for the whole reveal. Right, not
-   centred — centred under the head it read as a caption belonging to the
+   centred — centred over the page it read as a caption belonging to the
    document, and it is the opposite of that. */
-/* x7 — IN the head's right corner, not in a row of its own (민서, 08-09). A row
-   of its own is a row that goes: the control removes itself when the reveal
-   lands, and the document jumped up a line at the moment the reader reached the
-   end of it. `.file-head` is a `space-between` flex with `align-items:flex-end`,
-   so no margin is needed to place this — it lands opposite the title block on
-   the same baseline band, and the head keeps its height from `.fh-left` when the
-   button goes. */
-.cover-skip{padding:var(--space-2) 0 var(--space-2) var(--space-6);
+/* x11 — ABSOLUTE because the head it used to ride in is gone. A flow row would
+   still vanish when the reveal lands and would still pull the document upward at
+   the exact moment the reader reaches the end of it. */
+.cover-skip{position:absolute;top:0;right:0;z-index:2;padding:var(--space-2) 0 var(--space-2) var(--space-6);
   background:transparent;border:0;
   font-size:var(--fs-8-5);letter-spacing:.16em;color:var(--surface-muted);
   text-decoration:underline;text-underline-offset:.3em;cursor:pointer;

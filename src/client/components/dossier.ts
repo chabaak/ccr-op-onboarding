@@ -198,7 +198,14 @@ const COMMS_ORDERS =
   '관측한 것과 판단한 것을 구분하여 송신하며, 수신 신호가 약해질 수 있으니 문장을 짧게 끝맺는다.'
 
 interface SectionHead {
-  title: string
+  title?: string
+  /**
+   * A section can keep its data identity while declining the printed heading.
+   *
+   * x11 — 식별's title row left the page with the file head; its rows are still
+   * the first thing an agent page owes, but the page now opens directly on them.
+   */
+  headless?: boolean
   /**
    * The section's stable ASCII name, printed as `data-sect` by the builder.
    *
@@ -311,7 +318,7 @@ export function coverModel(copy: AgentFileCoverCopy): DossierSection[] {
 export function agentModel(input: AgentInput): DossierSection[] {
   return [
     {
-      title: '식별',
+      headless: true,
       slug: 'identity',
       state: 'fixed',
       rows: [
@@ -340,15 +347,15 @@ export function agentModel(input: AgentInput): DossierSection[] {
 /**
  * Pure: a FINISHED agent's page — the same document, closed.
  *
- * U5.3. 식별 is identical in shape to the live agent's, because it is the same
- * document art with a different callsign; what changes is 인수인계 사항, which
- * is no longer something the operator can operate. It is a record of what went
- * out, and its flag says so.
+ * U5.3. The identity rows are identical in shape to the live agent's, because
+ * this is the same document art with a different callsign; what changes is
+ * 인수인계 사항, which is no longer something the operator can operate. It is a
+ * record of what went out, and its flag says so.
  */
 export function filedModel(input: FiledInput): DossierSection[] {
   return [
     {
-      title: '식별',
+      headless: true,
       slug: 'identity',
       state: 'fixed',
       rows: [
@@ -438,11 +445,17 @@ function buildSection(section: DossierSection, slotHost: HTMLElement): HTMLEleme
   // never paints. Two readers, two channels, and neither can be mistaken for the
   // other the way a second class in `sect ${state}` could be.
   if (section.slug !== undefined) node.dataset.sect = section.slug
-  const head = el('div', 'sect-hd')
-  // C1 — no `§n`. The titles are distinct words and carry the document on
-  // their own; a number that has to be kept in step with a page order is one
-  // more thing that can contradict the page it is printed on.
-  head.append(el('h4', undefined, section.title))
+  const head =
+    section.headless === true
+      ? null
+      : (() => {
+          const node = el('div', 'sect-hd')
+          // C1 — no `§n`. The titles are distinct words and carry the document on
+          // their own; a number that has to be kept in step with a page order is one
+          // more thing that can contradict the page it is printed on.
+          node.append(el('h4', undefined, section.title))
+          return node
+        })()
 
   if ('rows' in section) {
     const rows = el('dl', 'sect-rows')
@@ -450,7 +463,7 @@ function buildSection(section: DossierSection, slotHost: HTMLElement): HTMLEleme
       const dd = el('dd', key === CALLSIGN_KEY ? CALLSIGN_CLASS : undefined, value)
       rows.append(...spaced(el('dt', undefined, key), dd))
     }
-    node.append(...spaced(head, rows))
+    node.append(...(head === null ? [rows] : spaced(head, rows)))
     return node
   }
 
@@ -459,7 +472,8 @@ function buildSection(section: DossierSection, slotHost: HTMLElement): HTMLEleme
   // says. U5.3's past pages hand it read-only cards; the live page hands the
   // operable section the one SlotBoard (D7).
   if (section.state === 'operable' || section.state === 'filed') {
-    node.append(...spaced(head, el('div', 'sect-body', section.note), slotHost))
+    const body = el('div', 'sect-body', section.note)
+    node.append(...(head === null ? spaced(body, slotHost) : spaced(head, body, slotHost)))
     return node
   }
 
@@ -484,6 +498,6 @@ function buildSection(section: DossierSection, slotHost: HTMLElement): HTMLEleme
   // The note is a SIBLING of the body, never a span inside its last line: the
   // sheet paints it small and red and the reveal treats it as its own beat.
   const parts = section.note === undefined ? [body] : [body, el('div', 'sect-note', section.note)]
-  node.append(...spaced(head, ...parts))
+  node.append(...(head === null ? spaced(...parts) : spaced(head, ...parts)))
   return node
 }

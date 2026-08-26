@@ -1,7 +1,7 @@
 // u4 — AGENT FILE window: the rendered document.
 //
 // Covers [u4#c1] the dossier's sections · [u4#c4] the deploy stamp and the lock
-// · [u4#c6] membrane ops by keyboard alone · [x7] the headed pages and the
+// · [u4#c6] membrane ops by keyboard alone · [x7] the unheaded pages and the
 // cover's reveal.
 //
 // x7 — "the sealed §3 included" left this line with 기질 itself. The cover is
@@ -31,8 +31,6 @@ const FILE = '#w-file'
 const CAP = 4
 /** x7 — the cover's own escape hatch; present only while it is still printing. */
 const SKIP = `${FILE} #coverSkip`
-/** The doc number every page is headed with — `PORTAL.portalCode` is `ERR-2`. */
-const DOC_LINE = /^문서번호 ERR-2\/AF\/[^/]+$/
 /**
  * x7 — the callsign, ACCEPTING THE FIRST AGENT.
  *
@@ -153,36 +151,6 @@ async function seamStore(page: Page): Promise<SeamStore> {
 }
 
 /**
- * The pack slug the CLIENT actually asked the server for.
- *
- * RE-AIMED (08-09). Both callers used to read `#caseName`, which carried the
- * slug until the chrome pointed it at the pack display name, which
- * `shell/pack.ts` says outright is "DELIBERATELY not derived from `PACK_SLUG` — there is no
- * rule". So the chrome stopped being a slug source, silently: `(d)` compared
- * the doc number against a string with spaces in it, and `(e)` fetched
- * a display-name path, got the dev server's index.html and
- * died parsing it as JSON. Neither is caught by CI, which runs the `preview`
- * project alone.
- *
- * The boot request is the honest replacement. It is not a literal (C3), it is
- * not the display name, and it is not the doc line either — which matters,
- * because `(d)` exists to check the doc line against an INDEPENDENT source.
- * `performance` is read rather than a request listener so there is no ordering
- * race with `boot()`'s own `goto`.
- */
-async function packSlug(page: Page): Promise<string> {
-  const url = await page.evaluate(() =>
-    performance
-      .getEntriesByType('resource')
-      .map((entry) => entry.name)
-      .find((name) => /\/data\/scenario\/[^/]+\/meta\.json(\?|$)/.test(name)) ?? '',
-  )
-  const found = /\/data\/scenario\/([^/]+)\/meta\.json(\?|$)/.exec(url)
-  expect(found, `no pack meta.json request was observed: ${url}`).not.toBeNull()
-  return decodeURIComponent(found![1]!)
-}
-
-/**
  * Every pinned `data-block-id` the file currently shows, in DOM order — one per
  * filled slot.
  *
@@ -225,7 +193,8 @@ test.describe('dossier sections', () => {
     await expect(page.locator(`${FILE} .sect.sealed`)).toHaveCount(0)
     await page.locator(`${FILE} .pg-nav .pg-turn`).last().click()
     await expect(sects).toHaveCount(2)
-    await expect(sects.locator('h4')).toHaveText(['식별', '인수인계 사항'])
+    await expect(sects.locator('h4')).toHaveText(['인수인계 사항'])
+    await expect(sects.nth(0).locator('.sect-hd')).toHaveCount(0)
     await expect(page.locator(`${FILE} .sect-flag`)).toHaveCount(0)
   })
 
@@ -311,32 +280,15 @@ test.describe('dossier sections', () => {
     await expect(page.locator(`${FILE} .dz-meta`)).toHaveText(`2 / ${CAP} 슬롯 사용`)
   })
 
-  test('[u4#c1] (d) the case slug and doc number come from the pack, never a literal', async ({ page }) => {
+  test('[u4#c1] (d) the removed head stays gone and identity opens the agent page', async ({ page }) => {
     await boot(page)
-    const doc = page.locator(`${FILE} .fh-doc`)
-    // C1 — the number names the DOCUMENT, which spans every agent, so it has
-    // no run segment. It used to end `/01`, `/02`, …
-    await expect(doc).toHaveText(DOC_LINE)
-    // The slug the client fetched the pack under, not the chrome's display
-    // name — see `packSlug`. Still an independent source: the doc line is
-    // built by `windows/agent-file.ts` from the fetched identity, and this
-    // comes off the network.
-    const slug = await packSlug(page)
-    expect(slug.length).toBeGreaterThan(0)
-    await expect(doc).toHaveText(new RegExp(`/AF/${slug}$`))
-    await expect(page.locator(`${FILE} .fh-title`)).toHaveText('현장 요원 운용 파일')
-    // …and the callsign left the header outright. `.fh-v` is gone: a header
-    // that always names the CURRENT agent would contradict the page the moment
-    // the player turned back to an earlier one. It is 식별's first row now.
+    await expect(page.locator(`${FILE} .file-head`)).toHaveCount(0)
+    await expect(page.locator(`${FILE} .fh-doc`)).toHaveCount(0)
+    await expect(page.locator(`${FILE} .fh-title`)).toHaveCount(0)
     await expect(page.locator(`${FILE} .fh-v`)).toHaveCount(0)
     await page.locator(`${FILE} .pg-nav .pg-turn`).last().click()
     const identity = page.locator(`${FILE} .sect`).nth(0).locator('dl.sect-rows')
-    // x7 — was `toHaveText('ECHO-3')`. The fixture desk opens at run 3 and the
-    // ECHO series renumbered under it (run 1 is `ECHO` now), so the literal
-    // asserted the document's own numbering from a suite that owns none of it —
-    // and `agent-file.test.ts` already pins that numbering at the source. What
-    // this case is actually about is the doc line, and what 식별 owes it is a
-    // callsign at all.
+    await expect(page.locator(`${FILE} .sect`).nth(0).locator('.sect-hd')).toHaveCount(0)
     await expect(identity.locator('dd').first()).toHaveText(CALLSIGN)
   })
 
@@ -842,26 +794,18 @@ test.describe('[U5.3] a finished sitting becomes a page of its own', () => {
   })
 })
 
-/* ══ x7 · the document is headed, and the cover prints itself ═════════════
-   Two claims, both about the page BEFORE anything is pressed: every sheet of
-   the file says which file it is, and the cover is something the operator is
+/* ══ x7 · the document is unheaded, and the cover prints itself ═══════════
+   Two claims, both about the page BEFORE anything is pressed: the removed file
+   head stays gone on every sheet, and the cover is something the operator is
    made to read rather than something they are handed whole.
    ═══════════════════════════════════════════════════════════════════════ */
 
-test.describe('[x7] every page is headed, and the cover types itself out', () => {
+test.describe('[x7] every page is unheaded, and the cover types itself out', () => {
   /**
-   * The head was on the COVER alone, and that is the defect this pins.
-   *
-   * `pages()` built one `.file-head` element in the window's closure and
-   * appended it to page 0; the filed pages and the agent's page got none, so a
-   * reader who turned past the cover was holding unheaded sheets. The naive fix
-   * is the trap: appending that same node to three pages MOVES it, and the last
-   * page built would be the only one with a head — which looks right in whatever
-   * page the test happens to check and is wrong on every other. So this walks
-   * the WHOLE document, and it drives a third page into existence first, because
-   * two pages cannot tell a per-page head from a moved one.
+   * The removed head must stay removed from every page, including filed pages
+   * that are built after the first run closes.
    */
-  test('[x7] (a) 문서번호 and 현장 요원 운용 파일 head every page of the file', async ({ page }) => {
+  test('[x11] (a) 문서번호 and 현장 요원 운용 파일 are gone from every page of the file', async ({ page }) => {
     await boot(page)
     await page.locator(`${FILE} .pg-nav .pg-turn`).last().click()
     await seed(page)
@@ -882,10 +826,9 @@ test.describe('[x7] every page is headed, and the cover types itself out', () =>
     await expect(page.locator(`${FILE} .pg-count`)).toHaveText(`1 / ${total}`)
 
     for (let i = 0; i < total; i += 1) {
-      // Exactly one: a head per page, and one page mounted at a time (C1).
-      await expect(page.locator(`${FILE} .file-head`), `page ${i + 1} is not headed`).toHaveCount(1)
-      await expect(page.locator(`${FILE} .fh-doc`)).toHaveText(DOC_LINE)
-      await expect(page.locator(`${FILE} .fh-title`)).toHaveText('현장 요원 운용 파일')
+      await expect(page.locator(`${FILE} .file-head`), `page ${i + 1} kept the old head`).toHaveCount(0)
+      await expect(page.locator(`${FILE} .fh-doc`)).toHaveCount(0)
+      await expect(page.locator(`${FILE} .fh-title`)).toHaveCount(0)
       if (i < total - 1) await next.click()
     }
   })
@@ -894,9 +837,9 @@ test.describe('[x7] every page is headed, and the cover types itself out', () =>
    * The reveal itself — booted RAW, because `boot()` above presses the skip.
    *
    * What is asserted is the shape of it and not its pace: the cover arrives
-   * incomplete, the title block does not, the one control lands it, and the
-   * control leaves with the job. Timings are never equalities here — the reveal
-   * is decoration and a loaded CI box must not turn a beat into a red build.
+   * incomplete, the one control lands it, and the control leaves with the job.
+   * Timings are never equalities here — the reveal is decoration and a loaded CI
+   * box must not turn a beat into a red build.
    */
   test('[x7] (b) the cover arrives a character at a time, and 건너뛰기 lands it whole', async ({ page }) => {
     await page.goto('./')
@@ -915,11 +858,12 @@ test.describe('[x7] every page is headed, and the cover types itself out', () =>
       'the skip is not underlined',
     ).toContain('underline')
 
-    // The dossier is still printing; the title block never does.
+    // The dossier is still printing; the old title block is not present.
     const dossier = page.locator(`${FILE} #dossier`)
     const printing = ((await dossier.textContent()) ?? '').length
-    await expect(page.locator(`${FILE} .fh-doc`)).toHaveText(DOC_LINE)
-    await expect(page.locator(`${FILE} .fh-title`)).toHaveText('현장 요원 운용 파일')
+    await expect(page.locator(`${FILE} .file-head`)).toHaveCount(0)
+    await expect(page.locator(`${FILE} .fh-doc`)).toHaveCount(0)
+    await expect(page.locator(`${FILE} .fh-title`)).toHaveCount(0)
 
     // …and it arrives BY ITSELF, with no gesture in between. THIS is the
     // assertion the blank-cover bug walked straight through (x7, 08-09).

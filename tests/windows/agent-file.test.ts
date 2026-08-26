@@ -148,7 +148,8 @@ interface BlockCardModule {
 }
 
 interface DossierSection {
-  title: string
+  title?: string
+  headless?: boolean
   // U5.3 — `'filed'` is the fourth state. This mirror is what `tsc` reads and
   // `vitest` does not (§5.3), so it goes out of step silently if left.
   // x7 — `'sealed'` is gone: the cover was the only section that ever carried
@@ -353,7 +354,7 @@ describe('[u4#c2] §3 기질 is sealed by construction', () => {
       'a section still carries a number',
     ).toBe(true)
 
-    // x7 — THREE headings, replacing x6's four (임무 · 행동 원칙 · 기질 · 교신
+    // x7 — THREE cover headings, replacing x6's four (임무 · 행동 원칙 · 기질 · 교신
     // 지침). The cover leads with the incident now instead of with orders, and
     // 행동 원칙 left with the sealed 기질: a principle the operator cannot act on
     // was a screenful between the incident and the radio. Every section is
@@ -361,8 +362,9 @@ describe('[u4#c2] §3 기질 is sealed by construction', () => {
     // operable, which is what makes `agentModel` the only page with a board.
     expect(cover.map((s) => s.title)).toEqual(['사건 개요', '현장 요원 임무', '현장 요원 교신 지침'])
     expect(cover.map((s) => s.state)).toEqual(['fixed', 'fixed', 'fixed'])
-    expect(agent.map((s) => s.title)).toEqual(['식별', '인수인계 사항'])
+    expect(agent.map((s) => s.title)).toEqual([undefined, '인수인계 사항'])
     expect(agent.map((s) => s.state)).toEqual(['fixed', 'operable'])
+    expect(agent[0]!.headless).toBe(true)
 
     // x7 — 사건 개요 is the ONE section with a red footnote, and it must be its
     // own field rather than a fourth line of the body: `buildDossier` renders it
@@ -398,7 +400,7 @@ describe('[u4#c2] §3 기질 is sealed by construction', () => {
 
     // 인수인계 사항's note reads the cap, so the two cannot drift.
     expect(agent[1]!.note).toContain('4')
-    // 식별 carries the callsign it was handed (M1).
+    // The headless identity rows carry the callsign it was handed (M1).
     expect(JSON.stringify(agent[0]!.rows)).toContain('ECHO-1')
   })
 
@@ -941,12 +943,13 @@ describe('[u4#c9] u4 sources hold the run-wide hard constraints', () => {
 /* ══ U5.3 — a finished sitting's page ════════════════════════════════════ */
 
 describe('[U5.3] filedModel is the same document, closed', () => {
-  it('(a) it carries 식별 and a FILED 인수인계 사항, and nothing operable', async () => {
+  it('(a) it carries headless identity rows and a FILED 인수인계 사항, and nothing operable', async () => {
     const { filedModel } = await loadDossier()
     const sections = filedModel({ callsign: 'ECHO-1' })
 
-    expect(sections.map((s) => s.title)).toEqual(['식별', '인수인계 사항'])
+    expect(sections.map((s) => s.title)).toEqual([undefined, '인수인계 사항'])
     expect(sections.map((s) => s.state)).toEqual(['fixed', 'filed'])
+    expect(sections[0]!.headless).toBe(true)
     // x5 — the note no longer counts anything. It used to print '배치 3건', and
     // the page below it now prints those three sentences as a paragraph, so the
     // count was the document telling the reader what the reader can see. What
