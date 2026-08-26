@@ -31,6 +31,8 @@ const FILE = '#w-file'
 const CAP = 4
 /** x7 — the cover's own escape hatch; present only while it is still printing. */
 const SKIP = `${FILE} #coverSkip`
+const AGENT_RAIL = `${FILE} #agentRail`
+const AGENT_TAB = `${AGENT_RAIL} [role="option"]`
 /**
  * x7 — the callsign, ACCEPTING THE FIRST AGENT.
  *
@@ -711,6 +713,121 @@ test.describe('[U5.3] a finished sitting becomes a page of its own', () => {
     await expect(page.locator(`${FILE} #slotBoard`)).toHaveCount(0)
     await expect(page.locator(`${FILE} .slot-unset`)).toHaveCount(0)
     await expect(page.locator(`${FILE} [data-block-id]`)).toHaveCount(0)
+  })
+
+  test('[issue 227] agent tabs jump between named agent pages', async ({ page }) => {
+    await boot(page)
+    await expect(page.locator(AGENT_RAIL), 'the cover is not an agent tab').toBeHidden()
+    await page.locator(`${FILE} .pg-nav .pg-turn`).last().click()
+    await expect(page.locator(AGENT_RAIL), 'one named agent does not need a rail').toBeHidden()
+
+    const flying = await page.locator(`${FILE} .sect`).nth(0).locator('dd').first().textContent()
+    expect(flying, '식별 carries no callsign to fly').toMatch(CALLSIGN)
+    await page.locator('#btnDeploy').click()
+    await confirmDeploy(page)
+
+    await drain(page)
+    await expect(page.locator(`${FILE} .pg-count`)).toHaveText('3 / 3')
+    await expect(page.locator(AGENT_RAIL), 'the unnamed incoming page must not get a blank tab').toBeHidden()
+
+    await page.locator('#btnDeploy').click()
+    await confirmDeploy(page)
+    await expect(page.locator('#btnDeploy')).toHaveAttribute('data-op', 'deploy', { timeout: 20_000 })
+
+    const tabs = page.locator(AGENT_TAB)
+    await expect(page.locator(AGENT_RAIL)).toBeVisible()
+    await expect(tabs).toHaveCount(2)
+    await expect(tabs.first()).toHaveText(flying!)
+    await expect(tabs.nth(1)).toHaveText(CALLSIGN)
+    await expect(tabs.nth(1)).not.toHaveText(flying!)
+    await expect(tabs.nth(1)).toHaveAttribute('aria-selected', 'true')
+    await expect(tabs.nth(1)).toHaveAttribute('tabindex', '0')
+
+    await tabs.first().click()
+    await expect(page.locator(`${FILE} .pg-count`)).toHaveText('2 / 3')
+    await expect(page.locator(`${FILE} .sect`).nth(0).locator('dd').first()).toHaveText(flying!)
+    await expect(page.locator(`${AGENT_TAB}[aria-selected="true"]`)).toHaveText(flying!)
+
+    await page.locator(AGENT_TAB).nth(1).click()
+    await expect(page.locator(`${FILE} .pg-count`)).toHaveText('3 / 3')
+    await expect(page.locator(`${FILE} .sect`).nth(0).locator('dd').first()).not.toHaveText(flying!)
+
+    await page.locator(`${FILE} .pg-nav .pg-turn`).first().click()
+    await expect(page.locator(`${FILE} .pg-count`), 'the arrows remain the sequential page controls').toHaveText('2 / 3')
+  })
+
+  test('[issue 227] agent tabs are a roving listbox with clamped keyboard movement', async ({ page }) => {
+    await boot(page)
+    await page.locator(`${FILE} .pg-nav .pg-turn`).last().click()
+    const flying = await page.locator(`${FILE} .sect`).nth(0).locator('dd').first().textContent()
+    await page.locator('#btnDeploy').click()
+    await confirmDeploy(page)
+    await newRun(page)
+
+    const rail = page.locator(AGENT_RAIL)
+    const tabs = page.locator(AGENT_TAB)
+    await expect(rail).toHaveAttribute('role', 'listbox')
+    expect(await rail.getAttribute('aria-label')).not.toBe('')
+    await expect(tabs).toHaveCount(2)
+    await expect(page.locator(`${AGENT_TAB}[aria-selected="true"]`)).toHaveCount(1)
+    await expect(page.locator(`${AGENT_TAB}[tabindex="0"]`)).toHaveCount(1)
+
+    await tabs.first().click()
+    await expect(tabs.first()).toHaveAttribute('aria-selected', 'true')
+    await expect(page.locator(`${FILE} .pg-count`)).toHaveText('2 / 3')
+
+    await tabs.first().focus()
+    await page.keyboard.press('ArrowRight')
+    await expect(tabs.nth(1)).toHaveAttribute('aria-selected', 'true')
+    await expect(page.locator(`${FILE} .pg-count`)).toHaveText('3 / 3')
+
+    await page.keyboard.press('ArrowRight')
+    await expect(tabs.nth(1), 'ArrowRight clamps at the last agent tab').toHaveAttribute('aria-selected', 'true')
+
+    await page.keyboard.press('Home')
+    await expect(tabs.first()).toHaveAttribute('aria-selected', 'true')
+    await expect(page.locator(`${FILE} .sect`).nth(0).locator('dd').first()).toHaveText(flying!)
+
+    await page.keyboard.press('ArrowLeft')
+    await expect(tabs.first(), 'ArrowLeft clamps at the first agent tab').toHaveAttribute('aria-selected', 'true')
+
+    await page.keyboard.press('End')
+    await expect(tabs.nth(1)).toHaveAttribute('aria-selected', 'true')
+  })
+
+  test('[issue 227] 360px keeps agent tabs from pushing the page controls out', async ({ page }) => {
+    await boot(page)
+    await page.locator(`${FILE} .pg-nav .pg-turn`).last().click()
+    await page.locator('#btnDeploy').click()
+    await confirmDeploy(page)
+    await newRun(page)
+    await page.setViewportSize({ width: 360, height: 720 })
+
+    const rail = page.locator(AGENT_RAIL)
+    const nav = page.locator(`${FILE} .pg-nav`)
+    await expect(rail).toBeVisible()
+    await expect(page.locator(AGENT_TAB)).toHaveCount(2)
+    await expect(nav).toBeVisible()
+
+    const boxes = await page.evaluate(() => {
+      const file = document.querySelector('#w-file .win-body')?.getBoundingClientRect()
+      const nav = document.querySelector('#w-file .pg-nav')?.getBoundingClientRect()
+      const sheet = document.querySelector('#w-file .file-sheet')?.getBoundingClientRect()
+      const rail = document.querySelector('#w-file #agentRail')?.getBoundingClientRect()
+      if (!file || !nav || !sheet || !rail) return null
+      return {
+        fileBottom: file.bottom,
+        navBottom: nav.bottom,
+        sheetHeight: sheet.height,
+        railHeight: rail.height,
+      }
+    })
+    expect(boxes).not.toBeNull()
+    expect(boxes!.navBottom, 'page controls were pushed below the fixed AGENT FILE body').toBeLessThanOrEqual(
+      boxes!.fileBottom + 1,
+    )
+    expect(boxes!.sheetHeight, 'the tab rail consumed the document sheet at 360px').toBeGreaterThan(120)
+    expect(boxes!.railHeight, 'the tab rail wrapped into a tall block at 360px').toBeLessThan(60)
   })
 
   /**

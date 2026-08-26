@@ -98,6 +98,112 @@ export function railKeyIndex(count: number, current: number, key: string): numbe
 
 /* ── the DOM side ────────────────────────────────────────────────────────── */
 
+export interface RailSegmentItem {
+  id: string
+  label: string
+  selected: boolean
+  data?: Record<string, string>
+}
+
+export interface SegmentedRail {
+  readonly root: HTMLElement
+  render(segments: readonly RailSegmentItem[]): void
+  select(id: string): void
+  ids(): string[]
+}
+
+export interface SegmentedRailOptions {
+  id: string
+  label: string
+  rootClass?: string
+  buttonClass?: string
+  note?: string
+  noteClass?: string
+  onSelect(id: string): void
+}
+
+export function createSegmentedRail(options: SegmentedRailOptions): SegmentedRail {
+  const root = el('div', options.rootClass ?? 'arch-rail')
+  root.id = options.id
+  root.setAttribute('role', 'listbox')
+  root.setAttribute('aria-label', options.label)
+
+  const buttonClass = options.buttonClass ?? 'arch'
+  const noteClass = options.noteClass ?? 'arch-note'
+  let buttons: HTMLButtonElement[] = []
+  let order: string[] = []
+
+  function paintSelection(id: string): void {
+    buttons.forEach((node, i) => {
+      const on = order[i] === id
+      node.classList.toggle('on', on)
+      node.setAttribute('aria-selected', on ? 'true' : 'false')
+      node.tabIndex = on ? 0 : -1
+    })
+  }
+
+  function choose(id: string): void {
+    paintSelection(id)
+    options.onSelect(id)
+  }
+
+  root.addEventListener('keydown', (event: KeyboardEvent) => {
+    const current = order.findIndex((_, i) => buttons[i]?.tabIndex === 0)
+    const next = railKeyIndex(order.length, Math.max(0, current), event.key)
+    if (next === null) return
+    event.preventDefault()
+    const id = order[next]
+    if (id === undefined) return
+    choose(id)
+    buttons[next]?.focus()
+  })
+
+  return {
+    root,
+
+    render(segments: readonly RailSegmentItem[]): void {
+      root.replaceChildren()
+      order = segments.map((segment) => segment.id)
+      buttons = segments.map((segment) => {
+        const node = el('button', buttonClass)
+        node.type = 'button'
+        node.setAttribute('role', 'option')
+        node.dataset.railId = segment.id
+        for (const [key, value] of Object.entries(segment.data ?? {})) node.dataset[key] = value
+        node.append(el('span', undefined, segment.label))
+        node.addEventListener('click', () => {
+          choose(segment.id)
+        })
+        return node
+      })
+      root.append(...buttons)
+      if (options.note !== undefined) {
+        const note = el('div', noteClass, options.note)
+        note.setAttribute('aria-hidden', 'true')
+        root.append(note)
+      }
+      const selected = segments.find((segment) => segment.selected)
+      if (selected !== undefined) paintSelection(selected.id)
+      else if (buttons.length > 0) {
+        buttons.forEach((node) => {
+          node.classList.remove('on')
+          node.setAttribute('aria-selected', 'false')
+          node.tabIndex = -1
+        })
+        buttons[0]!.tabIndex = 0
+      }
+    },
+
+    select(id: string): void {
+      paintSelection(id)
+    },
+
+    ids(): string[] {
+      return [...order]
+    },
+  }
+}
+
 export interface ArchiveRail {
   readonly root: HTMLElement
   /** Rebuilds the segments; the active run keeps the selection. */
@@ -116,79 +222,45 @@ export interface ArchiveRailOptions {
 }
 
 export function createArchiveRail(options: ArchiveRailOptions): ArchiveRail {
-  const root = el('div', 'arch-rail')
-  root.id = 'archRail'
-  root.setAttribute('role', 'listbox')
-  root.setAttribute('aria-label', RAIL_LABEL)
-
-  let buttons: HTMLButtonElement[] = []
-  let order: number[] = []
+  const rail = createSegmentedRail({
+    id: 'archRail',
+    label: RAIL_LABEL,
+    note: RAIL_NOTE,
+    onSelect: (id) => {
+      options.onSelect(Number(id))
+    },
+  })
   let callsignSeries = options.callsignSeries
   let lastArchive: readonly ArchiveEntry[] = []
   let lastActiveRun: number | null = null
 
-  function paintSelection(run: number): void {
-    buttons.forEach((node, i) => {
-      const on = order[i] === run
-      node.classList.toggle('on', on)
-      node.setAttribute('aria-selected', on ? 'true' : 'false')
-      node.tabIndex = on ? 0 : -1
-    })
-  }
-
-  function choose(run: number): void {
-    paintSelection(run)
-    options.onSelect(run)
-  }
-
-  root.addEventListener('keydown', (event: KeyboardEvent) => {
-    const current = order.findIndex((_, i) => buttons[i]?.tabIndex === 0)
-    const next = railKeyIndex(order.length, Math.max(0, current), event.key)
-    if (next === null) return
-    event.preventDefault()
-    const run = order[next]
-    if (run === undefined) return
-    choose(run)
-    buttons[next]?.focus()
-  })
-
   return {
-    root,
+    root: rail.root,
 
     render(archive: readonly ArchiveEntry[], activeRun: number): void {
       lastArchive = archive
       lastActiveRun = activeRun
       const segments = archiveSegments(archive, activeRun, callsignSeries)
-      root.replaceChildren()
-      order = segments.map((s) => s.run)
-      buttons = segments.map((segment) => {
-        const node = el('button', 'arch')
-        node.type = 'button'
-        node.setAttribute('role', 'option')
-        // x7 — the tab says WHICH SITTING it is, in a form nothing has to parse.
-        //
-        // Its only identity was `runLabel`, the callsign — so a caller that
-        // wanted "the tab for run 3" had to know how run 3 is NAMED. `e2e/
-        // reports.spec.ts` carried a copy of `callsignOf` for exactly that, and
-        // a second copy read backwards (`label.match(/\d+/)`) to answer the
-        // reverse. The backwards one encoded the OLD rule and broke outright
-        // when x7 renumbered the series: it read every sitting one short and
-        // could not read run 1 at all, whose name has no digits in it.
-        //
-        // A run is a NUMBER the seam already carries. Publishing it is what lets
-        // the naming stay entirely `components/dossier.ts`'s business.
-        node.dataset.run = String(segment.run)
-        node.append(el('span', undefined, segment.runLabel))
-        node.addEventListener('click', () => {
-          choose(segment.run)
-        })
-        return node
-      })
-      root.append(...buttons)
-      const note = el('div', 'arch-note', RAIL_NOTE)
-      note.setAttribute('aria-hidden', 'true')
-      root.append(note)
-      paintSelection(activeRun)
+      rail.render(
+        segments.map((segment) => ({
+          id: String(segment.run),
+          label: segment.runLabel,
+          selected: segment.selected,
+          // x7 — the tab says WHICH SITTING it is, in a form nothing has to parse.
+          //
+          // Its only identity was `runLabel`, the callsign — so a caller that
+          // wanted "the tab for run 3" had to know how run 3 is NAMED. `e2e/
+          // reports.spec.ts` carried a copy of `callsignOf` for exactly that, and
+          // a second copy read backwards (`label.match(/\d+/)`) to answer the
+          // reverse. The backwards one encoded the OLD rule and broke outright
+          // when x7 renumbered the series: it read every sitting one short and
+          // could not read run 1 at all, whose name has no digits in it.
+          //
+          // A run is a NUMBER the seam already carries. Publishing it is what lets
+          // the naming stay entirely `components/dossier.ts`'s business.
+          data: { run: String(segment.run) },
+        })),
+      )
     },
 
     setCallsignSeries(series: string): void {
@@ -197,11 +269,11 @@ export function createArchiveRail(options: ArchiveRailOptions): ArchiveRail {
     },
 
     select(run: number): void {
-      paintSelection(run)
+      rail.select(String(run))
     },
 
     runs(): number[] {
-      return [...order]
+      return rail.ids().map((id) => Number(id))
     },
   }
 }

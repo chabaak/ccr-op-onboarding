@@ -39,6 +39,8 @@ import {
 import { SLOT_CAP, createSlotBoard, usedIds } from '../components/slot-board.ts'
 import { buildDeployStamp, buildDeployZone, deployView } from '../components/deploy-button.ts'
 import type { DeployMode } from '../components/deploy-button.ts'
+import { createSegmentedRail } from '../components/report-archive.ts'
+import type { RailSegmentItem } from '../components/report-archive.ts'
 import { PACE, settleRelease } from '../components/score-tally.ts'
 
 // x6b — THE LAST PRINTED WAIT LINE (민서, 08-09, playtest).
@@ -81,6 +83,8 @@ const SAY_HOLD_TAIL = ' 집계 대기 · 보고서 정리 중'
 const SAY_FILED_TAIL = ' 집계 완료 · 다음 시행을 시작할 수 있습니다'
 const SAY_LAPSED_TAIL = ' 보고서가 도착하지 않았습니다 · 다음 시행을 시작할 수 있습니다'
 const PAPER_PENDING_NOTE = '현장 기록 인쇄 중 — 인쇄 완료 후 다음 시행을 시작할 수 있습니다'
+const AGENT_RAIL_LABEL = '요원 파일 · 요원 선택'
+const AGENT_RAIL_NOTE = '요원 기록 · 호출부호 순'
 
 /** The dev/test handle, exactly as `shell/boot.ts` exposes `window.__shell`. */
 export interface AgentFileHandle {
@@ -542,6 +546,58 @@ export function mount(host: HTMLElement, driver: FixtureDriver): void {
   nav.append(pgPrev, pgCount, pgNext)
 
   let viewing = 0
+
+  const agentRail = createSegmentedRail({
+    id: 'agentRail',
+    label: AGENT_RAIL_LABEL,
+    rootClass: 'arch-rail file-agent-rail',
+    buttonClass: 'arch file-agent-tab',
+    note: AGENT_RAIL_NOTE,
+    noteClass: 'arch-note file-agent-note',
+    onSelect: (id) => {
+      const page = Number(id)
+      if (!Number.isInteger(page)) return
+      viewing = page
+      turn()
+    },
+  })
+
+  function liveTabLabel(): string {
+    if (!incoming) return callsignOf(run, callsignSeries)
+    const full = nextCallsignOf(run, callsignSeries)
+    return typedCallsign === full ? typedCallsign : ''
+  }
+
+  function agentTabs(lastPage: number): RailSegmentItem[] {
+    const segments: RailSegmentItem[] = []
+    let page = 1
+    for (const flown of [...filed.keys()].sort((a, b) => a - b)) {
+      segments.push({
+        id: String(page),
+        label: callsignOf(flown, callsignSeries),
+        selected: viewing === page,
+        data: { page: String(page), run: String(flown) },
+      })
+      page += 1
+    }
+    const liveLabel = liveTabLabel()
+    if (liveLabel !== '') {
+      segments.push({
+        id: String(lastPage),
+        label: liveLabel,
+        selected: viewing === lastPage,
+        data: { page: String(lastPage), live: 'true' },
+      })
+    }
+    return segments
+  }
+
+  function renderAgentRail(lastPage: number): void {
+    const segments = agentTabs(lastPage)
+    const selected = segments.some((segment) => segment.selected)
+    agentRail.root.hidden = segments.length < 2 || !selected
+    agentRail.render(segments)
+  }
 
   /* ══ x10 — THE CUE ON THE PAGE TURN ══════════════════════════════════════ */
 
@@ -1095,6 +1151,7 @@ export function mount(host: HTMLElement, driver: FixtureDriver): void {
     if (to === 'last') viewing = last
     const clamped = viewing < 0 ? 0 : viewing > last ? last : viewing
     viewing = clamped
+    renderAgentRail(last)
     // x10 — the cue's page condition, decided here because this is the only
     // place that holds both numbers. Two comparisons and no arithmetic, so the
     // `Math.max` ban (see above) is not even in reach: the mounted page is the
@@ -1150,7 +1207,7 @@ export function mount(host: HTMLElement, driver: FixtureDriver): void {
     turn()
   })
 
-  host.append(stamp.root, sheet, nav)
+  host.append(stamp.root, agentRail.root, sheet, nav)
 
   function dropHold(): void {
     if (hold === null) return
