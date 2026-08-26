@@ -39,7 +39,8 @@
 import { describe, it, expect } from 'vitest'
 import path from 'node:path'
 import { CLIENT, SHELL_DIR, exists, read, rel, tsFiles, walk } from './shell-utils.ts'
-import { TUTORIAL_ANCHORS, requireTutorialAnchor } from '../../src/client/shell/tutorial.ts'
+import { TUTORIAL_ANCHORS, requireTutorialAnchor, shouldRunTutorialWalk } from '../../src/client/shell/tutorial.ts'
+import type { TutorialWalkState } from '../../src/client/shell/tutorial.ts'
 
 const TUTORIAL_TS = path.join(SHELL_DIR, 'tutorial.ts')
 const COACH_TS = path.join(SHELL_DIR, 'coach.ts')
@@ -52,6 +53,13 @@ const MINABLE_SENTENCE_TS = path.join(CLIENT, 'components/minable-sentence.ts')
 const REPORT_VIEW_TS = path.join(CLIENT, 'components/report-view.ts')
 const SLOT_BOARD_TS = path.join(CLIENT, 'components/slot-board.ts')
 const WINDOW_REGISTRY_TS = path.join(SHELL_DIR, 'window-registry.ts')
+
+const walkState = (overrides: Partial<TutorialWalkState> = {}): TutorialWalkState => ({
+  flag: null,
+  tutorialPack: true,
+  webdriver: false,
+  ...overrides,
+})
 
 /** The walk is TWO modules now — the script and the layer it drives. */
 const WALK = [TUTORIAL_TS, COACH_TS] as const
@@ -172,6 +180,19 @@ describe('[x3] the walk exists and is wired exactly once', () => {
     // The walk outlives boot by minutes. An `await` here would hold the desk.
     expect(src).not.toMatch(/await\s+installTutorial/)
     expect(src).not.toMatch(/await\s+runTutorial/)
+  })
+})
+
+describe('[issue #213] the walk entry gate follows pack state', () => {
+  it.each([
+    ['show 는 튜토리얼 팩이 아니어도 걷는다', walkState({ flag: 'show', tutorialPack: false }), true],
+    ['show beats webdriver too', walkState({ flag: 'show', webdriver: true }), true],
+    ['skip refuses the tutorial pack', walkState({ flag: 'skip' }), false],
+    ['webdriver refuses the tutorial pack by default', walkState({ webdriver: true }), false],
+    ['tutorial pack walks by default', walkState(), true],
+    ['practice pack does not walk by default', walkState({ tutorialPack: false }), false],
+  ])('(%s)', (_name, input, expected) => {
+    expect(shouldRunTutorialWalk(input)).toBe(expected)
   })
 })
 
