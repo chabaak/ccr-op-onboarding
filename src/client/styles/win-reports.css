@@ -22,10 +22,13 @@
   font-size:var(--fs-10);letter-spacing:.24em;color:var(--surface-muted-2);white-space:nowrap}
 
 .rep-grid{flex:1;min-height:0;overflow-y:auto;background:var(--surface);position:relative;
-  scroll-behavior:smooth}
+  scroll-behavior:smooth;scrollbar-width:thin;scrollbar-color:var(--surface-muted) var(--surface-rule);
+  scrollbar-gutter:stable}
 .rep-grid.is-pinning{scroll-behavior:auto}
-.rep-grid::-webkit-scrollbar{width:8px}
-.rep-grid::-webkit-scrollbar-thumb{background:var(--sh-22)}
+.rep-grid::-webkit-scrollbar{width:1px}
+.rep-grid::-webkit-scrollbar-track{background:var(--surface-rule)}
+.rep-grid::-webkit-scrollbar-thumb{background:var(--surface-muted)}
+.rep-grid::-webkit-scrollbar-thumb:hover{background:var(--signal)}
 .rep-group{display:flex;flex-direction:column}
 .rep-row{display:grid;grid-template-columns:98px minmax(0,1fr);gap:var(--space-12);
   padding:var(--space-10) var(--space-12);box-sizing:border-box;align-items:start;
