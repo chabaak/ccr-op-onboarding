@@ -266,12 +266,11 @@ describe('published data — the allowlist tracks what the client fetches', () =
     ).toEqual([])
   })
 
-  it('(j) empty baseline lines cannot publish a stance label onto the player paper', () => {
-    // `baseline_utterance` is optional authoring data, but the compiled run
-    // always prints a baseline line when an empty handover skips Call 1. If the
-    // fallback is a stance label, `STANCE_SET` leaks through LIVE FEED/REPORTS.
+  it('(j) published baseline lines are authored and do not reuse stance labels', () => {
+    // `baseline_utterance` is optional in the schema because fixtures and
+    // future draft packs can omit it, but published packs should not lean on
+    // the neutral substitute as their normal player-visible radio line.
     const index = JSON.parse(read('data/scenario/index.json')) as { packs: { slug: string }[] }
-    let checked = 0
 
     for (const pack of index.packs) {
       const gates = JSON.parse(
@@ -290,20 +289,49 @@ describe('published data — the allowlist tracks what the client fetches', () =
       for (const gate of schedule.flatMap((beat) => (beat.gate === null ? [] : [beat.gate]))) {
         const source = gates.gates.find((entry) => entry.gate === gate.id)
         const authoredLine = (source?.baseline_utterance ?? '').trim()
-        if (authoredLine !== '') continue
-        checked += 1
-        expect(gate.baselineUtterance, `${pack.slug}/${gate.id} baseline substitute drifted`).toBe(
+        expect(authoredLine, `${pack.slug}/${gate.id} has no authored baseline line`).not.toBe('')
+        expect(gate.baselineUtterance, `${pack.slug}/${gate.id} used the neutral substitute`).not.toBe(
           SUBSTITUTE_BASELINE_UTTERANCE,
         )
+        expect(gate.baselineUtterance, `${pack.slug}/${gate.id} did not compile the authored line`).toBe(
+          authoredLine,
+        )
         for (const stance of source?.stances ?? []) {
-          expect(gate.baselineUtterance, `${pack.slug}/${gate.id} fell back to a stance label`).not.toBe(
-            stance.label,
-          )
+          expect(authoredLine, `${pack.slug}/${gate.id} authored a stance label`).not.toBe(stance.label)
         }
       }
     }
+  })
 
-    expect(checked, 'no published gate exercised the empty-baseline fallback').toBeGreaterThan(0)
+  it('(k) empty baseline lines still compile to neutral substitute text', () => {
+    // The #220 safety net remains: if a future authoring surface forgets this
+    // line, the compiled run must not print a stance label onto the player
+    // paper. A synthetic gate keeps that path covered now that published packs
+    // are fully authored.
+    const index = JSON.parse(read('data/scenario/index.json')) as { packs: { slug: string }[] }
+    const pack = index.packs[0]
+    expect(pack, 'no scenario pack to synthesize from').toBeDefined()
+    const gates = JSON.parse(read(`data/scenario/${pack!.slug}/gates.json`)) as Gates
+    const timeline = JSON.parse(read(`data/scenario/${pack!.slug}/timeline.json`)) as Timeline
+    const target = gates.gates[0]
+    expect(target, `${pack!.slug} has no gate to synthesize from`).toBeDefined()
+    const syntheticGates = {
+      gates: gates.gates.map((gate, index) =>
+        index === 0 ? { ...gate, baseline_utterance: null } : gate,
+      ),
+    } as Gates
+    const schedule = buildSchedule(timeline, syntheticGates)
+    const compiled = schedule.find((beat) => beat.gate?.id === target!.gate)?.gate
+    expect(compiled, `${pack!.slug}/${target!.gate} did not compile`).toBeDefined()
+    expect(compiled!.baselineUtterance, `${pack!.slug}/${target!.gate} baseline substitute drifted`).toBe(
+      SUBSTITUTE_BASELINE_UTTERANCE,
+    )
+
+    for (const stance of target!.stances) {
+      expect(compiled!.baselineUtterance, `${pack!.slug}/${target!.gate} fell back to a stance label`).not.toBe(
+        stance.label,
+      )
+    }
   })
 
   it('(f) every pack on disk is covered, so a new scenario cannot ship unlisted', () => {

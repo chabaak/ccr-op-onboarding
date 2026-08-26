@@ -28,6 +28,7 @@
         }
       ],
       "default_stance": "a",
+      "baseline_utterance": "TANGO, 운송사 품명 기준으로 생활화학 유출 접수하고 소규모 출동대 보내겠습니다.",
       "key_conditions": [
         {
           "id": "k1",
@@ -114,6 +115,7 @@
         }
       ],
       "default_stance": "a",
+      "baseline_utterance": "TANGO, 작업자 바람 위쪽으로 물리고 가는 물로 누출액 희석 들어가겠습니다.",
       "key_conditions": [
         {
           "id": "k1",
@@ -199,6 +201,7 @@
         }
       ],
       "default_stance": "a",
+      "baseline_utterance": "TANGO, 차 곁 작업자부터 안전거리 밖으로 빼는 데 남은 인력 붙이겠습니다.",
       "key_conditions": [
         {
           "id": "k1",
