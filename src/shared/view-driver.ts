@@ -24,6 +24,7 @@ export interface FeedLine { kind: FeedKind; clock: string /* "HH:MM" */; text: s
 
 export type ViewEvent =
   | { type: 'beat_start' | 'beat_end'; beat: number; clock: string }
+  | { type: 'round_open'; beat: number; clock: string; round: number }
   | { type: 'feed';     line: FeedLine }
   | { type: 'waiting';  active: boolean; for: 'judgment' | 'narration' | 'report' }
   | { type: 'fallback'; call: 1 | 2 | 3; code: string; beat: number }

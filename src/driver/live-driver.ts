@@ -6,7 +6,7 @@
  *
  * ```
  * beat_start
- *   gate beat only:  waiting(judgment,on) → [fallback] → waiting(judgment,off)
+ *   gate beat only:  round_open → waiting(judgment,on) → [fallback] → waiting(judgment,off)
  *   engine.applyBeatEffects()            → feed…        (the pre-narration flush)
  *   waiting(narration,on) → [fallback]   → waiting(narration,off)
  *   engine.applyNarration()              → feed…        (the post-narration flush)
@@ -212,6 +212,9 @@ export function createLiveDriver(deps: LiveDriverDeps): LiveDriver {
       beatIndex = beat.index
       cursor = 0
       emit({ type: 'beat_start', beat: beat.index, clock: beat.clock })
+      if (beat.kind === 'gate' && beat.roundIndex !== null) {
+        emit({ type: 'round_open', beat: beat.index, clock: beat.clock, round: beat.roundIndex })
+      }
 
       if (beat.kind === 'gate') {
         const blocks = membrane.deployed()

@@ -25,6 +25,7 @@ import { gatelessRun, leadingScriptRun, twoRounds } from './engine-fixtures/pack
 /** A1 — the gate beat, as a full array, not a subsequence. */
 const GATE_BEAT = [
   'beat_start',
+  'round_open',
   'waiting:judgment:on',
   'waiting:judgment:off',
   'feed:radio', // the utterance (`u`)
@@ -63,6 +64,12 @@ describe('[e7#A1] a gate beat emits exactly the ratified sequence', () => {
     expect(shape(sliceOf(events, 0))).toEqual([...GATE_BEAT])
   })
 
+  it('(c) round_open names the gate beat and its zero-based report round', async () => {
+    const events = await drain(makeRig({ shaped: true }))
+    const cue = sliceOf(events, 0).find((event) => event.type === 'round_open')
+    expect(cue).toEqual({ type: 'round_open', beat: 0, clock: '09:00', round: 0 })
+  })
+
   it('(b) the utterance reaches the feed on the PRE-narration flush, not after', async () => {
     const events = await drain(makeRig())
     const beat = shape(sliceOf(events, 0))
@@ -94,6 +101,15 @@ describe('[e7#A3] the round boundary', () => {
     const events = await drain(makeRig({ pack: twoRounds() }))
     const rounds = events.flatMap((e) => (e.type === 'report' ? [e.round] : []))
     expect(rounds).toEqual([0, 1])
+  })
+
+  it('(b2) exactly one round_open cue per opened gate round', async () => {
+    const events = await drain(makeRig({ shaped: true, pack: twoRounds() }))
+    const cues = events.flatMap((event) => (event.type === 'round_open' ? [event] : []))
+    expect(cues.map(({ clock, round }) => ({ clock, round }))).toEqual([
+      { clock: '09:00', round: 0 },
+      { clock: '10:00', round: 1 },
+    ])
   })
 
   it('(c) a beat before the first gate owes no report (decision 10)', async () => {

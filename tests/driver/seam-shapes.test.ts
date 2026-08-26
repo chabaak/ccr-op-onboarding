@@ -21,6 +21,7 @@ const DECLS = ['Species', 'Sentence', 'FeedKind', 'FeedLine', 'ViewEvent', 'Memb
 const VIEW_EVENT_TYPES = [
   'beat_start',
   'beat_end',
+  'round_open',
   'feed',
   'waiting',
   'fallback',
@@ -109,14 +110,14 @@ describe('[u2#c1]+[u2#c8] each declaration matches the ratified fence VERBATIM',
 })
 
 describe('[u2#c1] union arity is exact — no member added, none dropped', () => {
-  it('(e) ViewEvent carries all 8 members (9 `type` literals — beat_start/beat_end share one)', () => {
+  it('(e) ViewEvent carries all 9 members (10 `type` literals — beat_start/beat_end share one)', () => {
     const source = normalise(read(SEAM))
     const decl = declarations(source).get('ViewEvent') ?? ''
     for (const t of VIEW_EVENT_TYPES) {
       expect(decl, `ViewEvent is missing '${t}'`).toContain(`'${t}'`)
     }
     const members = decl.split('|').filter((m) => m.includes('type:')).length
-    expect(members, 'ViewEvent must have exactly 8 union members').toBe(8)
+    expect(members, 'ViewEvent must have exactly 9 union members').toBe(9)
   })
 
   it('(f) MembraneOp carries all 5 ops and no sixth', () => {

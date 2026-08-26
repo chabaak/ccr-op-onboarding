@@ -53,8 +53,9 @@ function twoEventBeat() {
 describe('[e7#A5] Call 1 fails', () => {
   it('(a) one `fallback{call:1}` lands between the judgment bracket’s two edges', async () => {
     const events = await drain(makeRig({ shaped: true, transport: failingTransport('judgment') }))
-    expect(shape(events).slice(0, 4)).toEqual([
+    expect(shape(events).slice(0, 5)).toEqual([
       'beat_start',
+      'round_open',
       'waiting:judgment:on',
       'fallback:1',
       'waiting:judgment:off',
@@ -83,9 +84,10 @@ describe('[e7#A5] Call 2 fails', () => {
   it('(a) one `fallback{call:2}` per beat, inside that beat’s narration bracket', async () => {
     const events = await drain(makeRig({ shaped: true, transport: failingTransport('narration') }))
     expect(fallbacks(events).map((event) => event.call)).toEqual([2, 2])
-    const beat = shape(events).slice(0, 9)
+    const beat = shape(events).slice(0, 10)
     expect(beat).toEqual([
       'beat_start',
+      'round_open',
       'waiting:judgment:on',
       'waiting:judgment:off',
       'feed:radio',
@@ -341,8 +343,9 @@ describe('[e7#A5] Call 3 fails', () => {
 describe('[#116 D] a call that lands unusable is a fallback too', () => {
   it('(a) a 200 judgment with no `stance` emits fallback{call:1} inside the bracket', async () => {
     const events = await drain(makeRig({ shaped: true, transport: unusableTransport('judgment', 'stance') }))
-    expect(shape(events).slice(0, 4)).toEqual([
+    expect(shape(events).slice(0, 5)).toEqual([
       'beat_start',
+      'round_open',
       'waiting:judgment:on',
       'fallback:1',
       'waiting:judgment:off',

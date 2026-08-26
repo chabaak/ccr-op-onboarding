@@ -47,7 +47,10 @@ const FROZEN_SUITES: Readonly<Record<string, string>> = {
   //
   // RE-PINNED (issue #53): the only change is the local compile smoke command,
   // now `tsc -p config/tsconfig.core.json` after the config file moved.
-  'seam-shapes.test.ts': '84007d2ffb890549a2b27d427d4a31dc17dee16004d5f9f5f19d3f00302e36be',
+  //
+  // RE-PINNED (#237): §5.2 gained the additive `round_open` cue approved for
+  // REPORTS gate timing; this suite now expects the widened seam contract.
+  'seam-shapes.test.ts': '0231116562a3131baf719e892648ada0581640a7e70b1a03e8fe5d9834ba0456',
 }
 
 function sha256(file: string): string {
