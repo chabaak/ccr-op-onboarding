@@ -13,6 +13,13 @@
       "role": "fixture",
       "order": 1,
       "difficulty": "2"
+    },
+    {
+      "slug": "병원연기",
+      "display_name": "병원 연기",
+      "role": "practice",
+      "order": 2,
+      "difficulty": "1"
     }
   ]
 }

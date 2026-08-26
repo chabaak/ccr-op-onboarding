@@ -1,0 +1,120 @@
+{
+  "characters": [
+    {
+      "id": "c1",
+      "name": "오민재",
+      "age": 39,
+      "role": "중앙멸균실 기사",
+      "interest": "비공식 충전대와 반입 기록을 숨기고 멸균기 과열로 사건을 묶어 자기 근무조의 책임을 줄이려 한다.",
+      "knows": [
+        "세척카트가 포장실에서 충전 중이었다는 것",
+        "임시 선반에 교체 배터리가 들어왔다는 것"
+      ],
+      "doesnt_know": [
+        "방화댐퍼 표시가 실제와 다르다는 것",
+        "외래동 대기홀 인원"
+      ],
+      "meters": [
+        {
+          "id": "m1",
+          "label": "축소",
+          "variable": "sterilizer_minimization",
+          "initial": 60
+        },
+        {
+          "id": "m2",
+          "label": "보호",
+          "variable": "staff_protection",
+          "initial": 35
+        }
+      ],
+      "strands": {
+        "truth_ids": [
+          "tr1",
+          "tr2"
+        ],
+        "gate_ids": [
+          "G1"
+        ]
+      }
+    },
+    {
+      "id": "c2",
+      "name": "정하린",
+      "age": 44,
+      "role": "외래 수간호사",
+      "interest": "외래 환자와 보호자를 직접 밖으로 빼고 싶지만 병원 방송 절차와 진료 중단 책임을 혼자 떠안기 어렵다.",
+      "knows": [
+        "외래 대기홀과 주사실에 거동이 느린 사람이 많다는 것",
+        "환기구에서 연기가 먼저 내려온다는 것"
+      ],
+      "doesnt_know": [
+        "지하 임시덕트 경로",
+        "수술부 반납 풍량"
+      ],
+      "meters": [
+        {
+          "id": "m1",
+          "label": "억제",
+          "variable": "outpatient_restraint",
+          "initial": 65
+        },
+        {
+          "id": "m2",
+          "label": "지속",
+          "variable": "nurse_persistence",
+          "initial": 45
+        }
+      ],
+      "strands": {
+        "truth_ids": [
+          "tr2",
+          "tr3"
+        ],
+        "gate_ids": [
+          "G2"
+        ]
+      }
+    },
+    {
+      "id": "c3",
+      "name": "권도윤",
+      "age": 48,
+      "role": "설비 협력업체 현장소장",
+      "interest": "점검 중 묶어 둔 방화댐퍼와 임시덕트 미철거를 드러내지 않고 공조 화면의 정상 표시로 상황을 눌러 두려 한다.",
+      "knows": [
+        "닫힌 댐퍼가 화면에는 열린 값으로 남는다는 것",
+        "임시덕트가 외래 반납풍도에 물렸다는 것",
+        "수술부 급기 표시가 반납 풍량을 가리지 못한다는 것"
+      ],
+      "doesnt_know": [
+        "외래동 실제 대기자 수",
+        "회복실 환자 상태"
+      ],
+      "meters": [
+        {
+          "id": "m1",
+          "label": "은폐",
+          "variable": "contractor_concealment",
+          "initial": 70
+        },
+        {
+          "id": "m2",
+          "label": "고집",
+          "variable": "contractor_stubbornness",
+          "initial": 60
+        }
+      ],
+      "strands": {
+        "truth_ids": [
+          "tr2",
+          "tr3",
+          "tr4"
+        ],
+        "gate_ids": [
+          "G3"
+        ]
+      }
+    }
+  ]
+}

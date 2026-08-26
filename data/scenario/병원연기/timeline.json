@@ -1,0 +1,407 @@
+{
+  "events": [
+    {
+      "id": "t1",
+      "time": "10:12",
+      "surface": "call",
+      "place_id": "p1",
+      "text": "오민재가 멸균기 뒤쪽에서 탄 냄새와 흰 연기가 난다고 신고하며 기계 과열 같다고 말한다.",
+      "exposure": {
+        "visible_from": null,
+        "extra_condition": null
+      },
+      "effects": {
+        "deltas": {},
+        "flags": {}
+      },
+      "present": [
+        {
+          "char_id": "c1",
+          "side": "line"
+        }
+      ]
+    },
+    {
+      "id": "t2",
+      "time": "10:15",
+      "surface": "cctv",
+      "place_id": "p1",
+      "text": "포장실 문틈 아래로 낮은 연기가 밀리고, 세척카트 충전대의 초록등이 깜박인다.",
+      "exposure": {
+        "visible_from": null,
+        "extra_condition": null
+      },
+      "effects": {
+        "deltas": {},
+        "flags": {}
+      },
+      "present": []
+    },
+    {
+      "id": "t3",
+      "time": "10:17",
+      "surface": "document",
+      "place_id": "p2",
+      "text": "설비 알림판은 `멸균기 스팀압 저하`를 먼저 띄우고 같은 줄 아래 `카트 충전 회로 과전류`를 작은 글씨로 남긴다.",
+      "exposure": {
+        "visible_from": null,
+        "extra_condition": null
+      },
+      "effects": {
+        "deltas": {},
+        "flags": {}
+      },
+      "present": []
+    },
+    {
+      "id": "t4",
+      "time": "10:20",
+      "surface": "call",
+      "place_id": "p1",
+      "text": "오민재가 “카트는 벽에 세워 뒀습니다. 멸균기 밸브부터 보겠습니다”라고 말한다.",
+      "exposure": {
+        "visible_from": "10:20",
+        "extra_condition": null
+      },
+      "effects": {
+        "deltas": {},
+        "flags": {}
+      },
+      "present": [
+        {
+          "char_id": "c1",
+          "side": "line"
+        }
+      ]
+    },
+    {
+      "id": "t5",
+      "time": "10:23",
+      "surface": "document",
+      "place_id": "p2",
+      "text": "야간 반입대장은 세척카트 배터리 교체품이 정식 창고가 아니라 포장실 임시 선반으로 들어온 기록을 보인다.",
+      "exposure": {
+        "visible_from": "10:23",
+        "extra_condition": null
+      },
+      "effects": {
+        "deltas": {},
+        "flags": {}
+      },
+      "present": []
+    },
+    {
+      "id": "t6",
+      "time": "10:26",
+      "surface": "onsite",
+      "place_id": "p1",
+      "text": "포장재 더미 옆 충전 케이블 피복이 녹아 붙고, 물분무 노즐 아래에서 검은 연기가 눌린다.",
+      "exposure": {
+        "visible_from": "10:26",
+        "extra_condition": null
+      },
+      "effects": {
+        "deltas": {},
+        "flags": {}
+      },
+      "present": []
+    },
+    {
+      "id": "t7",
+      "time": "10:30",
+      "surface": "call",
+      "place_id": "p1",
+      "text": "오민재가 “스팀을 잠그면 연기가 줄 겁니다. 카트는 빈 통로 쪽입니다”라고 서두른다.",
+      "exposure": {
+        "visible_from": "10:30",
+        "extra_condition": null
+      },
+      "effects": {
+        "deltas": {},
+        "flags": {}
+      },
+      "present": [
+        {
+          "char_id": "c1",
+          "side": "line"
+        }
+      ]
+    },
+    {
+      "id": "t8",
+      "time": "10:35",
+      "surface": "document",
+      "place_id": "p4",
+      "text": "공조 화면은 `B2-FD-4 열림`을 표시하지만, 점검표 사진에는 같은 손잡이가 붉은 끈으로 닫힘 위치에 묶여 있다.",
+      "exposure": {
+        "visible_from": "10:35",
+        "extra_condition": null
+      },
+      "effects": {
+        "deltas": {},
+        "flags": {}
+      },
+      "present": []
+    },
+    {
+      "id": "t9",
+      "time": "10:38",
+      "surface": "cctv",
+      "place_id": "p3",
+      "text": "외래동 접수창 위 환기구에서 얇은 회색 띠가 나오고, 대기 번호 화면 앞 보호자들이 고개를 든다.",
+      "exposure": {
+        "visible_from": "10:38",
+        "extra_condition": null
+      },
+      "effects": {
+        "deltas": {},
+        "flags": {}
+      },
+      "present": []
+    },
+    {
+      "id": "t10",
+      "time": "10:41",
+      "surface": "call",
+      "place_id": "p3",
+      "text": "정하린이 소아 대기줄과 주사실 의자를 아직 안쪽 홀에 붙잡아 두고 있다고 보고한다.",
+      "exposure": {
+        "visible_from": "10:41",
+        "extra_condition": null
+      },
+      "effects": {
+        "deltas": {},
+        "flags": {}
+      },
+      "present": [
+        {
+          "char_id": "c2",
+          "side": "line"
+        }
+      ]
+    },
+    {
+      "id": "t11",
+      "time": "10:45",
+      "surface": "onsite",
+      "place_id": "p3",
+      "text": "안내 방송은 입원동 계단을 비우라고 반복하고, 외래 대기홀 옆 출구는 셔틀 줄과 보안띠로 막혀 있다.",
+      "exposure": {
+        "visible_from": "10:45",
+        "extra_condition": null
+      },
+      "effects": {
+        "deltas": {},
+        "flags": {}
+      },
+      "present": []
+    },
+    {
+      "id": "t12",
+      "time": "10:49",
+      "surface": "document",
+      "place_id": "p4",
+      "text": "주말 공사 작업허가서는 지하 멸균실 배기 임시덕트가 외래동 천장 반납풍도에 물려 있다고 적는다.",
+      "exposure": {
+        "visible_from": "10:49",
+        "extra_condition": null
+      },
+      "effects": {
+        "deltas": {},
+        "flags": {}
+      },
+      "present": []
+    },
+    {
+      "id": "t13",
+      "time": "10:53",
+      "surface": "call",
+      "place_id": "p3",
+      "text": "정하린이 “기침하는 보호자들이 늘고 있습니다. 밖으로 내보내도 되는지 답을 기다립니다”라고 말한다.",
+      "exposure": {
+        "visible_from": "10:53",
+        "extra_condition": null
+      },
+      "effects": {
+        "deltas": {},
+        "flags": {}
+      },
+      "present": [
+        {
+          "char_id": "c2",
+          "side": "line"
+        }
+      ]
+    },
+    {
+      "id": "t14",
+      "time": "10:58",
+      "surface": "onsite",
+      "place_id": "p3",
+      "text": "대기홀 천장 쪽 연기가 짙어지고 휠체어 줄이 접수대와 주사실 사이에서 멈춘다.",
+      "exposure": {
+        "visible_from": "10:58",
+        "extra_condition": "not outpatient_evacuation"
+      },
+      "effects": {
+        "deltas": {},
+        "flags": {}
+      },
+      "present": []
+    },
+    {
+      "id": "t15",
+      "time": "11:04",
+      "surface": "document",
+      "place_id": "p4",
+      "text": "권도윤의 작업일지는 외래 반납풍도 임시 연결을 철거 예정으로 적고, 완료 칸은 비어 있다.",
+      "exposure": {
+        "visible_from": "11:04",
+        "extra_condition": null
+      },
+      "effects": {
+        "deltas": {},
+        "flags": {}
+      },
+      "present": []
+    },
+    {
+      "id": "t16",
+      "time": "11:09",
+      "surface": "cctv",
+      "place_id": "p5",
+      "text": "회복실 자동문 틈으로 연한 연기가 들어오지만 수술실 압력 화면은 파란 정상 칸을 유지한다.",
+      "exposure": {
+        "visible_from": "11:09",
+        "extra_condition": null
+      },
+      "effects": {
+        "deltas": {},
+        "flags": {}
+      },
+      "present": []
+    },
+    {
+      "id": "t17",
+      "time": "11:13",
+      "surface": "call",
+      "place_id": "p5",
+      "text": "마취 당직이 회복실 환자 산소포화도 알람이 이어진다고 말하고, 권도윤은 수술실 양압은 살아 있다고 답한다.",
+      "exposure": {
+        "visible_from": "11:13",
+        "extra_condition": null
+      },
+      "effects": {
+        "deltas": {},
+        "flags": {}
+      },
+      "present": [
+        {
+          "char_id": "c3",
+          "side": "line"
+        }
+      ]
+    },
+    {
+      "id": "t18",
+      "time": "11:17",
+      "surface": "document",
+      "place_id": "p4",
+      "text": "공조 추세표는 수술부 급기만 정상이고 회복실 반납 풍량은 지하팬 정지 뒤 낮은 칸으로 떨어진 것을 보인다.",
+      "exposure": {
+        "visible_from": "11:17",
+        "extra_condition": null
+      },
+      "effects": {
+        "deltas": {},
+        "flags": {}
+      },
+      "present": []
+    },
+    {
+      "id": "t19",
+      "time": "11:22",
+      "surface": "call",
+      "place_id": "p4",
+      "text": "권도윤이 “표시는 파랗습니다. 회복실 문만 닫으면 버팁니다”라고 말한다.",
+      "exposure": {
+        "visible_from": "11:22",
+        "extra_condition": null
+      },
+      "effects": {
+        "deltas": {},
+        "flags": {}
+      },
+      "present": [
+        {
+          "char_id": "c3",
+          "side": "line"
+        }
+      ]
+    },
+    {
+      "id": "t20",
+      "time": "11:28",
+      "surface": "onsite",
+      "place_id": "p5",
+      "text": "회복실 복도에 연기가 모이고, 들것을 밀던 간호사가 마스크를 잡은 채 벽 쪽으로 기대 선다.",
+      "exposure": {
+        "visible_from": "11:28",
+        "extra_condition": "not surgery_transfer"
+      },
+      "effects": {
+        "deltas": {},
+        "flags": {}
+      },
+      "present": []
+    },
+    {
+      "id": "t21",
+      "time": "11:43",
+      "surface": "onsite",
+      "place_id": "p3",
+      "text": "외래 대기홀에서 기침하던 보호자와 환자가 임시 처치구역으로 옮겨지고 접수대 앞 줄이 무너진다.",
+      "exposure": {
+        "visible_from": "11:43",
+        "extra_condition": "not outpatient_evacuation"
+      },
+      "effects": {
+        "deltas": {},
+        "flags": {}
+      },
+      "present": []
+    },
+    {
+      "id": "t22",
+      "time": "12:06",
+      "surface": "document",
+      "place_id": "p2",
+      "text": "병원 재난현황판이 외래 대기자, 회복실 환자, 지하 작업자를 따로 묶어 적색 칸을 늘린다.",
+      "exposure": {
+        "visible_from": "12:06",
+        "extra_condition": null
+      },
+      "effects": {
+        "deltas": {},
+        "flags": {}
+      },
+      "present": []
+    },
+    {
+      "id": "t23",
+      "time": "12:38+",
+      "surface": "call",
+      "place_id": "p2",
+      "text": "현장 지휘가 불은 꺼졌지만 공조를 탄 연기 노출은 병원 안 여러 층에 남았다고 보고한다.",
+      "exposure": {
+        "visible_from": "12:38+",
+        "extra_condition": null
+      },
+      "effects": {
+        "deltas": {},
+        "flags": {}
+      },
+      "present": []
+    }
+  ]
+}
