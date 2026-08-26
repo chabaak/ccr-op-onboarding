@@ -553,6 +553,78 @@ test.describe('typewriter is replay', () => {
     ).toBeLessThan(whole)
   })
 
+  test('typewriter is replay — animated arrivals keep following the sheet tail', async ({ page }) => {
+    test.setTimeout(60_000)
+    await boot(page, { reduced: false })
+    await deployFile(page)
+    await page.evaluate(() => {
+      const feed = (window as unknown as { __feed?: { seek(at: string): void; rate(to: number): void } }).__feed
+      if (!feed) throw new Error('window.__feed is not exposed by the LIVE FEED window')
+      feed.seek('21:03')
+      feed.rate(4)
+    })
+
+    type TailSample = {
+      gap: number
+      hiddenGridRows: number
+      hiddenRows: number
+      max: number
+      textChars: number
+      visibleRows: number
+    }
+    const readTail = async (): Promise<TailSample> =>
+      page.locator(`${REP} .rep-grid`).evaluate((node) => {
+        const grid = node as HTMLElement
+        const rows = [...grid.querySelectorAll<HTMLElement>('.rep-row')]
+        const max = grid.scrollHeight - grid.clientHeight
+        return {
+          gap: max - grid.scrollTop,
+          hiddenRows: rows.filter((row) => row.hidden).length,
+          hiddenGridRows: rows.filter((row) => row.hidden && getComputedStyle(row).display !== 'none').length,
+          max,
+          textChars: (grid.querySelector('.rep-rounds')?.textContent ?? '').length,
+          visibleRows: rows.filter((row) => !row.hidden).length,
+        }
+      })
+
+    let sample: TailSample = {
+      gap: Number.POSITIVE_INFINITY,
+      hiddenGridRows: 0,
+      hiddenRows: 0,
+      max: 0,
+      textChars: 0,
+      visibleRows: 0,
+    }
+    await expect
+      .poll(
+        async () => {
+          sample = await readTail()
+          return sample.textChars > 0 && sample.visibleRows > 0 && sample.hiddenRows > 0 && sample.max > 0
+        },
+        { timeout: 30_000, intervals: [40] },
+      )
+      .toBeTruthy()
+
+    const samples: TailSample[] = []
+    const deadline = Date.now() + 1_500
+    while (Date.now() < deadline) {
+      sample = await readTail()
+      if (sample.hiddenRows === 0) break
+      if (sample.textChars > 0 && sample.visibleRows > 0 && sample.max > 0) samples.push(sample)
+      await page.waitForTimeout(80)
+    }
+
+    expect(samples.length, 'the report was already whole, so animated follow is untested').toBeGreaterThan(2)
+    expect(
+      Math.max(...samples.map((entry) => entry.hiddenGridRows)),
+      'hidden report rows still occupy layout during replay',
+    ).toBe(0)
+    expect(
+      Math.max(...samples.map((entry) => entry.gap)),
+      'the report sheet detached from its tail while rows were still typing',
+    ).toBeLessThanOrEqual(2)
+  })
+
   // ADDED 08-05 (R4 on windows/reports.ts:90): NEW RUN re-entered `sync()`, the
   // rail gained an entry, and the document the tally had just sent the operator
   // to read blanked itself and re-typed for ~4 s over the next day's opening.

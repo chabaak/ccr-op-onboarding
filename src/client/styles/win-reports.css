@@ -23,6 +23,7 @@
 
 .rep-grid{flex:1;min-height:0;overflow-y:auto;background:var(--surface);position:relative;
   scroll-behavior:smooth}
+.rep-grid.is-pinning{scroll-behavior:auto}
 .rep-grid::-webkit-scrollbar{width:8px}
 .rep-grid::-webkit-scrollbar-thumb{background:var(--sh-22)}
 .rep-group{display:flex;flex-direction:column}
@@ -30,6 +31,7 @@
   padding:var(--space-10) var(--space-12);box-sizing:border-box;align-items:start;
   border:1px solid transparent;border-bottom-color:var(--ink-line);cursor:pointer;
   transition:background .15s,border-color .15s}
+.rep-row[hidden]{display:none}
 .rep-row:hover{background:var(--scan-a1)}
 .rep-row.is-mined,.rep-row:has(.min.mined){background:var(--band-1);border-color:var(--blueprint)}
 .rep-row.is-slotted{background:var(--scan-a05);border-color:var(--signal)}

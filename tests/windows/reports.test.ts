@@ -863,8 +863,15 @@ describe('[w2] a sitting accumulates its rounds into one document', () => {
     const text = view!.text
     expect(text, 'the report sheet has no tail attachment state').toMatch(/let attached = true/)
     expect(text, 'the sheet does not require a real scroll before detaching').toMatch(/!tail && !scrolledSincePin/)
-    expect(text, 'the sheet never scrolls itself to the tail').toMatch(/grid\.scrollTo\(\s*\{\s*top:\s*grid\.scrollHeight/)
-    expect(text, 'reduced motion can request instant scrolling').toMatch(/motionless\(\) \? 'instant' : 'smooth'/)
+    expect(text, 'the sheet never scrolls itself to the tail').toMatch(/grid\.scrollTop\s*=\s*grid\.scrollHeight/)
+    expect(text, 'tail catch-up is not instant, so the sheet can detach itself mid-replay').toMatch(
+      /grid\.classList\.add\(\s*'is-pinning'\s*\)[\s\S]*grid\.scrollTop\s*=\s*grid\.scrollHeight[\s\S]*grid\.classList\.remove\(\s*'is-pinning'\s*\)/,
+    )
+    const append = text.indexOf('append(slice: ReportModel')
+    const appendReread = text.indexOf('rereadAttachment()', append)
+    const appendGrow = text.indexOf('const grown = renderRound(slice', append)
+    expect(appendReread, 'append no longer reads tail state before growing the sheet').toBeGreaterThan(append)
+    expect(appendReread, 'append reads tail state after the new round changed scrollHeight').toBeLessThan(appendGrow)
     expect(text, 'append does not mark the new round as an arrival').toMatch(/replay\(\s*grown,\s*true,\s*true\s*\)/)
     expect(win!.text, 'arrival render does not pass the first-arrival boundary into the view').toMatch(
       /view\.render\(\s*model,\s*marks\(\),\s*\{\s*replay:\s*first,\s*follow:\s*first\s*\}\s*\)/,
