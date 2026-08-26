@@ -1,0 +1,100 @@
+{
+  "sterilizer_minimization": {
+    "up": [
+      {
+        "min": 1,
+        "text": "{who}의 설명이 멸균기 쪽으로 더 짧아진다."
+      }
+    ],
+    "down": [
+      {
+        "min": 1,
+        "text": "{who}가 충전대 흔적을 더는 밀어내지 못한다."
+      }
+    ]
+  },
+  "staff_protection": {
+    "up": [
+      {
+        "min": 1,
+        "text": "{who}가 포장실 사람을 먼저 물리자는 말에 힘을 싣는다."
+      }
+    ],
+    "down": [
+      {
+        "min": 1,
+        "text": "{who}가 작업자 보호 이야기를 삼킨다."
+      }
+    ]
+  },
+  "outpatient_restraint": {
+    "up": [
+      {
+        "min": 1,
+        "text": "{who}가 외래 홀을 붙잡는 방송을 더 오래 기다린다."
+      }
+    ],
+    "down": [
+      {
+        "min": 1,
+        "text": "{who}가 바깥 출구를 열어야 한다는 말에 기대 선다."
+      }
+    ]
+  },
+  "nurse_persistence": {
+    "up": [
+      {
+        "min": 1,
+        "text": "{who}가 대기홀 사람을 밖으로 빼는 일을 놓지 않는다."
+      }
+    ],
+    "down": [
+      {
+        "min": 1,
+        "text": "{who}의 외래 보고가 병원 방송 뒤로 밀린다."
+      }
+    ]
+  },
+  "contractor_concealment": {
+    "up": [
+      {
+        "min": 1,
+        "text": "{who}가 작업표의 빈칸을 더 깊이 접는다."
+      }
+    ],
+    "down": [
+      {
+        "min": 1,
+        "text": "{who}가 임시 연결 기록을 더는 가리지 못한다."
+      }
+    ]
+  },
+  "contractor_stubbornness": {
+    "up": [
+      {
+        "min": 1,
+        "text": "{who}가 파란 표시를 붙들고 문을 닫으라고 버틴다."
+      }
+    ],
+    "down": [
+      {
+        "min": 1,
+        "text": "{who}가 회복실 반납 풍량의 빈칸을 인정한다."
+      }
+    ]
+  },
+  "flags": {
+    "battery_origin_found": {
+      "set": "포장실 충전대가 첫 원점으로 상황판 앞줄에 오른다.",
+      "unset": null
+    },
+    "outpatient_evacuation": {
+      "set": "외래동 바깥 출구가 방송 순서보다 먼저 열린다.",
+      "unset": null
+    },
+    "surgery_transfer": {
+      "set": "회복실 환자 이동로가 파란 압력 표시보다 앞에 놓인다.",
+      "unset": null
+    }
+  }
+}
