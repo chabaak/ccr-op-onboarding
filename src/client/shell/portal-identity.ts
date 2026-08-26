@@ -46,8 +46,12 @@ export const PORTAL: PortalIdentity = {
   clearance: 'C-2',
 }
 
-/** The taskbar's standing hint — the reference's `.tb-hint`. */
-export const TASKBAR_HINT = '창을 끌어 배치 · 캡션에서 방향키로 이동'
+/**
+ * The former taskbar guidance keeps its measured slot without becoming visible
+ * or part of the accessibility tree. The spacer preserves the established
+ * positions of the task chips and abort control on wide desktops.
+ */
+export const TASKBAR_HINT_SPACER = '창을 끌어 배치 · 캡션에서 방향키로 이동'
 
 /**
  * The card the door TYPES ITSELF as the operator presses keys (`shell/sign-in.ts`).

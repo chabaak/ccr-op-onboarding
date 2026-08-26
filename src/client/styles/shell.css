@@ -199,9 +199,8 @@
 .abort-mission:focus-visible{outline:1px solid var(--warning);outline-offset:2px}
 .abort-mission[disabled]{opacity:.4;cursor:wait}
 .tb-hint{display:none;margin-left:auto;font-size:var(--fs-8-5);letter-spacing:.16em;color:var(--txt-8);
-  padding-right:var(--space-4);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+  padding-right:var(--space-4);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;visibility:hidden}
 @media (min-width:1500px){.tb-hint{display:block}}
-
 /* ═══ DESKTOP ═════════════════════════════════════════════════════════════ */
 /* no stacking context here — every .win must share the one runtime `--z`
    ladder the window manager writes. The rule outlived its original reason
