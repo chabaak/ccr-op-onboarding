@@ -2,9 +2,9 @@
 // (spec-client §4). Ported from docs/design/phase2-ui/app.js `renderDossier`
 // (203..232) + `data.js` DOSSIER (37..68) onto u1's vendored `.sect` skin.
 //
-// The copy is DOCUMENT ART, not engine data: the pack carries no callsign and
-// no standing orders. What IS pack-fed arrives as the models' own arguments —
-// incident-cover copy to `coverModel`, and the callsign and slot cap to
+// The copy is DOCUMENT ART over the pack-issued series, not engine data. What
+// IS pack-fed arrives as the models' own arguments — incident-cover copy and
+// callsign series to `coverModel`, and the numbered callsign and slot cap to
 // `agentModel` (u4 D2/D4).
 //
 // x7 — 기질 IS GONE FROM THE COVER, and the cover was the only place it appeared,
@@ -28,7 +28,7 @@
 import { el } from '../shell/dom.ts'
 
 /**
- * The sitting's callsign — document art; the pack carries none (D4).
+ * The sitting's callsign — document art over the pack-issued series.
  *
  * x7 — THE SERIES STARTS UNNUMBERED. It was `ECHO-${Math.max(1, run)}`, which
  * made the very first agent ECHO-1 and spent the bare name `ECHO` on nothing.
@@ -36,19 +36,19 @@ import { el } from '../shell/dom.ts'
  * yet — so the agent who flies it is just ECHO, and the numbering begins with
  * the second agent, the first one the operator actually shaped:
  *
- *   run 1 → ECHO · run 2 → ECHO-1 · run 3 → ECHO-2 · run 4 → ECHO-3
+ *   run 1 → SERIES · run 2 → SERIES-1 · run 3 → SERIES-2
  *
  * The `Math.max` fallback is gone with it. It existed to keep a run of 0 (the
  * pre-first-press desk) off `ECHO-0`, and `run <= 1` already answers that with
  * the same name the first real sitting gets — there is no second spelling of
  * "the agent who has not been shaped yet" left to drift.
  *
- * 사건 개요 on the cover names 요원 ECHO by hand. That is not a coincidence to
- * be tidied away: the file's opening paragraph and run 1's callsign are the
+ * 사건 개요 on the cover names the same series by data. That is not a coincidence
+ * to be tidied away: the file's opening paragraph and run 1's callsign are the
  * same agent, and if this mapping changes the paragraph is wrong.
  */
-export function callsignOf(run: number): string {
-  return run <= 1 ? 'ECHO' : `ECHO-${run - 1}`
+export function callsignOf(run: number, series: string): string {
+  return run <= 1 ? series : `${series}-${run - 1}`
 }
 
 /**
@@ -62,27 +62,22 @@ export function callsignOf(run: number): string {
  * numbers, and rightly: `run`, `runs_left`, `carried` and `archive` are the run
  * loop's and the client mirrors them.
  *
- * A callsign is not one of those numbers. The ECHO series is document art this
- * module already mints (`callsignOf` above — the pack carries no callsign at
- * all, D4), so "who comes after ECHO-3" is a question about the DOCUMENT's own
- * numbering and this is where it is answered. Nothing here reaches the seam,
- * decides a run, or survives into a `meta` field; the window still owns only
- * the choice of WHICH agent a page is about, which is a choice and not a sum.
+ * A callsign is not one of those numbers. The series comes from the active
+ * pack, while the x7 numbering is document art this module mints. Nothing here
+ * reaches the seam or decides a run; the window still owns only the choice of
+ * WHICH agent a page is about, which is a choice and not a sum.
  *
  * The desk never offers this page on the last day of an allotment — `runs_left`
  * is 0 there and `windows/agent-file.ts` reads it before turning — so no agent
  * is ever named who cannot be sent.
  *
- * x7 — it is STILL `callsignOf(run + 1)` and deliberately nothing more. The
- * series renumbered underneath it (run 1 is now plain ECHO), and the one place
- * an off-by-one could hide is the unnumbered → numbered boundary: after ECHO
- * comes ECHO-1, not ECHO-2. Composing rather than re-deriving is what makes
- * that free — there is one mapping and this reads it. `agent-file.test.ts
- * [u4#c2](g)` pins the boundary so a second copy of the arithmetic cannot be
- * introduced here without failing.
+ * x7 — it is STILL `callsignOf(run + 1, series)` and deliberately nothing more.
+ * The one place an off-by-one can hide is the unnumbered → numbered boundary:
+ * after SERIES comes SERIES-1, not SERIES-2. Composing rather than re-deriving
+ * is what makes that free — there is one mapping and this reads it.
  */
-export function nextCallsignOf(run: number): string {
-  return callsignOf(run + 1)
+export function nextCallsignOf(run: number, series: string): string {
+  return callsignOf(run + 1, series)
 }
 
 /**
@@ -107,7 +102,7 @@ const CALLSIGN_CLASS = 'rd-code'
 export interface AgentInput {
   /** 인수인계 사항's cap — read from `SLOT_CAP`, so note and board cannot drift (D3). */
   slotCap: number
-  /** 식별's 호출부호 — `ECHO-n` for the agent this page belongs to (M1). */
+  /** 식별's 호출부호 — `SERIES-n` for the agent this page belongs to (M1). */
   callsign: string
 }
 
@@ -121,6 +116,8 @@ export interface FiledInput {
 export interface AgentFileCoverCopy {
   /** 사건 개요's pack-authored fact lines, joined by `\n`. */
   incident: string
+  /** The selected scenario's callsign series. */
+  callsignSeries: string
 }
 
 /** A past page's 인수인계 사항 note — the sitting is over and nothing is operable. */
@@ -151,28 +148,29 @@ const FILED_NOTE = '파견 종료. 열람 전용'
  * The incident facts are selected-pack copy. They are passed in from the window
  * after it reads `data/scenario/<slug>/incidentCover.json`; keeping them out of
  * this module is what lets a pack switch move the cover with the pack. The
- * mission sentence and the dispatch sentence that names the ECHO series stay
- * here because every pack would otherwise restate the same portal invariant.
+ * mission sentence and the dispatch sentence that names the active callsign
+ * series stay here because every pack would otherwise restate the same portal
+ * invariant.
  */
 
 /**
  * 사건 개요's footing — the one line on the cover that is not in the fiction.
  *
- * It says the operator is reading a RECONSTRUCTION of ECHO's radio log, which
- * is the portal-wide reason a past incident can be replayed with different
- * handovers each time. That explanation belongs to the simulation terminal, not
- * to one incident's place, weather, time, or cause. Printed as body prose it
- * would read as a fourth incident clause and quietly contradict the three above
- * it; it is a small red note under the rule instead, which is how a form
- * footnotes itself. `.sect-note` is what the sheet paints that with.
+ * It says the operator is reading a RECONSTRUCTION of the active series' radio
+ * log, which is the portal-wide reason a past incident can be replayed with
+ * different handovers each time. That explanation belongs to the simulation
+ * terminal, not to one incident's place, weather, time, or cause. Printed as
+ * body prose it would read as a fourth incident clause and quietly contradict
+ * the three above it; it is a small red note under the rule instead.
  */
 // x7 — the ※ is part of the STRING, not a `::before` (민서, 08-09). The cover's
 // reveal prints text nodes, and a mark painted by the sheet would be on the page
 // before the sentence it belongs to had a character — the one glyph that would
 // give away that the line was coming. It types with the rest.
-const INCIDENT_NOTE = '※ 본 시뮬레이션은 당시 ECHO의 현장 무전 기록을 토대로 재구성되었습니다.'
-const CALLSIGN_SERIES = 'ECHO'
-const INCIDENT_DISPATCH = `긴급상황대응실 본부는 즉시 현장에 요원 ${CALLSIGN_SERIES}를 파견하여 상황 파악을 시작했다.`
+const incidentNote = (series: string): string =>
+  `※ 본 시뮬레이션은 당시 ${series}의 현장 무전 기록을 토대로 재구성되었습니다.`
+const incidentDispatch = (series: string): string =>
+  `긴급상황대응실 본부는 즉시 현장에 요원 ${series}를 파견하여 상황 파악을 시작했다.`
 const MISSION = '파견된 현장 위기 대응실에서 긴급 상황의 정체를 파악하고, 인명 피해를 최소화한다.'
 
 /**
@@ -243,6 +241,8 @@ export interface FixedSection extends SectionHead {
   state: 'fixed'
   /** `\n`-separated; every line becomes its own element (`buildSection`). */
   body: string
+  /** Callsign series to mark inside the body when this section names it. */
+  callsignSeries?: string
   /**
    * A small red footnote under the body — 사건 개요's is the only one (x7).
    *
@@ -299,7 +299,7 @@ export type DossierSection = RowsSection | FixedSection | OperableSection | File
  * incident cover prose, not chrome state or shared mission frame.
  */
 export function coverModel(copy: AgentFileCoverCopy): DossierSection[] {
-  const incident = `${copy.incident}\n${INCIDENT_DISPATCH}`
+  const incident = `${copy.incident}\n${incidentDispatch(copy.callsignSeries)}`
   return [
     // No slugs on the cover, and that is a decision the merge made rather than
     // inherited. `ui/tutorial-coach` slugged all three of these (`mission`,
@@ -308,7 +308,13 @@ export function coverModel(copy: AgentFileCoverCopy): DossierSection[] {
     // and a plate narrating a document mid-performance is a second voice over
     // the first. Nothing outside this window points here any more, so nothing
     // here needs a name. `handover` below is the one slug still earning its keep.
-    { title: '사건 개요', state: 'fixed', body: incident, note: INCIDENT_NOTE },
+    {
+      title: '사건 개요',
+      state: 'fixed',
+      body: incident,
+      note: incidentNote(copy.callsignSeries),
+      callsignSeries: copy.callsignSeries,
+    },
     { title: '현장 요원 임무', state: 'fixed', body: MISSION },
     { title: '현장 요원 교신 지침', state: 'fixed', body: COMMS_ORDERS },
   ]
@@ -412,22 +418,22 @@ export function buildDossier(model: readonly DossierSection[], slotHost: HTMLEle
  * sheet paints `.rd-echo` in the seal's red and bold, the same ink `.rd-code`
  * already gives the callsign row, so the brief and the identity agree.
  *
- * `ECHO` and not `callsignOf(...)`: this is the SERIES, not a sitting. The
- * incident summary is about the agent programme, and the run it is eventually
- * read beside may be ECHO-2. A literal is the honest thing here, and it is the
- * one place the bare series name is set in prose rather than minted.
+ * This marks the SERIES, not a sitting. The incident summary is about the agent
+ * programme, and the run it is eventually read beside may be the same series
+ * with a numeric suffix.
  *
  * Returns nodes rather than markup so the caller keeps control of the row, and
  * so the cover's reveal still sees plain text runs it can print into — the
  * `<b>` simply makes the sentence three text nodes instead of one, which
  * `collectCover` handles by keying its line pause to the ROW.
  */
-function callsignMarked(line: string): Node[] {
-  const parts = line.split(CALLSIGN_SERIES)
+function callsignMarked(line: string, series?: string): Node[] {
+  if (series === undefined || series.length === 0) return [document.createTextNode(line)]
+  const parts = line.split(series)
   if (parts.length === 1) return [document.createTextNode(line)]
   const out: Node[] = []
   for (const [index, part] of parts.entries()) {
-    if (index > 0) out.push(el('b', 'rd-echo', CALLSIGN_SERIES))
+    if (index > 0) out.push(el('b', 'rd-echo', series))
     if (part.length > 0) out.push(document.createTextNode(part))
   }
   return out
@@ -489,7 +495,7 @@ function buildSection(section: DossierSection, slotHost: HTMLElement): HTMLEleme
     ...spaced(
       ...section.body.split('\n').map((line) => {
         const row = el('div', 'sect-line')
-        row.append(...callsignMarked(line))
+        row.append(...callsignMarked(line, section.callsignSeries))
         return row
       }),
     ),

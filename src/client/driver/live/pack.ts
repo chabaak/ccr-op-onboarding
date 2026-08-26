@@ -40,8 +40,8 @@ const PACK_FILES = [
   'score',
 ] as const
 
-/** The pack plus the slug it declares — what `bindLiveRun` needs to open a run. */
-export type LivePack = EnginePack & { slug: string; score: ScorePack }
+/** The pack plus the identity fields the live facade needs to open a run. */
+export type LivePack = EnginePack & { slug: string; callsignSeries: string; score: ScorePack }
 
 /**
  * Only what a GET of a JSON file needs. Deliberately NOT the transport's
@@ -84,13 +84,17 @@ export async function fetchPack(source: PackSource, slug: string): Promise<LiveP
 
   // The same guard e9 applies: a pack whose meta disagrees with the directory
   // it was fetched from is not the pack the caller asked for.
-  const meta = pack.meta as { slug?: unknown }
+  const meta = pack.meta as { slug?: unknown; callsign_series?: unknown }
   if (meta.slug !== slug) {
     throw new Error(`pack "${slug}": meta.json declares slug ${JSON.stringify(meta.slug)}`)
+  }
+  if (typeof meta.callsign_series !== 'string' || !/^[A-Z]+$/.test(meta.callsign_series)) {
+    throw new Error(`pack "${slug}": meta.json has no uppercase callsign_series`)
   }
 
   return {
     slug,
+    callsignSeries: meta.callsign_series,
     timeline: pack.timeline,
     gates: pack.gates,
     characters: pack.characters,

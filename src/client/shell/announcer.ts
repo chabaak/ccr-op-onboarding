@@ -35,7 +35,7 @@ import { callsignOf } from '../components/dossier.ts'
 
 // x6b — `SHOW_MS` (4 s) went with the visible panel. It timed how long a line
 // stayed on screen; there is no screen now, and a live region does not expire.
-const RUN_OPENED = (run: number) => `${callsignOf(run)} 교신 시작`
+const RUN_OPENED = (run: number, callsignSeries: string) => `${callsignOf(run, callsignSeries)} 교신 시작`
 const FALLBACK: Record<1 | 2 | 3, string> = {
   1: '회신 불량',
   2: '네트워크 지연 중',
@@ -63,10 +63,10 @@ export function announce(text: string): void {
 }
 
 /** The line an event is worth saying out loud, or `null` for the ones that are not. */
-export function announcementOf(event: ViewEvent): string | null {
+export function announcementOf(event: ViewEvent, callsignSeries = 'ECHO'): string | null {
   switch (event.type) {
     case 'meta':
-      return RUN_OPENED(event.run)
+      return RUN_OPENED(event.run, callsignSeries)
     // x6 — spelled out rather than left to the default, so a reader who comes
     // here looking for the wait announcement finds the decision instead of a
     // gap: a wait is SAID nothing at all. See the header.
@@ -86,8 +86,9 @@ export function announcementOf(event: ViewEvent): string | null {
 /** Binds the live region to the stream. Returns the unsubscribe the shell owns. */
 export function createAnnouncer(host: HTMLElement, driver: FixtureDriver): () => void {
   region = host
+  const callsignSeries = driver.callsignSeries()
   return driver.subscribe((event: ViewEvent) => {
-    const line = announcementOf(event)
+    const line = announcementOf(event, callsignSeries)
     if (line !== null) announce(line)
   })
 }

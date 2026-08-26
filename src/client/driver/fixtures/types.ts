@@ -15,6 +15,8 @@ export interface FixtureRun {
   start: string
   /** `"HH:MM"` the run closes on. */
   end: string
+  /** Callsign series for this fixture run. Omitted fixtures use the tutorial series. */
+  callsignSeries?: string
   /** The stream, in the order the script means it to arrive. */
   events: ViewEvent[]
   /** Canned answers, keyed by op — an op with no entry is not expected. */

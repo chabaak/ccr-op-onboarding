@@ -120,13 +120,14 @@ interface ArchiveModule {
   archiveSegments(
     archive: readonly { run: number; label: string }[],
     activeRun: number,
+    callsignSeries: string,
   ): ArchiveSegment[]
   railKeyIndex(count: number, current: number, key: string): number | null
 }
 
-/** u4's — the one mint of the ECHO series. See `DOSSIER_TS`. */
+/** u4's — the one mint of the callsign series. See `DOSSIER_TS`. */
 interface DossierModule {
-  callsignOf(run: number): string
+  callsignOf(run: number, series: string): string
 }
 
 interface TypeState {
@@ -487,6 +488,7 @@ describe('[u6#c4] archive segmentation is pure and gate-free', () => {
         { run: 2, label: '09:10 — 21:04' },
       ],
       2,
+      'ECHO',
     )
     expect(segments.map((s) => s.run)).toEqual([1, 2])
   })
@@ -500,6 +502,7 @@ describe('[u6#c4] archive segmentation is pure and gate-free', () => {
         { run: 12, label: '09:10 — 21:04' },
       ],
       1,
+      'ECHO',
     )
     // x7 — asserted against `callsignOf`, not against the two strings it
     // happened to return the day this was written (`'ECHO-1'` / `'ECHO-12'`).
@@ -508,8 +511,8 @@ describe('[u6#c4] archive segmentation is pure and gate-free', () => {
     // and when the series was renumbered (the unshaped first agent is plain
     // `ECHO` now) it was this assertion that went red while the two surfaces it
     // guards still agreed perfectly.
-    expect(segments[0]!.runLabel).toBe(callsignOf(1))
-    expect(segments[1]!.runLabel).toBe(callsignOf(12))
+    expect(segments[0]!.runLabel).toBe(callsignOf(1, 'ECHO'))
+    expect(segments[1]!.runLabel).toBe(callsignOf(12, 'ECHO'))
     // …and not vacuously: a callsign in shape, DELIBERATELY LITERAL on `ECHO`
     // because that is the shipped name of the series and nothing else here says
     // it out loud — renaming it should not be able to pass in silence. The
@@ -538,6 +541,7 @@ describe('[u6#c4] archive segmentation is pure and gate-free', () => {
         { run: 2, label: 'driver-owned-r2' },
       ],
       1,
+      'SIERRA',
     )
     const printed = segments.map((s) => JSON.stringify(s))
     expect(printed[0]).not.toMatch(/08:50|21:04|RUN\s*01/)
@@ -545,7 +549,7 @@ describe('[u6#c4] archive segmentation is pure and gate-free', () => {
     // x7 — same substitution as (b): what is left on the tab after the seam's
     // label has been refused is the callsign, whatever `callsignOf` currently
     // makes of a run. This case is about what did NOT reach the tab.
-    expect(segments.map((s) => s.runLabel)).toEqual([callsignOf(1), callsignOf(2)])
+    expect(segments.map((s) => s.runLabel)).toEqual([callsignOf(1, 'SIERRA'), callsignOf(2, 'SIERRA')])
   })
 
   it('(d) exactly one segment is selected — the active run', async () => {
@@ -556,15 +560,16 @@ describe('[u6#c4] archive segmentation is pure and gate-free', () => {
         { run: 2, label: '09:10 — 21:04' },
       ],
       2,
+      'ECHO',
     )
     expect(segments.filter((s) => s.selected).map((s) => s.run)).toEqual([2])
   })
 
   it('(e) NO GATE LABEL reaches a player surface (spec-client §3 inv 6)', async () => {
     const a = await archive()
-    const segments = a.archiveSegments([{ run: 1, label: '08:50 — 21:04' }], 1)
+    const segments = a.archiveSegments([{ run: 1, label: '08:50 — 21:04' }], 1, 'ECHO')
     for (const s of segments) expect(JSON.stringify(s)).not.toMatch(/gate|게이트/i)
-    expect(() => a.archiveSegments([{ run: 1, label: 'GATE A / 08:50' }], 1)).toThrow()
+    expect(() => a.archiveSegments([{ run: 1, label: 'GATE A / 08:50' }], 1, 'ECHO')).toThrow()
   })
 
   it('(f) the rail is a roving-focus listbox: ←/→/Home/End move, anything else is not handled', async () => {

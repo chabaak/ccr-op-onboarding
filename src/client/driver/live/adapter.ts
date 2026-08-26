@@ -104,6 +104,8 @@ export type RunClose = {
 export type LiveAdapterDeps = {
   /** The first run, already bound. */
   first: BoundRun
+  /** Callsign series issued by the active pack. */
+  callsignSeries?: string
   /** Authored timeline clocks from the active pack. */
   feedGapClocks?: readonly string[]
   /**
@@ -403,6 +405,7 @@ export function createLiveAdapter(deps: LiveAdapterDeps): FixtureDriver {
   return {
     clock: clockProxy,
     feedGapClocks: deps.feedGapClocks === undefined ? undefined : () => deps.feedGapClocks!,
+    callsignSeries: () => deps.callsignSeries ?? 'ECHO',
 
     subscribe(listener: ViewListener) {
       listeners.add(listener)

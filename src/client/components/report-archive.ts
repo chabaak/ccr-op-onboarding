@@ -2,8 +2,8 @@
 //
 // The rail is segmented by SITTING and TIME, and by nothing else: "no gate
 // label appears on any player surface". The seam hands over `meta.archive` as
-// `{run, label}` pairs, so the run number is the authority for the `ECHO-n`
-// half (G3 — `callsignOf`) and the label contributes only its time span — a
+// `{run, label}` pairs, so the run number is the authority for the numbered
+// callsign half (G3 — `callsignOf`) and the label contributes only its time span — a
 // label that already
 // carries its own prefix is normalised rather than doubled, and a label that
 // smuggles a design-time marker is refused outright instead of being printed.
@@ -61,6 +61,7 @@ export const RAIL_NOTE = '보관 기록 · 시행 순'
 export function archiveSegments(
   archive: readonly ArchiveEntry[],
   activeRun: number,
+  callsignSeries: string,
 ): ArchiveSegment[] {
   return archive.map((entry) => {
     if (REFUSED.test(entry.label)) {
@@ -68,7 +69,7 @@ export function archiveSegments(
     }
     return {
       run: entry.run,
-      runLabel: callsignOf(entry.run),
+      runLabel: callsignOf(entry.run, callsignSeries),
       selected: entry.run === activeRun,
     }
   })
@@ -101,6 +102,8 @@ export interface ArchiveRail {
   readonly root: HTMLElement
   /** Rebuilds the segments; the active run keeps the selection. */
   render(archive: readonly ArchiveEntry[], activeRun: number): void
+  /** Rebinds existing tabs to the active pack's callsign series. */
+  setCallsignSeries(series: string): void
   /** Moves the announced selection and the roving tabindex to `run`. */
   select(run: number): void
   /** The runs the rail currently offers, in rail order. */
@@ -108,6 +111,7 @@ export interface ArchiveRail {
 }
 
 export interface ArchiveRailOptions {
+  callsignSeries: string
   onSelect(run: number): void
 }
 
@@ -119,6 +123,9 @@ export function createArchiveRail(options: ArchiveRailOptions): ArchiveRail {
 
   let buttons: HTMLButtonElement[] = []
   let order: number[] = []
+  let callsignSeries = options.callsignSeries
+  let lastArchive: readonly ArchiveEntry[] = []
+  let lastActiveRun: number | null = null
 
   function paintSelection(run: number): void {
     buttons.forEach((node, i) => {
@@ -149,7 +156,9 @@ export function createArchiveRail(options: ArchiveRailOptions): ArchiveRail {
     root,
 
     render(archive: readonly ArchiveEntry[], activeRun: number): void {
-      const segments = archiveSegments(archive, activeRun)
+      lastArchive = archive
+      lastActiveRun = activeRun
+      const segments = archiveSegments(archive, activeRun, callsignSeries)
       root.replaceChildren()
       order = segments.map((s) => s.run)
       buttons = segments.map((segment) => {
@@ -180,6 +189,11 @@ export function createArchiveRail(options: ArchiveRailOptions): ArchiveRail {
       note.setAttribute('aria-hidden', 'true')
       root.append(note)
       paintSelection(activeRun)
+    },
+
+    setCallsignSeries(series: string): void {
+      callsignSeries = series
+      if (lastActiveRun !== null) this.render(lastArchive, lastActiveRun)
     },
 
     select(run: number): void {
