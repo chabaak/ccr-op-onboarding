@@ -122,7 +122,7 @@ describe('scenario desktop replay files', () => {
       lead: '사건 장소와 출발 상황.',
       body: ['첫 번째 팩 전용 문장.', '두 번째 팩 전용 문장.'],
     }
-    const copy = incidentBriefCopy(entry, brief)
+    const copy = incidentBriefCopy(entry)
 
     expect(copy).toEqual({
       head: entry.displayName,

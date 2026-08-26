@@ -17,7 +17,7 @@ import {
   sortedScenarioPacks,
   tutorialScenarioPack,
 } from './pack.ts'
-import type { ScenarioEndings, ScenarioIncidentBrief, ScenarioIndex, ScenarioPackEntry, ScenarioScore } from './pack.ts'
+import type { ScenarioEndings, ScenarioIndex, ScenarioPackEntry, ScenarioScore } from './pack.ts'
 import { resetScenarioSession, returnToScenarioDesktop, switchScenarioPack } from './pack-session.ts'
 import type { ScenarioSwitchOptions } from './pack-session.ts'
 import type { ConfirmCopy } from './confirm.ts'
@@ -157,11 +157,7 @@ export function unlockAllScenarioFiles(
   return slugs
 }
 
-export function incidentBriefCopy(
-  entry: ScenarioPackEntry,
-  brief: ScenarioIncidentBrief,
-): ConfirmCopy {
-  void brief
+export function incidentBriefCopy(entry: ScenarioPackEntry): ConfirmCopy {
   return {
     head: entry.displayName,
     meta: '사건 배치',
@@ -274,8 +270,9 @@ export function installScenarioDesktop(deps: ScenarioDesktopDeps): ScenarioDeskt
           }
           return
         }
-        const brief = await fetchScenarioIncidentBrief(entry.slug)
-        const confirmed = await openConfirm(deps.app, incidentBriefCopy(entry, brief))
+        // Startup check: the brief must be readable, but the confirm plate no longer prints it.
+        await fetchScenarioIncidentBrief(entry.slug)
+        const confirmed = await openConfirm(deps.app, incidentBriefCopy(entry))
         if (confirmed) {
           switchScenarioPack(deps.index, entry.slug, {
             storage: sessionStorage,
