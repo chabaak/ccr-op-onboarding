@@ -2,6 +2,7 @@ import { describe, expect, it, vi } from 'vitest'
 
 import { META_KEY } from '../../src/client/shell/run-state.ts'
 import {
+  SCENARIO_CONFIRM_NOTE,
   SCENARIO_PICKER_NOTE,
   SCENARIO_UNLOCK_NOTICE,
   SCENARIO_ENDING_LOAD_FAILURE_NOTICE,
@@ -115,21 +116,25 @@ describe('scenario desktop replay files', () => {
     expect(JSON.parse(storage.getItem(UNLOCKED_SCENARIOS_KEY) ?? 'null')).toEqual(expected)
   })
 
-  it('(f) the case brief uses pack prose only for the case-specific lines', () => {
+  it('(f) the case confirm does not expose the incident brief before deployment', () => {
     const entry = sortedScenarioPacks(MANIFEST)[0]!
     const brief: ScenarioIncidentBrief = {
       lead: '사건 장소와 출발 상황.',
       body: ['첫 번째 팩 전용 문장.', '두 번째 팩 전용 문장.'],
     }
+    const copy = incidentBriefCopy(entry)
 
-    expect(incidentBriefCopy(entry, brief)).toEqual({
+    expect(copy).toEqual({
       head: entry.displayName,
-      meta: '사건 개요',
-      body: brief.lead,
-      note: brief.body.join('\n'),
+      meta: '사건 배치',
+      body: `${entry.displayName} 사건을 진행하시겠습니까?`,
+      note: SCENARIO_CONFIRM_NOTE,
       yes: '열기',
       no: '취소',
     })
+    const visible = Object.values(copy).join('\n')
+    expect(visible).not.toContain(brief.lead)
+    for (const line of brief.body) expect(visible).not.toContain(line)
   })
 
   it('(g) picker cards carry only assignment metadata before deployment', () => {
