@@ -28,6 +28,7 @@
         }
       ],
       "default_stance": "a",
+      "baseline_utterance": "ECHO, 한내돔 신고는 시설 누수로 접수하고 배수반 출동을 잡겠습니다.",
       "predicted_shift": null,
       "false_leads": [
         "표기웅의 말이 미심쩍었습니다 — 통화 · 시계 19:26. 결은 맞고 실은 것이 없다. 요원이 이미 느끼고 있는 것을 되돌려 받을 뿐이라 판단이 움직이지 않는다"
@@ -87,6 +88,7 @@
         }
       ],
       "default_stance": "a",
+      "baseline_utterance": "ECHO, 남측 회전 출입구가 정규 대피로라 전원 그쪽으로 유도하겠습니다.",
       "predicted_shift": null,
       "false_leads": [
         "돔에는 남측 회전문 말고 다른 개구부도 있습니다 — 통화 · 시계 20:41. 개구부가 있다는 것과 사람이 지나갈 수 있다는 것은 다른 말이고, 이 문장은 앞의 것만 싣는다"
@@ -156,6 +158,7 @@
         }
       ],
       "default_stance": "a",
+      "baseline_utterance": "ECHO, 지붕 압력 유지가 우선이라 서쪽 통로만 유지하고 추가 개방은 막겠습니다.",
       "predicted_shift": null,
       "false_leads": [
         "송풍기 두 대 가운데 한 대가 오래전부터 돌지 않았습니다 — 통화 · 시계 19:52. 고장으로 읽히는 문장이라, 고치라는 요청이 아니라 포기의 근거가 된다",

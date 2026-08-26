@@ -28,6 +28,7 @@
         }
       ],
       "default_stance": "a",
+      "baseline_utterance": "SIERRA, 멸균기 과열 건으로 보고 병원 설비반 중심 내부 화재 전파로 처리하겠습니다.",
       "key_conditions": [
         {
           "id": "k1",
@@ -114,6 +115,7 @@
         }
       ],
       "default_stance": "a",
+      "baseline_utterance": "SIERRA, 병원 방송 순서대로 입원동 계단과 지하 출입 통제에 인력 먼저 붙이겠습니다.",
       "key_conditions": [
         {
           "id": "k1",
@@ -212,6 +214,7 @@
         }
       ],
       "default_stance": "a",
+      "baseline_utterance": "SIERRA, 수술실 압력 계기 정상 확인했고 회복실 문 닫아 병원 안에서 버티겠습니다.",
       "key_conditions": [
         {
           "id": "k1",
