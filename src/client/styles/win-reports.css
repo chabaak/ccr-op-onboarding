@@ -21,7 +21,8 @@
 .arch-note{margin-left:auto;flex:0 0 auto;padding-left:var(--space-12);
   font-size:var(--fs-10);letter-spacing:.24em;color:var(--surface-muted-2);white-space:nowrap}
 
-.rep-grid{flex:1;min-height:0;overflow-y:auto;background:var(--surface);position:relative}
+.rep-grid{flex:1;min-height:0;overflow-y:auto;background:var(--surface);position:relative;
+  scroll-behavior:smooth}
 .rep-grid::-webkit-scrollbar{width:8px}
 .rep-grid::-webkit-scrollbar-thumb{background:var(--sh-22)}
 .rep-group{display:flex;flex-direction:column}
@@ -72,6 +73,10 @@
 .caret{display:inline-block;width:10px;height:1.05em;vertical-align:-.15em;
   background:var(--surface-text);animation:blink .85s steps(2) infinite;margin-left:var(--space-1)}
 @keyframes blink{0%,49%{opacity:1}50%,100%{opacity:0}}
+
+@media (prefers-reduced-motion: reduce){
+  .rep-grid{scroll-behavior:auto}
+}
 
 /* ===========================================================================
    the terminal record (U3, re-skinned x4) — the day's 집계, in the same tagged

@@ -401,14 +401,56 @@ test.describe('typewriter is replay', () => {
     await drain(page)
     const report = await reportForActiveRun(page)
 
+    const facts = await page
+      .locator(`${FACTS} .sent`)
+      .evaluateAll((nodes) => nodes.map((n) => (n.textContent ?? '').trim()))
     const painted = await page
       .locator(`${BODY} .sent`)
       .evaluateAll((nodes) => nodes.map((n) => (n.textContent ?? '').trim()))
+    expect(facts).toEqual(report.facts.map((s) => s.text.trim()))
     expect(painted).toEqual(report.report_body.map((s) => s.text.trim()))
     await expect(page.locator(`${REP} .caret`)).toHaveCount(0)
   })
 
-  test('typewriter is replay — the event is complete while the body is still being written', async ({
+  test('typewriter is replay — reduced-motion arrivals jump the sheet to the tail', async ({
+    page,
+  }) => {
+    await boot(page, { reduced: true })
+    await drain(page)
+
+    const metrics = await page.locator(`${REP} .rep-grid`).evaluate((node) => {
+      const grid = node as HTMLElement
+      const rows = [...grid.querySelectorAll<HTMLElement>('.rep-rounds .rep-row')]
+      const lastReport = rows[rows.length - 1] ?? null
+      const gridBox = grid.getBoundingClientRect()
+      const rowBox = lastReport?.getBoundingClientRect()
+      return {
+        top: grid.scrollTop,
+        max: grid.scrollHeight - grid.clientHeight,
+        visibleTail: rowBox === undefined || rowBox === null ? false : rowBox.bottom <= gridBox.bottom + 2,
+      }
+    })
+    expect(metrics.max, 'the report sheet does not overflow, so following is untested').toBeGreaterThan(0)
+    expect(metrics.top, 'the arriving report did not move the sheet at all').toBeGreaterThan(0)
+    expect(metrics.visibleTail, 'the arriving report did not jump its last row into view').toBe(true)
+  })
+
+  test('typewriter is replay — archive rereads do not move a reader off an older row', async ({
+    page,
+  }) => {
+    await boot(page, { reduced: true })
+    await drain(page)
+    const grid = page.locator(`${REP} .rep-grid`)
+    await grid.evaluate((node) => {
+      const sheet = node as HTMLElement
+      sheet.scrollTop = 0
+    })
+    await page.locator(`${OPTION}[aria-selected="true"]`).first().click()
+    await page.waitForTimeout(50)
+    expect(await grid.evaluate((node) => (node as HTMLElement).scrollTop)).toBe(0)
+  })
+
+  test('typewriter is replay — the event is complete while the document is still being written', async ({
     page,
   }) => {
     await boot(page, { reduced: false })
@@ -419,15 +461,15 @@ test.describe('typewriter is replay', () => {
       const handle = (window as unknown as { __shell?: { drain(): void; frame(): unknown } }).__shell
       if (!handle) throw new Error('window.__shell is not exposed by the shell boot')
       handle.drain()
-      const painted = document.querySelector('#w-rep #bodyList')?.textContent ?? ''
+      const painted = document.querySelector('#w-rep .rep-rounds')?.textContent ?? ''
       return { painted: painted.length, frame: handle.frame() as Frame }
     })
 
     const report = reportsOf(snapshot.frame).pop()
     expect(report, 'the boot run emits no `report` event — nothing to replay').toBeTruthy()
-    const whole = report!.report_body.map((s) => s.text).join('').length
+    const whole = [...report!.facts, ...report!.report_body].map((s) => s.text).join('').length
     expect(whole).toBeGreaterThan(0)
-    expect(snapshot.painted, 'the pane painted the whole body synchronously — that is not a replay').toBeLessThan(
+    expect(snapshot.painted, 'the pane painted the whole document synchronously — that is not a replay').toBeLessThan(
       whole,
     )
   })
@@ -458,12 +500,12 @@ test.describe('typewriter is replay', () => {
     await expect
       .poll(
         async () =>
-          (await page.locator(`${BODY} .sent`).evaluateAll((nodes) =>
+          (await page.locator(`${REP} .rep-facts .sent, ${REP} .rep-body .sent`).evaluateAll((nodes) =>
             nodes.map((n) => (n.textContent ?? '').trim()).join(''),
           )).length,
         { timeout: 30_000 },
       )
-      .toBe(report.report_body.map((s) => s.text.trim()).join('').length)
+      .toBe([...report.facts, ...report.report_body].map((s) => s.text.trim()).join('').length)
     await expect(page.locator(`${REP} .caret`)).toHaveCount(0)
   })
 

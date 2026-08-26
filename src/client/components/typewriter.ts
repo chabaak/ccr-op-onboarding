@@ -63,12 +63,18 @@ export interface TypePace {
  * The desk's READING pace — the feed arriving at the speed a radio delivers it.
  *
  * Still the default of every function here, so a caller that says nothing is
- * paced exactly as it was before the parameter existed: `report-view.ts`, the
- * REPORT body replay, passes nothing and is untouched by x10.
+ * paced exactly as it was before the parameter existed.
  */
 export const MS_PER_CHAR = 11
 export const MS_BETWEEN = 130
 export const READING_PACE: TypePace = { msPerChar: MS_PER_CHAR, msBetween: MS_BETWEEN }
+
+/**
+ * REPORTS arrives only after LIVE FEED has printed the round it summarizes.
+ * Replaying that document at the reading pace would charge the operator twice:
+ * once while the paper catches up, then again while the same round is filed.
+ */
+export const REPORT_PACE: TypePace = { msPerChar: 4, msBetween: 48 }
 
 /** How much elapsed time a cursor position already represents. */
 function costOf(state: TypeState, lengths: readonly number[], pace: TypePace): number {

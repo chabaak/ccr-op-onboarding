@@ -49,10 +49,10 @@ export interface ReportRoundModel {
 // `TypeState` and `TYPE_START` are part of this module's own published surface
 // (`tests/windows/reports.test.ts` and the frozen-animation paths read them),
 // and moving a definition is not a reason to move its callers.
-import { TYPE_START, typeCursor } from './typewriter.ts'
+import { REPORT_PACE, TYPE_START, typeCursor } from './typewriter.ts'
 import type { TypeState } from './typewriter.ts'
 export type { TypeState }
-export { TYPE_START, typeCursor }
+export { REPORT_PACE, TYPE_START, typeCursor }
 
 /** The pump registration name — one replay at a time, per window. */
 const PUMP = 'reports/typewriter'
@@ -129,6 +129,11 @@ export interface RenderOptions {
    * `true`: a caller that says nothing gets the arrival behaviour.
    */
   replay?: boolean
+  /**
+   * Whether this draw is a new arrival and should keep a reader already at the
+   * tail with the sheet. Archive rereads do not move the scroll position.
+   */
+  follow?: boolean
 }
 
 export interface ReportView {
@@ -196,6 +201,9 @@ const FOOT_LEAD = '기록 중 주요 사항을 선정하여 다음 요원에게 
 const FOOT_TAIL = '건 채굴됨'
 
 const ROW_STATE_CLASSES = ['is-mined', 'is-slotted', 'is-carried'] as const
+const FOLLOW_SLACK_MAX_PX = 32
+const FOLLOW_SLACK_MIN_PX = 4
+const FOLLOW_SLACK_RATIO = 0.25
 
 function rowStateClass(state: MinableState): (typeof ROW_STATE_CLASSES)[number] | null {
   if (state === 'mined') return 'is-mined'
@@ -255,6 +263,8 @@ export function createReportView(options: ReportViewOptions): ReportView {
   let activeReplay: ActiveReplay | null = null
   const caret = el('span', 'caret')
   caret.setAttribute('aria-hidden', 'true')
+  let attached = true
+  let scrolledSincePin = false
 
   /** One tagged report row: [source tag] [sentence]. */
   function reportRow(sentence: Sentence, tag: string, marks: MarkSets): { row: HTMLElement; node: HTMLElement } | null {
@@ -300,7 +310,38 @@ export function createReportView(options: ReportViewOptions): ReportView {
     return window.matchMedia('(prefers-reduced-motion: reduce)').matches
   }
 
-  function paint(cursor: TypeState, targets: ReplayTarget[]): void {
+  const followSlack = (): number =>
+    Math.max(
+      FOLLOW_SLACK_MIN_PX,
+      Math.min(FOLLOW_SLACK_MAX_PX, grid.clientHeight * FOLLOW_SLACK_RATIO),
+    )
+
+  const atTail = (): boolean =>
+    grid.scrollHeight - grid.scrollTop - grid.clientHeight <= followSlack()
+
+  const rereadAttachment = (): void => {
+    const tail = atTail()
+    if (tail === attached) return
+    if (!tail && !scrolledSincePin) return
+    attached = tail
+  }
+
+  const followSheet = (behavior: ScrollBehavior): void => {
+    if (!attached) return
+    grid.scrollTo({ top: grid.scrollHeight, behavior })
+    scrolledSincePin = false
+  }
+
+  grid.addEventListener(
+    'scroll',
+    () => {
+      scrolledSincePin = true
+      rereadAttachment()
+    },
+    { passive: true },
+  )
+
+  function paint(cursor: TypeState, targets: ReplayTarget[], follow = false): void {
     targets.forEach(({ sentence, node, row }, i) => {
       const current = i === cursor.sentence
       const visible = cursor.done || i < cursor.sentence || (current && cursor.chars > 0)
@@ -309,6 +350,7 @@ export function createReportView(options: ReportViewOptions): ReportView {
       else if (current) node.textContent = sentence.text.slice(0, cursor.chars)
       else node.textContent = ''
     })
+    if (follow) followSheet(motionless() ? 'instant' : 'smooth')
     if (cursor.done || cursor.sentence >= targets.length) {
       caret.remove()
       return
@@ -324,7 +366,7 @@ export function createReportView(options: ReportViewOptions): ReportView {
     paint({ sentence: replay.lengths.length, chars: 0, done: true }, replay.targets)
   }
 
-  function replay(targets: ReplayTarget[], animate: boolean): void {
+  function replay(targets: ReplayTarget[], animate: boolean, follow: boolean): void {
     const lengths = targets.map(({ sentence }) => sentence.text.length)
     // An empty document is not an unstamped one that will get there — it is a
     // sitting that has filed nothing, and there is no transmission to certify.
@@ -332,19 +374,21 @@ export function createReportView(options: ReportViewOptions): ReportView {
     // Read off the SITTING (`current`), not off `sentences`: what replays here
     // is one round, and `append()` replays round 7 of a document that already
     // carries six. Both callers set `current` to the whole sitting first.
+    if (follow) rereadAttachment()
     if (!animate || motionless()) {
       paint({ sentence: lengths.length, chars: 0, done: true }, targets)
+      if (follow) followSheet('instant')
       // The frozen-animation / reduced-motion sheet is whole on its first paint,
       // so it is TYPED the moment it is painted — but it is not certified until
       // the sitting has closed. The seal rule is the same on both paths.
       return
     }
-    paint(TYPE_START, targets)
+    paint(TYPE_START, targets, follow)
     let elapsed = 0
     const unregister = registerAnimation(PUMP, (realMs: number) => {
       elapsed += realMs
-      const cursor = typeCursor(TYPE_START, elapsed, lengths)
-      paint(cursor, targets)
+      const cursor = typeCursor(TYPE_START, elapsed, lengths, REPORT_PACE)
+      paint(cursor, targets, follow)
       if (!cursor.done) return
       unregister()
       if (activeReplay?.unregister === unregister) activeReplay = null
@@ -365,17 +409,17 @@ export function createReportView(options: ReportViewOptions): ReportView {
     const group = el('section', 'rep-round')
     const facts = el('div', 'rep-group rep-facts')
     if (options.factsAnchor) facts.id = 'factsList'
+    const targets: ReplayTarget[] = []
     for (const sentence of round.facts) {
       const built = reportRow(sentence, FACTS_TITLE, marks)
       if (built === null) continue
       const { row, node } = built
-      node.textContent = sentence.text
       facts.append(row)
+      targets.push({ sentence, row, node })
     }
 
     const body = el('div', 'rep-group rep-body')
     if (options.bodyAnchor) body.id = 'bodyList'
-    const targets: ReplayTarget[] = []
     for (const sentence of round.report_body) {
       const built = reportRow(sentence, BODY_TITLE, marks)
       if (built === null) continue
@@ -406,7 +450,7 @@ export function createReportView(options: ReportViewOptions): ReportView {
       })
 
       tally(marks)
-      replay(grown, true)
+      replay(grown, true, true)
     },
 
     render(model: ReportModel, marks: MarkSets, options?: RenderOptions): void {
@@ -416,17 +460,17 @@ export function createReportView(options: ReportViewOptions): ReportView {
       current = model
 
       rows.replaceChildren()
-      const bodyTargets: ReplayTarget[] = []
+      const replayTargets: ReplayTarget[] = []
       let factsAnchor = true
       let bodyAnchor = true
       reportRounds(model).forEach((round, index) => {
-        bodyTargets.push(...renderRound(round, marks, { breakBefore: index > 0, factsAnchor, bodyAnchor }))
+        replayTargets.push(...renderRound(round, marks, { breakBefore: index > 0, factsAnchor, bodyAnchor }))
         factsAnchor = false
         bodyAnchor = false
       })
 
       tally(marks)
-      replay(bodyTargets, options?.replay ?? true)
+      replay(replayTargets, options?.replay ?? true, options?.follow ?? false)
     },
 
     refresh(marks: MarkSets): void {
