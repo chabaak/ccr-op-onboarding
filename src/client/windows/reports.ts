@@ -274,7 +274,7 @@ export function mount(host: HTMLElement, driver: FixtureDriver): void {
     const key = `${active}:${model.round}`
     const first = model.report_body.length > 0 && !replayed.has(key)
     if (first) replayed.add(key)
-    view.render(model, marks(), { replay: first })
+    view.render(model, marks(), { replay: first, follow: first })
     mountRecord()
   }
 

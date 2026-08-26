@@ -827,6 +827,44 @@ describe('[w2] a sitting accumulates its rounds into one document', () => {
     expect(renderFinish, 'render still cancels by unregistering only').toBeGreaterThan(render)
     expect(renderFinish, 'render must settle before replacing report rows').toBeLessThan(text.indexOf('rows.replaceChildren()', render))
   })
+
+  it('(l) source: replay targets keep each round in 현장 then 무전 order', () => {
+    const src = scannedSources().find((s) => s.file.endsWith('components/report-view.ts'))
+    expect(src, 'the REPORTS view is not in the scanned set').toBeTruthy()
+    const text = src!.text
+    const renderRound = /function renderRound\([\s\S]*?\n {2}\}/.exec(text)?.[0] ?? ''
+    expect(renderRound, 'renderRound is gone').not.toBe('')
+    const facts = renderRound.indexOf('for (const sentence of round.facts)')
+    const body = renderRound.indexOf('for (const sentence of round.report_body)')
+    expect(facts, '현장 기록 rows are no longer rendered from the round facts').toBeGreaterThan(-1)
+    expect(body, '무전 기록 rows are no longer rendered from the round body').toBeGreaterThan(-1)
+    expect(facts, '무전 기록 can type before 현장 기록').toBeLessThan(body)
+    expect(renderRound.slice(facts, body), '현장 기록 is still printed whole instead of replayed').not.toMatch(
+      /node\.textContent\s*=\s*sentence\.text/,
+    )
+    expect(renderRound.slice(facts, body), '현장 기록 rows are not included in the replay cursor').toMatch(
+      /targets\.push\(\s*\{\s*sentence,\s*row,\s*node\s*\}\s*\)/,
+    )
+    expect(renderRound.slice(body), '무전 기록 rows are not included in the replay cursor').toMatch(
+      /targets\.push\(\s*\{\s*sentence,\s*row,\s*node\s*\}\s*\)/,
+    )
+  })
+
+  it('(m) source: only arriving reports follow the sheet tail', () => {
+    const view = scannedSources().find((s) => s.file.endsWith('components/report-view.ts'))
+    const win = scannedSources().find((s) => s.file.endsWith('windows/reports.ts'))
+    expect(view, 'the REPORTS view is not in the scanned set').toBeTruthy()
+    expect(win, 'the REPORTS window is not in the scanned set').toBeTruthy()
+    const text = view!.text
+    expect(text, 'the report sheet has no tail attachment state').toMatch(/let attached = true/)
+    expect(text, 'the sheet does not require a real scroll before detaching').toMatch(/!tail && !scrolledSincePin/)
+    expect(text, 'the sheet never scrolls itself to the tail').toMatch(/grid\.scrollTo\(\s*\{\s*top:\s*grid\.scrollHeight/)
+    expect(text, 'reduced motion can request instant scrolling').toMatch(/motionless\(\) \? 'instant' : 'smooth'/)
+    expect(text, 'append does not mark the new round as an arrival').toMatch(/replay\(\s*grown,\s*true,\s*true\s*\)/)
+    expect(win!.text, 'arrival render does not pass the first-arrival boundary into the view').toMatch(
+      /view\.render\(\s*model,\s*marks\(\),\s*\{\s*replay:\s*first,\s*follow:\s*first\s*\}\s*\)/,
+    )
+  })
 })
 
 /* ══ [x6] the 검인 chop — REMOVED (민서, 08-10) ══════════════════════════
@@ -876,6 +914,7 @@ interface TypewriterModule {
   MS_PER_CHAR: number
   MS_BETWEEN: number
   READING_PACE: TypePace
+  REPORT_PACE: TypePace
   TYPE_START: TypeState
   typeCursor(state: TypeState, elapsedMs: number, lengths: readonly number[], pace?: TypePace): TypeState
   typeDuration(lengths: readonly number[], pace?: TypePace): number
@@ -1043,13 +1082,15 @@ describe('[x10] mining is held while the handover is typing itself out', () => {
     expect(text, 'the frame stamp does not watch the hold').toMatch(/slotStamp[\s\S]{0,400}mineHeld\(\)/)
   })
 
-  it('(g) the REPORT body replay is untouched: its pace is the default, and it names none', async () => {
+  it('(g) the REPORT replay has its own faster pace, but not its own arithmetic', async () => {
     const t = await typewriter()
-    // The desk's reading pace, pinned. It is what `report-view.ts` types at and
-    // 민서 asked for the HANDOVER to be quicker, not the report.
+    // The desk's reading pace, pinned. It stays the default arithmetic for any
+    // caller that does not name a pace.
     expect(t.MS_PER_CHAR).toBe(11)
     expect(t.MS_BETWEEN).toBe(130)
     expect(t.READING_PACE).toEqual({ msPerChar: 11, msBetween: 130 })
+    expect(t.REPORT_PACE.msPerChar).toBeLessThan(t.READING_PACE.msPerChar)
+    expect(t.REPORT_PACE.msBetween).toBeLessThan(t.READING_PACE.msBetween)
 
     const lengths = [34, 34, 34]
     for (const elapsed of [0, 90, 400, 1_500, 60_000]) {
@@ -1057,14 +1098,19 @@ describe('[x10] mining is held while the handover is typing itself out', () => {
         t.typeCursor(t.TYPE_START, elapsed, lengths),
         'the default pace has drifted from the desk’s reading pace',
       ).toEqual(t.typeCursor(t.TYPE_START, elapsed, lengths, t.READING_PACE))
+      const slow = t.typeCursor(t.TYPE_START, elapsed, lengths)
+      const fast = t.typeCursor(t.TYPE_START, elapsed, lengths, t.REPORT_PACE)
+      const at = (c: TypeState): number => c.sentence * 1_000 + c.chars
+      expect(at(fast), `the report replay is not ahead of reading pace at ${elapsed} ms`).toBeGreaterThanOrEqual(at(slow))
     }
     expect(t.typeDuration(lengths)).toBe(t.typeDuration(lengths, t.READING_PACE))
+    expect(t.typeDuration(lengths, t.REPORT_PACE)).toBeLessThan(t.typeDuration(lengths))
 
-    // …and the caller says nothing, so it cannot drift even if a default did.
+    // …and the caller names the pace, not the numbers.
     const src = scannedSources().find((s) => s.file.endsWith('components/report-view.ts'))
-    expect(src!.text, 'the REPORT replay now names a pace of its own').toMatch(
-      /typeCursor\(\s*TYPE_START,\s*elapsed,\s*lengths\s*\)/,
+    expect(src!.text, 'the REPORT replay does not use the named report pace').toMatch(
+      /typeCursor\(\s*TYPE_START,\s*elapsed,\s*lengths,\s*REPORT_PACE\s*\)/,
     )
-    expect(src!.text, 'the REPORT replay carries pace numbers').not.toMatch(/msPerChar|msBetween|PACE\b/)
+    expect(src!.text, 'the REPORT replay carries pace numbers').not.toMatch(/msPerChar|msBetween/)
   })
 })
