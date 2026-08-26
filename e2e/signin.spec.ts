@@ -304,3 +304,22 @@ test.describe('[issue 210] entry routing', () => {
     await expect(page.locator('.win')).toHaveCount(3)
   })
 })
+
+test.describe('[issue 239] scenario picker taskbar guard', () => {
+  test('the picker disables desk-window controls, then the selected desk enables them', async ({ page }) => {
+    await openNaturalDoor(page)
+    await completeLogin(page)
+
+    await expect(page.locator('.scenario-picker')).toBeVisible()
+    const tasks = page.locator('#taskbar .task')
+    await expect(tasks).toHaveCount(3)
+    expect(await tasks.evaluateAll((nodes) => nodes.every((node) => (node as HTMLButtonElement).disabled))).toBe(true)
+    await expect(page.locator('.win.hidden')).toHaveCount(3)
+
+    await chooseFirstScenario(page)
+    await closeManual(page)
+    await waitForBoot(page)
+    await expect(page.locator('.scenario-picker')).toBeHidden()
+    expect(await tasks.evaluateAll((nodes) => nodes.every((node) => !(node as HTMLButtonElement).disabled))).toBe(true)
+  })
+})

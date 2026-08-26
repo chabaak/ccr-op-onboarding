@@ -402,9 +402,11 @@ export async function bootShell(): Promise<void> {
     if (state === 'select') {
       scenarioDesktop.show()
       desk.closeAll()
+      desk.setTaskbarEnabled(false)
       return
     }
     scenarioDesktop.hide()
+    desk.setTaskbarEnabled(true)
     desk.focus('feed')
   }
   if (entryState !== 'door') routeEntry(entryState)
@@ -470,6 +472,7 @@ export async function bootShell(): Promise<void> {
       onGoodEnding: async () => {
         scenarioDesktop.unlockAll()
         desk.closeAll()
+        desk.setTaskbarEnabled(false)
         await scenarioDesktop.showUnlockNotice()
       },
       onBadEnding: () => scenarioDesktop.restartCurrent(),

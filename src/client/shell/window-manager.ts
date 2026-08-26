@@ -41,6 +41,8 @@ export interface WindowManager {
   arrange(viewport: Viewport): void
   /** Hides every managed window, leaving the desktop itself visible. */
   closeAll(): void
+  /** Makes the managed-window taskbar controls available or unavailable together. */
+  setTaskbarEnabled(enabled: boolean): void
   focus(key: WindowKey): void
 }
 
@@ -104,6 +106,10 @@ export function createWindowManager(deps: Deps): WindowManager {
   function closeAll(): void {
     for (const frame of frames) frame.root.classList.add('hidden')
     syncTaskbar()
+  }
+
+  function setTaskbarEnabled(enabled: boolean): void {
+    for (const task of tasks.values()) task.disabled = !enabled
   }
 
   function move(frame: WindowFrame, x: number, y: number): void {
@@ -260,5 +266,5 @@ export function createWindowManager(deps: Deps): WindowManager {
   buildTaskbar()
   syncTaskbar()
 
-  return { frames, arrange, closeAll, focus }
+  return { frames, arrange, closeAll, setTaskbarEnabled, focus }
 }
