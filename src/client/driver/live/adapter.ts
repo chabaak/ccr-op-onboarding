@@ -144,7 +144,7 @@ export type LiveAdapterDeps = {
  * stream pace identically.
  */
 function stampOf(event: ViewEvent): string | null {
-  if (event.type === 'beat_start' || event.type === 'beat_end') return event.clock
+  if (event.type === 'beat_start' || event.type === 'beat_end' || event.type === 'round_open') return event.clock
   if (event.type === 'feed') return event.line.clock
   return null
 }

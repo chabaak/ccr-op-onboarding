@@ -209,6 +209,21 @@ describe('the shipped pack plays its day to the end', () => {
       'a beat went missing — the run stopped before the day did',
     ).toHaveLength(authoredStamps.size)
     expect(types, 'the day never closed — TALLY cannot open without run_end').toContain('run_end')
+    const roundOpen = events.filter((event) => event.type === 'round_open')
+    const gateClocks = new Set(
+      GATES.gates.map((gate) => gate.clock).filter((clock): clock is string => typeof clock === 'string'),
+    )
+    expect(roundOpen.length, 'no shipped-pack gate emitted a REPORTS timing cue').toBeGreaterThan(0)
+    roundOpen.forEach((event) => {
+      expect(gateClocks.has(event.clock), `round ${event.round} opened at a non-gate clock`).toBe(true)
+      const openedAt = events.findIndex((candidate) =>
+        candidate.type === 'beat_start' && candidate.beat === event.beat && candidate.clock === event.clock
+      )
+      expect(openedAt, `round ${event.round} has no matching beat_start`).toBeGreaterThanOrEqual(0)
+      expect(events[openedAt + 1], `round ${event.round} is not announced immediately after beat_start`).toBe(
+        event,
+      )
+    })
     // One report per gate: a gate is a round, and a round closes on a report.
     expect(events.filter((event) => event.type === 'report')).toHaveLength(GATES.gates.length)
   })

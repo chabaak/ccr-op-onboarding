@@ -28,10 +28,10 @@
 //
 // So the ARRIVING document waits for the paper: `shell/feed-reach.ts` publishes
 // where the fanfold has got to, and `afterPaper` below holds each report until
-// the feed has walked past that round's `report` event — which is the round's
-// last beat printed. The record's count-up waits for the `score` the same way,
-// because the fanfold mints the run divider from it and the two surfaces mark
-// one boundary.
+// the feed has opened the next gate. The final round has no next gate, so it
+// waits for the `score` cue instead; the record's count-up waits for that same
+// score because the fanfold mints the run divider there and the two surfaces
+// mark one boundary.
 //
 // NOTHING ELSE WAITS. A report already in the archive, one the operator picks
 // off the rail, a document redrawn because the rail reconciled — all of them
@@ -107,6 +107,10 @@ export function mount(host: HTMLElement, driver: FixtureDriver): void {
   let title = ''
   let callsignSeries = driver.callsignSeries()
   const scores = new Map<number, number>()
+  type ReportEvent = Extract<ViewEvent, { type: 'report' }>
+  type PendingReport = { sitting: number; event: ReportEvent }
+  const openedRounds = new Map<number, Set<number>>()
+  const pendingReports = new Map<string, PendingReport>()
 
   const marks = (): MarkSets => deriveMarks(driver.store(), carried)
 
@@ -141,6 +145,17 @@ export function mount(host: HTMLElement, driver: FixtureDriver): void {
         console.error('the document behind the paper never landed', cause)
       })
   }
+
+  const pendingKey = (sitting: number, round: number): string => `${sitting}:${round}`
+
+  const noteGateOpened = (sitting: number, round: number): void => {
+    const opened = openedRounds.get(sitting) ?? new Set<number>()
+    opened.add(round)
+    openedRounds.set(sitting, opened)
+  }
+
+  const hasGateOpened = (sitting: number, round: number): boolean =>
+    openedRounds.get(sitting)?.has(round) ?? false
 
   /**
    * Is the desk holding the tear right now?
@@ -332,6 +347,49 @@ export function mount(host: HTMLElement, driver: FixtureDriver): void {
     }
   }
 
+  function fileReport(sitting: number, event: ReportEvent): void {
+    const seen = rounds.get(sitting) ?? new Set<number>()
+    if (seen.has(event.round)) return
+    seen.add(event.round)
+    rounds.set(sitting, seen)
+
+    const held = filed.get(sitting) ?? null
+    const slice: ReportModel = {
+      round: event.round,
+      facts: event.facts,
+      report_body: event.report_body,
+    }
+    const whole = accumulated(held, slice)
+    filed.set(sitting, whole)
+
+    // The sitting already on the desk GROWS; any other case draws whole.
+    if (held !== null && active === sitting) {
+      replayed.add(`${sitting}:${event.round}`)
+      view.append(slice, whole, marks())
+      sync(false)
+      return
+    }
+    active = sitting
+    sync()
+  }
+
+  function releasePendingReport(sitting: number, round: number, cue: FeedCue): void {
+    const key = pendingKey(sitting, round)
+    const pending = pendingReports.get(key)
+    if (pending === undefined) return
+    pendingReports.delete(key)
+    afterPaper(cue, () => fileReport(pending.sitting, pending.event))
+  }
+
+  function releasePendingReportsAtScore(sitting: number): void {
+    const pending = [...pendingReports.values()]
+      .filter((report) => report.sitting === sitting)
+      .sort((a, b) => a.event.round - b.event.round)
+    for (const report of pending) {
+      releasePendingReport(sitting, report.event.round, { at: 'score', run: sitting })
+    }
+  }
+
   driver.subscribe((event) => {
     if (event.type === 'meta') {
       archive = [...event.archive]
@@ -355,6 +413,14 @@ export function mount(host: HTMLElement, driver: FixtureDriver): void {
       sync()
       return
     }
+    if (event.type === 'round_open') {
+      const sitting = run
+      noteGateOpened(sitting, event.round)
+      if (event.round > 0) {
+        releasePendingReport(sitting, event.round - 1, { at: 'gate', run: sitting, round: event.round })
+      }
+      return
+    }
     if (event.type === 'score') {
       // REPORTS keeps the event-local model and paper gate, but not the full
       // visible ledger. The selected sitting still carries one final death
@@ -363,6 +429,7 @@ export function mount(host: HTMLElement, driver: FixtureDriver): void {
       const sitting = run
       const tally = getScoreTally()
       scores.set(sitting, event.total)
+      releasePendingReportsAtScore(sitting)
       // The scored day takes the rail and the record mounts under it. Going
       // through `sync()` rather than straight to `mountRecord()` is what covers
       // a day that filed NO report (`?drill=tally-lapse`): without a rail
@@ -408,31 +475,13 @@ export function mount(host: HTMLElement, driver: FixtureDriver): void {
     // not printed the beats of — the gate defeated by the one path that does not
     // go through it.
     const sitting = run
-    afterPaper({ at: 'report', run: sitting, round: event.round }, () => {
-      const seen = rounds.get(sitting) ?? new Set<number>()
-      if (seen.has(event.round)) return
-      seen.add(event.round)
-      rounds.set(sitting, seen)
-
-      const held = filed.get(sitting) ?? null
-      const slice: ReportModel = {
-        round: event.round,
-        facts: event.facts,
-        report_body: event.report_body,
-      }
-      const whole = accumulated(held, slice)
-      filed.set(sitting, whole)
-
-      // The sitting already on the desk GROWS; any other case draws whole.
-      if (held !== null && active === sitting) {
-        replayed.add(`${sitting}:${event.round}`)
-        view.append(slice, whole, marks())
-        sync(false)
-        return
-      }
-      active = sitting
-      sync()
-    })
+    pendingReports.set(pendingKey(sitting, event.round), { sitting, event })
+    const nextGate = event.round + 1
+    if (hasGateOpened(sitting, nextGate)) {
+      releasePendingReport(sitting, event.round, { at: 'gate', run: sitting, round: nextGate })
+    } else if (scores.has(sitting)) {
+      releasePendingReport(sitting, event.round, { at: 'score', run: sitting })
+    }
   })
 
   // The record's headline needs the pack's own end-of-day stamp — the ONE

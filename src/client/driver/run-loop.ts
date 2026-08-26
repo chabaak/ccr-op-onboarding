@@ -89,7 +89,8 @@ export function createRunLoopDriver(
    * one is held the rest follow it into the queue by arrival order.
    */
   function isRunContent(event: ViewEvent): boolean {
-    return event.type === 'beat_start' || event.type === 'beat_end' || event.type === 'feed'
+    return event.type === 'beat_start' || event.type === 'beat_end' || event.type === 'round_open' ||
+      event.type === 'feed'
   }
 
   function fanout(event: ViewEvent): void {

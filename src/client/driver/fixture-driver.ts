@@ -51,7 +51,7 @@ export interface FixtureDriver {
 
 /** The `"HH:MM"` an event is due at, or null when it rides the one before it. */
 function stampOf(event: ViewEvent): string | null {
-  if (event.type === 'beat_start' || event.type === 'beat_end') return event.clock
+  if (event.type === 'beat_start' || event.type === 'beat_end' || event.type === 'round_open') return event.clock
   if (event.type === 'feed') return event.line.clock
   return null
 }
