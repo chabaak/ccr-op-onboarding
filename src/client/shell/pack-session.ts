@@ -65,6 +65,10 @@ export function scenarioPackInPlay(
   return tutorialScenarioPack(index)
 }
 
+export function hasScenarioPackSelection(options: ScenarioSessionOptions = {}): boolean {
+  return storageOf(options)?.getItem(SELECTED_SCENARIO_KEY) !== null
+}
+
 /**
  * Clears all pack-bound session state.
  *
