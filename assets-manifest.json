@@ -463,6 +463,22 @@
       "prompt": null,
       "license": "CC0-1.0",
       "license_source": "https://kenney.nl/assets/interface-sounds — License.txt inside the pack: 'License: (Creative Commons Zero, CC0)' (checked 2026-08-08)"
+    },
+    {
+      "file": "submission/thumbnail/gen/a.png",
+      "tool": "OpenAI gpt-image-2, via .claude/skills/impeccable/scripts/generate-image.mjs (1536x1024, quality medium)",
+      "license": "generated for this project against the team's own OpenAI API key; OpenAI Terms of Use assign output ownership to the requesting account",
+      "license_source": "https://openai.com/policies/terms-of-use — 'Ownership of content. As between you and OpenAI, and to the extent permitted by applicable law, you (a) retain your ownership rights in Input and (b) own the Output.' (checked 2026-08-26)",
+      "prompt": "Luminous thin-line technical drawing of a large air-supported stadium dome, structural elevation, delicate pale cyan-blue glowing linework on near-black: cable-net triangulation across the shell, a ring beam at grade, fine dimension lines, a faint blueprint grid. One small warm orange ring glowing at the crown of the dome with a soft bloom. Dome occupies the RIGHT side. Precise, engineered, restrained. Wide cinematic composition, the entire LEFT HALF deliberately empty near-black negative space for typography. Extremely dark background, near-black with a faint cool blue cast. No text, no lettering, no numbers, no labels, no watermark, no signature, no logo, no UI, no people.",
+      "note": "Key art for the Track 1 16:9 thumbnail. 한내시립스포츠돔 as a luminous cable-net wireframe with a warm ring at the crown. Composited in submission/thumbnail/thumb.html and baked into thumbnail.png."
+    },
+    {
+      "file": "submission/thumbnail/gen/snow-b.png",
+      "tool": "OpenAI gpt-image-2, via .claude/skills/impeccable/scripts/generate-image.mjs (1536x1024, quality medium)",
+      "license": "generated for this project against the team's own OpenAI API key; OpenAI Terms of Use assign output ownership to the requesting account",
+      "license_source": "https://openai.com/policies/terms-of-use — 'Ownership of content. As between you and OpenAI, and to the extent permitted by applicable law, you (a) retain your ownership rights in Input and (b) own the Output.' (checked 2026-08-26)",
+      "prompt": "A dense blizzard photographed against a pure black background: thick driving snow moving diagonally, heavy streaking and motion blur, layered depth from fine distant grain to large blurred foreground flakes, some areas thicker than others so the field is uneven rather than uniform. Cold neutral white. Pure solid black background with nothing else in frame: no landscape, no horizon, no structures, no light sources, no people, no text, no watermark. Only snow against black.",
+      "note": "Snowfall layer for the Track 1 thumbnail: a wind-driven diagonal blizzard on pure black, composited over the plate with mix-blend-mode:screen so the black ground drops out."
     }
   ]
 }

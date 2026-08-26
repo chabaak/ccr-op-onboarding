@@ -1,0 +1,6 @@
+{
+  "prompt": "A dense blizzard photographed against a pure black background: thick driving snow moving diagonally, heavy streaking and motion blur, layered depth from fine distant grain to large blurred foreground flakes, some areas thicker than others so the field is uneven rather than uniform. Cold neutral white. Pure solid black background with nothing else in frame: no landscape, no horizon, no structures, no light sources, no people, no text, no watermark. Only snow against black.",
+  "createdAt": "2026-08-26T13:07:22.059Z",
+  "tool": "generate-image.mjs",
+  "model": "gpt-image-2"
+}

@@ -1,0 +1,90 @@
+<!doctype html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<title>thumbnail</title>
+<link rel="stylesheet" href="/assets/fonts/fonts.css">
+<link rel="stylesheet" href="/src/client/styles/tokens.css?direct">
+<style>
+  /* Display steps, built by the SAME name x 1.2 rule tokens.css uses
+     (--fs-44 = 52.8px). The product ramp stops there because the desk is
+     1280px wide; a 1920px poster needs steps above it. */
+  :root{--fs-52:62.4px;--fs-60:72px;--fs-65:78px;--fs-92:110.4px;--fs-110:132px}
+
+  *{margin:0;padding:0;box-sizing:border-box}
+  body{background:var(--ink-0)}
+  .comp{position:relative;width:1920px;height:1080px;overflow:hidden;
+    background:var(--ink-0);color:var(--txt);font-family:var(--mono);isolation:isolate}
+
+  /* ── the comp: gen/a.png, the bar the build matches ────────────── */
+  .plate{position:absolute;inset:32px;z-index:1}
+  .plate img{width:100%;height:100%;object-fit:cover;object-position:34% 26%}
+  /* the storm that brings the roof down. Generated on pure black, so `screen`
+     drops the ground and keeps only the flakes. Sits over the dome — snow is
+     between the viewer and the building, not behind it. */
+  .snow{position:absolute;inset:32px;z-index:2;mix-blend-mode:screen;opacity:1}
+  .snow img{width:100%;height:100%;object-fit:cover;object-position:center}
+
+  /* the left third is where type lives, so the artwork is taken back there */
+  .fade-l{position:absolute;inset:32px;z-index:3;
+    background:linear-gradient(90deg,var(--ink-0) 0 20%,var(--sh-9) 34%,var(--sh-7) 48%,var(--sh-3) 62%,transparent 76%)}
+  .fade-tr{position:absolute;inset:32px;z-index:3;
+    background:radial-gradient(46% 34% at 88% 6%, var(--sh-9) 0 40%, transparent 78%)}
+  .fade-b{position:absolute;inset:32px;z-index:3;
+    background:linear-gradient(180deg,var(--sh-5) 0 5%,transparent 16% 58%,var(--sh-5) 80%,var(--sh-9) 100%)}
+  .grain{position:absolute;inset:32px;z-index:4;pointer-events:none;opacity:.05;
+    background-image:repeating-linear-gradient(0deg,var(--sheen-25) 0 1px,transparent 1px 3px)}
+
+  /* the desk's own window frame: `.win` is 1px solid var(--edge) and
+     `.win.focused` swaps that to var(--signal) (shell.css:231,277). The whole
+     poster is that window, so the title reads as something on a screen. */
+  .bezel{position:absolute;inset:32px;z-index:8;pointer-events:none;
+    border:2px solid var(--signal);opacity:.55}
+
+  /* ── the lockup ────────────────────────────────────────────────── */
+  .lockup{position:absolute;left:120px;top:205px;z-index:6;width:1580px}
+  /* machine chrome, so --mono: this is the desk naming itself, not a person
+     speaking. Dimmed --signal keeps it the palette's own blue while staying
+     clearly subordinate to the Korean title. */
+  .en-name{font-family:var(--mono);font-weight:400;font-size:var(--fs-34);
+    line-height:1.22;letter-spacing:.04em;color:var(--signal);opacity:.58}
+  .trule{width:420px;height:1px;background:var(--signal);opacity:.5;
+    margin:var(--space-30) 0}
+  .tagline{word-break:keep-all;
+    font-family:var(--prose);font-weight:400;font-size:var(--fs-60);
+    line-height:1.28;letter-spacing:-.015em;color:var(--warning)}
+  /* hangul carries its own internal air: no tracking, tight leading */
+  .ko-title{font-family:var(--prose);font-weight:600;font-size:var(--fs-110);
+    line-height:1.04;letter-spacing:-.02em;color:var(--txt-max);
+    /* the clause is ~1270px at this size; the column is widened to hold it
+       on one line rather than wrapping at eojeol */
+    width:1580px;word-break:keep-all}
+  .ko-title .clause{white-space:nowrap}
+
+</style>
+</head>
+<body>
+<section class="comp" id="thumb">
+  <div class="plate"><img id="plateimg" src="./gen/a.png" alt="한내시립스포츠돔"></div>
+  <div class="snow"><img id="snowimg" src="./gen/snow-b.png" alt=""></div>
+  <div class="fade-l"></div><div class="fade-tr"></div><div class="fade-b"></div><div class="grain"></div>
+  <div class="bezel"></div>
+
+  <div class="lockup">
+
+    <div class="en-name">Central Control Room<br>Operator Onboarding</div>
+    <div class="trule"></div>
+    <div class="ko-title">중앙상황제어실<br><span class="clause">운영자 임용을 축하합니다</span></div>
+    <div class="trule"></div>
+    <div class="tagline">모두를 구할 때까지 오늘은 반복된다</div>
+
+  </div>
+
+</section>
+<script>
+  // ?snowop=0.4 — dial the storm without a rebuild
+  const op = new URLSearchParams(location.search).get('snowop')
+  if (op) document.querySelector('.snow').style.opacity = op
+</script>
+</body>
+</html>
