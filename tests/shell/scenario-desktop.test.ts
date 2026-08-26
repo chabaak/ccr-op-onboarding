@@ -84,17 +84,13 @@ describe('scenario desktop replay files', () => {
       JSON.stringify([sorted[2]!.slug, 'missing-pack', sorted[0]!.slug, sorted[2]!.slug]),
     )
 
-    expect(readUnlockedScenarioSlugs(MANIFEST, storage)).toEqual([
-      sorted[0]!.slug,
-      sorted[1]!.slug,
-      sorted[2]!.slug,
-    ])
+    expect(readUnlockedScenarioSlugs(MANIFEST, storage)).toEqual([sorted[0]!.slug, sorted[2]!.slug])
   })
 
-  it('(c) every playable file is the desktop floor before any completion', () => {
+  it('(c) only the tutorial file is the desktop floor before any completion', () => {
     const storage = new FakeStorage()
     const sorted = sortedScenarioPacks(MANIFEST)
-    const expected = [sorted[0]!.slug, sorted[1]!.slug]
+    const expected = [sorted[0]!.slug]
 
     expect(readUnlockedScenarioSlugs(MANIFEST, storage)).toEqual(expected)
     expect(readUnlockedScenarioSlugs(MANIFEST, null)).toEqual(expected)
@@ -105,7 +101,7 @@ describe('scenario desktop replay files', () => {
     const sorted = sortedScenarioPacks(MANIFEST)
     storage.setItem(UNLOCKED_SCENARIOS_KEY, '{')
 
-    expect(readUnlockedScenarioSlugs(MANIFEST, storage)).toEqual([sorted[0]!.slug, sorted[1]!.slug])
+    expect(readUnlockedScenarioSlugs(MANIFEST, storage)).toEqual([sorted[0]!.slug])
   })
 
   it('(e) a good ending unlocks every completed scenario as replayable', () => {
@@ -141,16 +137,18 @@ describe('scenario desktop replay files', () => {
     const entry = sortedScenarioPacks(MANIFEST)[0]!
     const model = scenarioCardModel(entry, 0, true)
 
-    expect(Object.keys(model)).toEqual(['code', 'difficulty', 'runs', 'status', 'enabled'])
+    expect(Object.keys(model)).toEqual(['code', 'name', 'difficulty', 'runs', 'status', 'enabled'])
     expect(model).toEqual({
       code: 'ERR-2/SC-01',
+      name: 'Tutorial Pack',
       difficulty: '등급 TUTORIAL',
       runs: `RUN 01 / ${String(DEFAULT_TOTAL_RUNS).padStart(2, '0')}`,
       status: '배치 가능',
       enabled: true,
     })
-    expect(Object.values(model).join(' ')).not.toContain(entry.displayName)
+    expect(model.name).toBe(entry.displayName)
     expect(SCENARIO_PICKER_NOTE).toContain('사건 개요는 배치 후 회선에서만 열람')
+    expect(SCENARIO_PICKER_NOTE).toContain('사건명, 난이도와 시행 횟수')
   })
 
   it('(h) locked picker cards expose status without becoming playable', () => {
@@ -158,6 +156,7 @@ describe('scenario desktop replay files', () => {
 
     expect(scenarioCardModel(entry, 1, false)).toEqual({
       code: 'ERR-2/SC-02',
+      name: 'Practice A',
       difficulty: '등급 STANDARD',
       runs: `RUN 01 / ${String(DEFAULT_TOTAL_RUNS).padStart(2, '0')}`,
       status: '미개방',
@@ -170,6 +169,7 @@ describe('scenario desktop replay files', () => {
 
     expect(scenarioCardModel(entry, 2, true)).toEqual({
       code: 'ERR-2/SC-03',
+      name: 'Fixture Pack',
       difficulty: '등급 FIXTURE',
       runs: `RUN 01 / ${String(DEFAULT_TOTAL_RUNS).padStart(2, '0')}`,
       status: '열람 전용',

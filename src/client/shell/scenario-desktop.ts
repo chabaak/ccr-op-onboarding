@@ -28,7 +28,7 @@ export const SCENARIO_UNLOCK_NOTICE = '다른 사건도 해결해보십시오.'
 export const SCENARIO_UNPLAYABLE_NOTICE = '이 사건은 아직 종료 자료가 없어 시작할 수 없습니다.'
 export const SCENARIO_ENDING_LOAD_FAILURE_NOTICE = '종료 자료를 확인할 수 없어 이 사건을 시작할 수 없습니다.'
 export const SCENARIO_PICKER_NOTE =
-  '사건 개요는 배치 후 회선에서만 열람할 수 있습니다. 아래 표시되는 것은 난이도와 시행 횟수뿐입니다. 배치된 사건은 시행을 모두 소진할 때까지 교체할 수 없습니다.'
+  '사건 개요는 배치 후 회선에서만 열람할 수 있습니다. 아래 표시되는 것은 사건명, 난이도와 시행 횟수뿐입니다. 배치된 사건은 시행을 모두 소진할 때까지 교체할 수 없습니다.'
 export const SCENARIO_PICKER_FOOT = '시행을 모두 소진하면 동일 사건으로 재평가가 편성됩니다.'
 export const SCENARIO_CONFIRM_NOTE = '배치된 사건은 시행을 모두 소진할 때까지 교체할 수 없습니다.'
 
@@ -52,6 +52,7 @@ export type ScenarioStartCheck =
 
 export interface ScenarioCardModel {
   readonly code: string
+  readonly name: string
   readonly difficulty: string
   readonly runs: string
   readonly status: string
@@ -111,6 +112,7 @@ export function scenarioCardModel(
   const enabled = unlocked && isScenarioPlayable(entry)
   return {
     code: scenarioFileCode(index),
+    name: entry.displayName,
     difficulty: difficultyGrade(entry),
     runs: `RUN 01 / ${String(DEFAULT_TOTAL_RUNS).padStart(2, '0')}`,
     status: enabled ? '배치 가능' : unlocked ? '열람 전용' : '미개방',
@@ -122,9 +124,9 @@ export function readUnlockedScenarioSlugs(
   index: ScenarioIndex,
   storage: StoragePort | null | undefined,
 ): readonly string[] {
-  tutorialScenarioPack(index)
+  const tutorial = tutorialScenarioPack(index)
   const sorted = sortedScenarioPacks(index)
-  const floor = sorted.filter(isScenarioPlayable).map((pack) => pack.slug)
+  const floor = [tutorial.slug]
   const port = storageOf(storage)
   if (port === null) return floor
   const raw = port.getItem(UNLOCKED_SCENARIOS_KEY)
@@ -298,14 +300,15 @@ export function installScenarioDesktop(deps: ScenarioDesktopDeps): ScenarioDeskt
         files.set(pack.slug, node)
       }
       const model = scenarioCardModel(pack, index, unlocked.has(pack.slug))
-      node.title = `${model.code} ${model.status}`
-      node.setAttribute('aria-label', `${model.code} ${model.status}`)
+      node.title = `${model.name} ${model.code} ${model.status}`
+      node.setAttribute('aria-label', `${model.name} ${model.code} ${model.status}`)
       node.disabled = !model.enabled
       node.classList.toggle('is-locked', !model.enabled)
       node.classList.toggle('is-open', model.enabled)
       node.replaceChildren(
         el('span', 'scenario-file-top', model.code),
         el('span', 'scenario-file-status', model.status),
+        el('strong', 'scenario-file-name', model.name),
         el('span', 'scenario-file-field', '난이도'),
         el('b', undefined, model.difficulty),
         el('span', 'scenario-file-field', '시행'),
