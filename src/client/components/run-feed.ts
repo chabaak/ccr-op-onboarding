@@ -979,9 +979,8 @@ export function createRunFeed(host: HTMLElement, driver: FixtureDriver): RunFeed
       case 'waiting':
         return false
       case 'round_open':
-        // The A-side release cue: a report for round r becomes
-        // readable when the paper opens gate r+1. The final report has no next
-        // gate, so REPORTS releases that one on the score cue below.
+        // Still published for consumers that track gate arrival. REPORTS no
+        // longer keys off it: issue 254 makes the report event itself the paper cue.
         publishFeedReached({ at: 'gate', run, round: event.round })
         return false
       case 'score': {

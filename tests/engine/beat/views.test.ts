@@ -90,8 +90,8 @@ describe('[e3#A8] gateView / beatView / roundView return snapshots', () => {
     r.driver.advance()
     r.driver.applyBeatEffects()
     const view = r.driver.roundView()
-    expect(view.EXPERIENCED).toEqual(r.assembler.instanceFor(0))
-    expect(view.EXPERIENCED).not.toBe(r.assembler.instanceFor(0))
+    expect(view.EXPERIENCED).toEqual(r.assembler.instanceFor(1))
+    expect(view.EXPERIENCED).not.toBe(r.assembler.instanceFor(1))
   })
 
   it('does not hand back the pack s own objects (STANCE_SET / TEMPERAMENT are cloned)', () => {

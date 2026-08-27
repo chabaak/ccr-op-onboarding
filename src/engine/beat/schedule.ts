@@ -10,10 +10,11 @@
  *   Call 2 on that beat still has a fixed NPC action to honour.
  * - **D3** a gate with no co-timed event gets a beat of its own, with an empty
  *   event list; the gate's `scene` carries the fixed action instead.
- * - **decision 10** a beat before the first gate belongs to no round —
- *   `roundIndex` is `null` and no report is ever owed for it.
- * - **A7** a round runs from its gate up to (not including) the next gate; the
- *   last beat of the run closes the last round.
+ * - **decision 10 superseded (issue 254)** every beat belongs to a round. A gate
+ *   closes the round it judges, so the first gate reports on the opening beats
+ *   and the last gate leaves a final gate-less tail round that still reports.
+ * - **A7** a round runs from the previous gate's aftermath through the next
+ *   gate; the run's last beat closes the final gate-less round.
  *
  * Edge predicates compile here, not at routing time: a datapack that cannot
  * route fails before the first beat, never mid-run.
@@ -87,7 +88,7 @@ export type Beat = {
   /** In `timeline.json` order. Empty on a gate-only beat (D3). */
   events: TimelineEvent[]
   gate: ScheduledGate | null
-  /** `null` before the first gate — that beat is in no round (decision 10). */
+  /** Round membership. Kept nullable at the port boundary, but build output is numbered. */
   roundIndex: number | null
   /** True on the last beat of a round: the beat that owes Call 3. */
   isRoundLast: boolean
@@ -153,12 +154,12 @@ function compileGate(authored: AuthoredGate): ScheduledGate {
   }
 }
 
-/** A gate opens a round; the beat before the next gate closes it. */
+/** A gate closes the round it judges; the following beat starts the next round. */
 function assignRounds(beats: Beat[]): Beat[] {
-  let round = -1
+  let round = 0
   for (const beat of beats) {
+    beat.roundIndex = round
     if (beat.kind === 'gate') round += 1
-    beat.roundIndex = round < 0 ? null : round
   }
   beats.forEach((beat, index) => {
     if (beat.roundIndex === null) return

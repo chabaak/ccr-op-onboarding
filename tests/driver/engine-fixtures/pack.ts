@@ -97,7 +97,7 @@ function gate(id: string, clock: string): G {
   }
 }
 
-/** One gate beat (09:00) + one trailing script beat (09:30) — one whole round. */
+/** One gate beat (09:00) + one trailing script beat (09:30) — two report rounds. */
 export function scriptedRound(): EnginePack {
   return {
     timeline: {
@@ -146,7 +146,7 @@ export function attributedRound(): EnginePack {
 }
 
 /**
- * Two whole rounds. Round 0's report therefore lands on a beat that is NOT the
+ * Two gates plus a trailing script beat. Round 0's report therefore lands on a beat that is NOT the
  * run's last, which is the only way to observe "the run continues after a
  * failed Call 3".
  */
@@ -167,7 +167,7 @@ export function twoRounds(): EnginePack {
   }
 }
 
-/** A script beat BEFORE the first gate — it belongs to no round (decision 10). */
+/** A script beat BEFORE the first gate — it belongs to round 0, closed by G1. */
 export function leadingScriptRun(): EnginePack {
   return {
     timeline: {
@@ -183,7 +183,7 @@ export function leadingScriptRun(): EnginePack {
   }
 }
 
-/** Two script beats and no gate at all — the "no round, no report" case. */
+/** Two script beats and no gate at all — one gate-less round and one report. */
 export function gatelessRun(): EnginePack {
   return {
     timeline: {

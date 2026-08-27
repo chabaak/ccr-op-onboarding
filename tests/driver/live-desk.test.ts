@@ -259,9 +259,9 @@ describe('(A) the live desk plays its day to the end', () => {
     ])
     expect(events.filter((e) => e.type === 'beat_start')).toHaveLength(authoredStamps.size)
     expect(types, 'the day never closed — TALLY cannot open without this').toContain('run_end')
-    // One per gate: the last round is where terminal-stamp bugs used to keep
-    // the report from reaching the desk.
-    expect(events.filter((e) => e.type === 'report')).toHaveLength(gates.gates.gates.length)
+    // One per gate, plus the gate-less tail after the last gate: the tail is
+    // where terminal-stamp bugs used to keep the report from reaching the desk.
+    expect(events.filter((e) => e.type === 'report')).toHaveLength(gates.gates.gates.length + 1)
 
     // AND THE LEDGER. This comment used to say the opposite — that `score` is
     // not asserted because nothing in the repo builds a `ScorerPort`, so TALLY
