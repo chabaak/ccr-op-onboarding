@@ -384,9 +384,6 @@ export function mount(host: HTMLElement, driver: FixtureDriver): void {
       sync()
       return
     }
-    if (event.type === 'round_open') {
-      return
-    }
     if (event.type === 'score') {
       // REPORTS keeps the event-local model and paper gate, but not the full
       // visible ledger. `scored` is only rail identity; `visibleScores` is the
