@@ -11,9 +11,6 @@ function engineAtReportBoundary() {
   engine.submitStance(null)
   engine.applyBeatEffects()
   engine.applyNarration(null)
-  expect(engine.advance()).toBe(true)
-  engine.applyBeatEffects()
-  engine.applyNarration(null)
 
   return engine
 }

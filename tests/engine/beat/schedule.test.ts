@@ -13,11 +13,11 @@ const schedule = buildSchedule(real.timeline, real.gates)
 
 /** A7's pinned boundaries — [first clock … last clock] of each round. */
 const ROUNDS: Array<{ clocks: string[] }> = [
-  { clocks: ['18:41', '18:55', '18:55+', '19:26', '19:26+', '19:33', '19:33+'] },
-  { clocks: ['19:34', '19:47', '19:48', '19:52', '19:52+', '19:53', '19:55'] },
+  { clocks: ['18:38', '18:38+', '18:40', '18:40+', '18:41'] },
+  { clocks: ['18:55', '18:55+', '19:26', '19:26+', '19:33', '19:33+', '19:34'] },
+  { clocks: ['19:47', '19:48', '19:52', '19:52+', '19:53', '19:55', '19:58'] },
   {
     clocks: [
-      '19:58',
       '20:04',
       '20:05',
       '20:14',
@@ -104,25 +104,20 @@ describe('[e3#D7] clock parsing and the 21:04+ tie-break', () => {
   })
 })
 
-describe('[e3#A6] a beat before the first gate belongs to no round', () => {
-  it('gives the opening beats before G1 roundIndex null', () => {
+describe('[e3#A6] every beat belongs to a round', () => {
+  it('gives the opening beats before G1 roundIndex 0', () => {
     for (const clock of ['18:38', '18:38+', '18:40', '18:40+']) {
-      expect(beatAt(schedule, clock).roundIndex).toBeNull()
+      expect(beatAt(schedule, clock).roundIndex).toBe(0)
       expect(beatAt(schedule, clock).isRoundLast).toBe(false)
     }
     expect(beatAt(schedule, '18:38').index).toBe(0)
   })
 
-  it('only beats before G1 have a null roundIndex', () => {
-    expect(schedule.filter((b) => b.roundIndex === null).map((b) => b.clock)).toEqual([
-      '18:38',
-      '18:38+',
-      '18:40',
-      '18:40+',
-    ])
+  it('buildSchedule emits no null roundIndex values', () => {
+    expect(schedule.filter((b) => b.roundIndex === null)).toEqual([])
   })
 
-  it('makes roundView() throw on it', () => {
+  it('keeps roundView() illegal until the first gate closes round 0', () => {
     const r = rig(real)
     expect(r.driver.current().clock).toBe('18:38')
     expect(() => r.driver.roundView()).toThrow(BeatPhaseError)
@@ -130,20 +125,22 @@ describe('[e3#A6] a beat before the first gate belongs to no round', () => {
     expect(() => r.driver.roundView()).toThrow(BeatPhaseError)
   })
 
-  it('emits no report step before the first gate', () => {
+  it('emits round 0 report at G1, not before it', () => {
     const r = rig(real)
+    while (r.driver.current().clock !== '18:41') {
+      r.driver.applyBeatEffects()
+      expect(r.driver.steps().filter((s) => s.kind === 'report')).toHaveLength(0)
+      expect(r.driver.advance()).toBe(true)
+    }
+    r.driver.submitStance({ stance: r.schedule[r.driver.current().index]!.gate!.defaultStance, utterance: 'u' })
     r.driver.applyBeatEffects()
-    expect(r.driver.steps().filter((s) => s.kind === 'report')).toHaveLength(0)
-    r.driver.advance()
-    r.driver.advance()
-    r.driver.advance()
-    r.driver.advance()
-    expect(r.driver.current().clock).toBe('18:41')
-    expect(r.driver.steps().filter((s) => s.kind === 'report')).toHaveLength(0)
+    expect(r.driver.steps().filter((s) => s.kind === 'report')).toEqual([
+      { kind: 'report', beat: beatAt(schedule, '18:41').index, round: 0 },
+    ])
   })
 })
 
-describe('[e3#A7] round boundary = just before the next gate', () => {
+describe('[e3#A7] round boundary = the gate that judges it', () => {
   it('assigns the pinned tutorial round membership', () => {
     ROUNDS.forEach((round, i) => {
       expect(
@@ -151,7 +148,7 @@ describe('[e3#A7] round boundary = just before the next gate', () => {
         `round ${i}`,
       ).toEqual(round.clocks)
     })
-    expect(Math.max(...schedule.map((b) => b.roundIndex ?? -1))).toBe(2)
+    expect(Math.max(...schedule.map((b) => b.roundIndex ?? -1))).toBe(3)
   })
 
   it('marks exactly one isRoundLast beat per round, at the round s last clock', () => {
@@ -164,8 +161,8 @@ describe('[e3#A7] round boundary = just before the next gate', () => {
     const r = rig(real)
     driveAll(r)
     const reports = r.driver.steps().filter((s) => s.kind === 'report')
-    expect(reports).toHaveLength(3)
-    expect(reports.map((s) => (s as { round: number }).round)).toEqual([0, 1, 2])
+    expect(reports).toHaveLength(4)
+    expect(reports.map((s) => (s as { round: number }).round)).toEqual([0, 1, 2, 3])
     expect(reports.map((s) => s.beat)).toEqual(
       ROUNDS.map((round) => beatAt(schedule, round.clocks[round.clocks.length - 1]!).index),
     )

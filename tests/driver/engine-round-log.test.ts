@@ -14,7 +14,7 @@
 import { describe, it, expect } from 'vitest'
 import type { CallRequest } from '../../src/shared/contracts.ts'
 import { drain, makeRig, spyOn } from './engine-fixtures/rig.ts'
-import { scriptedRound } from './engine-fixtures/pack.ts'
+import { leadingScriptRun, scriptedRound } from './engine-fixtures/pack.ts'
 import { createFixtureProvider } from '../../src/transport/index.ts'
 
 const UTTERANCE = '기록을 남긴다.'
@@ -46,7 +46,7 @@ function echoingProvider() {
   })
 }
 
-async function run(): Promise<{ npcLines: string[]; experienced: string[] }> {
+async function run(): Promise<{ npcLines: string[]; experienced: string[][] }> {
   const transport = spyOn(echoingProvider())
   // Shaped, so the gate is asked and its utterance is the ECHOING one above.
   // Unshaped the gate takes x14's baseline path, whose line comes from the pack
@@ -60,20 +60,52 @@ async function run(): Promise<{ npcLines: string[]; experienced: string[] }> {
       ? [`${event.line.speaker}: ${event.line.text}`]
       : [],
   )
-  const reporter = transport.sent.find(
-    (request: CallRequest) => request.call_type === 'reporter',
-  )
-  const slots = (reporter?.slots ?? {}) as Record<string, unknown>
-  const experienced = (slots['EXPERIENCED'] ?? []) as string[]
+  const experienced = transport.sent
+    .filter((request: CallRequest) => request.call_type === 'reporter')
+    .map((request) => ((request.slots ?? {}) as Record<string, unknown>)['EXPERIENCED'] as string[])
   return { npcLines, experienced }
 }
 
 describe('[#116 G] EXPERIENCED is the timeline’s log, not a second one', () => {
+  it('(#254) round 0 carries the opening beats through G1, with gate radio before G1 narration', async () => {
+    const transport = spyOn(
+      createFixtureProvider({
+        judgment: {
+          inner_note: 'G1 판단을 먼저 남긴다.',
+          stance: 'hold',
+          because_referent: 'r',
+          because_block_ids: [],
+          rejected_stance: 'escalate',
+          rejected_reason: 'x',
+          utterance: 'G1 무전이 먼저 나간다.',
+        },
+        narration: {
+          event_lines: [
+            { id: 't0', text: '당직이 교대했다.' },
+            { id: 't1', text: '남측 관측소가 신호를 놓쳤다.' },
+          ],
+          timeline_entries: [],
+          npc_lines: [],
+        },
+      }),
+    )
+    await drain(makeRig({ shaped: true, pack: leadingScriptRun(), transport }))
+
+    const reporter = transport.sent.find((request) => request.call_type === 'reporter')
+    const experienced = ((reporter?.slots ?? {}) as Record<string, unknown>)['EXPERIENCED'] as string[]
+    expect(experienced).toEqual([
+      '당직이 교대했다.',
+      '[속내] G1 판단을 먼저 남긴다.',
+      '[무전] G1 무전이 먼저 나간다.',
+      '남측 관측소가 신호를 놓쳤다.',
+    ])
+  })
+
   it('(a) the gate beat’s echo is dropped from BOTH — the rule is on where it should be', async () => {
     const { npcLines, experienced } = await run()
     // c1 is present only on the gate beat, where the utterance is non-empty.
     expect(npcLines.filter((line) => line.startsWith('신고자: '))).toEqual([])
-    expect(experienced.filter((line) => line.startsWith('신고자: '))).toEqual([])
+    expect(experienced.flat().filter((line) => line.startsWith('신고자: '))).toEqual([])
   })
 
   it('(b) the script beat’s identical line reaches the timeline — no Call 1, no echo rule', async () => {
@@ -83,13 +115,13 @@ describe('[#116 G] EXPERIENCED is the timeline’s log, not a second one', () =>
 
   it('(c) …and the same line reaches EXPERIENCED. This is the regression.', async () => {
     const { experienced } = await run()
-    expect(experienced).toContain(`실장: ${UTTERANCE}`)
+    expect(experienced.flat()).toContain(`실장: ${UTTERANCE}`)
   })
 
   it('(d) every npc line the player was shown appears in the round’s log, in order', async () => {
     const { npcLines, experienced } = await run()
     expect(npcLines.length).toBeGreaterThan(0)
-    expect(experienced.filter((line) => npcLines.includes(line))).toEqual(npcLines)
+    expect(experienced.flat().filter((line) => npcLines.includes(line))).toEqual(npcLines)
   })
 
   it('(e) a well-formed run is unaffected — the ordinary fixture still agrees', async () => {
@@ -100,10 +132,9 @@ describe('[#116 G] EXPERIENCED is the timeline’s log, not a second one', () =>
         ? [`${event.line.speaker}: ${event.line.text}`]
         : [],
     )
-    const reporter = transport.sent.find((request) => request.call_type === 'reporter')
-    const experienced = ((reporter?.slots ?? {}) as Record<string, unknown>)[
-      'EXPERIENCED'
-    ] as string[]
+    const experienced = transport.sent
+      .filter((request) => request.call_type === 'reporter')
+      .flatMap((request) => ((request.slots ?? {}) as Record<string, unknown>)['EXPERIENCED'] as string[])
     expect(npcLines.length).toBeGreaterThan(0)
     expect(experienced.filter((line) => npcLines.includes(line))).toEqual(npcLines)
   })

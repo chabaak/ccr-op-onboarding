@@ -99,6 +99,6 @@ describe('[e3#A10] src/engine/beat never value-imports the state core', () => {
     r.driver.applyBeatEffects()
     expect(r.driver.roundView().EXPERIENCED.length).toBeGreaterThan(0)
     expect(r.assembler.log.map((e) => e.op)).toContain('experienced')
-    expect(r.assembler.log[0]!.args[0]).toBe(0)
+    expect(r.assembler.log[0]!.args[0]).toBe(1)
   })
 })

@@ -100,7 +100,7 @@ describe('[e7#A3] the round boundary', () => {
   it('(b) exactly one report per round', async () => {
     const events = await drain(makeRig({ pack: twoRounds() }))
     const rounds = events.flatMap((e) => (e.type === 'report' ? [e.round] : []))
-    expect(rounds).toEqual([0, 1])
+    expect(rounds).toEqual([0, 1, 2])
   })
 
   it('(b2) exactly one round_open cue per opened gate round', async () => {
@@ -112,7 +112,7 @@ describe('[e7#A3] the round boundary', () => {
     ])
   })
 
-  it('(c) a beat before the first gate owes no report (decision 10)', async () => {
+  it('(c) a beat before the first gate reports when G1 closes round 0', async () => {
     const events = await drain(makeRig({ shaped: true, pack: leadingScriptRun() }))
     const firstReport = events.findIndex((e) => e.type === 'report')
     const firstJudgment = events.findIndex((e) => e.type === 'waiting' && e.for === 'judgment')
@@ -120,9 +120,9 @@ describe('[e7#A3] the round boundary', () => {
     expect(firstReport).toBeGreaterThan(firstJudgment)
   })
 
-  it('(d) a run with no gate emits no report at all', async () => {
+  it('(d) a run with no gate still closes one gate-less round', async () => {
     const events = await drain(makeRig({ pack: gatelessRun() }))
-    expect(typesOf(events)).not.toContain('report')
+    expect(events.flatMap((e) => (e.type === 'report' ? [e.round] : []))).toEqual([0])
   })
 })
 
@@ -211,7 +211,7 @@ describe('[e7#A7] no view is held across a beat', () => {
       expect(entry.value).toBe(previous?.value)
       checked += 1
     })
-    expect(checked).toBe(2 + 4 + 2)
+    expect(checked).toBe(2 + 4 + 3)
   })
 
   it('(b) mutating a delivered view cannot reach the next beat’s payload', async () => {

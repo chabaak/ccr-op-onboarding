@@ -224,8 +224,8 @@ describe('the shipped pack plays its day to the end', () => {
         event,
       )
     })
-    // One report per gate: a gate is a round, and a round closes on a report.
-    expect(events.filter((event) => event.type === 'report')).toHaveLength(GATES.gates.length)
+    // One report per gate, plus the gate-less tail after the last gate.
+    expect(events.filter((event) => event.type === 'report')).toHaveLength(GATES.gates.length + 1)
   })
 
   it('(d) the day closes on a ledger, and an untouched day scores the authored baseline', async () => {

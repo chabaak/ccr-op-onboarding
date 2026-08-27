@@ -75,8 +75,9 @@ describe('[e7#A5] Call 1 fails', () => {
     // The `u` channel is minted from Call 1's utterance and from nothing else;
     // a substituted stance carries no line, so the radio row is absent.
     expect(feedLines(events).filter((line) => line.kind === 'radio')).toEqual([])
-    // …and the round still closed, which it could not have without a stance.
-    expect(events.filter((event) => event.type === 'report').length).toBe(1)
+    // …and both rounds still closed, which the gate round could not have done
+    // without a stance.
+    expect(events.filter((event) => event.type === 'report').length).toBe(2)
   })
 })
 
@@ -266,8 +267,8 @@ describe('[#97] Call 2 repairs imperfect event_lines instead of dropping the bea
     const reports = events.flatMap((event) => (event.type === 'report' ? [event] : []))
 
     expect(fallbacks(events).filter((event) => event.call === 3)).toEqual([])
-    expect(reports).toHaveLength(1)
-    expect(reports[0]!.facts.map((sentence) => sentence.text)).toEqual(
+    expect(reports).toHaveLength(2)
+    expect(reports.flatMap((report) => report.facts.map((sentence) => sentence.text))).toEqual(
       expect.arrayContaining(['남측 관측소가 신호를 놓쳤다.', '실장이 회선을 열었다.']),
     )
   })
@@ -276,7 +277,7 @@ describe('[#97] Call 2 repairs imperfect event_lines instead of dropping the bea
 describe('[e7#A5] Call 3 fails', () => {
   it('(a) one `fallback{call:3}` per round, inside that round’s report bracket', async () => {
     const events = await drain(makeRig({ shaped: true, pack: twoRounds(), transport: failingTransport('reporter') }))
-    expect(fallbacks(events).map((event) => event.call)).toEqual([3, 3])
+    expect(fallbacks(events).map((event) => event.call)).toEqual([3, 3, 3])
     const tokens = shape(events)
     const at = tokens.indexOf('fallback:3')
     expect(tokens.slice(at - 1, at + 3)).toEqual([
@@ -290,14 +291,14 @@ describe('[e7#A5] Call 3 fails', () => {
   it('(b) the run continues past a failed round report', async () => {
     const rig = makeRig({ shaped: true, pack: twoRounds(), transport: failingTransport('reporter') })
     expect(await rig.driver.step()).toBe(true)
-    // Beat 1 closes round 0 and its Call 3 fails; the run must not end there.
+    // Beat 0 closes round 0 and its Call 3 fails; the run must not end there.
     expect(await rig.driver.step()).toBe(true)
   })
 
   it('(c) `facts` are non-empty from the objective log and `report_body` is the substitute', async () => {
     const events = await drain(makeRig({ shaped: true, transport: failingTransport('reporter') }))
     const reports = events.flatMap((event) => (event.type === 'report' ? [event] : []))
-    expect(reports.length).toBe(1)
+    expect(reports.length).toBe(2)
     const report = reports[0]
     expect(report?.facts.length).toBeGreaterThan(0)
     // The objective log — assembled round events — not model output.
@@ -323,7 +324,7 @@ describe('[e7#A5] Call 3 fails', () => {
       }),
     )
     const reports = events.flatMap((event) => (event.type === 'report' ? [event] : []))
-    expect(reports.length).toBe(1)
+    expect(reports.length).toBe(2)
     const texts = reports[0]!.facts.map((sentence) => sentence.text)
 
     expect(texts.filter((text) => text.includes('SENTINEL-INNER-NOTE'))).toEqual([])
@@ -393,9 +394,9 @@ describe('[#116 D] a call that lands unusable is a fallback too', () => {
     const events = await drain(
       makeRig({ shaped: true, transport: unusableTransport('reporter', 'report_body') }),
     )
-    expect(fallbacks(events).map((event) => event.call)).toEqual([3])
+    expect(fallbacks(events).map((event) => event.call)).toEqual([3, 3])
     const reports = events.flatMap((event) => (event.type === 'report' ? [event] : []))
-    expect(reports.length).toBe(1)
+    expect(reports.length).toBe(2)
     expect(reports[0]!.report_body.length).toBeGreaterThan(0)
   })
 
@@ -411,12 +412,13 @@ describe('[#116 D] a call that lands unusable is a fallback too', () => {
 
     expect(
       recorder.log.filter((entry) => entry.name === 'engine.applyReport').map((entry) => entry.value),
-    ).toEqual([null])
+    ).toEqual([null, null])
     expect(fallbacks(events).filter((event) => event.call === 3)).toEqual([
+      { type: 'fallback', call: 3, code: UNUSABLE_PAYLOAD_CODE, beat: 0 },
       { type: 'fallback', call: 3, code: UNUSABLE_PAYLOAD_CODE, beat: 1 },
     ])
     const reports = events.flatMap((event) => (event.type === 'report' ? [event] : []))
-    expect(reports).toHaveLength(1)
+    expect(reports).toHaveLength(2)
     expect(reports[0]!.report_body.length).toBeGreaterThan(0)
   })
 
@@ -432,12 +434,13 @@ describe('[#116 D] a call that lands unusable is a fallback too', () => {
 
     expect(
       recorder.log.filter((entry) => entry.name === 'engine.applyReport').map((entry) => entry.value),
-    ).toEqual([null])
+    ).toEqual([null, null])
     expect(fallbacks(events).filter((event) => event.call === 3)).toEqual([
+      { type: 'fallback', call: 3, code: UNUSABLE_PAYLOAD_CODE, beat: 0 },
       { type: 'fallback', call: 3, code: UNUSABLE_PAYLOAD_CODE, beat: 1 },
     ])
     const reports = events.flatMap((event) => (event.type === 'report' ? [event] : []))
-    expect(reports).toHaveLength(1)
+    expect(reports).toHaveLength(2)
     expect(reports[0]!.report_body.length).toBeGreaterThan(0)
   })
 

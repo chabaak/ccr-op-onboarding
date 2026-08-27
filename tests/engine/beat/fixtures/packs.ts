@@ -232,7 +232,7 @@ export function nullEffectsPack(): BeatPack {
   return pack([ev('n1', '10:00', { effects: null, present: [{ char_id: 'c2', side: 'room' }] })])
 }
 
-// ── A8 / D8 · one gate + one trailing script beat = one whole round ─────────
+// ── A8 / D8 · one gate round + one trailing gate-less round ─────────────────
 export function roundPack(): BeatPack {
   return pack(
     [
@@ -244,7 +244,7 @@ export function roundPack(): BeatPack {
 }
 
 // ── A9 · line windowing ─────────────────────────────────────────────────────
-/** `n` script beats at 01:00, 02:00, … — no gates, so no rounds and no reports. */
+/** `n` script beats at 01:00, 02:00, … — no gates, so one gate-less round. */
 export function linesPack(n: number): BeatPack {
   const events: Ev[] = []
   for (let i = 0; i < n; i += 1) {

@@ -28,10 +28,11 @@
 //
 // So the ARRIVING document waits for the paper: `shell/feed-reach.ts` publishes
 // where the fanfold has got to, and `afterPaper` below holds each report until
-// the feed has opened the next gate. The final round has no next gate, so it
-// waits for the `score` cue instead; the record's count-up waits for that same
-// score because the fanfold mints the run divider there and the two surfaces
-// mark one boundary.
+// the feed has printed the report event itself. Under issue 254 the report belongs at
+// the gate that closed its own round; the final gate-less tail has no gate cue
+// either, but it still has the same report cue. The record's count-up keeps
+// waiting for `score` because the fanfold mints the run divider there and the two
+// surfaces mark one boundary.
 //
 // NOTHING ELSE WAITS. A report already in the archive, one the operator picks
 // off the rail, a document redrawn because the rail reconciled — all of them
@@ -109,9 +110,6 @@ export function mount(host: HTMLElement, driver: FixtureDriver): void {
   const scored = new Set<number>()
   const visibleScores = new Map<number, number>()
   type ReportEvent = Extract<ViewEvent, { type: 'report' }>
-  type PendingReport = { sitting: number; event: ReportEvent }
-  const openedRounds = new Map<number, Set<number>>()
-  const pendingReports = new Map<string, PendingReport>()
 
   const marks = (): MarkSets => deriveMarks(driver.store(), carried)
 
@@ -119,7 +117,7 @@ export function mount(host: HTMLElement, driver: FixtureDriver): void {
    * x12 — the arrival queue: land `work` once the fanfold has printed its way to
    * `cue`, and never out of turn.
    *
-   * A CHAIN AND NOT A BARE `await`, because a day files seven reports and the
+   * A CHAIN AND NOT A BARE `await`, because a day files multiple reports and the
    * document ACCUMULATES: `accumulated(held, slice)` folds each round onto the
    * one before it and `view.append` grows the page in place, so two rounds that
    * landed in the wrong order would file the day's text out of sequence and
@@ -146,17 +144,6 @@ export function mount(host: HTMLElement, driver: FixtureDriver): void {
         console.error('the document behind the paper never landed', cause)
       })
   }
-
-  const pendingKey = (sitting: number, round: number): string => `${sitting}:${round}`
-
-  const noteGateOpened = (sitting: number, round: number): void => {
-    const opened = openedRounds.get(sitting) ?? new Set<number>()
-    opened.add(round)
-    openedRounds.set(sitting, opened)
-  }
-
-  const hasGateOpened = (sitting: number, round: number): boolean =>
-    openedRounds.get(sitting)?.has(round) ?? false
 
   /**
    * Is the desk holding the tear right now?
@@ -374,23 +361,6 @@ export function mount(host: HTMLElement, driver: FixtureDriver): void {
     sync()
   }
 
-  function releasePendingReport(sitting: number, round: number, cue: FeedCue): void {
-    const key = pendingKey(sitting, round)
-    const pending = pendingReports.get(key)
-    if (pending === undefined) return
-    pendingReports.delete(key)
-    afterPaper(cue, () => fileReport(pending.sitting, pending.event))
-  }
-
-  function releasePendingReportsAtScore(sitting: number): void {
-    const pending = [...pendingReports.values()]
-      .filter((report) => report.sitting === sitting)
-      .sort((a, b) => a.event.round - b.event.round)
-    for (const report of pending) {
-      releasePendingReport(sitting, report.event.round, { at: 'score', run: sitting })
-    }
-  }
-
   driver.subscribe((event) => {
     if (event.type === 'meta') {
       archive = [...event.archive]
@@ -415,11 +385,6 @@ export function mount(host: HTMLElement, driver: FixtureDriver): void {
       return
     }
     if (event.type === 'round_open') {
-      const sitting = run
-      noteGateOpened(sitting, event.round)
-      if (event.round > 0) {
-        releasePendingReport(sitting, event.round - 1, { at: 'gate', run: sitting, round: event.round })
-      }
       return
     }
     if (event.type === 'score') {
@@ -430,7 +395,6 @@ export function mount(host: HTMLElement, driver: FixtureDriver): void {
       const sitting = run
       const tally = getScoreTally()
       scored.add(sitting)
-      releasePendingReportsAtScore(sitting)
       // The scored day takes the rail and the record mounts under it. Going
       // through `sync()` rather than straight to `mountRecord()` is what covers
       // a day that filed NO report (`?drill=tally-lapse`): without a rail
@@ -464,28 +428,18 @@ export function mount(host: HTMLElement, driver: FixtureDriver): void {
       return
     }
     if (event.type !== 'report') return
-    // W2 — the seam types `report` with a ROUND, and a live day has seven of
+    // W2 — the seam types `report` with a ROUND, and a live day has several of
     // them (`tests/driver/live-desk.test.ts:126`). The SITTING it belongs to is
     // the run `meta` last named; pairing the two here is what collapses seven
     // rail tabs into one accumulating document. A round is filed once — a
     // replayed stream must not double the day.
     //
-    // x12 — captured HERE and read inside the gate, because that is the pairing
-    // itself: the run the desk was on when the round arrived. The whole body
-    // below runs behind the paper, `rounds` and `filed` included — deliberately.
-    // Filing the round early and drawing it late would leave the two out of
-    // step, and a rail reconcile in between (a `meta` arriving, a tab pressed)
-    // reaches `drawDocument()`, which would then paint a round the fanfold has
-    // not printed the beats of — the gate defeated by the one path that does not
-    // go through it.
+    // issue 254 — captured HERE and released at this report's own paper cue. The
+    // report event now sits exactly after the beat that closed the round, so the
+    // feed publishing `{ at: 'report' }` is the moment the fanfold has printed
+    // everything the document describes.
     const sitting = run
-    pendingReports.set(pendingKey(sitting, event.round), { sitting, event })
-    const nextGate = event.round + 1
-    if (hasGateOpened(sitting, nextGate)) {
-      releasePendingReport(sitting, event.round, { at: 'gate', run: sitting, round: nextGate })
-    } else if (scored.has(sitting)) {
-      releasePendingReport(sitting, event.round, { at: 'score', run: sitting })
-    }
+    afterPaper({ at: 'report', run: sitting, round: event.round }, () => fileReport(sitting, event))
   })
 
   // The record's headline needs the pack's own end-of-day stamp — the ONE

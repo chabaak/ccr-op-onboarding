@@ -304,7 +304,7 @@ describe('[x12] the fanfold publishes where it has printed to', () => {
     // a seek, reduced motion, frozen animations, a halted desk and the
     // mount-time prefill all land the cues with the lines they belong to —
     // without any of those paths knowing the slot exists. Publish from `receive`
-    // instead and the gate opens on ARRIVAL, which is the bug; publish from the
+    // instead and the cue releases on ARRIVAL, which is the bug; publish from the
     // pump alone and every flush path strands whatever was waiting.
     const src = code(RUN_FEED_TS)
     const apply = block(src, 'const apply = ')
@@ -371,7 +371,7 @@ describe('[x12] the fanfold publishes where it has printed to', () => {
 /* ══ 4 — the waiters ══════════════════════════════════════════════════════ */
 
 describe('[x12] the arriving document waits for the paper', () => {
-  it('(a) the report that ARRIVES is gated, and the whole of it is', () => {
+  it('(a) the report that ARRIVES is gated on its own paper cue, and the whole of it is', () => {
     // Filing the round early and drawing it late would leave the two out of
     // step, and a rail reconcile in between reaches `drawDocument()` — which
     // would paint a round the paper has not printed the beats of, defeating the
@@ -379,20 +379,19 @@ describe('[x12] the arriving document waits for the paper', () => {
     // inside the wait, not before it.
     const src = code(REPORTS_TS)
     expect(src, 'the arrival queue is gone').toMatch(/const afterPaper = /)
-    expect(src, 'arriving reports are no longer held until a release cue').toMatch(/pendingReports\.set/)
-    expect(src, 'the next gate no longer releases the previous report').toMatch(
+    expect(src, 'the old report queue came back').not.toMatch(/pendingReports\.set/)
+    expect(src, 'the next gate releases the previous report again').not.toMatch(
       /releasePendingReport\(\s*sitting,\s*event\.round - 1,\s*\{ at: 'gate'/,
     )
-    expect(src, 'the final report is not released at score').toMatch(/releasePendingReportsAtScore/)
+    expect(src, 'the final report is released at score again').not.toMatch(/releasePendingReportsAtScore/)
+    expect(src, 'arriving reports are not held on their own paper cue').toMatch(
+      /afterPaper\(\s*\{\s*at: 'report',\s*run: sitting,\s*round: event\.round\s*\}/,
+    )
     const gate = /function fileReport[\s\S]*?sync\(\)\n {2}\}/.exec(src)
     expect(gate, 'the report filing body is gone — re-aim this guard').not.toBeNull()
     for (const owned of ['rounds.set(', 'filed.set(', 'view.append(', 'sync()']) {
       expect(gate![0], `${owned} was lifted out of the wait`).toContain(owned)
     }
-    const release = /function releasePendingReport[\s\S]*?\n {2}\}/.exec(src)
-    expect(release, 'the pending report release path is gone').not.toBeNull()
-    expect(release![0], 'the arriving report is no longer gated on the paper').toMatch(/afterPaper\(\s*cue/)
-    expect(release![0], 'the gate no longer files the full report body').toMatch(/fileReport\(/)
   })
 
   it('(b) the terminal record opens on the event and COUNTS on the paper', () => {

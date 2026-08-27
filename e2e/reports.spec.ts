@@ -248,6 +248,27 @@ test.describe('report renders once after the last beat', () => {
     await expect(page.locator(`${FACTS} .rep-row`)).toHaveCount(0)
   })
 
+  test('report renders once after the last beat — the report waits for its own paper cue', async ({
+    page,
+  }) => {
+    const snapshot = await page.evaluate(() => {
+      const handle = (window as unknown as { __shell?: { drain(): void; frame(): unknown } }).__shell
+      if (!handle) throw new Error('window.__shell is not exposed by the shell boot')
+      handle.drain()
+      return {
+        frame: handle.frame() as Frame,
+        facts: document.querySelectorAll('#w-rep #factsList .rep-row').length,
+        body: document.querySelectorAll('#w-rep #bodyList .sent').length,
+      }
+    })
+    expect(reportsOf(snapshot.frame).length, 'the stream emitted no report event, so the cue wait is vacuous').toBeGreaterThan(0)
+    expect(snapshot.facts, 'REPORTS filed facts before LIVE FEED reached the report cue').toBe(0)
+    expect(snapshot.body, 'REPORTS filed the body before LIVE FEED reached the report cue').toBe(0)
+
+    await flushFeed(page)
+    await expect(page.locator(`${FACTS} .rep-row, ${BODY} .sent`).first()).toBeVisible()
+  })
+
   /* x13 — 'the 검인 chop waits for the day to close' was here (민서, 08-10).
      It was the DOM half of a rule proved under node, and it held the case that
      used to stamp a blank sheet: reduced motion is on in this describe, so the

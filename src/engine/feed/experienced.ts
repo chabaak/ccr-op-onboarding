@@ -2,7 +2,7 @@
  * The round event assembler (contract-engine-composer §5) — the `EXPERIENCED`
  * slot Call 3 reads.
  *
- * Its input table has exactly three rows: the gate beat's `utterance` plus
+ * Its input table has exactly three rows: the round-closing gate's `utterance` plus
  * `inner_note`, every beat's Call 2 event lines and reaction entries
  * (post-drop), and authored script events only on the Call 2 fallback path.
  * Symptoms are **not** in that table and are excluded here.
@@ -10,8 +10,8 @@
  * This is the one place `inner_note` is allowed to be read. It reaches the
  * player only through the report; it never enters a `FeedLine`, never appears
  * on the timeline, and no other view exposes it (§8-5). The note sits
- * immediately **before** its beat's utterance, mirroring call contracts §3's
- * field order — deliberation, then the line that came out of it.
+ * immediately **before** its beat's utterance, and both sit before that beat's
+ * narration: Call 1 judges the gate before Call 2 describes the beat.
  *
  * Nothing here mints. `EXPERIENCED` is prose handed to a prompt, not sentences
  * the player can mine, so this module takes no allocator — which also keeps a
@@ -53,8 +53,8 @@ function assemble(round: RoundInput, audience: Audience): string[] {
   const out: string[] = []
 
   round.beats.forEach((beat, index) => {
-    // The gate belongs to the round, and it is decided once, at its beat.
-    if (index === 0) {
+    // The gate closes this round, and it is decided before its beat is narrated.
+    if (index === round.beats.length - 1) {
       if (audience === 'call3' && round.gate.inner_note !== '') {
         out.push(`${EXPERIENCED_PREFIX.INNER_NOTE}${round.gate.inner_note}`)
       }

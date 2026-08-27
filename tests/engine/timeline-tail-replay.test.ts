@@ -32,6 +32,6 @@ describe('timeline-tail replay safety net', () => {
     expect(engine.roundView().EXPERIENCED).toEqual(
       expect.arrayContaining(['실장이 회선을 열었다고 기록했다.', fresh]),
     )
-    expect(engine.roundView().EXPERIENCED.filter((line) => line === replay)).toHaveLength(1)
+    expect(engine.roundView().EXPERIENCED.filter((line) => line === replay)).toHaveLength(0)
   })
 })
