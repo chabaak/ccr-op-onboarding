@@ -35,7 +35,7 @@ export type ViewListener = (event: ViewEvent) => void
 export interface FixtureDriver {
   readonly clock: Clock
   /** Optional feed schedule, supplied by the active pack or fixture run. */
-  readonly feedGapClocks?: () => readonly string[]
+  readonly feedGapClocks?: (() => readonly string[]) | undefined
   /** Callsign series issued by the active pack before x7 run numbering is applied. */
   readonly callsignSeries: () => string
   subscribe(listener: ViewListener): () => void

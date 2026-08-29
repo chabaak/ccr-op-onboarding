@@ -594,12 +594,14 @@ export function installAudio(deps: AudioDeps): AudioHandle {
     // says where the desk is.
     openTheRoom()
     if (deps.deskReady === undefined) openTheWatchWindow()
-    else void deps.deskReady.then(openTheWatchWindow)
+    else deps.deskReady.then(openTheWatchWindow).catch(() => undefined)
     const reports = deps.root.querySelector('#w-rep .rep-grid')
     if (reports !== null) typing.observe(reports, { subtree: true, characterData: true })
   }
 
-  const kick = (): void => void unlock()
+  const kick = (): void => {
+    unlock().catch(() => undefined)
+  }
   document.addEventListener('pointerdown', kick, true)
   document.addEventListener('keydown', kick, true)
   teardown.push(() => {

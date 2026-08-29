@@ -39,7 +39,7 @@ export type RunLoopDeps = {
   store: MetaStore
   packSlug: string
   /** Defaults to `DEFAULT_TOTAL_RUNS`. Config — never persisted. */
-  totalRuns?: number
+  totalRuns?: number | undefined
 }
 
 /** What a caller needs to open a run: its number, its carry-over, its depth. */

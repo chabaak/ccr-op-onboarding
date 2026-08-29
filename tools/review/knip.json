@@ -1,0 +1,27 @@
+{
+  "$schema": "https://unpkg.com/knip@5/schema.json",
+  "entry": [
+    "../../src/client/main.ts",
+    "../../src/client/debug/index.ts",
+    "../../proxy/src/handler.ts",
+    "../../tools/**/*.mjs",
+    "../../authoring/**/*.mjs",
+    "../../tests/**/*.ts",
+    "../../e2e/**/*.spec.ts",
+    "../../proxy/tests/**/*.ts"
+  ],
+  "project": [
+    "../../src/**/*.ts",
+    "../../proxy/src/**/*.ts"
+  ],
+  "ignore": [
+    "**/*.d.ts",
+    "proxy/src/prompt-bundle.generated.ts"
+  ],
+  "ignoreDependencies": [
+    "vite",
+    "vitest",
+    "playwright"
+  ],
+  "includeEntryExports": true
+}

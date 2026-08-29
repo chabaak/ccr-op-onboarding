@@ -504,7 +504,7 @@ export function createLiveAdapter(deps: LiveAdapterDeps): FixtureDriver {
           }
           return REFUSED
         }
-        void rebuild()
+        rebuild().catch(() => undefined)
       }
       return { ok: true }
     },

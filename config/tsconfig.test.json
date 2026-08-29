@@ -4,11 +4,18 @@
    * product build and stays untouched; this config adds Node globals for the
    * structural suites and the two runner configs. No `paths` — the repo resolves
    * by relative specifier everywhere (AGENTS.md design constraints).
+   *
+   * `noUncheckedIndexedAccess` is deliberately OFF here while ON for `src`. A
+   * bad index in shipped code is a blank desk; in a test it is a failed test,
+   * which is the assertion the test already exists to make. Turning it on adds
+   * ~37 `!` marks to fixtures and buys nothing. `exactOptionalPropertyTypes`
+   * stays ON — those findings were real shape mismatches.
    */
   "extends": "../tsconfig.json",
   "compilerOptions": {
     "types": ["node", "vite/client"],
-    "esModuleInterop": true
+    "esModuleInterop": true,
+    "noUncheckedIndexedAccess": false
   },
   "include": ["../tests", "../e2e", "vitest.config.ts", "playwright.config.ts"]
 }

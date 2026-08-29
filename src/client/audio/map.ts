@@ -149,7 +149,7 @@ export function validateAudioMap(raw: unknown): { map: AudioMap } | { error: str
       files: files as string[],
       bus: def.bus,
       gain: def.gain,
-      cooldownMs: typeof def.cooldownMs === 'number' ? def.cooldownMs : undefined,
+      ...(typeof def.cooldownMs === 'number' ? { cooldownMs: def.cooldownMs } : {}),
       loop: def.loop === true,
     })
   }

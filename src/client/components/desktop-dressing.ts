@@ -42,12 +42,13 @@ export function revealDesk(body: HTMLElement, windows: readonly HTMLElement[]): 
           .filter((a) => a.effect?.getComputedTiming().iterations !== Infinity)
           .map((a) => a.finished),
       )
-      void Promise.all(settled)
+      Promise.all(settled)
         .catch(() => undefined)
         .then(() => {
           body.classList.remove('booting')
           resolve()
         })
+        .catch(() => undefined)
     })
   })
 }

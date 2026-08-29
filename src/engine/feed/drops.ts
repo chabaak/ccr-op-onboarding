@@ -43,8 +43,7 @@ export function classifyNpcLines(
   const drops: DropRecord[] = []
   const echo = collapse(ctx.utterance)
 
-  for (let index = 0; index < raw.length; index += 1) {
-    const line = raw[index]
+  for (const [index, line] of raw.entries()) {
     const drop = (reason: DropReason): void => {
       drops.push({ raw: line, reason, index })
     }
@@ -56,8 +55,8 @@ export function classifyNpcLines(
       continue
     }
 
-    const speakerId = parsed[1]
-    const text = parsed[2].trim()
+    const speakerId = parsed[1]!
+    const text = parsed[2]!.trim()
 
     const speaker = ctx.present.find((npc) => npc.id === speakerId)
     if (!speaker) {

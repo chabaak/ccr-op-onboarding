@@ -24,11 +24,11 @@ interface StoragePort {
 }
 
 export interface ScenarioSessionOptions {
-  storage?: StoragePort | null
+  storage?: StoragePort | null | undefined
 }
 
 export interface ScenarioSwitchOptions extends ScenarioSessionOptions {
-  reload?: () => void
+  reload?: (() => void) | undefined
 }
 
 export type EntryState = 'door' | 'select' | 'desk'

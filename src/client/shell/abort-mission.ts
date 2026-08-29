@@ -41,12 +41,14 @@ export function installAbortMissionControl(deps: AbortMissionDeps): HTMLButtonEl
   control.setAttribute('aria-label', '현재 시행 중단')
   control.addEventListener('click', () => {
     control.disabled = true
-    void confirmAbortMission({
+    confirmAbortMission({
       app: deps.app,
       returnToDesktop: deps.returnToDesktop,
-    }).finally(() => {
-      if (control.isConnected) control.disabled = false
     })
+      .finally(() => {
+        if (control.isConnected) control.disabled = false
+      })
+      .catch(() => undefined)
   })
   deps.taskbar.append(control)
   return control

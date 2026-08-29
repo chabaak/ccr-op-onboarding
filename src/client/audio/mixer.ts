@@ -103,14 +103,15 @@ export function createMixer(deps: MixerDeps): AudioMixer {
   })()
   // Neither later wave is awaited by `ready`: a bed that arrives late fades in
   // late, and nothing upstream should block on it.
-  void ready
+  ready
     .then(() => Promise.all(rest.map(load)))
     .then(() => Promise.all(beds.map(load)))
     .then(() => {
-    // A slot asked for before its bed finished decoding is honoured now.
-    // Placeholders only: a slot whose source is already playing is left alone.
-    for (const [slot, entry] of [...held]) if (entry.source === null) reHold(slot, entry.cue)
-  })
+      // A slot asked for before its bed finished decoding is honoured now.
+      // Placeholders only: a slot whose source is already playing is left alone.
+      for (const [slot, entry] of [...held]) if (entry.source === null) reHold(slot, entry.cue)
+    })
+    .catch(() => undefined)
 
   /** Picks a variation that is not the one played last — never twice running. */
   function pick(cueId: string, files: readonly string[]): string | null {
@@ -209,13 +210,13 @@ export function createMixer(deps: MixerDeps): AudioMixer {
       master.gain.setValueAtTime(master.gain.value, at)
       master.gain.linearRampToValueAtTime(next ? 0 : 1, at + 0.12)
       // Suspending while muted stops the loops burning cycles for nothing.
-      if (next) void ctx.suspend()
-      else void ctx.resume()
+      if (next) ctx.suspend().catch(() => undefined)
+      else ctx.resume().catch(() => undefined)
     },
     dispose() {
       disposed = true
       for (const slot of [...held.keys()]) release(slot)
-      void ctx.close()
+      ctx.close().catch(() => undefined)
     },
   }
 }

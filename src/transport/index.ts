@@ -92,7 +92,7 @@ export interface Transport {
 
 export type TransportDeps = {
   /** `<PROXY_BASE_URL>` — contract-calls §11's endpoint configuration. */
-  baseUrl?: string | null
+  baseUrl?: string | null | undefined
   /** A pre-built request function; wins over `fetch` when both are given. */
   request?: TransportRequestFn
   /** A raw `FetchLike`, adapted into a request function via `createHttpRequestFn`. */
