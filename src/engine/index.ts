@@ -128,7 +128,7 @@ export type EnginePack = BeatPack & { symptoms: Symptoms }
  */
 export type EngineDeps = {
   pack: EnginePack
-  run?: number
+  run?: number | undefined
 }
 
 export interface Engine {

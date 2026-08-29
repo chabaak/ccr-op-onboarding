@@ -37,7 +37,7 @@ function context(): AudioContext | null {
       if (Ctor === undefined) return null
       ctx = new Ctor()
     }
-    if (ctx.state === 'suspended') void ctx.resume()
+    if (ctx.state === 'suspended') ctx.resume().catch(() => undefined)
     return ctx.state === 'running' ? ctx : null
   } catch {
     return null

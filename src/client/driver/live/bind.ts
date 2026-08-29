@@ -39,7 +39,7 @@ export type BindDeps = {
    * One live sitting's transport. Reused across bound runs so its request cache
    * spans the sitting.
    */
-  transport?: Transport
+  transport?: Transport | undefined
 }
 
 export type OpenRunDeps = {

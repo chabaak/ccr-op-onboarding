@@ -1,0 +1,20 @@
+{
+  "name": "@nan2026/review",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "description": "Deterministic review layer: type-aware lint and dead-export analysis. Outside the root install by design, the same way proxy/ is (physical architecture \u00a73.3) \u2014 the root tree keeps zero runtime deps and the frozen devDependency set that `A8 \u2014 no new dependency` asserts.",
+  "engines": {
+    "node": ">=22"
+  },
+  "scripts": {
+    "lint": "eslint --config eslint.config.js",
+    "dead": "knip --config knip.json"
+  },
+  "devDependencies": {
+    "eslint": "^10.9.1",
+    "knip": "^6.33.0",
+    "typescript": "~6.0.2",
+    "typescript-eslint": "^8.68.0"
+  }
+}

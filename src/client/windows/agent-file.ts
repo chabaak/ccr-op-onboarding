@@ -385,12 +385,14 @@ export function mount(host: HTMLElement, driver: FixtureDriver): void {
   function watchPaper(): void {
     if (!closed || paperWatch || feedPending() === 0) return
     paperWatch = true
-    void feedDrained().then(() => {
-      paperWatch = false
-      if (!closed) return
-      settle()
-      sync()
-    })
+    feedDrained()
+      .then(() => {
+        paperWatch = false
+        if (!closed) return
+        settle()
+        sync()
+      })
+      .catch(() => undefined)
   }
 
   /**
@@ -513,9 +515,11 @@ export function mount(host: HTMLElement, driver: FixtureDriver): void {
     // blank until the press names it, so on the first press there was no name
     // to agree with. The question asks whether the HANDOVER is finished; the
     // file is what says who carries it.
-    void openConfirm(must('#app'), deployCopy()).then((confirmed) => {
-      if (confirmed) commitFile(mode)
-    })
+    openConfirm(must('#app'), deployCopy())
+      .then((confirmed) => {
+        if (confirmed) commitFile(mode)
+      })
+      .catch(() => undefined)
   })
   const stamp = buildDeployStamp()
   // Direct handles onto the control's own note and button, exactly as

@@ -134,9 +134,9 @@ export type LiveDriverDeps = DriverDeps & {
   transport: TransportPort
   /** The store the composer was constructed with — pass the same instance. */
   blocks?: MutableBlockStore
-  scorer?: ScorerPort
+  scorer?: ScorerPort | undefined
   /** The run number `run_end` carries. Defaults to 1. */
-  run?: number
+  run?: number | undefined
 }
 
 export interface LiveDriver {

@@ -76,7 +76,7 @@ const isStringArray = (value: unknown): value is string[] =>
 function stamp(value: unknown, field: string): string {
   if (typeof value === 'string') {
     const match = /^(\d{1,2}:\d{2})\+?$/.exec(value.trim())
-    if (match) return match[1].padStart(5, '0')
+    if (match) return match[1]!.padStart(5, '0')
   }
   throw new Error(`scenario pack: meta.json '${field}' is not an "HH:MM" stamp`)
 }

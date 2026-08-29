@@ -266,7 +266,7 @@ export function installScenarioDesktop(deps: ScenarioDesktopDeps): ScenarioDeskt
 
   function openFile(entry: ScenarioPackEntry, node: HTMLButtonElement): void {
     node.disabled = true
-    void (async () => {
+    ;(async () => {
       try {
         const startable = await scenarioStartCheck(entry)
         if (!startable.ok) {
@@ -295,7 +295,7 @@ export function installScenarioDesktop(deps: ScenarioDesktopDeps): ScenarioDeskt
       } finally {
         node.disabled = false
       }
-    })()
+    })().catch(() => undefined)
   }
 
   function render(): void {
